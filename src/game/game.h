@@ -2,7 +2,8 @@
 
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
-
+#include "../level/Level/level.h"
+#include "vector"
 class Game
 {
 public:
@@ -11,11 +12,16 @@ public:
     void setWindow(sf::RenderWindow *window);
     void start();
     void run();
+    Level* getLevel();
+    void setLevel(Level *level);
+    
 
 private:
     sf::RenderWindow *window;
+    Level * level;
     bool running = false;
-    //sf::Thread m_thread;
     void render();
     void tick();
+
+    
 };

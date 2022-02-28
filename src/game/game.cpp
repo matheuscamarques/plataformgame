@@ -1,16 +1,29 @@
+#include <iostream>
 #include "./game.h"
 #include "../window/window.h"
 
 
+
 void Game::main()
 {
-    new Window(800, 600, "Game", new Game());
+    auto game = new Game();
+    auto level = new Level();
+    for(auto i =0; i< level->getM();i++){
+        for(auto j=0;j<level->getN(); j++){
+            auto value = level->map[i][j];
+            std::cout << value << " ";
+        }
+        std::cout << std::endl;
+    }
+    game->setLevel(level);
+    new Window(800, 800, "Game", game);
 }
 
-void Game::setWindow(sf::RenderWindow *cwindow)
+void Game::setWindow(sf::RenderWindow *window)
 {
-    window = cwindow;
+    this->window = window;
 }
+
 void Game::start()
 {
     if (running)
@@ -33,7 +46,7 @@ void Game::run()
 
     while (running && window->isOpen())
     {   
-        sf::Event event;
+        sf::Event event{};
         while (window->pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
@@ -41,7 +54,7 @@ void Game::run()
         }
 
         long long now = sf::Clock().getElapsedTime().asMicroseconds();
-        delta += (now - lastTime) / ns;
+        delta += (double(now - lastTime) / ns);
         lastTime = now;
         while (delta >= 1)
         {
@@ -63,12 +76,19 @@ void Game::run()
 }
 
 void Game::render()
-{
-    window->clear();
+{   
+    window->clear(sf::Color::Black);
     //////////// DRAWER
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
-    window->draw(shape);
+    Level * plevel = getLevel();
+    std::vector<Entity> * list = plevel->getPlatforms();
+    auto p = list->begin();
+    while ( p != this->level->getPlatforms()->end() )
+    {
+        p->draw(window);
+        p->update();
+        p++;
+    }
+
 
     /////////////////////////
     window->display();
@@ -81,4 +101,12 @@ void Game::tick(){
 
 Game::Game() 
 {
+}
+
+Level* Game::getLevel() {
+    return this->level;
+}
+
+void Game::setLevel(Level *level) {
+    this->level = level;
 }

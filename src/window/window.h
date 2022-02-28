@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "../game/game.h"
-
+#include <SFML/OpenGL.hpp>
 class Window
 {
 public:
