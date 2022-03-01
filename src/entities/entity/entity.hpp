@@ -30,10 +30,10 @@
         void setH(float h);
         void setGravity(float g);
         
-        sf::FloatRect getBoundsBottom();
-        sf::FloatRect getBoundsTop();
-        sf::FloatRect getBoundsLeft();
-        sf::FloatRect getBoundsRight();
+        // sf::FloatRect getBoundsBottom();
+        // sf::FloatRect getBoundsTop();
+        // sf::FloatRect getBoundsLeft();
+        // sf::FloatRect getBoundsRight();
 
     private:
         float x;

@@ -15,8 +15,7 @@ clear:
 	mkdir compiled/
 	mkdir build/
 start:
+	make
 	./build/plataformer
-watch-build:
-	watch -n 10 make
-watch-start:
-	watch -n 10 ./build/plataformer
+watch:
+	watch -n 10 make all

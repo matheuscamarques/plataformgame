@@ -51,7 +51,15 @@ void Game::run()
         {
             if (event.type == sf::Event::Closed)
                 window->close();
+
+            if (event.type == sf::Event::Resized) {
+                // update the view to the new size of the window
+                sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
+                window->setView(sf::View(visibleArea));
+            }
         }
+
+
 
         long long now = sf::Clock().getElapsedTime().asMicroseconds();
         delta += (double(now - lastTime) / ns);
@@ -77,10 +85,8 @@ void Game::run()
 
 void Game::render()
 {   
-    window->clear(sf::Color::Black);
-    //////////// DRAWER
-    Level * plevel = getLevel();
-    std::vector<Entity> * list = plevel->getPlatforms();
+    window->clear(sf::Color(135, 206, 235));
+    std::vector<Entity> * list = getLevel()->getPlatforms();
     auto p = list->begin();
     while ( p != this->level->getPlatforms()->end() )
     {
@@ -88,9 +94,6 @@ void Game::render()
         p->update();
         p++;
     }
-
-
-    /////////////////////////
     window->display();
 }
 
