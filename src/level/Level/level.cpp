@@ -3,7 +3,7 @@
 //
 
 #include "level.h"
-#define BLOCK_SIZE 40
+#define BLOCK_SIZE 50
 
 Level::Level()
 {

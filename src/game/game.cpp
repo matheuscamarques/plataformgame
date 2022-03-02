@@ -91,7 +91,7 @@ void Game::render()
     while ( p != this->level->getPlatforms()->end() )
     {
         p->draw(window);
-        p->update();
+        p->tick();
         p++;
     }
     window->display();

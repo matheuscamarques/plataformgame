@@ -4,13 +4,14 @@
 #include <SFML/Window.hpp>
 #include <SFML/OpenGL.hpp>
 #include <map>
+#include "../../component/component.h"
 
- class Entity : public sf::RectangleShape
+class Entity : public Component
 {
     public:
         Entity(float x, float y, float w, float h);
 
-        void update();
+        void tick();
         void draw(sf::RenderWindow *window);
         
         //bool  isColide(Entity &entity);
@@ -29,11 +30,11 @@
         void setW(float w);
         void setH(float h);
         void setGravity(float g);
-        
-        // sf::FloatRect getBoundsBottom();
-        // sf::FloatRect getBoundsTop();
-        // sf::FloatRect getBoundsLeft();
-        // sf::FloatRect getBoundsRight();
+
+        Component getBoundsBottom();
+        Component getBoundsTop();
+        Component getBoundsLeft();
+        Component getBoundsRight();
 
     private:
         float x;
@@ -43,7 +44,7 @@
         float vy;
         float h;
         float gravity;
-        std::map<std::string,sf::FloatRect> bounds;
+        std::map<std::string,Component> bounds;
 
     private:
 
