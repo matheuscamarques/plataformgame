@@ -1,33 +1,34 @@
 
 #include "./entity.hpp"
 
-Entity::Entity(float x, float y, float w, float h) : Component(sf::Vector2f(x, y), sf::Vector2f(w, h))
-{
+
+Entity::Entity(const char* name,float x, float y, float w, float h) : Component(sf::Vector2f(x, y), sf::Vector2f(w, h)){
+    this->name = name;
     this->x = x;
     this->y = y;
     this->w = w;
     this->h = h;
     this->vx = 0;
     this->vy = 0;
-    this->gravity = 0.5;
+    this->gravity = 0.0;
     this->bounds = std::map<std::string, Component>();
 
-    this->bounds["bottom"] = Component(x + (w / 2) - ((w / 2) / 2), y + (h / 2), w / 2, h / 2);
+    this->bounds["bottom"] = Component(x + (w / 3) - ((w / 3) / 2), y + (h / 2), w / 3, h / 2);
     this->bounds["bottom"].setFillColor(sf::Color::Transparent);
     this->bounds["bottom"].setOutlineColor(sf::Color::Green);
     this->bounds["bottom"].setOutlineThickness(1);
 
-    this->bounds["top"] = Component(x + (w / 2) - ((w / 2) / 2), y, w / 2, h / 2);
+    this->bounds["top"] = Component(x + (w / 2) - ((w / 2) / 2), y, w / 3, h / 2);
     this->bounds["top"].setFillColor(sf::Color::Transparent);
     this->bounds["top"].setOutlineColor(sf::Color::Green);
     this->bounds["top"].setOutlineThickness(1);
 
-    this->bounds["left"] = Component(x, y + 5, 5, h - 15);
+    this->bounds["left"] = Component(x,y,w*0.2f,h-(h*0.2f));
     this->bounds["left"].setFillColor(sf::Color::Transparent);
     this->bounds["left"].setOutlineColor(sf::Color::Green);
     this->bounds["left"].setOutlineThickness(1);
 
-    this->bounds["right"] = Component(x + w - 5, y + 5, 5, h - 15);
+    this->bounds["right"] = Component(x,y,w*0.20f,h-(h*0.2f));
     this->bounds["right"].setFillColor(sf::Color::Transparent);
     this->bounds["right"].setOutlineColor(sf::Color::Green);
     this->bounds["right"].setOutlineThickness(1);
@@ -35,18 +36,24 @@ Entity::Entity(float x, float y, float w, float h) : Component(sf::Vector2f(x, y
     this->setPosition(x, y);
 }
 
+
+
 void Entity::tick()
 {
-    setX(this->x + this->vx);
-    setY(this->y + this->vy);
-    this->setPosition(this->x, this->y);
+    setX(getX() + getVx());
+    setY(getY() + getVy());
+    this->left = getX();
+    this->top  = getY();
+    this->setPosition(getX(), getY());
 }
 
 void Entity::draw(sf::RenderWindow *window)
 {
     window->draw(*this);
-    for (auto &b : this->bounds) window->draw(b.second);
-    
+    window->draw(this->getBoundsBottom());
+    window->draw(this->getBoundsTop());
+    window->draw(this->getBoundsLeft());
+    window->draw(this->getBoundsRight());
 }
 
 float Entity::getX()
@@ -70,13 +77,22 @@ float Entity::getGravity()
     return this->gravity;
 }
 
+const char* Entity::getName()
+{
+    return name;
+}
+
 void Entity::setX(float x)
 {
     this->x = x;
+    this->left = x;
+    setPosition(x, getY());
 }
 void Entity::setY(float y)
 {
     this->y = y;
+    this->top = y;
+    setPosition(getX(), y);
 }
 void Entity::setW(float w)
 {
@@ -93,30 +109,35 @@ void Entity::setGravity(float g)
 
 Component Entity::getBoundsBottom()
 {
-    this->bounds["bottom"].left = this->x + (this->w / 2) - ((this->w / 2) / 2);
+    this->bounds["bottom"].setPosition(this->x + (this->w / 2) - ((this->w / 2) / 3), this->y + (this->h / 2));
     this->bounds["bottom"].top = this->y + (this->h / 2);
+    this->bounds["bottom"].left = this->x + (this->w / 2) - ((this->w / 2) / 3);
     return this->bounds["bottom"];
 }
 Component Entity::getBoundsTop()
 {
-    this->bounds["top"].left = this->x + (this->w / 2) - ((this->w / 2) / 2);
+    this->bounds["top"].setPosition(this->x + (this->w / 2) - ((this->w / 2) / 3), this->y);
     this->bounds["top"].top = this->y;
+    this->bounds["top"].left = this->x + (this->w / 2) - ((this->w / 2) / 3);
     return this->bounds["top"];
 }
 
 Component Entity::getBoundsLeft()
 {
+    this->bounds["left"].setPosition(x,y+h*0.1f);
+    this->bounds["left"].top = this->y + h*0.1f;
     this->bounds["left"].left = this->x;
-    this->bounds["left"].top = this->y + 5;
     return this->bounds["left"];
 }
 
 Component Entity::getBoundsRight()
 {
-    this->bounds["right"].left = this->x + this->w - 5;
-    this->bounds["right"].top = this->y + 5;
+    this->bounds["right"].setPosition(x+w-w*0.2f,y+h*0.1f);
+    this->bounds["right"].top = y+h*0.1f;
+    this->bounds["right"].left = x+w-w*0.2f;
     return this->bounds["right"];
 }
+
 
 float Entity::getVx()
 {
@@ -135,5 +156,9 @@ void Entity::setVx(float xx)
 
 void Entity::setVy(float vy)
 {
-    this->vy = vy;
+    this->vy = vy ;
+}
+
+std::map<std::string, Component> Entity::getBounds() {
+    return this->bounds;
 }

@@ -3,11 +3,13 @@
 //
 
 #include "level.h"
+#include<string.h>
 #define BLOCK_SIZE 50
 
 Level::Level()
 {
     this->platforms = new std::vector<Entity>();
+    this->colidesPlatforms = new std::vector<Entity>();
     this->enemies = new std::vector<Entity>();
     this->generateLevel();
 }
@@ -19,10 +21,7 @@ void Level::addPlatform(Entity platform)
 {
     this->platforms->push_back(platform);
 }
-void Level::addPlayer(Entity *player)
-{
-    this->player = player;
-}
+
 std::vector<Entity> *Level::getEnemies()
 {
     return this->enemies;
@@ -31,7 +30,7 @@ std::vector<Entity> *Level::getPlatforms()
 {
     return this->platforms;
 }
-Entity *Level::getPlayer()
+Player *Level::getPlayer()
 {
     return this->player;
 }
@@ -209,7 +208,7 @@ void Level::generateLevel()
                 continue;
             }
 
-            if (i > m / 2 )
+            if (i > m / 2)
             {
                 // set seed
                 float random = (float)rand() / (float)RAND_MAX;
@@ -242,72 +241,85 @@ void Level::generateLevel()
                 continue;
             }
         }
-        for (int i = 0; i < this->m; i++)
-        {
-            for (int j = 0; j < this->n; j++)
-            {
-                auto platform = Entity(j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+    }
 
-                if (this->map[i][j] == 1)
+    for (int i = 0; i < this->m; i++)
+    {
+        for (int j = 0; j < this->n; j++)
+        {
+            auto platform = Entity("colide", j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+
+            if (this->map[i][j] == 1)
+            {
+                platform.setFillColor(sf::Color(60, 60, 60));
+            }
+            else if (this->map[i][j] == 2)
+            {
+                platform.setFillColor(sf::Color(146, 90, 43));
+            }
+            else if (this->map[i][j] == 3)
+            {
+                platform.setFillColor(sf::Color(120, 60, 0));
+            }
+            else if (this->map[i][j] == 4)
+            {
+                platform.setFillColor(sf::Color(159, 89, 30));
+            }
+            else if (this->map[i][j] == 5)
+            {
+                platform.setFillColor(sf::Color(150, 75, 0));
+            }
+            if (this->map[i][j] != 0)
+            {
+                this->platforms->push_back(platform);
+            }
+        }
+    }
+
+    for (int i = 0; i < this->m; i++)
+    {
+        for (int j = 0; j < this->n; j++)
+        {
+            if (i > m / 2)
+            {
+                // search in plataforms if there is a platform
+                std::vector<Entity> *list = this->getPlatforms();
+                auto p = list->begin();
+                int isValid = 0;
+                while (p != this->getPlatforms()->end())
                 {
-                    platform.setFillColor(sf::Color(60, 60, 60));
+                    if ((int)p->getX() == j * BLOCK_SIZE && (int)p->getY() == i * BLOCK_SIZE)
+                    {
+                        isValid = 1;
+                    }
+                    p++;
                 }
-                else if (this->map[i][j] == 2)
+
+                if (isValid == 0)
                 {
-                    platform.setFillColor(sf::Color(146, 90, 43));
-                }
-                else if (this->map[i][j] == 3)
-                {
-                    platform.setFillColor(sf::Color(120, 60, 0));
-                }
-                else if (this->map[i][j] == 4)
-                {
-                    platform.setFillColor(sf::Color(159, 89, 30));
-                }
-                else if (this->map[i][j] == 5)
-                {
-                    platform.setFillColor(sf::Color(150, 75, 0));
-                }
-                if (this->map[i][j] != 0)
-                {
+                    auto platform = Entity("water", j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                    platform.setFillColor(sf::Color(0, 255, 255));
                     this->platforms->push_back(platform);
                 }
             }
         }
+    }
 
-        for (int i = 0; i < this->m; i++)
+    std::vector<Entity> *list = this->getPlatforms();
+    auto p = list->begin();
+    while (p != this->getPlatforms()->end())
+    {
+        if(!strcmp(p->getName(),"colide"))
         {
-            for (int j = 0; j < this->n; j++)
-            {
-                if (i > m / 2)
-                {
-                    // search in plataforms if there is a platform
-                    std::vector<Entity> *list = this->getPlatforms();
-                    auto p = list->begin();
-                    int isValid = 0;
-                    while (p != this->getPlatforms()->end())
-                    {
-                        if ((int)p->getX() == j * BLOCK_SIZE && (int)p->getY() == i * BLOCK_SIZE)
-                        {
-                            isValid = 1;
-                        }
-                        p++;
-                    }
-
-                    if (isValid == 0)
-                    {
-                        auto platform = Entity(j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-                        platform.setFillColor(sf::Color(0, 255, 255));
-                        this->platforms->push_back(platform);
-                    }
-                }
-
-                
-            }
+           colidesPlatforms->push_back(*p);
         }
 
-        
+        p++;
     }
+}
+
+std::vector<Entity> *  Level::getColidePlatforms(){
+    return colidesPlatforms;
 }
 
 int Level::getM()
@@ -318,4 +330,9 @@ int Level::getM()
 int Level::getN()
 {
     return this->n;
+}
+
+void Level::setPlayer(Player *pPlayer)
+{
+    this->player = pPlayer;
 }

@@ -2,9 +2,11 @@
 
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
-#include "../level/Level/level.h"
 #include "vector"
-class Game
+#include "../level/Level/level.h"
+#include "../camera/Camera.h"
+
+class Game : public Component
 {
 public:
     Game();
@@ -19,6 +21,7 @@ public:
 private:
     sf::RenderWindow *window;
     Level * level;
+    //sf::View *view;
     bool running = false;
     void render();
     void tick();

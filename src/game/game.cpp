@@ -1,26 +1,38 @@
 #include <iostream>
+#include <chrono>
 #include "./game.h"
 #include "../window/window.h"
+#include "../entities/player/player.h"
 
+Game::Game() : Component()
+{
+}
 
 
 void Game::main()
 {
     auto game = new Game();
+    //game->view = new sf::View(sf::FloatRect(0.f, 0.f, 1000.f, 600.f));
     auto level = new Level();
-    for(auto i =0; i< level->getM();i++){
-        for(auto j=0;j<level->getN(); j++){
-            auto value = level->map[i][j];
-            std::cout << value << " ";
-        }
-        std::cout << std::endl;
-    }
+    auto player = new Player();
+    level->setPlayer(player);
+    // for(auto i =0; i< level->getM();i++){
+    //     for(auto j=0;j<level->getN(); j++){
+    //         auto value = level->map[i][j];
+    //         std::cout << value << " ";
+    //     }
+    //     std::cout << std::endl;
+    // }
     game->setLevel(level);
     new Window(800, 800, "Game", game);
 }
 
 void Game::setWindow(sf::RenderWindow *window)
 {
+     setH(window->getSize().y);
+     setW(window->getSize().x);
+
+    //window->setView(*this->view);
     this->window = window;
 }
 
@@ -36,11 +48,12 @@ void Game::start()
 
 void Game::run()
 {
-    long long lastTime = sf::Clock().getElapsedTime().asMicroseconds();
-    double amountOfTicks = 30.0;
-    double ns = 1000000000 / amountOfTicks;
-    double delta = 0;
-    long long timer = sf::Clock().getElapsedTime().asMicroseconds();
+    // System nano time
+    auto lastTime = std::chrono::high_resolution_clock::now();
+    float amountOfTicks = 30.0;
+    float ns = 1000000000 / amountOfTicks;
+    float delta = 0;
+    auto timer = std::chrono::high_resolution_clock::now();
     int frames = 0;
     int updates = 0;
 
@@ -58,52 +71,70 @@ void Game::run()
                 window->setView(sf::View(visibleArea));
             }
         }
-
-
-
-        long long now = sf::Clock().getElapsedTime().asMicroseconds();
-        delta += (double(now - lastTime) / ns);
+        auto now = std::chrono::high_resolution_clock::now();
+        delta += std::chrono::duration_cast<std::chrono::nanoseconds>(now - lastTime).count();
         lastTime = now;
-        while (delta >= 1)
+        while (delta >= ns)
         {
             tick();
             updates++;
-            delta--;
+            delta -= ns;
         }
         render();
         frames++;
 
-        if (sf::Clock().getElapsedTime().asMicroseconds() - timer > 1000000)
+        if(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - timer).count() > 1)
         {
-            timer += 1000000;
+            timer = std::chrono::high_resolution_clock::now();
             //std::cout << "updates: " << updates << " frames: " << frames << std::endl;
             updates = 0;
             frames = 0;
         }
+
     }
 }
 
 void Game::render()
 {   
     window->clear(sf::Color(135, 206, 235));
+    //view->setCenter(level->getPlayer()->getX(), level->getPlayer()->getY());
+    auto view = window->getDefaultView();
+    view.move(level->getPlayer()->getX() - this->getW()/2,
+              level->getPlayer()->getY() - this->getH()/2);
+    //view.zoom(-10.0f);
+    window->setView(view);
     std::vector<Entity> * list = getLevel()->getPlatforms();
     auto p = list->begin();
     while ( p != this->level->getPlatforms()->end() )
     {
-        p->draw(window);
-        p->tick();
+        Entity entity = *p;
+        entity.draw(window);   
         p++;
     }
+
+    getLevel()->getPlayer()->draw(window);
     window->display();
 }
 
-void Game::tick(){
+void Game::tick() {
+    //std::cout << "tick" << std::endl;
+    getLevel()->getPlayer()->moveRight = sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
+    getLevel()->getPlayer()->moveUp    = sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
+    getLevel()->getPlayer()->moveDown  = sf::Keyboard::isKeyPressed(sf::Keyboard::Down);
+    getLevel()->getPlayer()->moveLeft  = sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
+    getLevel()->getPlayer()->runFast   = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
 
-}
+    getLevel()->getPlayer()->tick();
 
-
-Game::Game() 
-{
+    std::vector<Entity> * list = getLevel()->getColidePlatforms();
+    auto p = list->begin();
+    while ( p != this->level->getColidePlatforms()->end() )
+    {
+        Entity entity = *p;
+        entity.tick();
+        this->level->getPlayer()->collide(entity);
+        p++;
+    }
 }
 
 Level* Game::getLevel() {

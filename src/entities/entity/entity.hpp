@@ -9,7 +9,7 @@
 class Entity : public Component
 {
     public:
-        Entity(float x, float y, float w, float h);
+        Entity(const char* name,float x, float y, float w, float h);
 
         void tick();
         void draw(sf::RenderWindow *window);
@@ -35,7 +35,9 @@ class Entity : public Component
         Component getBoundsTop();
         Component getBoundsLeft();
         Component getBoundsRight();
+        std::map<std::string,Component> getBounds();
 
+        const char* getName();
     private:
         float x;
         float y;
@@ -44,10 +46,6 @@ class Entity : public Component
         float vy;
         float h;
         float gravity;
+        const char* name = "";
         std::map<std::string,Component> bounds;
-
-    private:
-
-
-
 }; 
