@@ -6,7 +6,7 @@
 #include "../../entities/player/player.h"
 
 
-#define  M 18;
+#define  M 50;
 #define  N 100;
 
 class Level {
@@ -33,7 +33,7 @@ class Level {
        int getM();
        int getN();
 
-    int map[18][100]  = {0};
+    int map[50][100]  = {}; // quadtree
 
     void setPlayer(Player *pPlayer);
 };

@@ -50,10 +50,10 @@ void Entity::tick()
 void Entity::draw(sf::RenderWindow *window)
 {
     window->draw(*this);
-    window->draw(this->getBoundsBottom());
-    window->draw(this->getBoundsTop());
-    window->draw(this->getBoundsLeft());
-    window->draw(this->getBoundsRight());
+    // window->draw(this->getBoundsBottom());
+    // window->draw(this->getBoundsTop());
+    // window->draw(this->getBoundsLeft());
+    // window->draw(this->getBoundsRight());
 }
 
 float Entity::getX()
