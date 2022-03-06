@@ -8,22 +8,24 @@ Component::Component() : sf::RectangleShape(), sf::FloatRect()
 {
 }
 
-Component::Component(float x, float y, float w, float h) :
+Component::Component(const char * name,float x, float y, float w, float h) :
 sf::RectangleShape(sf::Vector2f(w, h)),
 sf::FloatRect(sf::Vector2f(x, y), sf::Vector2f(w, h)) {
     setPosition(x, y);
     left = x;
     top  = y;
+    this->name = name;
     
 }
 
-Component::Component(sf::Vector2f pos, sf::Vector2f size) :
+Component::Component(const char * name,sf::Vector2f pos, sf::Vector2f size) :
 sf::RectangleShape(size) ,
 sf::FloatRect(pos, size)
 {
     setPosition(pos);
     left = x;
     top  = y;
+    this->name = name;
 }
 
 void Component::setX(float x) {
@@ -57,5 +59,25 @@ float Component::getW() {
 float Component::getH() {
    return this->h;
 }
+
+float Component::getRight() const {
+    return left + w;
+}
+
+float Component::getBottom() const {
+    return top + h;
+}
+
+sf::Vector2f Component::getTopLeft() const {
+    return {left, top};
+}
+sf::Vector2f Component::getCenter() const {
+    return {left + w/2, top + h/2};
+}
+
+const char *Component::getName() {
+    return this->name;
+}
+
 
 

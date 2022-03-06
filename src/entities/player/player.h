@@ -12,5 +12,6 @@ class Player : public Entity
 
         Player();
         void collide(Entity entity);
+        void collide(Component bloco);
         void tick();
 };

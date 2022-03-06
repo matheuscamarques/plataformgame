@@ -38,10 +38,14 @@ class Entity : public Component
         std::map<std::string,Component> getBounds();
 
         const char* getName();
-    private:
-        float x;
-        float y;
-        float w;
+
+        bool isColide(Entity entity);
+        float getCenterX();
+        float getCenterY();
+    float x;
+    float y;
+private:
+    float w;
         float vx;
         float vy;
         float h;
