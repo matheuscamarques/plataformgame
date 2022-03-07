@@ -25,6 +25,7 @@ private:
     bool running = false;
     void render();
     void tick();
+    int totalQuadtreeSee = 0;
 
-    
+    sf::Font *font;
 };

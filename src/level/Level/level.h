@@ -4,28 +4,30 @@
 
 #include "../../entities/entity/entity.hpp"
 #include "../../entities/player/player.h"
+#include "../../quadtree/quadtree.h"
 
 
 #define  M 50;
-#define  N 100;
+#define  N 1000;
 
 class Level {
     private:
-        std::vector<Entity> *enemies;
-        std::vector<Entity> *platforms;
-        std::vector<Entity> *colidesPlatforms;
+        std::vector<Entity*> *enemies;
+        std::vector<Entity*> *platforms;
+        std::vector<Entity*> *colidesPlatforms;
         Player *player = nullptr;
         int m = M;
         int n = N;
 
         void generateLevel();
     public:
-        Level();
-        void addEnemy(Entity enemy);
-        void addPlatform(Entity platform);
-        std::vector<Entity> * getEnemies();
-        std::vector<Entity> * getPlatforms();
-        std::vector<Entity> * getColidePlatforms();
+        explicit Level(Quadtree *quadtree);
+        Quadtree *quadtree;
+        void addEnemy(Entity *enemy);
+        void addPlatform(Entity *platform);
+        std::vector<Entity*> * getEnemies();
+        std::vector<Entity*> * getPlatforms();
+        std::vector<Entity*> * getColidePlatforms();
         Player* getPlayer();
         //Camera* getCamera();
        // void setCamera(Camera* camera);
@@ -33,7 +35,7 @@ class Level {
        int getM();
        int getN();
 
-    int map[50][100]  = {}; // quadtree
+    int **map;// quadtree
 
     void setPlayer(Player *pPlayer);
 };

@@ -8,10 +8,12 @@ all:
 	g++ -c src/entities/player/player.cpp
 	g++ -c src/level/Level/level.cpp
 	g++ -c src/camera/Camera.cpp
-	g++ main.o -o plataformer  game.o window.o component.o entity.o player.o level.o Camera.o -lsfml-graphics -lsfml-window -lsfml-system
+	g++ -c src/quadtree/quadtree.cpp
+	g++ main.o -o plataformer  game.o window.o component.o entity.o player.o level.o Camera.o quadtree.o -lsfml-graphics -lsfml-window -lsfml-system
 	echo "#-#-# Moving files #-#-#"
 	mv *.o compiled/
 	mv plataformer build/
+	cp ./arial.ttf build/
 clear:
 	rm -rf compiled/
 	rm -rf build/
@@ -22,3 +24,5 @@ start:
 	./build/plataformer
 watch:
 	watch -n 10 make all
+run: 
+	./build/plataformer

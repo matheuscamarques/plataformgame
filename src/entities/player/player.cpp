@@ -2,7 +2,7 @@
 #include <iostream>
 
  Player::Player() :
-Entity("player",0,0,50,100)
+Entity("player",0,0,50,50)
 {
     setFillColor(sf::Color::Red);
     //this->setGravity(9.8f);
@@ -21,6 +21,31 @@ void Player::collide(Entity bloco)
         jumping = true;
     } else if(jumping){
          moveDown = true;
+    }
+
+    if (getBoundsRight().intersects(bloco)) {
+        setX(bloco.getX() - getW());
+    }
+
+    if (getBoundsLeft().intersects(bloco)) {
+        setX(bloco.getX() + getW());
+    }
+
+}
+
+void Player::collide(Component bloco)
+{
+    if (getBoundsTop().intersects(bloco)
+            ) {
+        setY(bloco.getY() + getH());
+    }
+
+    if (getBoundsBottom().intersects(bloco)) {
+        setY(bloco.getY() - getH());
+        moveDown = false;
+        jumping = true;
+    } else if(jumping){
+        moveDown = true;
     }
 
     if (getBoundsRight().intersects(bloco)) {
@@ -55,10 +80,10 @@ void Player::tick() {
     }
 
     if(moveLeft){
-        setVx(-5.0f - vxRunSpeed);
+        setVx(-9.8f - vxRunSpeed);
     }
     if(moveRight)
-        setVx(5.0f + vxRunSpeed);
+        setVx(9.8f + vxRunSpeed);
 
     if(!moveLeft && !moveRight){
         setVx(0.0f);

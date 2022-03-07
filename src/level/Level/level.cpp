@@ -6,27 +6,32 @@
 #include<string.h>
 #define BLOCK_SIZE 50
 
-Level::Level()
-{
-    this->platforms = new std::vector<Entity>();
-    this->colidesPlatforms = new std::vector<Entity>();
-    this->enemies = new std::vector<Entity>();
+Level::Level(Quadtree *quadtree)  {
+    this->quadtree = quadtree;
+    this->platforms = new std::vector<Entity*>();
+    this->colidesPlatforms = new std::vector<Entity*>();
+    this->enemies = new std::vector<Entity*>();
+    this->map = (int **) malloc(sizeof(int *) * this->m);
+    for (int i = 0; i < BLOCK_SIZE; i++) {
+        this->map[i] = (int *) malloc(sizeof(int) * this->n);
+    }
+
     this->generateLevel();
 }
-void Level::addEnemy(Entity enemy)
+void Level::addEnemy(Entity *enemy)
 {
     this->enemies->push_back(enemy);
 }
-void Level::addPlatform(Entity platform)
+void Level::addPlatform(Entity *platform)
 {
     this->platforms->push_back(platform);
 }
 
-std::vector<Entity> *Level::getEnemies()
+std::vector<Entity*> *Level::getEnemies()
 {
     return this->enemies;
 }
-std::vector<Entity> *Level::getPlatforms()
+std::vector<Entity*> *Level::getPlatforms()
 {
     return this->platforms;
 }
@@ -34,6 +39,7 @@ Player *Level::getPlayer()
 {
     return this->player;
 }
+
 void Level::generateLevel()
 {
     // percorre map set int values
@@ -247,27 +253,27 @@ void Level::generateLevel()
     {
         for (int j = 0; j < this->n; j++)
         {
-            auto platform = Entity("colide", j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+            auto platform = new Entity("colide", j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
 
             if (this->map[i][j] == 1)
             {
-                platform.setFillColor(sf::Color(60, 60, 60));
+                platform->setFillColor(sf::Color(60, 60, 60));
             }
             else if (this->map[i][j] == 2)
             {
-                platform.setFillColor(sf::Color(146, 90, 43));
+                platform->setFillColor(sf::Color(146, 90, 43));
             }
             else if (this->map[i][j] == 3)
             {
-                platform.setFillColor(sf::Color(120, 60, 0));
+                platform->setFillColor(sf::Color(120, 60, 0));
             }
             else if (this->map[i][j] == 4)
             {
-                platform.setFillColor(sf::Color(159, 89, 30));
+                platform->setFillColor(sf::Color(159, 89, 30));
             }
             else if (this->map[i][j] == 5)
             {
-                platform.setFillColor(sf::Color(150, 75, 0));
+                platform->setFillColor(sf::Color(150, 75, 0));
             }
             if (this->map[i][j] != 0)
             {
@@ -283,12 +289,13 @@ void Level::generateLevel()
             if (i > m / 2)
             {
                 // search in plataforms if there is a platform
-                std::vector<Entity> *list = this->getPlatforms();
+                std::vector<Entity*> *list = this->getPlatforms();
                 auto p = list->begin();
                 int isValid = 0;
                 while (p != this->getPlatforms()->end())
                 {
-                    if ((int)p->getX() == j * BLOCK_SIZE && (int)p->getY() == i * BLOCK_SIZE)
+                    Entity * platform = *p;
+                    if ((int)platform->getX() == j * BLOCK_SIZE && (int)platform->getY() == i * BLOCK_SIZE)
                     {
                         isValid = 1;
                     }
@@ -297,19 +304,20 @@ void Level::generateLevel()
 
                 if (isValid == 0)
                 {
-                    auto platform = Entity("water", j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-                    platform.setFillColor(sf::Color(0, 255, 255));
+                    auto platform = new Entity("water", j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                    platform->setFillColor(sf::Color(0, 255, 255));
                     this->platforms->push_back(platform);
                 }
             }
         }
     }
 
-    std::vector<Entity> *list = this->getPlatforms();
+    std::vector<Entity*> *list = this->getPlatforms();
     auto p = list->begin();
     while (p != this->getPlatforms()->end())
     {
-        if(!strcmp(p->getName(),"colide"))
+        Entity * platform = *p;
+        if(!strcmp(platform->getName(),"colide"))
         {
            colidesPlatforms->push_back(*p);
         }
@@ -318,7 +326,7 @@ void Level::generateLevel()
     }
 }
 
-std::vector<Entity> *  Level::getColidePlatforms(){
+std::vector<Entity*> *  Level::getColidePlatforms(){
     return colidesPlatforms;
 }
 
