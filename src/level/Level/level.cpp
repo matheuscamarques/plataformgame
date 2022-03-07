@@ -11,6 +11,11 @@ Level::Level(Quadtree *quadtree)  {
     this->platforms = new std::vector<Entity*>();
     this->colidesPlatforms = new std::vector<Entity*>();
     this->enemies = new std::vector<Entity*>();
+    this->map = (int **) malloc(sizeof(int *) * this->m);
+    for (int i = 0; i < BLOCK_SIZE; i++) {
+        this->map[i] = (int *) malloc(sizeof(int) * this->n);
+    }
+
     this->generateLevel();
 }
 void Level::addEnemy(Entity *enemy)

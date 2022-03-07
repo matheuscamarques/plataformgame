@@ -77,7 +77,7 @@ vector<Entity*> Quadtree::GetObjectsAt(float _x, float _y) {
             return returnObjects;
         }
     } else if (_x > getX() && _x <= getX() + getW() / 2.0f) {
-        if (_y > getY() + getH() / 2.0f && _y < y + getH()) {
+        if (_y > getY() + getH() / 2.0f && _y < getY() + getH()) {
             childReturnObjects = SW->GetObjectsAt(_x, _y);
             returnObjects.insert(returnObjects.end(), childReturnObjects.begin(), childReturnObjects.end());
             return returnObjects;
@@ -131,21 +131,16 @@ void Quadtree::Draw(sf::RenderWindow *canvas) {
 }
 
 bool Quadtree::contains(Quadtree *child, Entity *object) {
-
-    float x = child->getX();
-    float y = child->getY();
-
-    float width = child->getW();
-    float height = child->getH();
-
-    float oX = object->getX();
-    float oY = object->getY();
-    float oWidth = object->getW();
-    float oHeight = object->getH();
     return (
-            x <= oX &&
-            y <= oY &&
-            x + width >= oX + oWidth &&
-            y + height >= oY + oHeight
+        child->getX() <= object->getX() &&
+        child->getY() <= object->getY() &&
+        child->getX() + child->getW() >= object->getX() + object->getW() &&
+        child->getY() + child->getH() >= object->getY() + object->getH()
     );
+
+
+
+
+
+
 }

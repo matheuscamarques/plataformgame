@@ -7,8 +7,8 @@
 #include "../../quadtree/quadtree.h"
 
 
-#define  M 10;
-#define  N 100;
+#define  M 50;
+#define  N 1000;
 
 class Level {
     private:
@@ -35,7 +35,7 @@ class Level {
        int getM();
        int getN();
 
-    int map[10][100]  = {}; // quadtree
+    int **map;// quadtree
 
     void setPlayer(Player *pPlayer);
 };

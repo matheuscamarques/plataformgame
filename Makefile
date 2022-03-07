@@ -13,6 +13,7 @@ all:
 	echo "#-#-# Moving files #-#-#"
 	mv *.o compiled/
 	mv plataformer build/
+	cp ./arial.ttf build/
 clear:
 	rm -rf compiled/
 	rm -rf build/

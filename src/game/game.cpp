@@ -28,6 +28,16 @@ void Game::main()
     //     std::cout << std::endl;
     // }
     game->setLevel(level);
+
+    sf::Font font;
+    if (!font.loadFromFile("./arial.ttf"))
+    {
+        throw std::runtime_error("Could not load font");
+    }
+    game->font = &font;
+
+    // add border font
+
     new Window(800, 800, "Game", game);
 }
 
@@ -108,29 +118,101 @@ void Game::render()
               level->getPlayer()->getY() - this->getH()/2);
     //view.zoom(-10.0f);
     window->setView(view);
-    std::vector<Entity*> * list = getLevel()->getPlatforms();
-    auto p = list->begin();
-    while ( p != this->level->getPlatforms()->end() )
-    {
-        Entity *entity = *p;
-        entity->draw(window);
-        p++;
+    getLevel()->quadtree->Draw(window);
+    vector<Entity*> * objects = getLevel()->getPlatforms();
+    // draw total platforms text
+    sf::Text totalPlataformsTxt;
+    totalPlataformsTxt.setFont(*font);
+    totalPlataformsTxt.setString("Total Platforms: " + std::to_string(objects->size()));
+    totalPlataformsTxt.setCharacterSize(20);
+    totalPlataformsTxt.setFillColor(sf::Color::Green);
+    totalPlataformsTxt.setPosition(level->getPlayer()->getX(), level->getPlayer()->getY() - 200);
+    totalPlataformsTxt.setOutlineColor(sf::Color::Black);
+    totalPlataformsTxt.setOutlineThickness(1);
+
+    window->draw(totalPlataformsTxt);
+
+    getLevel()->quadtree = new Quadtree(
+            level->getPlayer()->getX() - this->getW()/2 ,
+            level->getPlayer()->getY() - this->getH()/2,
+            this->getW(),
+            this->getH(),
+            0,1);
+    level->quadtree->SetFont(*this->font);
+
+    for(auto i = objects->begin(); i != objects->end(); i++){
+        Entity *entity = *i;
+        entity->tick();
+        getLevel()->quadtree->AddObject( entity );
     }
+
+    vector<Entity*> returnObjectsQ1 = getLevel()->quadtree->GetObjectsAt( getLevel()->getPlayer()->getCenterX() - 50, getLevel()->getPlayer()->getCenterY() -50 );
+    vector<Entity*> returnObjectsQ2 = getLevel()->quadtree->GetObjectsAt( getLevel()->getPlayer()->getCenterX(), getLevel()->getPlayer()->getCenterY() - 50);
+    vector<Entity*> returnObjectsQ3 = getLevel()->quadtree->GetObjectsAt( getLevel()->getPlayer()->getCenterX() - 50, getLevel()->getPlayer()->getCenterY() );
+    vector<Entity*> returnObjectsQ4 = getLevel()->quadtree->GetObjectsAt( getLevel()->getPlayer()->getCenterX(), getLevel()->getPlayer()->getCenterY() );
+
+    vector<Entity*> returnObjects = vector<Entity*>();
+    returnObjects.insert(returnObjects.end(), returnObjectsQ1.begin(), returnObjectsQ1.end());
+    returnObjects.insert(returnObjects.end(), returnObjectsQ2.begin(), returnObjectsQ2.end());
+    returnObjects.insert(returnObjects.end(), returnObjectsQ3.begin(), returnObjectsQ3.end());
+    returnObjects.insert(returnObjects.end(), returnObjectsQ4.begin(), returnObjectsQ4.end());
+
+
+    totalQuadtreeSee =  returnObjects.size();
+    for(auto i = returnObjects.begin(); i != returnObjects.end(); i++){
+        Entity *entity = *i;
+        entity->draw(window);
+    }
+
+    getLevel()->quadtree->Clear();
 
     getLevel()->getPlayer()->draw(window);
     getLevel()->quadtree->Draw(window);
 
     // draw point
-    sf::CircleShape shape(5.f);
-    shape.setFillColor(sf::Color::Green);
-    shape.setPosition(getLevel()->getPlayer()->getCenterX(), getLevel()->getPlayer()->getCenterY());
-    window->draw(shape);
+//    sf::CircleShape shape(5.f);
+//    shape.setFillColor(sf::Color::Green);
+//    shape.setPosition(getLevel()->getPlayer()->getCenterX(), getLevel()->getPlayer()->getCenterY());
+//    window->draw(shape);
 
     // draw point
-    sf::CircleShape shape2(5.f);
-    shape2.setFillColor(sf::Color::Green);
-    shape2.setPosition(getLevel()->getPlayer()->getX(), getLevel()->getPlayer()->getY());
-    window->draw(shape2);
+//    sf::CircleShape shape2(5.f);
+//    shape2.setFillColor(sf::Color::Green);
+//    shape2.setPosition(getLevel()->getPlayer()->getX(), getLevel()->getPlayer()->getY());
+//    window->draw(shape2);
+
+    // draw text im top player
+    sf::Text text;
+
+    text.setString("QTREE: " + std::to_string(totalQuadtreeSee));
+    text.setCharacterSize(20);
+    text.setFont(*font);
+    text.setFillColor(sf::Color::Green);
+    text.setOutlineColor(sf::Color::Black);
+    text.setOutlineThickness(1);
+    text.setPosition(getLevel()->getPlayer()->getX() - getLevel()->getPlayer()->getW()/2, getLevel()->getPlayer()->getY() - getLevel()->getPlayer()->getH()/2);
+    window->draw(text);
+
+    // DRAW CIRCLE
+//    sf::CircleShape Q1(10);
+//    Q1.setFillColor(sf::Color::Green);
+//    Q1.setPosition(getLevel()->getPlayer()->getCenterX() - 50, getLevel()->getPlayer()->getCenterY() - 50);
+//    window->draw(Q1);
+//
+//    sf::CircleShape Q2(10);
+//    Q2.setFillColor(sf::Color::Green);
+//    Q2.setPosition(getLevel()->getPlayer()->getCenterX(), getLevel()->getPlayer()->getCenterY() - 50);
+//    window->draw(Q2);
+//
+//    sf::CircleShape Q3(10);
+//    Q3.setFillColor(sf::Color::Green);
+//    Q3.setPosition(getLevel()->getPlayer()->getCenterX() - 50, getLevel()->getPlayer()->getCenterY());
+//    window->draw(Q3);
+//
+//    sf::CircleShape Q4(10);
+//    Q4.setFillColor(sf::Color::Green);
+//    Q4.setPosition(getLevel()->getPlayer()->getCenterX(), getLevel()->getPlayer()->getCenterY());
+//    window->draw(Q4);
 
     window->display();
 }
@@ -142,18 +224,17 @@ void Game::tick() {
     getLevel()->getPlayer()->moveDown  = sf::Keyboard::isKeyPressed(sf::Keyboard::Down);
     getLevel()->getPlayer()->moveLeft  = sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
     getLevel()->getPlayer()->runFast   = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
-
     getLevel()->getPlayer()->tick();
 
 
     vector<Entity*> * objects = getLevel()->getColidePlatforms();
     getLevel()->quadtree = new Quadtree(
-            getLevel()->getPlayer()->getX() - getLevel()->getPlayer()->getW()*2 + getLevel()->getPlayer()->getW()/2 ,
-            getLevel()->getPlayer()->getY() - getLevel()->getPlayer()->getH()*2 + getLevel()->getPlayer()->getH()/2,
-            getLevel()->getPlayer()->getW()*4,
-            getLevel()->getPlayer()->getH()*4,
-            0,
-            2);
+            getLevel()->getPlayer()->getX() - getLevel()->getPlayer()->getW()/2 - getLevel()->getPlayer()->getW()/2 ,
+            getLevel()->getPlayer()->getY() - getLevel()->getPlayer()->getH()/2 - getLevel()->getPlayer()->getH()/2,
+            getLevel()->getPlayer()->getW() * 4,
+            getLevel()->getPlayer()->getH() * 4,
+            0,2);
+    level->quadtree->SetFont(*this->font);
 
     for(auto i = objects->begin(); i != objects->end(); i++){
         Entity *entity = *i;
@@ -162,33 +243,19 @@ void Game::tick() {
     }
 
     vector<Entity*> returnObjects = getLevel()->quadtree->GetObjectsAt( getLevel()->getPlayer()->getCenterX(), getLevel()->getPlayer()->getCenterY() );
-    cout << returnObjects.size() << endl;
 
+    //totalQuadtreeSee =  returnObjects.size();
     for(auto i = returnObjects.begin(); i != returnObjects.end(); i++){
         Entity *entity = *i;
         auto color = entity->getFillColor();
 
         if(getLevel()->getPlayer()->isColide(*entity)){
             getLevel()->getPlayer()->collide(*entity);
-            entity->setFillColor(sf::Color::Red);
         }
         //entity->setFillColor(color);
         entity->tick();
-    }
+        //entity->setFillColor(sf::Color::Red);
 
-    returnObjects = getLevel()->quadtree->GetObjectsAt( getLevel()->getPlayer()->getX(), getLevel()->getPlayer()->getY() );
-    cout << returnObjects.size() << endl;
-
-    for(auto i = returnObjects.begin(); i != returnObjects.end(); i++){
-        Entity *entity = *i;
-        auto color = entity->getFillColor();
-
-        if(getLevel()->getPlayer()->isColide(*entity)){
-            getLevel()->getPlayer()->collide(*entity);
-            entity->setFillColor(sf::Color::Red);
-        }
-        //entity->setFillColor(color);
-        entity->tick();
     }
 
     getLevel()->quadtree->Clear();
