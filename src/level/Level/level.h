@@ -5,7 +5,7 @@
 #include "../../entities/entity/entity.hpp"
 #include "../../entities/player/player.h"
 #include "../../quadtree/quadtree.h"
-
+#include "../../defines.h"
 
 #define  M 50;
 #define  N 1000;

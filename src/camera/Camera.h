@@ -1,4 +1,4 @@
-#pragma once
+#pragma once // Heresia usar pragma once
 #include "../game/game.h"
 #include "../entities/player/player.h"
 

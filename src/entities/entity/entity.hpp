@@ -9,7 +9,7 @@
 class Entity : public Component
 {
     public:
-        Entity(const char* name,float x, float y, float w, float h);
+        Entity(int name,float x, float y, float w, float h);
 
         void tick();
         void draw(sf::RenderWindow *window);
@@ -37,7 +37,7 @@ class Entity : public Component
         Component getBoundsRight();
         std::map<std::string,Component> getBounds();
 
-        const char* getName();
+        const int getName();
 
         bool isColide(Entity entity);
         float getCenterX();
@@ -50,6 +50,6 @@ private:
         float vy;
         float h;
         float gravity;
-        const char* name = "";
+        int name = -1;
         std::map<std::string,Component> bounds;
 }; 

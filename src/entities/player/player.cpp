@@ -1,8 +1,8 @@
 #include "player.h"
 #include <iostream>
-
+#include "../../defines.h"
  Player::Player() :
-Entity("player",0,0,50,50)
+Entity(PLAYER,0,0,50,50)
 {
     setFillColor(sf::Color::Red);
     //this->setGravity(9.8f);
@@ -10,6 +10,12 @@ Entity("player",0,0,50,50)
 
 void Player::collide(Entity bloco)
 {
+    if(
+        bloco.getName() == WATER
+    ){
+        jumping = true;
+        return;
+    }
     if (getBoundsTop().intersects(bloco)
     ) {
         setY(bloco.getY() + getH());

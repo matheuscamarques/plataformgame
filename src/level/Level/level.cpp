@@ -4,7 +4,6 @@
 
 #include "level.h"
 #include<string.h>
-#define BLOCK_SIZE 50
 
 Level::Level(Quadtree *quadtree)  {
     this->quadtree = quadtree;
@@ -253,7 +252,7 @@ void Level::generateLevel()
     {
         for (int j = 0; j < this->n; j++)
         {
-            auto platform = new Entity("colide", j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+            auto platform = new Entity(COLIDE, j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
 
             if (this->map[i][j] == 1)
             {
@@ -304,7 +303,7 @@ void Level::generateLevel()
 
                 if (isValid == 0)
                 {
-                    auto platform = new Entity("water", j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                    auto platform = new Entity(WATER, j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
                     platform->setFillColor(sf::Color(0, 255, 255));
                     this->platforms->push_back(platform);
                 }
@@ -312,18 +311,20 @@ void Level::generateLevel()
         }
     }
 
-    std::vector<Entity*> *list = this->getPlatforms();
-    auto p = list->begin();
-    while (p != this->getPlatforms()->end())
-    {
-        Entity * platform = *p;
-        if(!strcmp(platform->getName(),"colide"))
-        {
-           colidesPlatforms->push_back(*p);
-        }
+    // std::vector<Entity*> *list = this->getPlatforms();
+    // auto p = list->begin();
+    // while (p != this->getPlatforms()->end())
+    // {
+    //     Entity * platform = *p;
+    //     if(!strcmp(platform->getName(),COLIDE))
+    //     {
+    //        colidesPlatforms->push_back(*p);
+    //     }
 
-        p++;
-    }
+    //     p++;
+    // }
+
+    colidesPlatforms = this->getPlatforms();
 }
 
 std::vector<Entity*> *  Level::getColidePlatforms(){

@@ -8,8 +8,8 @@
 
 class Component : public sf::RectangleShape , public sf::FloatRect {
 public:
-    Component(const char * name,float x, float y, float w, float h);
-    Component(const char * name,sf::Vector2f pos, sf::Vector2f size);
+    Component(const int name,float x, float y, float w, float h);
+    Component(const int name,sf::Vector2f pos, sf::Vector2f size);
     Component();
     void setX(float x);
     void setY(float y);
@@ -25,10 +25,10 @@ public:
     sf::Vector2f getTopLeft() const;
     sf::Vector2f getCenter() const;
 
-    const char * getName();
+    int getName();
 
 private:
-    const char* name;
+    int name;
     float x;
     float y;
     float w;

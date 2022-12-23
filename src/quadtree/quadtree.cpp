@@ -1,11 +1,11 @@
 #include "./quadtree.h"
 #include <iostream>
 #include <sstream>
-
+#include "../defines.h"
 using namespace std;
 
 Quadtree::Quadtree(float _x, float _y, float _width, float _height, int _level, int _maxLevel) :
-        Entity("QuadTree",_x, _y, _width, _height),
+        Entity(QUADTREE,_x, _y, _width, _height),
         level	(_level),
         maxLevel(_maxLevel)
 {
