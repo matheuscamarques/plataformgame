@@ -137,10 +137,4 @@ bool Quadtree::contains(Quadtree *child, Entity *object) {
         child->getX() + child->getW() >= object->getX() + object->getW() &&
         child->getY() + child->getH() >= object->getY() + object->getH()
     );
-
-
-
-
-
-
 }
