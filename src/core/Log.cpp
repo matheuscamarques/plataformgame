@@ -30,9 +30,15 @@ const char *levelColor(LogLevel l) {
 
 void Log::write(LogLevel level, const char *category, const std::string &msg) {
     if (level < minLevel_) return;
-    std::ostream &out = (level >= LogLevel::Warn) ? std::cerr : std::cout;
-    out << levelColor(level) << "[" << levelName(level) << "]"
-        << "\033[0m[" << category << "] " << msg << std::endl;
+    // Regra do flush: Info/Debug vão para stdout bufferizado (barato);
+    // Warn/Error vão para stderr com endl (visível mesmo sob crash/kill).
+    if (level >= LogLevel::Warn) {
+        std::cerr << levelColor(level) << "[" << levelName(level) << "]"
+                  << "\033[0m[" << category << "] " << msg << std::endl;
+    } else {
+        std::cout << levelColor(level) << "[" << levelName(level) << "]"
+                  << "\033[0m[" << category << "] " << msg << '\n';
+    }
 }
 
 } // namespace core
