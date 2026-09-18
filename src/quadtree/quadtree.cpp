@@ -5,9 +5,17 @@
 using namespace std;
 
 Quadtree::Quadtree(float _x, float _y, float _width, float _height, int _level, int _maxLevel) :
-        Entity(QUADTREE,_x, _y, _width, _height),
-        level	(_level),
-        maxLevel(_maxLevel)
+        x(_x),
+        y(_y),
+        width(_width),
+        height(_height),
+        level(_level),
+        maxLevel(_maxLevel),
+        parent(nullptr),
+        NW(nullptr),
+        NE(nullptr),
+        SW(nullptr),
+        SE(nullptr)
 {
     shape.setPosition(this->getX(), this->getY());
     shape.setSize(sf::Vector2f(this->getW(), this->getH()));

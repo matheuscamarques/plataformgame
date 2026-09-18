@@ -1,9 +1,9 @@
 #ifndef PLATOFORMGAME_LEVEL_H
 #define PLATOFORMGAME_LEVEL_H
+#include <memory>
 #include <vector>
 
 #include "../../entities/entity/entity.hpp"
-#include "../../entities/player/player.h"
 #include "../../quadtree/quadtree.h"
 #include "../../defines.h"
 
@@ -12,33 +12,28 @@
 
 class Level {
     private:
-        std::vector<Entity*> *enemies;
-        std::vector<Entity*> *platforms;
-        std::vector<Entity*> *colidesPlatforms;
-        Player *player = nullptr;
+        std::vector<std::unique_ptr<Entity>> enemies;
+        std::vector<std::unique_ptr<Entity>> platforms;
+        // views não-owning para dentro de platforms (água fica fora)
+        std::vector<Entity*> colidesPlatforms;
         int m = M;
         int n = N;
 
         void generateLevel();
     public:
-        explicit Level(Quadtree *quadtree);
+        explicit Level(std::unique_ptr<Quadtree> qt);
         ~Level();
-        Quadtree *quadtree;
-        void addEnemy(Entity *enemy);
-        void addPlatform(Entity *platform);
-        std::vector<Entity*> * getEnemies();
-        std::vector<Entity*> * getPlatforms();
-        std::vector<Entity*> * getColidePlatforms();
-        Player* getPlayer();
-        //Camera* getCamera();
-       // void setCamera(Camera* camera);
+        std::unique_ptr<Quadtree> quadtree;
+        void addEnemy(std::unique_ptr<Entity> enemy);
+        void addPlatform(std::unique_ptr<Entity> platform);
+        std::vector<std::unique_ptr<Entity>> & getEnemies();
+        std::vector<std::unique_ptr<Entity>> & getPlatforms();
+        std::vector<Entity*> & getColidePlatforms();
 
        int getM();
        int getN();
 
     std::vector<std::vector<int>> map;
-
-    void setPlayer(Player *pPlayer);
 };
 
 

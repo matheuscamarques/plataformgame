@@ -14,12 +14,11 @@ Game::Game() : Component()
 
 void Game::main()
 {
-    auto game = new Game();
+    auto game = std::make_unique<Game>();
     //game->view = new sf::View(sf::FloatRect(0.f, 0.f, 1000.f, 600.f));
-    auto level = new Level(new Quadtree(0.0f, 0.0f, 0.f, 0.f,0,0));
+    auto level = std::make_unique<Level>(std::make_unique<Quadtree>(0.0f, 0.0f, 0.f, 0.f,0,0));
     //  level->quadtree = new Quadtree(0.0f, 0.0f, level->getN()*50, level->getM()*50,0,1);
-    auto player = new Player();
-    level->setPlayer(player);
+    game->player = std::make_unique<Player>();
     // for(auto i =0; i< level->getM();i++){
     //     for(auto j=0;j<level->getN(); j++){
     //         auto value = level->map[i][j];
@@ -27,7 +26,7 @@ void Game::main()
     //     }
     //     std::cout << std::endl;
     // }
-    game->setLevel(level);
+    game->setLevel(std::move(level));
 
     if (!game->font.loadFromFile("./arial.ttf"))
     {
@@ -36,7 +35,7 @@ void Game::main()
 
     // add border font
 
-    new Window(800, 800, "Game", game);
+    Window window(800, 800, "Game", game.get());
 }
 
 void Game::setWindow(sf::RenderWindow *window)
@@ -110,45 +109,44 @@ void Game::render()
 {
 
     window->clear(sf::Color(135, 206, 235));
-    //view->setCenter(level->getPlayer()->getX(), level->getPlayer()->getY());
+    //view->setCenter(player.get()->getX(), player.get()->getY());
     auto view = window->getDefaultView();
-    view.move(level->getPlayer()->getX() - this->getW()/2,
-              level->getPlayer()->getY() - this->getH()/2);
+    view.move(player.get()->getX() - this->getW()/2,
+              player.get()->getY() - this->getH()/2);
     //view.zoom(-10.0f);
     window->setView(view);
     getLevel()->quadtree->Draw(window);
-    vector<Entity*> * objects = getLevel()->getPlatforms();
+    auto &objects = getLevel()->getPlatforms();
     // draw total platforms text
     sf::Text totalPlataformsTxt;
     totalPlataformsTxt.setFont(font);
-    totalPlataformsTxt.setString("Total Platforms: " + std::to_string(objects->size()));
+    totalPlataformsTxt.setString("Total Platforms: " + std::to_string(objects.size()));
     totalPlataformsTxt.setCharacterSize(20);
     totalPlataformsTxt.setFillColor(sf::Color::Green);
-    totalPlataformsTxt.setPosition(level->getPlayer()->getX(), level->getPlayer()->getY() - 200);
+    totalPlataformsTxt.setPosition(player.get()->getX(), player.get()->getY() - 200);
     totalPlataformsTxt.setOutlineColor(sf::Color::Black);
     totalPlataformsTxt.setOutlineThickness(1);
 
     window->draw(totalPlataformsTxt);
 
-    delete getLevel()->quadtree;
-    getLevel()->quadtree = new Quadtree(
-            level->getPlayer()->getX() - this->getW()/2 ,
-            level->getPlayer()->getY() - this->getH()/2,
+    getLevel()->quadtree = std::make_unique<Quadtree>(
+            player.get()->getX() - this->getW()/2 ,
+            player.get()->getY() - this->getH()/2,
             this->getW(),
             this->getH(),
             0,1);
     level->quadtree->SetFont(this->font);
 
-    for(auto i = objects->begin(); i != objects->end(); i++){
-        Entity *entity = *i;
+    for(auto &slot : objects){
+        Entity *entity = slot.get();
         entity->tick();
         getLevel()->quadtree->AddObject( entity );
     }
 
-    vector<Entity*> returnObjectsQ1 = getLevel()->quadtree->GetObjectsAt( getLevel()->getPlayer()->getCenterX() - 50, getLevel()->getPlayer()->getCenterY() -50 );
-    vector<Entity*> returnObjectsQ2 = getLevel()->quadtree->GetObjectsAt( getLevel()->getPlayer()->getCenterX(), getLevel()->getPlayer()->getCenterY() - 50);
-    vector<Entity*> returnObjectsQ3 = getLevel()->quadtree->GetObjectsAt( getLevel()->getPlayer()->getCenterX() - 50, getLevel()->getPlayer()->getCenterY() );
-    vector<Entity*> returnObjectsQ4 = getLevel()->quadtree->GetObjectsAt( getLevel()->getPlayer()->getCenterX(), getLevel()->getPlayer()->getCenterY() );
+    vector<Entity*> returnObjectsQ1 = getLevel()->quadtree->GetObjectsAt( player.get()->getCenterX() - 50, player.get()->getCenterY() -50 );
+    vector<Entity*> returnObjectsQ2 = getLevel()->quadtree->GetObjectsAt( player.get()->getCenterX(), player.get()->getCenterY() - 50);
+    vector<Entity*> returnObjectsQ3 = getLevel()->quadtree->GetObjectsAt( player.get()->getCenterX() - 50, player.get()->getCenterY() );
+    vector<Entity*> returnObjectsQ4 = getLevel()->quadtree->GetObjectsAt( player.get()->getCenterX(), player.get()->getCenterY() );
 
     vector<Entity*> returnObjects = vector<Entity*>();
     returnObjects.insert(returnObjects.end(), returnObjectsQ1.begin(), returnObjectsQ1.end());
@@ -165,19 +163,19 @@ void Game::render()
 
     getLevel()->quadtree->Clear();
 
-    getLevel()->getPlayer()->draw(window);
+    player.get()->draw(window);
     getLevel()->quadtree->Draw(window);
 
     // draw point
 //    sf::CircleShape shape(5.f);
 //    shape.setFillColor(sf::Color::Green);
-//    shape.setPosition(getLevel()->getPlayer()->getCenterX(), getLevel()->getPlayer()->getCenterY());
+//    shape.setPosition(player.get()->getCenterX(), player.get()->getCenterY());
 //    window->draw(shape);
 
     // draw point
 //    sf::CircleShape shape2(5.f);
 //    shape2.setFillColor(sf::Color::Green);
-//    shape2.setPosition(getLevel()->getPlayer()->getX(), getLevel()->getPlayer()->getY());
+//    shape2.setPosition(player.get()->getX(), player.get()->getY());
 //    window->draw(shape2);
 
     // draw text im top player
@@ -189,28 +187,28 @@ void Game::render()
     text.setFillColor(sf::Color::Green);
     text.setOutlineColor(sf::Color::Black);
     text.setOutlineThickness(1);
-    text.setPosition(getLevel()->getPlayer()->getX() - getLevel()->getPlayer()->getW()/2, getLevel()->getPlayer()->getY() - getLevel()->getPlayer()->getH()/2);
+    text.setPosition(player.get()->getX() - player.get()->getW()/2, player.get()->getY() - player.get()->getH()/2);
     window->draw(text);
 
     // DRAW CIRCLE
 //    sf::CircleShape Q1(10);
 //    Q1.setFillColor(sf::Color::Green);
-//    Q1.setPosition(getLevel()->getPlayer()->getCenterX() - 50, getLevel()->getPlayer()->getCenterY() - 50);
+//    Q1.setPosition(player.get()->getCenterX() - 50, player.get()->getCenterY() - 50);
 //    window->draw(Q1);
 //
 //    sf::CircleShape Q2(10);
 //    Q2.setFillColor(sf::Color::Green);
-//    Q2.setPosition(getLevel()->getPlayer()->getCenterX(), getLevel()->getPlayer()->getCenterY() - 50);
+//    Q2.setPosition(player.get()->getCenterX(), player.get()->getCenterY() - 50);
 //    window->draw(Q2);
 //
 //    sf::CircleShape Q3(10);
 //    Q3.setFillColor(sf::Color::Green);
-//    Q3.setPosition(getLevel()->getPlayer()->getCenterX() - 50, getLevel()->getPlayer()->getCenterY());
+//    Q3.setPosition(player.get()->getCenterX() - 50, player.get()->getCenterY());
 //    window->draw(Q3);
 //
 //    sf::CircleShape Q4(10);
 //    Q4.setFillColor(sf::Color::Green);
-//    Q4.setPosition(getLevel()->getPlayer()->getCenterX(), getLevel()->getPlayer()->getCenterY());
+//    Q4.setPosition(player.get()->getCenterX(), player.get()->getCenterY());
 //    window->draw(Q4);
 
     window->display();
@@ -218,39 +216,38 @@ void Game::render()
 
 void Game::tick() {
     //std::cout << "tick" << std::endl;
-    getLevel()->getPlayer()->moveRight = sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
-    getLevel()->getPlayer()->moveUp    = sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
-    getLevel()->getPlayer()->moveDown  = sf::Keyboard::isKeyPressed(sf::Keyboard::Down);
-    getLevel()->getPlayer()->moveLeft  = sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
-    getLevel()->getPlayer()->runFast   = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
-    getLevel()->getPlayer()->tick();
+    player.get()->moveRight = sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
+    player.get()->moveUp    = sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
+    player.get()->moveDown  = sf::Keyboard::isKeyPressed(sf::Keyboard::Down);
+    player.get()->moveLeft  = sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
+    player.get()->runFast   = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
+    player.get()->tick();
 
 
-    vector<Entity*> * objects = getLevel()->getColidePlatforms();
-    delete getLevel()->quadtree;
-    getLevel()->quadtree = new Quadtree(
-            getLevel()->getPlayer()->getX() - getLevel()->getPlayer()->getW()/2 - getLevel()->getPlayer()->getW()/2 ,
-            getLevel()->getPlayer()->getY() - getLevel()->getPlayer()->getH()/2 - getLevel()->getPlayer()->getH()/2,
-            getLevel()->getPlayer()->getW() * 4,
-            getLevel()->getPlayer()->getH() * 4,
+    auto &objects = getLevel()->getColidePlatforms();
+    getLevel()->quadtree = std::make_unique<Quadtree>(
+            player.get()->getX() - player.get()->getW()/2 - player.get()->getW()/2 ,
+            player.get()->getY() - player.get()->getH()/2 - player.get()->getH()/2,
+            player.get()->getW() * 4,
+            player.get()->getH() * 4,
             0,2);
     level->quadtree->SetFont(this->font);
 
-    for(auto i = objects->begin(); i != objects->end(); i++){
+    for(auto i = objects.begin(); i != objects.end(); i++){
         Entity *entity = *i;
         entity->tick();
         getLevel()->quadtree->AddObject( entity );
     }
 
-    vector<Entity*> returnObjects = getLevel()->quadtree->GetObjectsAt( getLevel()->getPlayer()->getCenterX(), getLevel()->getPlayer()->getCenterY() );
+    vector<Entity*> returnObjects = getLevel()->quadtree->GetObjectsAt( player.get()->getCenterX(), player.get()->getCenterY() );
 
     //totalQuadtreeSee =  returnObjects.size();
     for(auto i = returnObjects.begin(); i != returnObjects.end(); i++){
         Entity *entity = *i;
         auto color = entity->getFillColor();
 
-        if(getLevel()->getPlayer()->isColide(*entity)){
-            getLevel()->getPlayer()->collide(*entity);
+        if(player.get()->isColide(*entity)){
+            player.get()->collide(*entity);
         }
         //entity->setFillColor(color);
         entity->tick();
@@ -262,9 +259,13 @@ void Game::tick() {
 }
 
 Level* Game::getLevel() {
-    return this->level;
+    return this->level.get();
 }
 
-void Game::setLevel(Level *level) {
-    this->level = level;
+void Game::setLevel(std::unique_ptr<Level> level) {
+    this->level = std::move(level);
+}
+
+Player* Game::getPlayer() {
+    return this->player.get();
 }

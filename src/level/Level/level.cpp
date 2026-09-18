@@ -5,45 +5,28 @@
 #include "level.h"
 #include<string.h>
 
-Level::Level(Quadtree *quadtree) : map(m, std::vector<int>(n, 0)) {
-    this->quadtree = quadtree;
-    this->platforms = new std::vector<Entity*>();
-    this->colidesPlatforms = new std::vector<Entity*>();
-    this->enemies = new std::vector<Entity*>();
-
+Level::Level(std::unique_ptr<Quadtree> qt) : quadtree(std::move(qt)), map(m, std::vector<int>(n, 0)) {
     this->generateLevel();
 }
 
-Level::~Level() {
-    for (Entity *e : *platforms) delete e;
-    for (Entity *e : *enemies) delete e;
-    // colidesPlatforms compartilha ponteiros com platforms: só limpa, não deleta
-    delete platforms;
-    delete colidesPlatforms;
-    delete enemies;
-    delete player;
-    delete quadtree;
-}
-void Level::addEnemy(Entity *enemy)
+Level::~Level() = default;
+
+void Level::addEnemy(std::unique_ptr<Entity> enemy)
 {
-    this->enemies->push_back(enemy);
+    this->enemies.push_back(std::move(enemy));
 }
-void Level::addPlatform(Entity *platform)
+void Level::addPlatform(std::unique_ptr<Entity> platform)
 {
-    this->platforms->push_back(platform);
+    this->platforms.push_back(std::move(platform));
 }
 
-std::vector<Entity*> *Level::getEnemies()
+std::vector<std::unique_ptr<Entity>> &Level::getEnemies()
 {
     return this->enemies;
 }
-std::vector<Entity*> *Level::getPlatforms()
+std::vector<std::unique_ptr<Entity>> &Level::getPlatforms()
 {
     return this->platforms;
-}
-Player *Level::getPlayer()
-{
-    return this->player;
 }
 
 void Level::generateLevel()
@@ -263,7 +246,7 @@ void Level::generateLevel()
             {
                 continue;
             }
-            auto platform = new Entity(COLIDE, j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+            auto platform = std::make_unique<Entity>(COLIDE, j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
 
             if (this->map[i][j] == 1)
             {
@@ -285,7 +268,7 @@ void Level::generateLevel()
             {
                 platform->setFillColor(sf::Color(150, 75, 0));
             }
-            this->platforms->push_back(platform);
+            this->platforms.push_back(std::move(platform));
         }
     }
 
@@ -296,41 +279,39 @@ void Level::generateLevel()
             if (i > m / 2)
             {
                 // search in plataforms if there is a platform
-                std::vector<Entity*> *list = this->getPlatforms();
-                auto p = list->begin();
                 int isValid = 0;
-                while (p != this->getPlatforms()->end())
+                for (auto &slot : this->platforms)
                 {
-                    Entity * platform = *p;
+                    Entity *platform = slot.get();
                     if ((int)platform->getX() == j * BLOCK_SIZE && (int)platform->getY() == i * BLOCK_SIZE)
                     {
                         isValid = 1;
+                        break;
                     }
-                    p++;
                 }
 
                 if (isValid == 0)
                 {
-                    auto platform = new Entity(WATER, j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                    auto platform = std::make_unique<Entity>(WATER, j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
                     platform->setFillColor(sf::Color(0, 255, 255));
-                    this->platforms->push_back(platform);
+                    this->platforms.push_back(std::move(platform));
                 }
             }
         }
     }
 
     // Água só entra em platforms; colisão usa filtro abaixo.
-    colidesPlatforms->clear();
-    for (Entity *e : *platforms)
+    colidesPlatforms.clear();
+    for (auto &slot : platforms)
     {
-        if (e->getName() != WATER)
+        if (slot->getName() != WATER)
         {
-            colidesPlatforms->push_back(e);
+            colidesPlatforms.push_back(slot.get());
         }
     }
 }
 
-std::vector<Entity*> *  Level::getColidePlatforms(){
+std::vector<Entity*> & Level::getColidePlatforms(){
     return colidesPlatforms;
 }
 
@@ -342,9 +323,4 @@ int Level::getM()
 int Level::getN()
 {
     return this->n;
-}
-
-void Level::setPlayer(Player *pPlayer)
-{
-    this->player = pPlayer;
 }

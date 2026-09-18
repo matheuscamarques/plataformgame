@@ -11,10 +11,7 @@
 #include "../entities/entity/entity.hpp"
 using namespace std;
 
-class Quadtree;
-class Entity;
-
-class Quadtree : public Entity {
+class Quadtree {
 public:
     Quadtree(float x, float y, float width, float height, int level, int maxLevel);
 
@@ -26,6 +23,11 @@ public:
 
     void					SetFont(const sf::Font &font);
     void					Draw(sf::RenderWindow  *canvas);
+
+    float getX() const { return x; }
+    float getY() const { return y; }
+    float getW() const { return width; }
+    float getH() const { return height; }
 
 private:
     float					x;
