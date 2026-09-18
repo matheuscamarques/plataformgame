@@ -2,6 +2,8 @@
 #include <chrono>
 #include <cmath>
 #include "./game.h"
+#include "../core/Log.h"
+#include "../core/Time.h"
 #include "../window/window.h"
 #include "../entities/player/player.h"
 
@@ -28,6 +30,7 @@ void Game::main()
     {
         throw std::runtime_error("Could not load font");
     }
+    LOG_INFO("Game", "boot ok, seed=" << WORLD_SEED);
 
     // add border font
 
@@ -55,12 +58,9 @@ void Game::start()
 
 void Game::run()
 {
-    // System nano time
-    auto lastTime = std::chrono::high_resolution_clock::now();
-    float amountOfTicks = 30.0;
-    float ns = 1000000000 / amountOfTicks;
-    float delta = 0;
-    auto timer = std::chrono::high_resolution_clock::now();
+    // Preserva os 30 TPS do loop original (Time default é 1/60).
+    core::Time::setFixedStep(1.0f / 30.0f);
+    float lastStat = 0.0f;
     int frames = 0;
     int updates = 0;
 
@@ -78,22 +78,19 @@ void Game::run()
                 window->setView(sf::View(visibleArea));
             }
         }
-        auto now = std::chrono::high_resolution_clock::now();
-        delta += std::chrono::duration_cast<std::chrono::nanoseconds>(now - lastTime).count();
-        lastTime = now;
-        while (delta >= ns)
+        core::Time::beginFrame();
+        int ticks = core::Time::consumeTicks();
+        for (int i = 0; i < ticks; i++)
         {
             tick();
             updates++;
-            delta -= ns;
         }
         render();
         frames++;
 
-        if(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - timer).count() > 1)
+        if (core::Time::elapsed() - lastStat >= 1.0f)
         {
-            timer = std::chrono::high_resolution_clock::now();
-            //std::cout << "updates: " << updates << " frames: " << frames << std::endl;
+            lastStat = core::Time::elapsed();
             updates = 0;
             frames = 0;
         }

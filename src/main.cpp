@@ -1,11 +1,11 @@
 #include "game/game.h"
-#include "iostream"
+#include "core/Log.h"
 
 int main()
 {
    try{
      Game::main();
    }catch(std::exception &e){
-     std::cout << e.what() << std::endl;
+     LOG_ERROR("Main", e.what());
    }
 };
