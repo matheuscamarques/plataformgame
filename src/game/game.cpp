@@ -4,7 +4,6 @@
 #include "./game.h"
 #include "../window/window.h"
 #include "../entities/player/player.h"
-#include "../quadtree/quadtree.h"
 
 namespace {
 constexpr uint32_t WORLD_SEED = 1337u;
@@ -112,7 +111,6 @@ void Game::render()
     view.move(camera.x, camera.y);
     //view.zoom(-10.0f);
     window->setView(view);
-    getLevel()->quadtree->Draw(window);
     auto &objects = getLevel()->getPlatforms();
     // draw total platforms text
     sf::Text totalPlataformsTxt;
@@ -126,46 +124,59 @@ void Game::render()
 
     window->draw(totalPlataformsTxt);
 
-    getLevel()->quadtree = std::make_unique<Quadtree>(
-            camera.x,
-            camera.y,
-            this->getW(),
-            this->getH(),
-            0,1);
-    level->quadtree->SetFont(this->font);
-
-    // Só o visível (+margem) entra na quadtree do render.
+    // Desenha só o visível (+margem); sem quadtree no caminho.
     float vx0 = camera.x - 60.0f, vy0 = camera.y - 60.0f;
     float vx1 = camera.x + this->getW() + 60.0f, vy1 = camera.y + this->getH() + 60.0f;
     for(Entity *entity : objects){
         if (entity->getX() + entity->getW() < vx0 || entity->getX() > vx1 ||
             entity->getY() + entity->getH() < vy0 || entity->getY() > vy1) continue;
-        entity->tick();
-        getLevel()->quadtree->AddObject( entity );
-    }
-
-    vector<Entity*> returnObjectsQ1 = getLevel()->quadtree->GetObjectsAt( player.get()->getCenterX() - 50, player.get()->getCenterY() -50 );
-    vector<Entity*> returnObjectsQ2 = getLevel()->quadtree->GetObjectsAt( player.get()->getCenterX(), player.get()->getCenterY() - 50);
-    vector<Entity*> returnObjectsQ3 = getLevel()->quadtree->GetObjectsAt( player.get()->getCenterX() - 50, player.get()->getCenterY() );
-    vector<Entity*> returnObjectsQ4 = getLevel()->quadtree->GetObjectsAt( player.get()->getCenterX(), player.get()->getCenterY() );
-
-    vector<Entity*> returnObjects = vector<Entity*>();
-    returnObjects.insert(returnObjects.end(), returnObjectsQ1.begin(), returnObjectsQ1.end());
-    returnObjects.insert(returnObjects.end(), returnObjectsQ2.begin(), returnObjectsQ2.end());
-    returnObjects.insert(returnObjects.end(), returnObjectsQ3.begin(), returnObjectsQ3.end());
-    returnObjects.insert(returnObjects.end(), returnObjectsQ4.begin(), returnObjectsQ4.end());
-
-
-    totalQuadtreeSee =  returnObjects.size();
-    for(auto i = returnObjects.begin(); i != returnObjects.end(); i++){
-        Entity *entity = *i;
         entity->draw(window);
     }
 
-    getLevel()->quadtree->Clear();
-
     player.get()->draw(window);
-    getLevel()->quadtree->Draw(window);
+
+    // --- Debug do SpatialHash: query + células + contagens ---
+    Player *p = player.get();
+    float qx = p->getX() - BLOCK_SIZE;
+    float qy = p->getY() - BLOCK_SIZE;
+    float qw = p->getW() + BLOCK_SIZE * 2;
+    float qh = p->getH() + BLOCK_SIZE * 2;
+
+    sf::RectangleShape queryRect(sf::Vector2f(qw, qh));
+    queryRect.setPosition(qx, qy);
+    queryRect.setFillColor(sf::Color(0, 255, 0, 30));
+    queryRect.setOutlineColor(sf::Color::Green);
+    queryRect.setOutlineThickness(1.f);
+    window->draw(queryRect);
+
+    const float cs = Chunk::HASH_CELL;
+    std::vector<std::pair<int,int>> cells;
+    getLevel()->debugCells(qx, qy, qw, qh, cells);
+    for (auto &cell : cells) {
+        float cx = cell.first * cs;
+        float cy = cell.second * cs;
+
+        sf::RectangleShape cellRect(sf::Vector2f(cs, cs));
+        cellRect.setPosition(cx, cy);
+        cellRect.setFillColor(sf::Color::Transparent);
+        cellRect.setOutlineColor(sf::Color(64, 128, 255));
+        cellRect.setOutlineThickness(1.f);
+        window->draw(cellRect);
+
+        sf::Text t;
+        t.setFont(font);
+        t.setString(std::to_string(getLevel()->debugCellCount(cell.first, cell.second)));
+        t.setCharacterSize(12);
+        t.setFillColor(sf::Color::Yellow);
+        t.setOutlineColor(sf::Color::Black);
+        t.setOutlineThickness(1);
+        t.setPosition(cx + 4, cy + 4);
+        window->draw(t);
+    }
+
+    std::vector<Entity*> candidatos;
+    getLevel()->query(qx, qy, qw, qh, candidatos);
+    totalCandidatesSeen = candidatos.size();
 
     // draw point
 //    sf::CircleShape shape(5.f);
@@ -182,7 +193,7 @@ void Game::render()
     // draw text im top player
     sf::Text text;
 
-    text.setString("QTREE: " + std::to_string(totalQuadtreeSee));
+    text.setString("HASH: " + std::to_string(totalCandidatesSeen));
     text.setCharacterSize(20);
     text.setFont(font);
     text.setFillColor(sf::Color::Green);
@@ -216,52 +227,34 @@ void Game::render()
 }
 
 void Game::tick() {
-    //std::cout << "tick" << std::endl;
-    player.get()->moveRight = sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
-    player.get()->moveUp    = sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
-    player.get()->moveDown  = sf::Keyboard::isKeyPressed(sf::Keyboard::Down);
-    player.get()->moveLeft  = sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
-    player.get()->runFast   = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
-    player.get()->tick();
+    Player *p = player.get();
+    p->moveRight = sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
+    p->moveUp    = sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
+    p->moveDown  = sf::Keyboard::isKeyPressed(sf::Keyboard::Down);
+    p->moveLeft  = sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
+    p->runFast   = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
+    p->tick();
 
     // Mundo infinito: carrega/descarrega chunks em torno do tile do player.
-    int playerTileX = static_cast<int>(std::floor(player.get()->getX() / BLOCK_SIZE));
-    int playerTileY = static_cast<int>(std::floor(player.get()->getY() / BLOCK_SIZE));
+    int playerTileX = static_cast<int>(std::floor(p->getX() / BLOCK_SIZE));
+    int playerTileY = static_cast<int>(std::floor(p->getY() / BLOCK_SIZE));
     getLevel()->update(playerTileX, playerTileY);
 
+    // Consulta o hash ao redor do player (1 tile de margem).
+    // Inclui água de propósito: Player::collide usa WATER para natação.
+    std::vector<Entity*> candidatos;
+    getLevel()->query(
+        p->getX() - BLOCK_SIZE,
+        p->getY() - BLOCK_SIZE,
+        p->getW() + BLOCK_SIZE * 2,
+        p->getH() + BLOCK_SIZE * 2,
+        candidatos);
 
-    auto &objects = getLevel()->getColidePlatforms();
-    getLevel()->quadtree = std::make_unique<Quadtree>(
-            player.get()->getX() - player.get()->getW()/2 - player.get()->getW()/2 ,
-            player.get()->getY() - player.get()->getH()/2 - player.get()->getH()/2,
-            player.get()->getW() * 4,
-            player.get()->getH() * 4,
-            0,2);
-    level->quadtree->SetFont(this->font);
-
-    for(auto i = objects.begin(); i != objects.end(); i++){
-        Entity *entity = *i;
-        entity->tick();
-        getLevel()->quadtree->AddObject( entity );
-    }
-
-    vector<Entity*> returnObjects = getLevel()->quadtree->GetObjectsAt( player.get()->getCenterX(), player.get()->getCenterY() );
-
-    //totalQuadtreeSee =  returnObjects.size();
-    for(auto i = returnObjects.begin(); i != returnObjects.end(); i++){
-        Entity *entity = *i;
-        auto color = entity->getFillColor();
-
-        if(player.get()->isColide(*entity)){
-            player.get()->collide(*entity);
+    for (Entity *e : candidatos) {
+        if (p->isColide(*e)) {
+            p->collide(*e);
         }
-        //entity->setFillColor(color);
-        entity->tick();
-        //entity->setFillColor(sf::Color::Red);
-
     }
-
-    getLevel()->quadtree->Clear();
 }
 
 Level* Game::getLevel() {

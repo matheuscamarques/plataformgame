@@ -63,6 +63,7 @@ void ChunkManager::generate(int cx, int cy) {
                     auto water = std::make_unique<Entity>(
                         WATER, tx * BLOCK_SIZE, ty * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
                     water->setFillColor(sf::Color(0, 255, 255));
+                    c->index(water.get());
                     c->entities.push_back(std::move(water));
                 }
                 continue;
@@ -70,6 +71,7 @@ void ChunkManager::generate(int cx, int cy) {
             auto platform = std::make_unique<Entity>(
                 COLIDE, tx * BLOCK_SIZE, ty * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
             paint(platform.get(), t);
+            c->index(platform.get());
             c->entities.push_back(std::move(platform));
         }
     }
