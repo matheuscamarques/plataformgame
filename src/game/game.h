@@ -27,5 +27,5 @@ private:
     void tick();
     int totalQuadtreeSee = 0;
 
-    sf::Font *font;
+    sf::Font font;
 };

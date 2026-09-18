@@ -29,12 +29,10 @@ void Game::main()
     // }
     game->setLevel(level);
 
-    sf::Font font;
-    if (!font.loadFromFile("./arial.ttf"))
+    if (!game->font.loadFromFile("./arial.ttf"))
     {
         throw std::runtime_error("Could not load font");
     }
-    game->font = &font;
 
     // add border font
 
@@ -122,7 +120,7 @@ void Game::render()
     vector<Entity*> * objects = getLevel()->getPlatforms();
     // draw total platforms text
     sf::Text totalPlataformsTxt;
-    totalPlataformsTxt.setFont(*font);
+    totalPlataformsTxt.setFont(font);
     totalPlataformsTxt.setString("Total Platforms: " + std::to_string(objects->size()));
     totalPlataformsTxt.setCharacterSize(20);
     totalPlataformsTxt.setFillColor(sf::Color::Green);
@@ -132,13 +130,14 @@ void Game::render()
 
     window->draw(totalPlataformsTxt);
 
+    delete getLevel()->quadtree;
     getLevel()->quadtree = new Quadtree(
             level->getPlayer()->getX() - this->getW()/2 ,
             level->getPlayer()->getY() - this->getH()/2,
             this->getW(),
             this->getH(),
             0,1);
-    level->quadtree->SetFont(*this->font);
+    level->quadtree->SetFont(this->font);
 
     for(auto i = objects->begin(); i != objects->end(); i++){
         Entity *entity = *i;
@@ -186,7 +185,7 @@ void Game::render()
 
     text.setString("QTREE: " + std::to_string(totalQuadtreeSee));
     text.setCharacterSize(20);
-    text.setFont(*font);
+    text.setFont(font);
     text.setFillColor(sf::Color::Green);
     text.setOutlineColor(sf::Color::Black);
     text.setOutlineThickness(1);
@@ -228,13 +227,14 @@ void Game::tick() {
 
 
     vector<Entity*> * objects = getLevel()->getColidePlatforms();
+    delete getLevel()->quadtree;
     getLevel()->quadtree = new Quadtree(
             getLevel()->getPlayer()->getX() - getLevel()->getPlayer()->getW()/2 - getLevel()->getPlayer()->getW()/2 ,
             getLevel()->getPlayer()->getY() - getLevel()->getPlayer()->getH()/2 - getLevel()->getPlayer()->getH()/2,
             getLevel()->getPlayer()->getW() * 4,
             getLevel()->getPlayer()->getH() * 4,
             0,2);
-    level->quadtree->SetFont(*this->font);
+    level->quadtree->SetFont(this->font);
 
     for(auto i = objects->begin(); i != objects->end(); i++){
         Entity *entity = *i;

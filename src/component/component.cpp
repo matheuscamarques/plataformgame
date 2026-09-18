@@ -49,7 +49,7 @@ float Component::getX() {
 }
 
 float Component::getY() {
-    return this->w;
+    return this->y;
 }
 
 float Component::getW() {

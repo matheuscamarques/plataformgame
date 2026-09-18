@@ -7,8 +7,8 @@
 #include "../../quadtree/quadtree.h"
 #include "../../defines.h"
 
-#define  M 50;
-#define  N 1000;
+#define  M 50
+#define  N 1000
 
 class Level {
     private:
@@ -22,6 +22,7 @@ class Level {
         void generateLevel();
     public:
         explicit Level(Quadtree *quadtree);
+        ~Level();
         Quadtree *quadtree;
         void addEnemy(Entity *enemy);
         void addPlatform(Entity *platform);
@@ -35,7 +36,7 @@ class Level {
        int getM();
        int getN();
 
-    int **map;// quadtree
+    std::vector<std::vector<int>> map;
 
     void setPlayer(Player *pPlayer);
 };

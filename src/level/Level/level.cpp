@@ -5,17 +5,24 @@
 #include "level.h"
 #include<string.h>
 
-Level::Level(Quadtree *quadtree)  {
+Level::Level(Quadtree *quadtree) : map(m, std::vector<int>(n, 0)) {
     this->quadtree = quadtree;
     this->platforms = new std::vector<Entity*>();
     this->colidesPlatforms = new std::vector<Entity*>();
     this->enemies = new std::vector<Entity*>();
-    this->map = (int **) malloc(sizeof(int *) * this->m);
-    for (int i = 0; i < BLOCK_SIZE; i++) {
-        this->map[i] = (int *) malloc(sizeof(int) * this->n);
-    }
 
     this->generateLevel();
+}
+
+Level::~Level() {
+    for (Entity *e : *platforms) delete e;
+    for (Entity *e : *enemies) delete e;
+    // colidesPlatforms compartilha ponteiros com platforms: só limpa, não deleta
+    delete platforms;
+    delete colidesPlatforms;
+    delete enemies;
+    delete player;
+    delete quadtree;
 }
 void Level::addEnemy(Entity *enemy)
 {
@@ -252,6 +259,10 @@ void Level::generateLevel()
     {
         for (int j = 0; j < this->n; j++)
         {
+            if (this->map[i][j] == 0)
+            {
+                continue;
+            }
             auto platform = new Entity(COLIDE, j * BLOCK_SIZE, i * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
 
             if (this->map[i][j] == 1)
@@ -274,10 +285,7 @@ void Level::generateLevel()
             {
                 platform->setFillColor(sf::Color(150, 75, 0));
             }
-            if (this->map[i][j] != 0)
-            {
-                this->platforms->push_back(platform);
-            }
+            this->platforms->push_back(platform);
         }
     }
 
@@ -311,20 +319,15 @@ void Level::generateLevel()
         }
     }
 
-    // std::vector<Entity*> *list = this->getPlatforms();
-    // auto p = list->begin();
-    // while (p != this->getPlatforms()->end())
-    // {
-    //     Entity * platform = *p;
-    //     if(!strcmp(platform->getName(),COLIDE))
-    //     {
-    //        colidesPlatforms->push_back(*p);
-    //     }
-
-    //     p++;
-    // }
-
-    colidesPlatforms = this->getPlatforms();
+    // Água só entra em platforms; colisão usa filtro abaixo.
+    colidesPlatforms->clear();
+    for (Entity *e : *platforms)
+    {
+        if (e->getName() != WATER)
+        {
+            colidesPlatforms->push_back(e);
+        }
+    }
 }
 
 std::vector<Entity*> *  Level::getColidePlatforms(){
