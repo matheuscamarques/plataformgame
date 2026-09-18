@@ -6,39 +6,30 @@
 
 #include "../../entities/entity/entity.hpp"
 #include "../../quadtree/quadtree.h"
-#include "../../world/hash.h"
+#include "../../world/chunkmanager.h"
 #include "../../defines.h"
 
-#define  M 50
-#define  N 1000
-
+// Fachada sobre o ChunkManager: mantém os chunks próximos ao player
+// carregados e expõe as entidades ativas como views (sem ownership).
 class Level {
-    private:
-        std::vector<std::unique_ptr<Entity>> enemies;
-        std::vector<std::unique_ptr<Entity>> platforms;
-        // views não-owning para dentro de platforms (água fica fora)
-        std::vector<Entity*> colidesPlatforms;
-        int m = M;
-        int n = N;
-        uint32_t seed = 1337u;
-
-        void generateLevel();
     public:
-        explicit Level(std::unique_ptr<Quadtree> qt);
-        ~Level();
+        explicit Level(uint32_t seed);
         std::unique_ptr<Quadtree> quadtree;
-        void addEnemy(std::unique_ptr<Entity> enemy);
-        void addPlatform(std::unique_ptr<Entity> platform);
-        std::vector<std::unique_ptr<Entity>> & getEnemies();
-        std::vector<std::unique_ptr<Entity>> & getPlatforms();
+
+        // Recarrega/descarrega chunks em torno do tile do player e
+        // reconstrói as listas ativas. Chamar uma vez por tick.
+        void update(int playerTileX, int playerTileY);
+
+        // Views não-owning para as entidades dos chunks ativos.
+        std::vector<Entity*> & getPlatforms();
         std::vector<Entity*> & getColidePlatforms();
+        size_t loadedChunkCount() const { return chunks.loadedCount(); }
+        uint32_t getSeed() const { return chunks.getSeed(); }
 
-       int getM();
-       int getN();
-       uint32_t getSeed() const { return seed; }
-       void setSeed(uint32_t s) { seed = s; }
-
-    std::vector<std::vector<int>> map;
+    private:
+        ChunkManager chunks;
+        std::vector<Entity*> activePlatforms;
+        std::vector<Entity*> activeColides;
 };
 
 

@@ -1,9 +1,14 @@
 #include <iostream>
 #include <chrono>
+#include <cmath>
 #include "./game.h"
 #include "../window/window.h"
 #include "../entities/player/player.h"
 #include "../quadtree/quadtree.h"
+
+namespace {
+constexpr uint32_t WORLD_SEED = 1337u;
+}
 
 
 
@@ -16,16 +21,8 @@ void Game::main()
 {
     auto game = std::make_unique<Game>();
     //game->view = new sf::View(sf::FloatRect(0.f, 0.f, 1000.f, 600.f));
-    auto level = std::make_unique<Level>(std::make_unique<Quadtree>(0.0f, 0.0f, 0.f, 0.f,0,0));
-    //  level->quadtree = new Quadtree(0.0f, 0.0f, level->getN()*50, level->getM()*50,0,1);
+    auto level = std::make_unique<Level>(WORLD_SEED);
     game->player = std::make_unique<Player>();
-    // for(auto i =0; i< level->getM();i++){
-    //     for(auto j=0;j<level->getN(); j++){
-    //         auto value = level->map[i][j];
-    //         std::cout << value << " ";
-    //     }
-    //     std::cout << std::endl;
-    // }
     game->setLevel(std::move(level));
 
     if (!game->font.loadFromFile("./arial.ttf"))
@@ -137,8 +134,7 @@ void Game::render()
             0,1);
     level->quadtree->SetFont(this->font);
 
-    for(auto &slot : objects){
-        Entity *entity = slot.get();
+    for(Entity *entity : objects){
         entity->tick();
         getLevel()->quadtree->AddObject( entity );
     }
@@ -222,6 +218,11 @@ void Game::tick() {
     player.get()->moveLeft  = sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
     player.get()->runFast   = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
     player.get()->tick();
+
+    // Mundo infinito: carrega/descarrega chunks em torno do tile do player.
+    int playerTileX = static_cast<int>(std::floor(player.get()->getX() / BLOCK_SIZE));
+    int playerTileY = static_cast<int>(std::floor(player.get()->getY() / BLOCK_SIZE));
+    getLevel()->update(playerTileX, playerTileY);
 
 
     auto &objects = getLevel()->getColidePlatforms();
