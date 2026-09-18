@@ -36,203 +36,32 @@ void Level::generateLevel()
     {
         for (int j = 0; j < this->n; j++)
         {
-            // get random value 0.000 a 1.000
-            if (i > m / 2 + m / 3)
-            {
-                // valor determinístico do tile (coluna j, linha i)
-                float random = rand01(j, i, seed);
-                // if random value is less than 0.2
-                if (random < 0.2)
-                {
-                    // set value to 1
-                    this->map[i][j] = 1;
-                }
-                else if (random > 0.2 && random < 0.4)
-                {
-                    this->map[i][j] = 5;
-                }
-                else if (random > 0.4 && random < 0.6)
-                {
-                    this->map[i][j] = 3;
-                }
-                else if (random > 0.6 && random < 0.8)
-                {
-                    this->map[i][j] = 3;
-                }
-                else if (random > 0.8 && random < 1.0)
-                {
-                    this->map[i][j] = 5;
-                }
-                else
-                {
-                    this->map[i][j] = 0;
-                }
-                continue;
-            }
+            // Terreno coerente: superfície suave via noise + tipos por hash.
+            // Funciona para qualquer coluna j (inclusive negativa, Fase 4).
+            float relief = valueNoise2D(j * 0.02f, 3.7f, seed); // [0,1] suave
+            int surface = m / 2 - 4 + static_cast<int>(relief * 9.0f);
 
-            if (i > m / 2 + m / 4)
+            if (i > surface)
             {
-                // valor determinístico do tile (coluna j, linha i)
-                float random = rand01(j, i, seed);
-                // if random value is less than 0.2
-                if (random < 0.2)
-                {
-                    // set value to 1
-                    this->map[i][j] = 0;
-                }
-                else if (random > 0.2 && random < 0.4)
-                {
-                    this->map[i][j] = 2;
-                }
-                else if (random > 0.4 && random < 0.6)
-                {
-                    this->map[i][j] = 3;
-                }
-                else if (random > 0.6 && random < 0.8)
-                {
-                    this->map[i][j] = 4;
-                }
-                else if (random > 0.8 && random < 1.0)
-                {
-                    this->map[i][j] = 5;
-                }
-                else
-                {
-                    this->map[i][j] = 0;
-                }
-                continue;
+                // Maciço: sempre sólido; tipo cosmético varia por hash.
+                float pick = rand01(j, i, seed ^ 0x9E3779B9u);
+                if (pick < 0.15f)      this->map[i][j] = 1;
+                else if (pick < 0.35f) this->map[i][j] = 2;
+                else if (pick < 0.55f) this->map[i][j] = 3;
+                else if (pick < 0.75f) this->map[i][j] = 4;
+                else                   this->map[i][j] = 5;
             }
-
-            if (i > m / 2 + m / 5)
+            else if (i == surface)
             {
-                // valor determinístico do tile (coluna j, linha i)
-                float random = rand01(j, i, seed);
-                // if random value is less than 0.2
-                if (random < 0.2)
-                {
-                    // set value to 1
-                    this->map[i][j] = 0;
-                }
-                else if (random > 0.2 && random < 0.4)
-                {
-                    this->map[i][j] = 2;
-                }
-                else if (random > 0.4 && random < 0.6)
-                {
-                    this->map[i][j] = 0;
-                }
-                else if (random > 0.6 && random < 0.8)
-                {
-                    this->map[i][j] = 4;
-                }
-                else if (random > 0.8 && random < 1.0)
-                {
-                    this->map[i][j] = 5;
-                }
-                else
-                {
-                    this->map[i][j] = 0;
-                }
-                continue;
+                // Topo do terreno: sempre sólido (chão contínuo e caminhável).
+                this->map[i][j] = 4;
             }
-
-            if (i > m / 2 + m / 6)
+            else
             {
-                // valor determinístico do tile (coluna j, linha i)
-                float random = rand01(j, i, seed);
-                // if random value is less than 0.2
-                if (random < 0.2)
-                {
-                    // set value to 1
-                    this->map[i][j] = 0;
-                }
-                else if (random > 0.2 && random < 0.4)
-                {
-                    this->map[i][j] = 2;
-                }
-                else if (random > 0.4 && random < 0.6)
-                {
-                    this->map[i][j] = 0;
-                }
-                else if (random > 0.6 && random < 0.8)
-                {
-                    this->map[i][j] = 4;
-                }
-                else if (random > 0.8 && random < 1.0)
-                {
-                    this->map[i][j] = 0;
-                }
-                else
-                {
-                    this->map[i][j] = 0;
-                }
-                continue;
-            }
-
-            if (i > m / 2 + m / 7)
-            {
-                // valor determinístico do tile (coluna j, linha i)
-                float random = rand01(j, i, seed);
-                // if random value is less than 0.2
-                if (random < 0.2)
-                {
-                    // set value to 1
-                    this->map[i][j] = 0;
-                }
-                else if (random > 0.2 && random < 0.4)
-                {
-                    this->map[i][j] = 2;
-                }
-                else if (random > 0.4 && random < 0.6)
-                {
-                    this->map[i][j] = 0;
-                }
-                else if (random > 0.6 && random < 0.8)
-                {
-                    this->map[i][j] = 0;
-                }
-                else if (random > 0.8 && random < 1.0)
-                {
-                    this->map[i][j] = 0;
-                }
-                else
-                {
-                    this->map[i][j] = 0;
-                }
-                continue;
-            }
-
-            if (i > m / 2)
-            {
-                // valor determinístico do tile (coluna j, linha i)
-                float random = rand01(j, i, seed);
-                // if random value is less than 0.2
-                if (random < 0.2)
-                {
-                    // set value to 1
-                    this->map[i][j] = 4;
-                }
-                else if (random > 0.2 && random < 0.4)
-                {
-                    this->map[i][j] = 2;
-                }
-                else if (random > 0.4 && random < 0.6)
-                {
-                    this->map[i][j] = 0;
-                }
-                else if (random > 0.6 && random < 0.8)
-                {
-                    this->map[i][j] = 0;
-                }
-                else if (random > 0.8 && random < 1.0)
-                {
-                    this->map[i][j] = 4;
-                }
-                else
-                {
-                    this->map[i][j] = 0;
-                }
-                continue;
+                // Acima do terreno: vazio, com plataformas flutuantes esparsas.
+                float plat = rand01(j, i, seed ^ 0x51F37EDu);
+                if (plat < 0.035f) this->map[i][j] = 2;
+                else               this->map[i][j] = 0;
             }
         }
     }
