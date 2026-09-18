@@ -1,10 +1,12 @@
 #ifndef PLATOFORMGAME_LEVEL_H
 #define PLATOFORMGAME_LEVEL_H
+#include <cstdint>
 #include <memory>
 #include <vector>
 
 #include "../../entities/entity/entity.hpp"
 #include "../../quadtree/quadtree.h"
+#include "../../world/hash.h"
 #include "../../defines.h"
 
 #define  M 50
@@ -18,6 +20,7 @@ class Level {
         std::vector<Entity*> colidesPlatforms;
         int m = M;
         int n = N;
+        uint32_t seed = 1337u;
 
         void generateLevel();
     public:
@@ -32,6 +35,8 @@ class Level {
 
        int getM();
        int getN();
+       uint32_t getSeed() const { return seed; }
+       void setSeed(uint32_t s) { seed = s; }
 
     std::vector<std::vector<int>> map;
 };

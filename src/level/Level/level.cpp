@@ -31,8 +31,7 @@ std::vector<std::unique_ptr<Entity>> &Level::getPlatforms()
 
 void Level::generateLevel()
 {
-    // percorre map set int values
-    srand(time(NULL));
+    // Geração determinística por tile: mesma (coluna, linha, seed) = mesmo mapa.
     for (int i = 0; i < this->m; i++)
     {
         for (int j = 0; j < this->n; j++)
@@ -40,8 +39,8 @@ void Level::generateLevel()
             // get random value 0.000 a 1.000
             if (i > m / 2 + m / 3)
             {
-                // set seed
-                float random = (float)rand() / (float)RAND_MAX;
+                // valor determinístico do tile (coluna j, linha i)
+                float random = rand01(j, i, seed);
                 // if random value is less than 0.2
                 if (random < 0.2)
                 {
@@ -73,8 +72,8 @@ void Level::generateLevel()
 
             if (i > m / 2 + m / 4)
             {
-                // set seed
-                float random = (float)rand() / (float)RAND_MAX;
+                // valor determinístico do tile (coluna j, linha i)
+                float random = rand01(j, i, seed);
                 // if random value is less than 0.2
                 if (random < 0.2)
                 {
@@ -106,8 +105,8 @@ void Level::generateLevel()
 
             if (i > m / 2 + m / 5)
             {
-                // set seed
-                float random = (float)rand() / (float)RAND_MAX;
+                // valor determinístico do tile (coluna j, linha i)
+                float random = rand01(j, i, seed);
                 // if random value is less than 0.2
                 if (random < 0.2)
                 {
@@ -139,8 +138,8 @@ void Level::generateLevel()
 
             if (i > m / 2 + m / 6)
             {
-                // set seed
-                float random = (float)rand() / (float)RAND_MAX;
+                // valor determinístico do tile (coluna j, linha i)
+                float random = rand01(j, i, seed);
                 // if random value is less than 0.2
                 if (random < 0.2)
                 {
@@ -172,8 +171,8 @@ void Level::generateLevel()
 
             if (i > m / 2 + m / 7)
             {
-                // set seed
-                float random = (float)rand() / (float)RAND_MAX;
+                // valor determinístico do tile (coluna j, linha i)
+                float random = rand01(j, i, seed);
                 // if random value is less than 0.2
                 if (random < 0.2)
                 {
@@ -205,8 +204,8 @@ void Level::generateLevel()
 
             if (i > m / 2)
             {
-                // set seed
-                float random = (float)rand() / (float)RAND_MAX;
+                // valor determinístico do tile (coluna j, linha i)
+                float random = rand01(j, i, seed);
                 // if random value is less than 0.2
                 if (random < 0.2)
                 {
