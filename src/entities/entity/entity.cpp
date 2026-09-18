@@ -28,12 +28,15 @@ Entity::Entity(int name,float x, float y, float w, float h) : Component(name,sf:
     this->bounds["top"].setOutlineColor(sf::Color::Green);
     this->bounds["top"].setOutlineThickness(1);
 
-    this->bounds["left"] = Component(BOUND,x,y,w*0.2f,h-(h*0.2f));
+    // Sensores laterais cobrem só a banda média [0.3h, 0.7h]: andar sobre
+    // o chão afunda o player ~vy por tick, e sensor alto demais encostava
+    // no tile vizinho do mesmo nível (parede invisível nas emendas).
+    this->bounds["left"] = Component(BOUND,x,y+h*0.3f,w*0.2f,h*0.4f);
     this->bounds["left"].setFillColor(sf::Color::Transparent);
     this->bounds["left"].setOutlineColor(sf::Color::Green);
     this->bounds["left"].setOutlineThickness(1);
 
-    this->bounds["right"] = Component(BOUND,x,y,w*0.20f,h-(h*0.2f));
+    this->bounds["right"] = Component(BOUND,x,y+h*0.3f,w*0.20f,h*0.4f);
     this->bounds["right"].setFillColor(sf::Color::Transparent);
     this->bounds["right"].setOutlineColor(sf::Color::Green);
     this->bounds["right"].setOutlineThickness(1);
@@ -129,16 +132,16 @@ Component Entity::getBoundsTop()
 
 Component Entity::getBoundsLeft()
 {
-    this->bounds["left"].setPosition(x,y+h*0.1f);
-    this->bounds["left"].top = this->y + h*0.1f;
+    this->bounds["left"].setPosition(x,y+h*0.3f);
+    this->bounds["left"].top = this->y + h*0.3f;
     this->bounds["left"].left = this->x;
     return this->bounds["left"];
 }
 
 Component Entity::getBoundsRight()
 {
-    this->bounds["right"].setPosition(x+w-w*0.2f,y+h*0.1f);
-    this->bounds["right"].top = y+h*0.1f;
+    this->bounds["right"].setPosition(x+w-w*0.2f,y+h*0.3f);
+    this->bounds["right"].top = y+h*0.3f;
     this->bounds["right"].left = x+w-w*0.2f;
     return this->bounds["right"];
 }
