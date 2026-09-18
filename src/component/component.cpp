@@ -23,8 +23,8 @@ sf::RectangleShape(size) ,
 sf::FloatRect(pos, size)
 {
     setPosition(pos);
-    left = x;
-    top  = y;
+    left = pos.x;
+    top  = pos.y;
     this->name = name;
 }
 

@@ -9,6 +9,10 @@ Entity::Entity(int name,float x, float y, float w, float h) : Component(name,sf:
     this->y = y;
     this->w = w;
     this->h = h;
+    // Sincroniza o FloatRect base: plataformas estáticas nunca recebem
+    // tick(), então left/top precisam nascer corretos para intersects().
+    this->left = x;
+    this->top = y;
     this->vx = 0;
     this->vy = 0;
     this->gravity = 0.0;
