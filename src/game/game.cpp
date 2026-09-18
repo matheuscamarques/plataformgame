@@ -107,9 +107,9 @@ void Game::render()
 
     window->clear(sf::Color(135, 206, 235));
     //view->setCenter(player.get()->getX(), player.get()->getY());
+    camera.tick(player.get()->getX(), player.get()->getY(), this->getW(), this->getH());
     auto view = window->getDefaultView();
-    view.move(player.get()->getX() - this->getW()/2,
-              player.get()->getY() - this->getH()/2);
+    view.move(camera.x, camera.y);
     //view.zoom(-10.0f);
     window->setView(view);
     getLevel()->quadtree->Draw(window);
@@ -127,14 +127,19 @@ void Game::render()
     window->draw(totalPlataformsTxt);
 
     getLevel()->quadtree = std::make_unique<Quadtree>(
-            player.get()->getX() - this->getW()/2 ,
-            player.get()->getY() - this->getH()/2,
+            camera.x,
+            camera.y,
             this->getW(),
             this->getH(),
             0,1);
     level->quadtree->SetFont(this->font);
 
+    // Só o visível (+margem) entra na quadtree do render.
+    float vx0 = camera.x - 60.0f, vy0 = camera.y - 60.0f;
+    float vx1 = camera.x + this->getW() + 60.0f, vy1 = camera.y + this->getH() + 60.0f;
     for(Entity *entity : objects){
+        if (entity->getX() + entity->getW() < vx0 || entity->getX() > vx1 ||
+            entity->getY() + entity->getH() < vy0 || entity->getY() > vy1) continue;
         entity->tick();
         getLevel()->quadtree->AddObject( entity );
     }

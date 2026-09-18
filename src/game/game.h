@@ -25,6 +25,7 @@ private:
     sf::RenderWindow *window;
     std::unique_ptr<Level> level;
     std::unique_ptr<Player> player;
+    Camera camera{0.0f, 0.0f};
     //sf::View *view;
     bool running = false;
     void render();
