@@ -77,6 +77,16 @@ inline const std::array<BlockDef, TILE_COUNT> BLOCKS = {{
     /* Cobblestone    */ {{110, 105,  95,255}, "cobblestone",     BlockKind::Solid},
     /* CrystalCluster */ {{ 80, 220, 230,255}, "crystal_cluster", BlockKind::Solid},
     /* PlasmaStone    */ {{120,  90,  50,255}, "plasma_stone",    BlockKind::Solid},
+    /* FossilStone    */ {{165, 155, 130,255}, "fossil_stone",    BlockKind::Solid},
+    /* GlowCap        */ {{ 90, 200, 180,255}, "glow_cap",        BlockKind::Solid},
+    /* GeodeStone     */ {{100, 130, 155,255}, "geode_stone",     BlockKind::Solid},
+    /* AncientLamp    */ {{200, 160,  90,255}, "ancient_lamp",    BlockKind::Solid},
+    /* CrystalHeart   */ {{120, 230, 240,255}, "crystal_heart",   BlockKind::Solid},
+    /* VolcanicBomb   */ {{140,  60,  50,255}, "volcanic_bomb",   BlockKind::Solid},
+    /* VoidShard      */ {{ 90,  60, 120,255}, "void_shard",      BlockKind::Solid},
+    /* BeatingHeart   */ {{170,  50,  60,255}, "beating_heart",   BlockKind::Solid},
+    /* SolarFlare     */ {{255, 220, 140,255}, "solar_flare",     BlockKind::Solid},
+    /* WorldEdge      */ {{ 30,  30,  40,255}, "world_edge",      BlockKind::Solid},
 }};
 
 inline const BlockDef& blockDef(Tile t) {

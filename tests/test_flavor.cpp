@@ -1,5 +1,6 @@
 #include <cassert>
 #include <cstdio>
+#include "core/Noise.h"
 #include "support/World/Block.h"
 #include "support/World/Generation.h"
 
@@ -46,6 +47,32 @@ int main() {
                 if (!isSolid(t)) continue; // caverna/água: fora do hook
                 assert(t == Tile::Stone || t == Tile::OreCopper ||
                        t == Tile::OreIron || t == Tile::OreGold);
+            }
+        }
+    }
+    { // RareFraction (~1% FossilStone no S1, hash direto ±30%)
+        const float chance = 0.010f;
+        const int N = 20000;
+        int hits = 0;
+        for (int i = 0; i < N; ++i) {
+            if (core::rand01(i, 0, 1337u + 0xB001u) < chance) hits++;
+        }
+        std::printf("fossil hash frac=%.4f\n", (float)hits / N);
+        assert(hits > (int)(N * chance * 0.7f) && hits < (int)(N * chance * 1.3f));
+    }
+    { // RareExistsInStratum (S1 gera FossilStone de verdade via tileType)
+        int found = 0;
+        for (int tx = -400; tx < 400 && !found; tx += 2) {
+            for (int ty = 200; ty < 1400; ty += 10) {
+                if (tileType(tx, ty, 1337u) == Tile::FossilStone) { found++; break; }
+            }
+        }
+        assert(found > 0);
+    }
+    { // RareNeverInWrongStratum (fossil só no S1; varre S2..S10)
+        for (int tx = -200; tx < 200; tx += 4) {
+            for (int ty = 1400; ty < 12000; ty += 40) {
+                assert(tileType(tx, ty, 1337u) != Tile::FossilStone);
             }
         }
     }

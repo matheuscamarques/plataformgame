@@ -11,14 +11,16 @@ int main() {
     BlockRegistry &reg = BlockRegistry::instance();
 
     { // TenEntriesWithMatchingBlocksTable
-        assert(reg.all().size() == 11u);
+        assert(reg.all().size() == 21u);
         for (auto &e : reg.all()) {
             const BlockDef &b = blockDef(e.tile);
             assert(std::string_view(b.name) == std::string_view(e.name));
             assert(b.color.r == e.r && b.color.g == e.g && b.color.b == e.b);
             assert(b.kind == e.kind);
             assert(e.chance >= 0.f && e.chance < 1.f);
-            assert(e.generates);
+            if (!e.generates) { // só os 2 gated de 2b
+                assert(e.tile == Tile::VolcanicBomb || e.tile == Tile::SolarFlare);
+            }
         }
     }
     { // BaseForStrata (S3+ tem base; S0-S2 = Stone legado)
@@ -39,11 +41,24 @@ int main() {
         for (int s = 1; s <= 5; ++s) assert(reg.flavorsFor(s).size() == 1u);
         for (int s = 6; s <= 10; ++s) assert(reg.flavorsFor(s).empty());
         assert(reg.flavorsFor(1)[0]->tile == Tile::PebbledStone);
-        assert(reg.raresFor(3).empty()); // raros vêm no C2
+        assert(reg.raresFor(3)[0]->tile == Tile::GeodeStone); // 2b: raro S3
     }
     { // TileBudgetGuard (124 cabem em uint8_t com folga)
-        assert(static_cast<int>(Tile::COUNT) == 54);
+        assert(static_cast<int>(Tile::COUNT) == 64);
         assert(TILE_COUNT <= 200u);
+    }
+    { // RaresForStrata (1 por estrato S1..S5/S7/S8/S10; S6/S9 gated=vazio)
+        assert(reg.raresFor(1)[0]->tile == Tile::FossilStone);
+        assert(reg.raresFor(2)[0]->tile == Tile::GlowCap);
+        assert(reg.raresFor(5)[0]->tile == Tile::CrystalHeart);
+        assert(reg.raresFor(10)[0]->tile == Tile::WorldEdge);
+        assert(reg.raresFor(6).empty() && reg.raresFor(9).empty());
+        // Raro tem exatamente 1 estrato no mask.
+        for (auto &e : reg.all()) {
+            if (!e.isRare) continue;
+            assert(__builtin_popcount(e.strataMask) == 1);
+            assert(e.chance > 0.f && e.chance < 0.05f);
+        }
     }
 
     std::printf("registry test OK\n");

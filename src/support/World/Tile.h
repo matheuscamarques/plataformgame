@@ -66,6 +66,17 @@ enum class Tile : uint8_t {
     CrystalCluster = 52,
     // 2a: base do S9 (tira o temporário BloodRock)
     PlasmaStone    = 53,
+    // 2b: 10 raros (2 gated: VolcanicBomb, SolarFlare)
+    FossilStone    = 54,
+    GlowCap        = 55,
+    GeodeStone     = 56,
+    AncientLamp    = 57,
+    CrystalHeart   = 58,
+    VolcanicBomb   = 59,
+    VoidShard      = 60,
+    BeatingHeart   = 61,
+    SolarFlare     = 62,
+    WorldEdge      = 63,
 
     COUNT
 };
