@@ -2,25 +2,41 @@
 #include <cstdio>
 #include <cstdlib>
 #include "core/Noise.h"
+#include "support/World/Generation.h"
+
 int main() {
     using namespace core;
-    const int m = 50;
+    using namespace support;
     uint32_t seed = 1337u;
-    int prev = -100, maxStep = 0, solidBelow = 0, checked = 0;
-    for (int j = -200; j < 1200; j++) {
-        float relief = valueNoise2D(j * 0.02f, 3.7f, seed);
-        assert(relief >= 0.0f && relief <= 1.0f);
-        int surface = m / 2 - 4 + static_cast<int>(relief * 9.0f);
-        assert(surface >= m/2-4 && surface <= m/2+5);
-        if (prev != -100) {
-            int step = std::abs(surface - prev);
-            if (step > maxStep) maxStep = step;
-            assert(step <= 1); // chão contínuo: degrau de no máximo 1 tile
-        }
-        prev = surface;
-        for (int i = surface + 1; i < m; i++) { solidBelow++; checked++; }
+
+    // máscara em [0,1]
+    for (int j = -500; j < 500; j++) {
+        float m = mountainMask(j, 0, seed);
+        assert(m >= 0.0f && m <= 1.0f);
     }
-    assert(checked == solidBelow); // tudo abaixo da superfície é sólido
-    std::printf("surface OK: maxStep=%d cols j=[-200,1200)\n", maxStep);
+
+    int prev = -1000, maxStep = 0, lo = 1000, hi = -1000;
+    for (int j = -1200; j < 1200; j++) {
+        int s = surfaceHeight(j, seed);
+        // base [21,30] menos até 18 de montanha
+        assert(s >= 25 - 4 - 18 && s <= 25 + 5);
+        if (s < lo) lo = s;
+        if (s > hi) hi = s;
+        if (prev != -1000) {
+            int step = std::abs(s - prev);
+            if (step > maxStep) maxStep = step;
+        }
+        prev = s;
+        // coerência tileType x superfície
+        for (int i = s - 2; i <= s + 2; i++) {
+            int t = tileType(j, i, seed);
+            if (i > s) assert(t != 0);                    // maciço sempre sólido
+            if (i == s) assert(t == 4);                   // topo sempre 4
+            if (i < s) assert(t == 0 || t == 2);          // ar ou plataforma
+            assert(tileType(j, i, seed) == t);            // determinístico
+        }
+    }
+    std::printf("surface+montanha OK: faixa=[%d,%d] maxStep=%d\n", lo, hi, maxStep);
+    assert(maxStep <= 4); // montanha íngreme, mas sem paredão
     return 0;
 }

@@ -11,7 +11,17 @@ const int SURFACE_MID = 25;
 
 int surfaceHeight(int tx, uint32_t seed) {
     float relief = core::valueNoise2D(tx * 0.02f, 3.7f, seed); // [0,1] suave
-    return SURFACE_MID - 4 + static_cast<int>(relief * 9.0f);
+    int base = SURFACE_MID - 4 + static_cast<int>(relief * 9.0f);
+    float m = mountainMask(tx, 0, seed);
+    if (m > MOUNTAIN_THRESHOLD) {
+        float t = (m - MOUNTAIN_THRESHOLD) / (1.0f - MOUNTAIN_THRESHOLD);
+        base -= static_cast<int>(t * 18.0f); // montanha sobe (y menor = mais alto)
+    }
+    return base;
+}
+
+float mountainMask(int tx, int ty, uint32_t seed) {
+    return core::fbm(tx / 256.0f, ty / 256.0f, seed + 1009u, 3);
 }
 
 int tileType(int tx, int ty, uint32_t seed) {

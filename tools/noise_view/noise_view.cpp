@@ -37,7 +37,7 @@ sf::Color tileColor(int t) {
 int main(int argc, char **argv) {
     if (argc != 8) {
         std::printf("uso: %s seed x0 x1 y0 y1 camada saida.png\n", argv[0]);
-        std::printf("camadas: relief | surface | tiles\n");
+        std::printf("camadas: relief | mask | surface | tiles\n");
         return 2;
     }
     uint32_t seed = static_cast<uint32_t>(std::strtoul(argv[1], nullptr, 10));
@@ -63,6 +63,10 @@ int main(int argc, char **argv) {
                 if (v < lo) lo = v;
                 if (v > hi) hi = v;
                 sum += v;
+            } else if (layer == "mask") {
+                float v = support::mountainMask(tx, ty, seed);
+                px = sf::Color(gray(v), gray(v), gray(v));
+                if (v > support::MOUNTAIN_THRESHOLD) sum += 1.0f;
             } else if (layer == "surface") {
                 // Banda clara = linha da superfície.
                 int s = support::surfaceHeight(tx, seed);
@@ -86,6 +90,9 @@ int main(int argc, char **argv) {
     if (layer == "relief") {
         int n = (x1 - x0) * (y1 - y0);
         std::printf("salvo %s (lo=%.3f hi=%.3f media=%.3f)\n", out.c_str(), lo, hi, sum / n);
+    } else if (layer == "mask") {
+        int n = (x1 - x0) * (y1 - y0);
+        std::printf("salvo %s (fração montanhosa=%.3f, alvo 0.30-0.40)\n", out.c_str(), sum / n);
     } else {
         std::printf("salvo %s\n", out.c_str());
     }
