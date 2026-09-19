@@ -1,10 +1,14 @@
 #pragma once
 
+#include <SFML/Graphics/Rect.hpp>
 #include "../entity/entity.hpp"
 #include "../../support/Body.h"
 #include "../../core/Cooldown.h"
 
 namespace support { class ThrowSystem; }
+
+// Fase do swing atual. Idle = sem ataque em curso.
+enum class MeleePhase : uint8_t { Idle, Windup, Active, Recovery };
 
 class Player : public Entity
 {
@@ -21,6 +25,17 @@ class Player : public Entity
         core::Cooldown throwCooldown{0.5f};
         int dynamiteCount = 999;
 
+        // Combate: HP + i-frames. Morte/restart ficam para o bloco B.
+        int hp = 100;
+        int hpMax = 100;
+        core::Cooldown hurtIframes;
+
+        // Melee light 3-hit. Estado avançado pelo MeleeSystem (tem dt).
+        MeleePhase meleePhase = MeleePhase::Idle;
+        int meleeCombo = 0;
+        float meleeTimer = 0.f;
+        int meleeSwingId = 0;
+
         Player();
         void collide(Entity entity);
         void collide(Component bloco);
@@ -29,4 +44,22 @@ class Player : public Entity
         // Tenta arremessar na direção do facing com arco fixo.
         // Retorna false sem efeito se cooldown/inventário/pool bloquearem.
         bool tryThrow(support::ThrowSystem &throws);
+
+        // Dano com gate de i-frame (0.6s). Retorna se aplicou.
+        // hp trava em 0; morte/restart vêm no bloco B.
+        bool hurt(int dmg);
+
+        // Inicia swing (Idle→combo 0) ou encadeia (Recovery→próximo).
+        // Retorna false se já está em Windup/Active.
+        bool startSwing();
+
+        // Avança timers; retorna a fase atual.
+        MeleePhase updateMelee(float dt);
+
+        // Hitbox do swing atual (à frente, lado do facing). Só válida
+        // em Active; em outras fases retorna rect vazio.
+        // Não-const: getters legados do Entity não são const.
+        sf::FloatRect meleeHitbox();
+        int meleeDamage() const;
+        float meleePosture() const;
 };

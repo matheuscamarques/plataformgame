@@ -27,6 +27,8 @@ struct Slime {
     bool grounded = false;
     // IA não sobrescreve vel enquanto roda (knockback visível).
     core::Cooldown knockbackLock;
+    // Último swing de melee que acertou (1 hit por swing por slime).
+    int lastHitSwing = -1;
 
     Slime(Entity b, std::unique_ptr<Behavior> a)
         : body(std::move(b)), ai(std::move(a)) {}

@@ -8,12 +8,14 @@
 #include "../support/World/World.h"
 #include "../entities/player/player.h"
 #include "../support/Camera/Camera.h"
+#include "../support/ContactDamageSystem.h"
 #include "../support/Debug/DebugOverlay.h"
 #include "../support/DeathSystem.h"
 #include "../support/DropSystem.h"
 #include "../support/EnemySystem.h"
 #include "../support/ExplosionSystem.h"
 #include "../support/Input/InputMap.h"
+#include "../support/MeleeSystem.h"
 #include "../support/ParticleSystem.h"
 #include "../support/ThrowSystem.h"
 
@@ -42,6 +44,7 @@ private:
     support::ThrowSystem *throws_ = nullptr; // observa; dono é o scheduler
     support::ExplosionSystem *explodes_ = nullptr; // observa; dono é o scheduler
     support::DeathSystem *deaths_ = nullptr; // observa; dono é o scheduler
+    support::MeleeSystem *melee_ = nullptr; // observa; dono é o scheduler
     support::DropSystem *drops_ = nullptr; // observa; dono é o scheduler
     support::ParticleSystem *particles_ = nullptr; // observa; dono é o scheduler
     bool running = false;

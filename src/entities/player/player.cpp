@@ -129,3 +129,71 @@ bool Player::tryThrow(support::ThrowSystem &throws) {
     throwCooldown.trigger();
     return true;
 }
+
+bool Player::hurt(int dmg) {
+    if (dmg <= 0 || hp <= 0 || !hurtIframes.ready()) return false;
+    hp -= dmg;
+    if (hp < 0) hp = 0;
+    hurtIframes.trigger(0.6f);
+    return true;
+}
+
+namespace {
+struct MeleeDef {
+    float windup, active, recovery;
+    int   damage;
+    float posture;
+    float hx, hy; // tamanho da hitbox
+};
+
+// Combo light 3-hit: tempos em segundos (tick fixo 1/30).
+constexpr MeleeDef kLight[3] = {
+    {0.06f, 0.08f, 0.10f,  8,  5.f, 16.f, 20.f},
+    {0.05f, 0.08f, 0.12f, 10,  6.f, 18.f, 20.f},
+    {0.10f, 0.10f, 0.22f, 16, 12.f, 22.f, 24.f},
+};
+} // namespace
+
+bool Player::startSwing() {
+    if (meleePhase == MeleePhase::Idle) {
+        meleeCombo = 0;
+    } else if (meleePhase == MeleePhase::Recovery) {
+        meleeCombo = (meleeCombo + 1) % 3;
+    } else {
+        return false; // Windup/Active: press ignorado
+    }
+    meleePhase = MeleePhase::Windup;
+    meleeTimer = kLight[meleeCombo].windup;
+    meleeSwingId++;
+    return true;
+}
+
+MeleePhase Player::updateMelee(float dt) {
+    if (meleePhase == MeleePhase::Idle) return meleePhase;
+    meleeTimer -= dt;
+    if (meleeTimer > 0.f) return meleePhase;
+    const MeleeDef &d = kLight[meleeCombo];
+    if (meleePhase == MeleePhase::Windup) {
+        meleePhase = MeleePhase::Active;
+        meleeTimer = d.active;
+    } else if (meleePhase == MeleePhase::Active) {
+        meleePhase = MeleePhase::Recovery;
+        meleeTimer = d.recovery;
+    } else { // Recovery esgotou: volta ao Idle
+        meleePhase = MeleePhase::Idle;
+        meleeCombo = 0;
+    }
+    return meleePhase;
+}
+
+sf::FloatRect Player::meleeHitbox() {
+    if (meleePhase != MeleePhase::Active) return sf::FloatRect{};
+    const MeleeDef &d = kLight[meleeCombo];
+    const float cx = getCenterX() + static_cast<float>(facing) * (getW() * 0.5f + d.hx * 0.5f);
+    const float cy = getCenterY();
+    return sf::FloatRect{cx - d.hx * 0.5f, cy - d.hy * 0.5f, d.hx, d.hy};
+}
+
+int Player::meleeDamage() const { return kLight[meleeCombo].damage; }
+
+float Player::meleePosture() const { return kLight[meleeCombo].posture; }

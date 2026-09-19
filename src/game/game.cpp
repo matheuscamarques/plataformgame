@@ -46,12 +46,15 @@ void Game::main()
     game->throws_ = &game->scheduler_.add<support::ThrowSystem>();
     game->explodes_ = &game->scheduler_.add<support::ExplosionSystem>();
     game->deaths_ = &game->scheduler_.add<support::DeathSystem>();
+    game->melee_ = &game->scheduler_.add<support::MeleeSystem>();
+    game->scheduler_.add<support::ContactDamageSystem>();
     game->drops_ = &game->scheduler_.add<support::DropSystem>();
     game->throws_->setExplosionSystem(game->explodes_);
     game->throws_->setParticleSystem(game->particles_);
     game->explodes_->setParticleSystem(game->particles_);
     game->deaths_->setDropSystem(game->drops_);
     game->deaths_->setParticleSystem(game->particles_);
+    game->melee_->setParticleSystem(game->particles_);
     game->enemies_->spawn("slime", (spawnTx - 6) * BLOCK_SIZE, 0.0f);
     game->enemies_->spawn("slime", (spawnTx + 6) * BLOCK_SIZE, 0.0f);
 
@@ -170,6 +173,17 @@ void Game::render()
     });
 
     particles_->render(*window);
+
+    // Flash do swing: outline da hitbox só na janela Active.
+    if (player.get()->meleePhase == MeleePhase::Active) {
+        const sf::FloatRect box = player.get()->meleeHitbox();
+        sf::RectangleShape r(sf::Vector2f(box.width, box.height));
+        r.setPosition(box.left, box.top);
+        r.setFillColor(sf::Color::Transparent);
+        r.setOutlineColor(sf::Color::Yellow);
+        r.setOutlineThickness(1.f);
+        window->draw(r);
+    }
 
     drops_->render(*window);
 
