@@ -50,16 +50,24 @@ int main() {
         // coerência tileType x superfície
         for (int i = s - 2; i <= s + 2; i++) {
             Tile t = tileType(j, i, seed);
-            if (i > s) assert(isSolid(t));                // maciço sempre sólido
+            // maciço sempre sólido, exceto boca (ar seco, água molhada)
+            if (i > s) {
+                bool mouthWater = t == Tile::Water && wormMouth(j, i, seed);
+                assert(isSolid(t) || mouthWater ||
+                       (t == Tile::Air && wormMouth(j, i, seed)));
+            }
             if (i == s) {
                 // topo decide por bioma (areia continua 6 na costa),
-                // ou neve 8 nos picos altos e fortes.
+                // neve nos picos, boca (ar em terra, água em oceano).
                 bool ocean = isOceanColumn(j, seed);
                 Biome b = pickBiome(temperature(j, s, seed), humidity(j, s, seed),
                                     ocean, isCoastal(s));
-                Tile expected = snowcap(s) ? Tile::Snow : biomeTopTile(b);
+                Tile expected = wormMouth(j, s, seed)
+                    ? (ocean ? Tile::Water : Tile::Air)
+                    : snowcap(s) ? Tile::Snow : biomeTopTile(b);
                 assert(t == expected);
-                if (isCoastal(s)) assert(t == Tile::Sand);
+                // costa é areia, exceto boca (ar/água)
+                if (isCoastal(s) && !wormMouth(j, s, seed)) assert(t == Tile::Sand);
             }
             if (i < s) {
                 // ar, ilha — ou água na banda do oceano

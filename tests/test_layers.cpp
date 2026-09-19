@@ -15,13 +15,16 @@ int main() {
             int s = col.surface;
             bool ocean = col.ocean;
 
-            // 1. Topo == tile do bioma (ou neve).
+            // 1. Topo == tile do bioma (ou neve, ou boca).
             {
                 Tile top = tileType(tx, s, seed);
                 assert(top == tileType(tx, s, seed, col)); // sobrecarga idêntica
                 Biome b = pickBiome(col.temperature, col.humidity,
                                     ocean, isCoastal(s));
-                Tile expected = snowcap(s) ? Tile::Snow : biomeTopTile(b);
+                Tile expected = wormMouth(tx, s, seed)
+                              ? (ocean ? Tile::Water : Tile::Air)
+                              : snowcap(s)            ? Tile::Snow
+                                                      : biomeTopTile(b);
                 assert(top == expected);
             }
 

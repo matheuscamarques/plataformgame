@@ -87,6 +87,29 @@ float caveNoise(int tx, int ty, uint32_t seed) {
     return core::fbm(tx / 64.0f, ty / 64.0f, seed + 2017u, 3);
 }
 
+float wormDist(int tx, int ty, uint32_t seed) {
+    // Salt 7121 livre (em uso: 1009/2017/3019/4021/6067/7079/8081/9091/XORs).
+    float n = core::fbm(tx * WORM_FREQ, ty * WORM_FREQ, seed + 7121u, 2);
+    return std::fabs(n - 0.5f);
+}
+
+bool wormCave(int tx, int ty, uint32_t seed) {
+    return wormDist(tx, ty, seed) < WORM_WIDTH;
+}
+
+bool wormMouth(int tx, int ty, uint32_t seed) {
+    return wormDist(tx, ty, seed) < WORM_WIDTH * WORM_MOUTH_FRAC;
+}
+
+float lakeWet(int tx, int ty, uint32_t seed) {
+    // fbm 2D direto (não por coluna): lago acompanha o relevo do noise.
+    float n = core::fbm(tx * 0.020f, ty * 0.020f, seed + 7151u, 3);
+    float t = (n - LAKE_THRESHOLD) / 0.10f;
+    if (t < 0.0f) t = 0.0f;
+    if (t > 1.0f) t = 1.0f;
+    return t;
+}
+
 float temperature(int tx, int ty, uint32_t seed) {
     return core::fbm(tx / 512.0f, ty / 512.0f, seed + 3019u, 3);
 }
@@ -186,7 +209,11 @@ Tile biomeTopTile(Biome b) {
 }
 
 bool isCave(int tx, int ty, uint32_t seed, int surfaceY, float mountain) {
-    if (ty < surfaceY + 3) return false; // guard: nunca perto da superfície
+    // Boca primeiro: centro do verme abre passagem na faixa do guard.
+    // Fora do centro, o guard protege (nunca perto da superfície).
+    if (ty < surfaceY + 3) return wormMouth(tx, ty, seed);
+    // Verme soma ao blob (nunca substitui): ou escava, ou deixa quieto.
+    if (wormCave(tx, ty, seed)) return true;
     // Divisor 40 (não 25): falloff satura devagar; threshold fica acima
     // da mediana (~0.49) em todo lugar — pedra continua sendo a maioria.
     float depth = float(ty - surfaceY) / CAVE_DEPTH_RANGE;
@@ -234,6 +261,8 @@ Tile tileType(int tx, int ty, uint32_t seed, const ColumnData &col) {
             // Caverna funda vira lava, não ar. Com +5 de folga para a
             // boca não abrir direto na lava. Acima do surface, nunca.
             if (ty > LAVA_LEVEL && ty > surface + 5) return Tile::Lava;
+            // Lago: caverna rasa com wetness vira água (funda é lava).
+            if (lakeWet(tx, ty, seed) > 0.0f) return Tile::Water;
             return airOrWater(ty);
         }
         if (ty <= surface + DIRT_DEPTH) {
@@ -245,9 +274,13 @@ Tile tileType(int tx, int ty, uint32_t seed, const ColumnData &col) {
         Tile ore = pickOre(tx, ty, seed, surface, ty - surface);
         return ore != Tile::Air ? ore : Tile::Stone;
     }
-    // Topo: clima da coluna na altura da superfície (não do tile fundo).
-    // Neve primeiro: pico alto e forte passa na frente do bioma.
+    // Topo: boca de verme abre passagem (resto do guard protege).
+    // Neve depois da boca: pico com entrada mostra a entrada.
+    // Clima por último.
     if (ty == surface) {
+        // Boca no topo: buraco. Em oceano é água (submerso), em terra é ar.
+        if (isCave(tx, ty, seed, surface, col.mountain))
+            return ocean ? Tile::Water : Tile::Air;
         if (snowcap(surface)) return Tile::Snow;
         Biome b = pickBiome(col.temperature, col.humidity,
                             ocean, isCoastal(surface));

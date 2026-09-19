@@ -58,8 +58,12 @@ int main() {
                 default: break;
             }
             if (idx >= 0) seen[idx] = true;
-            // topo do mundo == topo do bioma (ou neve nos picos)
-            Tile expected = snowcap(s) ? Tile::Snow : biomeTopTile(b);
+            // topo do mundo == topo do bioma (ou neve nos picos,
+            // ou ar onde o verme abre boca).
+            Tile expected = wormMouth(tx, s, seed)
+                              ? (ocean ? Tile::Water : Tile::Air)
+                          : snowcap(s)            ? Tile::Snow
+                                                  : biomeTopTile(b);
             assert(tileType(tx, s, seed) == expected);
             if (expected == Tile::Grass) seenGrassTop = true;
         }

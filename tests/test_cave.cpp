@@ -8,22 +8,28 @@ int main() {
     using namespace support;
 
     for (uint32_t seed : {1337u, 999u, 42u}) {
-        // Guard direto: nunca caverna em/até surfaceY + 2.
+        // Guard direto: nunca caverna em/até surfaceY + 2,
+        // EXCETO boca de verme (única exceção, testada em test_worms).
         for (int tx = -300; tx < 300; tx += 7) {
             int s = surfaceHeight(tx, seed);
             float m = mountainMask(tx, 0, seed);
-            assert(!isCave(tx, s, seed, s, m));
-            assert(!isCave(tx, s + 1, seed, s, m));
-            assert(!isCave(tx, s + 2, seed, s, m));
+            assert(!isCave(tx, s, seed, s, m) || wormMouth(tx, s, seed));
+            assert(!isCave(tx, s + 1, seed, s, m) || wormMouth(tx, s + 1, seed));
+            assert(!isCave(tx, s + 2, seed, s, m) || wormMouth(tx, s + 2, seed));
             assert(isCave(tx, s, seed, s, m) == isCave(tx, s, seed, s, m)); // determinístico
         }
 
-        // Invariante que não pode falhar: nenhum buraco em wy <= surface + 2.
+        // Invariante: nenhum buraco em wy <= surface + 2, exceto boca
+        // (ar seco ou água se a boca está molhada).
         for (int tx = -400; tx < 400; tx++) {
             int s = surfaceHeight(tx, seed);
             for (int ty = s - 4; ty <= s + 2; ty++) {
                 Tile t = tileType(tx, ty, seed);
-                if (ty >= s) assert(isSolid(t)); // topo/maciço: sempre sólido
+                if (ty >= s) {
+                    bool mouthWater = t == Tile::Water && wormMouth(tx, ty, seed);
+                    assert(isSolid(t) || mouthWater ||
+                           (t == Tile::Air && wormMouth(tx, ty, seed)));
+                }
                 assert(tileType(tx, ty, seed) == t); // determinístico
             }
         }

@@ -22,17 +22,24 @@ int main() {
             // Topo: areia na costa (inclui todo oceano), bioma fora dela.
             Tile top = tileType(tx, s, seed);
             if (isCoastal(s)) {
-                assert(top == Tile::Sand);
-                sandTops++;
+                // areia, exceto boca (ar em terra, água em oceano)
+                bool mouthOk = wormMouth(tx, s, seed) &&
+                               top == (ocean ? Tile::Water : Tile::Air);
+                assert(top == Tile::Sand || mouthOk);
+                if (top == Tile::Sand) sandTops++;
             } else {
                 Biome b = pickBiome(temperature(tx, s, seed), humidity(tx, s, seed),
                                     ocean, false);
-                Tile expected = snowcap(s) ? Tile::Snow : biomeTopTile(b);
+                Tile expected = wormMouth(tx, s, seed)
+                              ? (ocean ? Tile::Water : Tile::Air)
+                              : snowcap(s)            ? Tile::Snow
+                                                      : biomeTopTile(b);
                 assert(top == expected);
             }
             if (ocean) {
-                oceanTops++;
-                assert(top == Tile::Sand); // oceano é sempre costeiro (s <= SEA+3 aqui)
+                // oceano é sempre costeiro (s <= SEA+3 aqui): areia ou boca d'água
+                if (top == Tile::Sand) oceanTops++;
+                else assert(top == Tile::Water && wormMouth(tx, s, seed));
             }
 
             // Céu acima do mar: ar. Banda d'água: Tile::Water (vira entidade).
@@ -50,7 +57,10 @@ int main() {
             if (!ocean) {
                 Biome b = pickBiome(temperature(tx, s, seed), humidity(tx, s, seed),
                                     false, isCoastal(s));
-                Tile expected = snowcap(s) ? Tile::Snow : biomeTopTile(b);
+                Tile expected = wormMouth(tx, s, seed)
+                              ? (ocean ? Tile::Water : Tile::Air)
+                              : snowcap(s)            ? Tile::Snow
+                                                      : biomeTopTile(b);
                 assert(top == expected);
                 for (int ty = s - 10; ty < s; ty++) {
                     Tile t = tileType(tx, ty, seed);

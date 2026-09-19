@@ -31,7 +31,7 @@ sf::Color tileColor(support::Tile t) {
 int main(int argc, char **argv) {
     if (argc != 8) {
         std::printf("uso: %s seed x0 x1 y0 y1 camada saida.png\n", argv[0]);
-        std::printf("camadas: relief | mask | peak | cave | overlay | temp | humid | biome_overlay | biomes | surface | tiles\n");
+        std::printf("camadas: relief | mask | peak | cave | worms | overlay | temp | humid | biome_overlay | biomes | surface | tiles\n");
         return 2;
     }
     uint32_t seed = static_cast<uint32_t>(std::strtoul(argv[1], nullptr, 10));
@@ -74,6 +74,8 @@ int main(int argc, char **argv) {
                 if (v < lo) lo = v;
                 if (v > hi) hi = v;
                 sum += v;
+            } else if (layer == "worms") {
+                px = support::wormCave(tx, ty, seed) ? sf::Color::White : sf::Color::Black;
             } else if (layer == "overlay") {
                 // R = mountainMask, G = caveNoise: onde bate, modulação atua.
                 float m = support::mountainMask(tx, ty, seed);

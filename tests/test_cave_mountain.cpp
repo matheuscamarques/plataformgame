@@ -40,12 +40,16 @@ int main() {
         assert(strict > 200); // bônus abre cavernas de verdade
         std::printf("seed=%u monotonicidade OK (strict=%d)\n", seed, strict);
 
-        // 2) Guard intacto nos picos: topo de montanha nunca é oco.
+        // 2) Guard intacto nos picos: topo de montanha nunca é oco
+        // (exceto boca, seca ou molhada).
         for (int tx = -1200; tx < 1200; tx++) {
             int s = surfaceHeight(tx, seed);
             for (int ty = s; ty <= s + 2; ty++) {
-                assert(isSolid(tileType(tx, ty, seed)));
-                assert(tileType(tx, ty, seed) == tileType(tx, ty, seed));
+                Tile t = tileType(tx, ty, seed);
+                bool mouthWater = t == Tile::Water && wormMouth(tx, ty, seed);
+                assert(isSolid(t) || mouthWater ||
+                       (t == Tile::Air && wormMouth(tx, ty, seed)));
+                assert(tileType(tx, ty, seed) == t);
             }
         }
 

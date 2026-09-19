@@ -93,6 +93,23 @@ float humidity(int tx, int ty, uint32_t seed);    // features médias
 // Nunca sobre o oceano. Substitui o ruído 3.5% que parecia "bloco voando".
 bool islandTile(int tx, int ty, uint32_t seed);
 
+// Worms (túneis vermiformes): seguem a iso-linha n~=0.5 do noise,
+// gerando túneis conectados em vez de blobs. Aditivo ao blob:
+// worm nunca substitui, só acrescenta. Calibrado: width 0.020 =>
+// área 5-17%, conectividade 0.77-1.0, bocas 5-8% das colunas.
+// Mouth: fração do centro que abre boca (ty em [surface, surface+2]).
+inline constexpr float WORM_FREQ = 0.010f;
+inline constexpr float WORM_WIDTH = 0.020f;
+inline constexpr float WORM_MOUTH_FRAC = 0.5f;
+float wormDist(int tx, int ty, uint32_t seed); // |n-0.5|, sem threshold
+bool wormCave(int tx, int ty, uint32_t seed);  // dist < width
+bool wormMouth(int tx, int ty, uint32_t seed); // centro: abre boca
+// Lagos: não carvam nada, pintam ar já carvado. fbm /0.020 (mais blobs
+// que /0.008: fração wet>0 estável 9-12% nas 3 seeds em vez de 3-41%).
+// Threshold 0.68 calibrado por histograma.
+inline constexpr float LAKE_THRESHOLD = 0.68f;
+float lakeWet(int tx, int ty, uint32_t seed); // [0,1]: 0 seco, 1 cheio
+
 // Neve no pico: só altitude (surface <= 14 exige uplift alto, que só
 // montanha alcança). t alto sem altitude é flanco, não pico.
 bool snowcap(int surface);
