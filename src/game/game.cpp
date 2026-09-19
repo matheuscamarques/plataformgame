@@ -37,6 +37,11 @@ void Game::main()
     }
     LOG_INFO("Game", "boot ok, seed=" << WORLD_SEED << " spawnTx=" << spawnTx);
 
+    // Sistemas via scheduler; 2 slimes perto do spawn (determinístico).
+    game->enemies_ = &game->scheduler_.add<support::EnemySystem>();
+    game->enemies_->spawn("slime", (spawnTx - 6) * BLOCK_SIZE, 0.0f);
+    game->enemies_->spawn("slime", (spawnTx + 6) * BLOCK_SIZE, 0.0f);
+
     // add border font
 
     Window window(800, 800, "Game", game.get());
@@ -132,6 +137,8 @@ void Game::render()
 
     player.get()->draw(window);
 
+    enemies_->forEach([&](support::Slime &s) { s.body.draw(window); });
+
     overlay_.render(*window, font, *getWorld(), *player.get(), objects.size());
 
     window->display();
@@ -166,6 +173,10 @@ void Game::tick() {
             p->collide(*e);
         }
     }
+
+    // Sistemas (inimigos etc.): scheduler com prioridade declarada.
+    support::GameContext ctx{getWorld(), p, &input_};
+    scheduler_.tick(1.0f / 30.0f, ctx);
 }
 
 support::World* Game::getWorld() {

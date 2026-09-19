@@ -22,6 +22,12 @@ void Player::collide(Entity bloco)
     ){
         return;
     }
+    // Slime não empurra o player (dano de contato vem na Fase C).
+    if(
+        bloco.getName() == SLIME
+    ){
+        return;
+    }
     if(
         bloco.getName() == TREE_TRUNK || bloco.getName() == TREE_LEAF
     ){

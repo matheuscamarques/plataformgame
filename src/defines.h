@@ -8,4 +8,6 @@
 // mesmos números por convenção, não por acoplamento).
 #define TREE_TRUNK 20
 #define TREE_LEAF 21
+// Inimigos (Fase C usa; mundo nunca gera).
+#define SLIME 40
 #define BOUND 99
