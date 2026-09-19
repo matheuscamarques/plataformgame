@@ -45,11 +45,12 @@ int main() {
     assert(snapshot(find(m.loaded(), 0, 0)) == before);
     assert(snapshot(find(m.loaded(), -2, -2)) == negBefore);
 
-    // Seed diferente gera mundo diferente.
+    // Seed diferente gera mundo diferente (compara maciço, não céu:
+    // céu pode ser identicamente vazio nas duas seeds).
     support::ChunkManager other(999u, 0);
-    other.update(0, 0);
+    other.update(0, 40); // chunk (0,2): maciço
     assert(other.loadedCount() == 1);
-    assert(snapshot(find(other.loaded(), 0, 0)) != before);
+    assert(snapshot(find(other.loaded(), 0, 2)) != snapshot(find(m.loaded(), 0, 2)));
 
     // Chunks têm 256 tiles; algum chunk carregado tem entidades
     // (o (0,0) pode ser céu vazio sobre o oceano — sem plataformas lá).

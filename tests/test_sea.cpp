@@ -27,7 +27,8 @@ int main() {
             } else {
                 Biome b = pickBiome(temperature(tx, s, seed), humidity(tx, s, seed),
                                     ocean, false);
-                assert(top == biomeTopTile(b));
+                int expected = snowcap(tx, seed, s) ? 8 : biomeTopTile(b);
+                assert(top == expected);
             }
             if (ocean) {
                 oceanTops++;
@@ -45,11 +46,13 @@ int main() {
                 }
             }
 
-            // Terra segue igual: topo sólido do bioma, ar acima (ou plataforma).
+            // Terra segue igual: topo sólido do bioma (ou neve 8 nos picos),
+            // ar acima (ou ilha).
             if (!ocean) {
                 Biome b = pickBiome(temperature(tx, s, seed), humidity(tx, s, seed),
                                     false, isCoastal(s));
-                assert(top == biomeTopTile(b));
+                int expected = snowcap(tx, seed, s) ? 8 : biomeTopTile(b);
+                assert(top == expected);
                 for (int ty = s - 10; ty < s; ty++) {
                     int t = tileType(tx, ty, seed);
                     assert(t == 0 || t == 2);

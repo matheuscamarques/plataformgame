@@ -32,11 +32,13 @@ int main() {
             int t = tileType(j, i, seed);
             if (i > s) assert(t != 0);                    // maciço sempre sólido
             if (i == s) {
-                // topo decide por bioma (areia continua 6 na costa)
+                // topo decide por bioma (areia continua 6 na costa),
+                // ou neve 8 nos picos altos e fortes.
                 bool ocean = isOceanColumn(j, seed);
                 Biome b = pickBiome(temperature(j, s, seed), humidity(j, s, seed),
                                     ocean, isCoastal(s));
-                assert(t == biomeTopTile(b));
+                int expected = snowcap(j, seed, s) ? 8 : biomeTopTile(b);
+                assert(t == expected);
                 if (isCoastal(s)) assert(t == 6);
             }
             if (i < s) assert(t == 0 || t == 2);          // ar ou plataforma

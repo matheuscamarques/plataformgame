@@ -57,8 +57,9 @@ int main() {
                 default: break;
             }
             if (idx >= 0) seen[idx] = true;
-            // topo do mundo == topo do bioma
-            assert(tileType(tx, s, seed) == biomeTopTile(b));
+            // topo do mundo == topo do bioma (ou neve 8 nos picos)
+            int expected = snowcap(tx, seed, s) ? 8 : biomeTopTile(b);
+            assert(tileType(tx, s, seed) == expected);
         }
     }
     for (int i = 0; i < 8; i++) assert(seen[i]);

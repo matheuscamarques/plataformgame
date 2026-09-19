@@ -1,6 +1,7 @@
 #include "Generation.h"
 
 #include <cmath>
+#include <initializer_list>
 
 #include "../../core/Noise.h"
 #include "ChunkKey.h"
@@ -54,6 +55,23 @@ bool islandTile(int tx, int ty, uint32_t seed) {
     if (isOceanColumn(cx, seed)) return false; // céu limpo sobre o mar
     int hy = surfaceHeight(cx, seed) - 6 - int(core::rand01(g, 37, seed ^ SALT) * 5.0f);
     return ty == hy;
+}
+
+bool snowcap(int tx, uint32_t seed, int surface) {
+    float m = mountainMask(tx, 0, seed);
+    float t = (m - MOUNTAIN_THRESHOLD) / (1.0f - MOUNTAIN_THRESHOLD);
+    return t > 0.65f && surface <= 14;
+}
+
+int findSpawnTileX(int nearX, uint32_t seed) {
+    // Flanco de montanha: uplift 8..20 (terra garantida: s <= 21 < mar).
+    for (int d = 0; d <= 2000; d++) {
+        for (int tx : {nearX + d, nearX - d}) {
+            int up = 29 - surfaceHeight(tx, seed);
+            if (up >= 8 && up <= 20) return tx;
+        }
+    }
+    return nearX; // fallback: nunca acontece nas seeds medidas
 }
 
 Biome pickBiome(float temp, float humid, bool ocean, bool coastal) {
@@ -116,7 +134,9 @@ int tileType(int tx, int ty, uint32_t seed) {
         else                   return 5;
     }
     // Topo: clima da coluna na altura da superfície (não do tile fundo).
+    // Neve primeiro: pico alto e forte passa na frente do bioma.
     if (ty == surface) {
+        if (snowcap(tx, seed, surface)) return 8;
         Biome b = pickBiome(temperature(tx, surface, seed),
                             humidity(tx, surface, seed),
                             ocean, isCoastal(surface));

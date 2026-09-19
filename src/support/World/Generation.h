@@ -8,7 +8,7 @@ namespace support {
 // inclusive para coords negativas. Salts: terreno usa XOR 0x9E3779B9 e
 // 0x51F37ED; camadas novas usam +1009/+2017/+3019 (domínios disjuntos).
 int surfaceHeight(int tx, uint32_t seed);
-int tileType(int tx, int ty, uint32_t seed); // 0 = vazio, 1..6 = sólido
+int tileType(int tx, int ty, uint32_t seed); // 0 = vazio, 1..8 = sólido (8 = neve)
 
 // Máscara de montanha em [0,1]: manchas orgânicas via fbm.
 // Onde > MOUNTAIN_THRESHOLD, a superfície sobe (commit 1) e a caverna
@@ -45,6 +45,15 @@ float humidity(int tx, int ty, uint32_t seed);    // features médias
 // Determinística por grupo; pontas enterradas somem no morro (natural).
 // Nunca sobre o oceano. Substitui o ruído 3.5% que parecia "bloco voando".
 bool islandTile(int tx, int ty, uint32_t seed);
+
+// Neve no pico: só onde a montanha é forte (t > 0.65) E alta
+// (surface <= 14). Raro de propósito (1-3% das colunas): pico, não campo.
+bool snowcap(int tx, uint32_t seed, int surface);
+
+// Spawn: primeira coluna a partir de nearX com flanco de montanha
+// (uplift 8..20: terra garantida, nem mar nem pico). Determinístico.
+// Player cai do céu até a superfície — qualquer seed funciona.
+int findSpawnTileX(int nearX, uint32_t seed);
 
 // Bioma: tabela de dupla entrada temperatura x umidade.
 // Thresholds = tercis globais medidos em 3 seeds (cada quadrante 8.5%+):

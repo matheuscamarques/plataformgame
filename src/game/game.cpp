@@ -4,6 +4,7 @@
 #include "./game.h"
 #include "../core/Log.h"
 #include "../core/Time.h"
+#include "../support/World/Generation.h"
 #include "../window/window.h"
 #include "../entities/player/player.h"
 
@@ -24,13 +25,17 @@ void Game::main()
     //game->view = new sf::View(sf::FloatRect(0.f, 0.f, 1000.f, 600.f));
     auto world = std::make_unique<support::World>(WORLD_SEED);
     game->player = std::make_unique<Player>();
+    // Spawn no flanco de montanha mais próximo (terra garantida):
+    // cair do céu no meio do nada não mostra o jogo.
+    int spawnTx = support::findSpawnTileX(0, WORLD_SEED);
+    game->player->setX(spawnTx * BLOCK_SIZE);
     game->setWorld(std::move(world));
 
     if (!game->font.loadFromFile("./arial.ttf"))
     {
         throw std::runtime_error("Could not load font");
     }
-    LOG_INFO("Game", "boot ok, seed=" << WORLD_SEED);
+    LOG_INFO("Game", "boot ok, seed=" << WORLD_SEED << " spawnTx=" << spawnTx);
 
     // add border font
 

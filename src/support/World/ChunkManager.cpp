@@ -23,6 +23,7 @@ static void paint(Entity *e, int t) {
     else if (t == 4) e->setFillColor(sf::Color(159, 89, 30));
     else if (t == 5) e->setFillColor(sf::Color(150, 75, 0));
     else if (t == 6) e->setFillColor(sf::Color(194, 178, 128)); // areia costeira
+    else if (t == 8) e->setFillColor(sf::Color(235, 235, 245)); // neve no pico
 }
 
 void ChunkManager::generate(int cx, int cy) {
