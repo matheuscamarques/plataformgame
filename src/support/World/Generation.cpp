@@ -28,18 +28,26 @@ float caveNoise(int tx, int ty, uint32_t seed) {
     return core::fbm(tx / 64.0f, ty / 64.0f, seed + 2017u, 3);
 }
 
-bool isCave(int tx, int ty, uint32_t seed, int surfaceY) {
+bool isCave(int tx, int ty, uint32_t seed, int surfaceY, float mountain) {
     if (ty < surfaceY + 3) return false; // guard: nunca perto da superfície
     float depth = float(ty - surfaceY) / 25.0f;
     if (depth > 1.0f) depth = 1.0f; // Y infinito não pode virar oco
-    return caveNoise(tx, ty, seed) > CAVE_BASE - depth * CAVE_DEPTH_FALLOFF;
+    // Ordem fixa: base -> falloff de profundidade -> bônus de montanha -> piso.
+    float threshold = CAVE_BASE - depth * CAVE_DEPTH_FALLOFF;
+    if (mountain > MOUNTAIN_THRESHOLD) {
+        float t = (mountain - MOUNTAIN_THRESHOLD) / (1.0f - MOUNTAIN_THRESHOLD);
+        threshold -= t * CAVE_MOUNTAIN_BONUS;
+    }
+    if (threshold < CAVE_MIN_THRESHOLD) threshold = CAVE_MIN_THRESHOLD;
+    return caveNoise(tx, ty, seed) > threshold;
 }
 
 int tileType(int tx, int ty, uint32_t seed) {
     int surface = surfaceHeight(tx, seed);
     if (ty > surface) {
         // Caverna antes do tipo: buraco é ar, não pedra.
-        if (isCave(tx, ty, seed, surface)) return 0;
+        // mask calculada 1x aqui (surfaceHeight já pagou a dela).
+        if (isCave(tx, ty, seed, surface, mountainMask(tx, 0, seed))) return 0;
         // Maciço: sempre sólido; tipo cosmético varia por hash.
         float pick = core::rand01(tx, ty, seed ^ 0x9E3779B9u);
         if (pick < 0.15f)      return 1;

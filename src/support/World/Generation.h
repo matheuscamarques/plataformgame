@@ -24,9 +24,13 @@ float mountainMask(int tx, int ty, uint32_t seed);
 // senão o Y infinito vira oco).
 inline constexpr float CAVE_BASE = 0.62f;
 inline constexpr float CAVE_DEPTH_FALLOFF = 0.10f;
+// Bônus de montanha e piso: pior caso 0.62-0.10-0.12=0.40 seria ~70%
+// oco no fundo; o piso segura em 0.45.
+inline constexpr float CAVE_MOUNTAIN_BONUS = 0.12f;
+inline constexpr float CAVE_MIN_THRESHOLD = 0.45f;
 float caveNoise(int tx, int ty, uint32_t seed);
-// Guard primeiro: nunca acima de surfaceY + 2. surfaceY por parâmetro
-// (não recalcula surfaceHeight: 2x por tile em chunk quente).
-bool isCave(int tx, int ty, uint32_t seed, int surfaceY);
+// Guard primeiro: nunca acima de surfaceY + 2. surfaceY e mountainMask
+// por parâmetro (não recalcula: 2x por tile em chunk quente).
+bool isCave(int tx, int ty, uint32_t seed, int surfaceY, float mountain);
 
 } // namespace support

@@ -10,10 +10,11 @@ int main() {
         // Guard direto: nunca caverna em/até surfaceY + 2.
         for (int tx = -300; tx < 300; tx += 7) {
             int s = surfaceHeight(tx, seed);
-            assert(!isCave(tx, s, seed, s));
-            assert(!isCave(tx, s + 1, seed, s));
-            assert(!isCave(tx, s + 2, seed, s));
-            assert(isCave(tx, s, seed, s) == isCave(tx, s, seed, s)); // determinístico
+            float m = mountainMask(tx, 0, seed);
+            assert(!isCave(tx, s, seed, s, m));
+            assert(!isCave(tx, s + 1, seed, s, m));
+            assert(!isCave(tx, s + 2, seed, s, m));
+            assert(isCave(tx, s, seed, s, m) == isCave(tx, s, seed, s, m)); // determinístico
         }
 
         // Invariante que não pode falhar: nenhum buraco em wy <= surface + 2.
@@ -26,9 +27,13 @@ int main() {
             }
         }
 
-        // Densidade cresce com a profundidade.
+        // Densidade cresce com a profundidade (só colunas planas:
+        // montanha tem teto próprio no test_cave_mountain).
+        // Range largo (+-2000): features de 64px correlacionam tiles
+        // vizinhos; range estreito mede um blob só, não a densidade.
         int shallow = 0, deep = 0, nShallow = 0, nDeep = 0;
-        for (int tx = -400; tx < 400; tx++) {
+        for (int tx = -2000; tx < 2000; tx++) {
+            if (mountainMask(tx, 0, seed) > MOUNTAIN_THRESHOLD) continue;
             int s = surfaceHeight(tx, seed);
             for (int d = 0; d <= 10; d++) {
                 nShallow++;

@@ -37,7 +37,7 @@ sf::Color tileColor(int t) {
 int main(int argc, char **argv) {
     if (argc != 8) {
         std::printf("uso: %s seed x0 x1 y0 y1 camada saida.png\n", argv[0]);
-        std::printf("camadas: relief | mask | cave | surface | tiles\n");
+        std::printf("camadas: relief | mask | cave | overlay | surface | tiles\n");
         return 2;
     }
     uint32_t seed = static_cast<uint32_t>(std::strtoul(argv[1], nullptr, 10));
@@ -73,6 +73,11 @@ int main(int argc, char **argv) {
                 if (v < lo) lo = v;
                 if (v > hi) hi = v;
                 sum += v;
+            } else if (layer == "overlay") {
+                // R = mountainMask, G = caveNoise: onde bate, modulação atua.
+                float m = support::mountainMask(tx, ty, seed);
+                float c = support::caveNoise(tx, ty, seed);
+                px = sf::Color(gray(m), gray(c), 0);
             } else if (layer == "surface") {
                 // Banda clara = linha da superfície.
                 int s = support::surfaceHeight(tx, seed);
