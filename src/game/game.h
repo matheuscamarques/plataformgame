@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include "vector"
-#include "../level/Level/level.h"
+#include "../support/World/World.h"
 #include "../entities/player/player.h"
 #include "../camera/Camera.h"
 
@@ -16,14 +16,14 @@ public:
     void setWindow(sf::RenderWindow *window);
     void start();
     void run();
-    Level* getLevel();
-    void setLevel(std::unique_ptr<Level> level);
+    support::World* getWorld();
+    void setWorld(std::unique_ptr<support::World> world);
     Player* getPlayer();
     
 
 private:
     sf::RenderWindow *window;
-    std::unique_ptr<Level> level;
+    std::unique_ptr<support::World> world;
     std::unique_ptr<Player> player;
     Camera camera{0.0f, 0.0f};
     //sf::View *view;

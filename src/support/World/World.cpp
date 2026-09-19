@@ -1,0 +1,66 @@
+#include "World.h"
+
+#include "../../defines.h"
+
+namespace support {
+
+World::World(uint32_t seed)
+    : chunks_(seed) {
+    update(0, 0); // área de spawn
+}
+
+void World::update(int playerTileX, int playerTileY) {
+    chunks_.update(playerTileX, playerTileY);
+    activePlatforms_.clear();
+    activeColides_.clear();
+    for (Chunk *c : chunks_.loaded()) {
+        for (auto &slot : c->entities) {
+            Entity *e = slot.get();
+            activePlatforms_.push_back(e);
+            if (e->getName() != WATER) activeColides_.push_back(e);
+        }
+    }
+}
+
+int World::tileAt(int worldTileX, int worldTileY) const {
+    ChunkCoord c = chunkCoordFromWorld(worldTileX, worldTileY, Chunk::W);
+    const Chunk *chunk = chunks_.find(c.x, c.y);
+    if (!chunk) return 0;
+    return chunk->tile(worldTileX - c.x * Chunk::W, worldTileY - c.y * Chunk::H);
+}
+
+bool World::isSolid(int worldTileX, int worldTileY) const {
+    return tileAt(worldTileX, worldTileY) != 0;
+}
+
+void World::query(float x, float y, float w, float h, std::vector<Entity*> &out) {
+    out.clear();
+    std::vector<Entity*> found;
+    for (Chunk *c : chunks_.loaded()) {
+        c->hash.query(x, y, w, h, found);
+        out.insert(out.end(), found.begin(), found.end());
+    }
+}
+
+void World::debugCells(float x, float y, float w, float h,
+                       std::vector<std::pair<int,int>> &out) {
+    out.clear();
+    auto loaded = chunks_.loaded();
+    if (!loaded.empty()) loaded.front()->hash.debugCells(x, y, w, h, out);
+}
+
+int World::debugCellCount(int cx, int cy) {
+    int total = 0;
+    for (Chunk *c : chunks_.loaded()) total += c->hash.getCellCount(cx, cy);
+    return total;
+}
+
+std::vector<Entity*> & World::getPlatforms() {
+    return activePlatforms_;
+}
+
+std::vector<Entity*> & World::getColidePlatforms() {
+    return activeColides_;
+}
+
+} // namespace support

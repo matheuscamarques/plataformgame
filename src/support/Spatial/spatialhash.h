@@ -8,6 +8,8 @@
 
 class Entity;
 
+namespace support {
+
 // SpatialHash — grade uniforme para consulta espacial.
 //
 // Uso típico:
@@ -21,6 +23,9 @@ class Entity;
 //
 // O vetor de saída é preenchido com entidades únicas (sem duplicatas),
 // mesmo que uma entidade ocupe várias células.
+//
+// NOTA: guarda Entity* (não Handle). O desacoplamento para Handle+AABB
+// vem na Fase C, junto com o EntityRegistry.
 class SpatialHash {
 public:
     explicit SpatialHash(float cellSize);
@@ -70,3 +75,5 @@ private:
     // Divisão inteira com arredondamento para baixo, correta para negativos.
     static int floorDiv(float v, float d);
 };
+
+} // namespace support

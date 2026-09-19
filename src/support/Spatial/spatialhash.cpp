@@ -1,5 +1,7 @@
 #include "spatialhash.h"
-#include "../entities/entity/entity.hpp"
+#include "../../entities/entity/entity.hpp"
+
+namespace support {
 
 SpatialHash::SpatialHash(float cellSize)
     : cellSize(cellSize)
@@ -112,3 +114,5 @@ int SpatialHash::getCellCount(int cx, int cy) const {
     if (it == buckets.end()) return 0;
     return static_cast<int>(it->second.size());
 }
+
+} // namespace support

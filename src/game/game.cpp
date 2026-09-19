@@ -22,9 +22,9 @@ void Game::main()
 {
     auto game = std::make_unique<Game>();
     //game->view = new sf::View(sf::FloatRect(0.f, 0.f, 1000.f, 600.f));
-    auto level = std::make_unique<Level>(WORLD_SEED);
+    auto world = std::make_unique<support::World>(WORLD_SEED);
     game->player = std::make_unique<Player>();
-    game->setLevel(std::move(level));
+    game->setWorld(std::move(world));
 
     if (!game->font.loadFromFile("./arial.ttf"))
     {
@@ -108,7 +108,7 @@ void Game::render()
     view.move(camera.x, camera.y);
     //view.zoom(-10.0f);
     window->setView(view);
-    auto &objects = getLevel()->getPlatforms();
+    auto &objects = getWorld()->getPlatforms();
     // draw total platforms text
     sf::Text totalPlataformsTxt;
     totalPlataformsTxt.setFont(font);
@@ -146,9 +146,9 @@ void Game::render()
     queryRect.setOutlineThickness(1.f);
     window->draw(queryRect);
 
-    const float cs = Chunk::HASH_CELL;
+    const float cs = support::Chunk::HASH_CELL;
     std::vector<std::pair<int,int>> cells;
-    getLevel()->debugCells(qx, qy, qw, qh, cells);
+    getWorld()->debugCells(qx, qy, qw, qh, cells);
     for (auto &cell : cells) {
         float cx = cell.first * cs;
         float cy = cell.second * cs;
@@ -162,7 +162,7 @@ void Game::render()
 
         sf::Text t;
         t.setFont(font);
-        t.setString(std::to_string(getLevel()->debugCellCount(cell.first, cell.second)));
+        t.setString(std::to_string(getWorld()->debugCellCount(cell.first, cell.second)));
         t.setCharacterSize(12);
         t.setFillColor(sf::Color::Yellow);
         t.setOutlineColor(sf::Color::Black);
@@ -172,7 +172,7 @@ void Game::render()
     }
 
     std::vector<Entity*> candidatos;
-    getLevel()->query(qx, qy, qw, qh, candidatos);
+    getWorld()->query(qx, qy, qw, qh, candidatos);
     totalCandidatesSeen = candidatos.size();
 
     // draw point
@@ -235,12 +235,12 @@ void Game::tick() {
     // Mundo infinito: carrega/descarrega chunks em torno do tile do player.
     int playerTileX = static_cast<int>(std::floor(p->getX() / BLOCK_SIZE));
     int playerTileY = static_cast<int>(std::floor(p->getY() / BLOCK_SIZE));
-    getLevel()->update(playerTileX, playerTileY);
+    getWorld()->update(playerTileX, playerTileY);
 
     // Consulta o hash ao redor do player (1 tile de margem).
     // Inclui água de propósito: Player::collide usa WATER para natação.
     std::vector<Entity*> candidatos;
-    getLevel()->query(
+    getWorld()->query(
         p->getX() - BLOCK_SIZE,
         p->getY() - BLOCK_SIZE,
         p->getW() + BLOCK_SIZE * 2,
@@ -254,12 +254,12 @@ void Game::tick() {
     }
 }
 
-Level* Game::getLevel() {
-    return this->level.get();
+support::World* Game::getWorld() {
+    return this->world.get();
 }
 
-void Game::setLevel(std::unique_ptr<Level> level) {
-    this->level = std::move(level);
+void Game::setWorld(std::unique_ptr<support::World> world) {
+    this->world = std::move(world);
 }
 
 Player* Game::getPlayer() {
