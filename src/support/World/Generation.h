@@ -120,6 +120,9 @@ bool snowcap(int surface);
 // no enum/blocos, mas não geram mais.
 // Thresholds herdados do esquema antigo (ordens de grandeza medidas).
 Tile pickOre(int tx, int ty, uint32_t seed, int surface, int depth);
+// Variedade visual: base rock + flavors do estrato (registry).
+// Ore tem prioridade (só roda quando pickOre deu Air).
+Tile strataRock(int tx, int ty, uint32_t seed);
 // Spawn: primeira coluna a partir de nearX com flanco de montanha
 // (uplift 8..20: terra garantida, nem mar nem pico). Determinístico.
 // Player cai do céu até a superfície — qualquer seed funciona.

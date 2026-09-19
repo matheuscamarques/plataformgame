@@ -53,6 +53,17 @@ enum class Tile : uint8_t {
     OrePlatinum    = 40,
     OreMithril     = 41,
     OreAdamant     = 42,
+    // Commit 1 visual: 5 base rocks + 5 flavors (registry em BlockRegistry.h)
+    Granite        = 43,
+    CrystalRock    = 44,
+    Basalt         = 45,
+    VoidStone      = 46,
+    BloodRock      = 47,
+    PebbledStone   = 48,
+    FungalStone    = 49,
+    StreakedStone  = 50,
+    Cobblestone    = 51,
+    CrystalCluster = 52,
 
     COUNT
 };

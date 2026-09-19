@@ -4,7 +4,9 @@
 #include <initializer_list>
 
 #include "../../core/Noise.h"
+#include "BlockRegistry.h"
 #include "ChunkKey.h"
+#include "Stratum.h"
 
 namespace support {
 
@@ -269,6 +271,20 @@ Tile tileType(int tx, int ty, uint32_t seed) {
     return tileType(tx, ty, seed, computeColumn(tx, seed));
 }
 
+// Variedade visual do subsolo: base rock do estrato + flavors por
+// hash01 (uniforme, salt por tipo). Ore tem prioridade (hook só roda
+// quando pickOre deu Air). ty<200 = Stone legado (superfície intacta).
+Tile strataRock(int tx, int ty, uint32_t seed) {
+    const int s = stratumAt(ty);
+    BlockRegistry &reg = BlockRegistry::instance();
+    Tile rock = Tile::Stone;
+    if (const BlockEntry *base = reg.baseFor(s)) rock = base->tile;
+    for (const BlockEntry *f : reg.flavorsFor(s)) {
+        if (core::rand01(tx, ty, seed + f->salt) < f->chance) return f->tile;
+    }
+    return rock;
+}
+
 // Ar vira água abaixo do nível do mar (banda do oceano + cavernas fundas
 // inundadas). Um lugar só — ChunkManager não decide mais água.
 static Tile airOrWater(int ty) {
@@ -312,7 +328,8 @@ Tile tileType(int tx, int ty, uint32_t seed, const ColumnData &col) {
         }
         // Pedra com minérios (raridade por profundidade, ordem do raro).
         Tile ore = pickOre(tx, ty, seed, surface, ty - surface);
-        return ore != Tile::Air ? ore : Tile::Stone;
+        if (ore != Tile::Air) return ore;
+        return strataRock(tx, ty, seed);
     }
     // Topo: boca de verme abre passagem (resto do guard protege).
     // Neve depois da boca: pico com entrada mostra a entrada.

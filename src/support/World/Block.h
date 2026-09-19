@@ -66,6 +66,16 @@ inline const std::array<BlockDef, TILE_COUNT> BLOCKS = {{
     /* OrePlatinum    */ {{225, 225, 235,255}, "ore_platinum",    BlockKind::Solid},
     /* OreMithril     */ {{110, 200, 130,255}, "ore_mithril",     BlockKind::Solid},
     /* OreAdamant     */ {{170,  40,  50,255}, "ore_adamant",     BlockKind::Solid},
+    /* Granite        */ {{ 90, 100, 115,255}, "granite",         BlockKind::Solid},
+    /* CrystalRock    */ {{ 85, 105, 120,255}, "crystal_rock",    BlockKind::Solid},
+    /* Basalt         */ {{ 60,  55,  55,255}, "basalt",          BlockKind::Solid},
+    /* VoidStone      */ {{ 45,  35,  60,255}, "void_stone",      BlockKind::Solid},
+    /* BloodRock      */ {{ 85,  30,  40,255}, "blood_rock",      BlockKind::Solid},
+    /* PebbledStone   */ {{100, 100, 105,255}, "pebbled_stone",   BlockKind::Solid},
+    /* FungalStone    */ {{130,  90, 140,255}, "fungal_stone",    BlockKind::Solid},
+    /* StreakedStone  */ {{120, 130, 145,255}, "streaked_stone",  BlockKind::Solid},
+    /* Cobblestone    */ {{110, 105,  95,255}, "cobblestone",     BlockKind::Solid},
+    /* CrystalCluster */ {{ 80, 220, 230,255}, "crystal_cluster", BlockKind::Solid},
 }};
 
 inline const BlockDef& blockDef(Tile t) {
