@@ -28,8 +28,16 @@ sf::Color tileColor(int t) {
         case 3:  return sf::Color(120, 60, 0);
         case 4:  return sf::Color(159, 89, 30);
         case 5:  return sf::Color(200, 120, 40);
+        case 6:  return sf::Color(194, 178, 128); // areia
         default: return sf::Color::Magenta;
     }
+}
+
+// Azul de oceano: tile vazio entre o nível do mar e a superfície.
+bool isOceanWater(int tx, int ty, uint32_t seed) {
+    return support::isOceanColumn(tx, seed) &&
+           ty >= support::SEA_LEVEL &&
+           ty < support::surfaceHeight(tx, seed);
 }
 
 } // namespace
@@ -85,7 +93,11 @@ int main(int argc, char **argv) {
                 if (d < 0.f) d = 0.f;
                 px = sf::Color(gray(d), gray(d), gray(d));
             } else if (layer == "tiles") {
-                px = tileColor(support::tileType(tx, ty, seed));
+                int t = support::tileType(tx, ty, seed);
+                if (t == 0 && isOceanWater(tx, ty, seed))
+                    px = sf::Color(20, 80, 200);
+                else
+                    px = tileColor(t);
             } else {
                 std::printf("camada desconhecida: %s\n", layer.c_str());
                 return 2;

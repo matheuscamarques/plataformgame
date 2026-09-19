@@ -8,7 +8,7 @@ namespace support {
 // inclusive para coords negativas. Salts: terreno usa XOR 0x9E3779B9 e
 // 0x51F37ED; camadas novas usam +1009/+2017/+3019 (domínios disjuntos).
 int surfaceHeight(int tx, uint32_t seed);
-int tileType(int tx, int ty, uint32_t seed); // 0 = vazio, 1..5 = sólido
+int tileType(int tx, int ty, uint32_t seed); // 0 = vazio, 1..5 = sólido, 6 = areia
 
 // Máscara de montanha em [0,1]: manchas orgânicas via fbm.
 // Onde > MOUNTAIN_THRESHOLD, a superfície sobe (commit 1) e a caverna
@@ -32,5 +32,22 @@ float caveNoise(int tx, int ty, uint32_t seed);
 // Guard primeiro: nunca acima de surfaceY + 2. surfaceY e mountainMask
 // por parâmetro (não recalcula: 2x por tile em chunk quente).
 bool isCave(int tx, int ty, uint32_t seed, int surfaceY, float mountain);
+
+// Mar: linha do mapa (tile row), não valor de noise. Calibrado por
+// histograma (3 seeds x 4000 cols, fração com surface > L):
+// L=25 => 29-41%, L=26 => 14-21%, L=27 => 8-10%. L=26 escolhido:
+// banda oceânica (26..surf) cai toda na regra de água legada (ty > 25),
+// sem buraco de ar na superfície da água. Não modifica altura nenhuma:
+// só decide o que fica entre surf e SEA_LEVEL.
+inline constexpr int SEA_LEVEL = 26;
+// Coluna oceânica = terreno abaixo da linha do mar.
+inline bool isOceanColumn(int tx, uint32_t seed) {
+    return surfaceHeight(tx, seed) > SEA_LEVEL;
+}
+// Costa = superfície a ±3 tiles do nível do mar (topo vira areia).
+inline bool isCoastal(int surfaceY) {
+    int d = surfaceY > SEA_LEVEL ? surfaceY - SEA_LEVEL : SEA_LEVEL - surfaceY;
+    return d <= 3;
+}
 
 } // namespace support

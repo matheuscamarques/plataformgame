@@ -44,6 +44,7 @@ bool isCave(int tx, int ty, uint32_t seed, int surfaceY, float mountain) {
 
 int tileType(int tx, int ty, uint32_t seed) {
     int surface = surfaceHeight(tx, seed);
+    bool ocean = surface > SEA_LEVEL;
     if (ty > surface) {
         // Caverna antes do tipo: buraco é ar, não pedra.
         // mask calculada 1x aqui (surfaceHeight já pagou a dela).
@@ -56,7 +57,10 @@ int tileType(int tx, int ty, uint32_t seed) {
         else if (pick < 0.75f) return 4;
         else                   return 5;
     }
-    if (ty == surface) return 4; // topo: sempre sólido
+    // Topo costeiro vira areia (tipo 6); topo comum continua 4.
+    if (ty == surface) return isCoastal(surface) ? 6 : 4;
+    // Sem plataformas flutuantes sobre o oceano: céu limpo acima do mar.
+    if (ocean) return 0;
     float plat = core::rand01(tx, ty, seed ^ 0x51F37EDu);
     return plat < 0.035f ? 2 : 0; // plataformas esparsas, resto vazio
 }
