@@ -122,16 +122,15 @@ int tileType(int tx, int ty, uint32_t seed) {
     int surface = surfaceHeight(tx, seed);
     bool ocean = surface > SEA_LEVEL;
     if (ty > surface) {
-        // Caverna antes do tipo: buraco é ar, não pedra.
-        // mask calculada 1x aqui (surfaceHeight já pagou a dela).
+        // Ordem sagrada: caverna vence terra e pedra. Se isCave, é ar
+        // mesmo dentro da zona de terra.
         if (isCave(tx, ty, seed, surface, mountainMask(tx, 0, seed))) return 0;
-        // Maciço: sempre sólido; tipo cosmético varia por hash.
-        float pick = core::rand01(tx, ty, seed ^ 0x9E3779B9u);
-        if (pick < 0.15f)      return 1;
-        else if (pick < 0.35f) return 2;
-        else if (pick < 0.55f) return 3;
-        else if (pick < 0.75f) return 4;
-        else                   return 5;
+        if (ty <= surface + DIRT_DEPTH) {
+            // Sob o oceano, areia continua areia (praia não vira terra).
+            if (ocean) return 6;
+            return 10; // terra
+        }
+        return 11; // pedra
     }
     // Topo: clima da coluna na altura da superfície (não do tile fundo).
     // Neve primeiro: pico alto e forte passa na frente do bioma.

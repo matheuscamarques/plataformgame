@@ -31,6 +31,8 @@ sf::Color tileColor(int t) {
         case 6:  return sf::Color(194, 178, 128); // areia
         case 8:  return sf::Color(235, 235, 245); // neve
         case 9:  return sf::Color(106, 190, 48);  // grama
+        case 10: return sf::Color(139, 69, 19);   // terra
+        case 11: return sf::Color(128, 128, 128); // pedra
         default: return sf::Color::Magenta;
     }
 }
