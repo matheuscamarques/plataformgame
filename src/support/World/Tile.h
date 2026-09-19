@@ -77,6 +77,70 @@ enum class Tile : uint8_t {
     BeatingHeart   = 61,
     SolarFlare     = 62,
     WorldEdge      = 63,
+    // 2c flood: flavors por estrato (S11 do catálogo fundido no S10:
+    // código tem 11 estratos 0..10, sem Abyss separado)
+    // S1 (CrackedStone = 27 já existia)
+    RootedDirt     = 64,
+    // S2
+    Mycelium       = 65,
+    BioluminescentStone = 66,
+    PetrifiedWood  = 67,
+    SporeStone     = 68,
+    MossyBoulder   = 69,
+    // S3
+    Schist         = 70,
+    QuartzStone    = 71,
+    IronBanded     = 72,
+    PaleStone      = 73,
+    MineralCrust   = 74,
+    // S4
+    Plank          = 75,
+    BrokenBrick    = 76,
+    CoalDust       = 77,
+    RustedMetal    = 78,
+    SupportBeam    = 79,
+    // S5
+    Geode          = 80,
+    PrismaticStone = 81,
+    FrozenCrystal  = 82,
+    VibrantStone   = 83,
+    PaleCrystal    = 84,
+    // S6 (Obsidian = 29 já existia)
+    CharredStone   = 85,
+    MagmaRock      = 86,
+    SulfurStone    = 87,
+    ScorchedEarth  = 88,
+    // S7
+    VoidAsh        = 89,
+    TwistedStone   = 90,
+    NullStone      = 91,
+    EchoStone      = 92,
+    SilentStone    = 93,
+    StarFragment   = 94,
+    // S8
+    VeinedStone    = 95,
+    DriedBlood     = 96,
+    Heartstone     = 97,
+    ScarredRock    = 98,
+    CrimsonCrystal = 99,
+    FleshStone     = 100,
+    // S9
+    MoltenGoldStone = 101,
+    AncientRune    = 102,
+    SolarStone     = 103,
+    CelestialRock  = 104,
+    EmberCore      = 105,
+    RunedPillar    = 106,
+    // S10 (+ S11 fundido: fundo/void)
+    Voidglass      = 107,
+    Nothingness    = 108,
+    AbyssStone     = 109,
+    FinalStone     = 110,
+    EnderRock      = 111,
+    NullField      = 112,
+    FracturedVoid  = 113,
+    SilentAbyss    = 114,
+    AbyssalCore    = 115,
 
     COUNT
 };

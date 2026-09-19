@@ -11,7 +11,7 @@ int main() {
     BlockRegistry &reg = BlockRegistry::instance();
 
     { // TenEntriesWithMatchingBlocksTable
-        assert(reg.all().size() == 21u);
+        assert(reg.all().size() == 75u);
         for (auto &e : reg.all()) {
             const BlockDef &b = blockDef(e.tile);
             assert(std::string_view(b.name) == std::string_view(e.name));
@@ -37,15 +37,22 @@ int main() {
         assert(reg.find(Tile::Granite) != nullptr);
         assert(reg.find(Tile::Stone) == nullptr); // legado não registrado
     }
-    { // FlavorsForStrata (1 por estrato S1..S5, resto vazio ainda)
-        for (int s = 1; s <= 5; ++s) assert(reg.flavorsFor(s).size() == 1u);
-        for (int s = 6; s <= 10; ++s) assert(reg.flavorsFor(s).empty());
+    { // FlavorsForStrata (spot: Pebbled S1, GeodeStone raro S3)
         assert(reg.flavorsFor(1)[0]->tile == Tile::PebbledStone);
         assert(reg.raresFor(3)[0]->tile == Tile::GeodeStone); // 2b: raro S3
     }
     { // TileBudgetGuard (124 cabem em uint8_t com folga)
-        assert(static_cast<int>(Tile::COUNT) == 64);
+        assert(static_cast<int>(Tile::COUNT) == 116);
         assert(TILE_COUNT <= 200u);
+    }
+    { // FlavorsPerStratum (flood 2c: S1=3, S2-S9=5-6, S10=9 fundido)
+        const std::size_t expect[11] = {0, 3, 6, 6, 6, 6, 5, 6, 6, 6, 9};
+        for (int s = 0; s <= 10; ++s) {
+            assert(reg.flavorsFor(s).size() == expect[s]);
+            for (auto *f : reg.flavorsFor(s)) {
+                assert(f->chance > 0.01f && f->chance < 0.10f);
+            }
+        }
     }
     { // RaresForStrata (1 por estrato S1..S5/S7/S8/S10; S6/S9 gated=vazio)
         assert(reg.raresFor(1)[0]->tile == Tile::FossilStone);

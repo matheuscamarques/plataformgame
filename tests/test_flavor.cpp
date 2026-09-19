@@ -76,6 +76,19 @@ int main() {
             }
         }
     }
+    { // DeepFlavorFraction (~5% SilentStone no S7, ±margem larga)
+        int flavor = 0, other = 0;
+        for (int tx = -200; tx < 200; tx += 2) {
+            for (int ty = 7400; ty < 8600; ty += 20) {
+                Tile t = tileType(tx, ty, 1337u);
+                if (t == Tile::SilentStone) flavor++;
+                else if (t == Tile::VoidStone || t == Tile::Stone) other++;
+            }
+        }
+        const float f = (float)flavor / (flavor + other);
+        std::printf("S7 silent frac=%.4f\n", f);
+        assert(f > 0.02f && f < 0.09f);
+    }
 
     std::printf("flavor test OK\n");
     return 0;
