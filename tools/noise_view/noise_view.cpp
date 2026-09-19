@@ -45,7 +45,7 @@ bool isOceanWater(int tx, int ty, uint32_t seed) {
 int main(int argc, char **argv) {
     if (argc != 8) {
         std::printf("uso: %s seed x0 x1 y0 y1 camada saida.png\n", argv[0]);
-        std::printf("camadas: relief | mask | cave | overlay | temp | humid | biome_overlay | surface | tiles\n");
+        std::printf("camadas: relief | mask | cave | overlay | temp | humid | biome_overlay | biomes | surface | tiles\n");
         return 2;
     }
     uint32_t seed = static_cast<uint32_t>(std::strtoul(argv[1], nullptr, 10));
@@ -99,6 +99,19 @@ int main(int argc, char **argv) {
                 float t = support::temperature(tx, ty, seed);
                 float h = support::humidity(tx, ty, seed);
                 px = sf::Color(gray(t), gray(h), 0);
+            } else if (layer == "biomes") {
+                // Clima cru (sem oceano): mostra a tabela funcionando.
+                float t = support::temperature(tx, ty, seed);
+                float h = support::humidity(tx, ty, seed);
+                switch (support::pickBiome(t, h, false, false)) {
+                    case support::Biome::Desert:    px = sf::Color(230, 200, 120); break;
+                    case support::Biome::Savanna:   px = sf::Color(200, 140, 60); break;
+                    case support::Biome::Grassland: px = sf::Color(90, 160, 70); break;
+                    case support::Biome::Forest:    px = sf::Color(40, 110, 50); break;
+                    case support::Biome::Taiga:     px = sf::Color(60, 120, 110); break;
+                    case support::Biome::Tundra:    px = sf::Color(150, 150, 150); break;
+                    default:                        px = sf::Color::Magenta; break;
+                }
             } else if (layer == "surface") {
                 // Banda clara = linha da superfície.
                 int s = support::surfaceHeight(tx, seed);

@@ -19,13 +19,15 @@ int main() {
             // Consistência: isOceanColumn == surface > SEA_LEVEL.
             assert(ocean == (s > SEA_LEVEL));
 
-            // Topo: areia na costa (inclui todo oceano), 4 fora dela.
+            // Topo: areia na costa (inclui todo oceano), bioma fora dela.
             int top = tileType(tx, s, seed);
             if (isCoastal(s)) {
                 assert(top == 6);
                 sandTops++;
             } else {
-                assert(top == 4);
+                Biome b = pickBiome(temperature(tx, s, seed), humidity(tx, s, seed),
+                                    ocean, false);
+                assert(top == biomeTopTile(b));
             }
             if (ocean) {
                 oceanTops++;
@@ -43,9 +45,11 @@ int main() {
                 }
             }
 
-            // Terra segue igual: topo sólido, ar acima (ou plataforma rara).
+            // Terra segue igual: topo sólido do bioma, ar acima (ou plataforma).
             if (!ocean) {
-                assert(top == 4 || top == 6);
+                Biome b = pickBiome(temperature(tx, s, seed), humidity(tx, s, seed),
+                                    false, isCoastal(s));
+                assert(top == biomeTopTile(b));
                 for (int ty = s - 10; ty < s; ty++) {
                     int t = tileType(tx, ty, seed);
                     assert(t == 0 || t == 2);

@@ -31,8 +31,14 @@ int main() {
         for (int i = s - 2; i <= s + 2; i++) {
             int t = tileType(j, i, seed);
             if (i > s) assert(t != 0);                    // maciço sempre sólido
-            if (i == s) assert(t == 4 || t == 6);         // topo: 4, ou 6 (areia)
-            if (i == s && isCoastal(s)) assert(t == 6);   // costa sempre areia
+            if (i == s) {
+                // topo decide por bioma (areia continua 6 na costa)
+                bool ocean = isOceanColumn(j, seed);
+                Biome b = pickBiome(temperature(j, s, seed), humidity(j, s, seed),
+                                    ocean, isCoastal(s));
+                assert(t == biomeTopTile(b));
+                if (isCoastal(s)) assert(t == 6);
+            }
             if (i < s) assert(t == 0 || t == 2);          // ar ou plataforma
             assert(tileType(j, i, seed) == t);            // determinístico
         }

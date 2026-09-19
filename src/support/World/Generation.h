@@ -39,6 +39,22 @@ bool isCave(int tx, int ty, uint32_t seed, int surfaceY, float mountain);
 // Salts 3019/4021 livres (em uso: 1009, 2017, XORs, fbm +i*1013).
 float temperature(int tx, int ty, uint32_t seed); // features grandes
 float humidity(int tx, int ty, uint32_t seed);    // features médias
+
+// Bioma: tabela de dupla entrada temperatura x umidade.
+// Thresholds = tercis globais medidos em 3 seeds (cada quadrante 8.5%+):
+// temp p33≈0.42/p66≈0.55, humid p33≈0.43/p66≈0.57. Fronteira estrita '>'
+// (== cai na faixa de baixo). Sem Snow: picos nevados ficam p/ depois.
+inline constexpr float T_HOT = 0.55f;
+inline constexpr float T_COLD = 0.42f;
+inline constexpr float H_DRY = 0.43f;
+inline constexpr float H_WET = 0.57f;
+
+enum class Biome { Ocean, Beach, Desert, Savanna, Grassland, Forest, Taiga, Tundra, COUNT };
+
+// Clima do tile (tx,ty); ocean/coastal têm precedência (mar virou bioma).
+Biome pickBiome(float temp, float humid, bool ocean, bool coastal);
+// Tile de topo para o bioma (subsolo não muda).
+int biomeTopTile(Biome b);
 // Mar: linha do mapa (tile row), não valor de noise. Calibrado por
 // histograma (3 seeds x 4000 cols, fração com surface > L):
 // L=25 => 29-41%, L=26 => 14-21%, L=27 => 8-10%. L=26 escolhido:

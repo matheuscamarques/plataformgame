@@ -41,6 +41,36 @@ float humidity(int tx, int ty, uint32_t seed) {
     return core::fbm(tx / 384.0f, ty / 384.0f, seed + 4021u, 3);
 }
 
+Biome pickBiome(float temp, float humid, bool ocean, bool coastal) {
+    if (ocean) return Biome::Ocean;
+    if (coastal) return Biome::Beach;
+    if (temp > T_HOT) {
+        if (humid < H_DRY) return Biome::Desert;
+        if (humid < H_WET) return Biome::Savanna;
+        return Biome::Forest;
+    }
+    if (temp > T_COLD) {
+        if (humid < H_DRY) return Biome::Grassland;
+        return Biome::Forest;
+    }
+    if (humid < H_DRY) return Biome::Tundra;
+    return Biome::Taiga;
+}
+
+int biomeTopTile(Biome b) {
+    switch (b) {
+        case Biome::Ocean:     return 6; // fundo do mar: areia
+        case Biome::Beach:     return 6;
+        case Biome::Desert:    return 6;
+        case Biome::Savanna:   return 5;
+        case Biome::Grassland: return 4;
+        case Biome::Forest:    return 2;
+        case Biome::Taiga:     return 3;
+        case Biome::Tundra:    return 1;
+        default:               return 4;
+    }
+}
+
 bool isCave(int tx, int ty, uint32_t seed, int surfaceY, float mountain) {
     if (ty < surfaceY + 3) return false; // guard: nunca perto da superfície
     float depth = float(ty - surfaceY) / 25.0f;
@@ -70,8 +100,13 @@ int tileType(int tx, int ty, uint32_t seed) {
         else if (pick < 0.75f) return 4;
         else                   return 5;
     }
-    // Topo costeiro vira areia (tipo 6); topo comum continua 4.
-    if (ty == surface) return isCoastal(surface) ? 6 : 4;
+    // Topo: clima da coluna na altura da superfície (não do tile fundo).
+    if (ty == surface) {
+        Biome b = pickBiome(temperature(tx, surface, seed),
+                            humidity(tx, surface, seed),
+                            ocean, isCoastal(surface));
+        return biomeTopTile(b);
+    }
     // Sem plataformas flutuantes sobre o oceano: céu limpo acima do mar.
     if (ocean) return 0;
     float plat = core::rand01(tx, ty, seed ^ 0x51F37EDu);
