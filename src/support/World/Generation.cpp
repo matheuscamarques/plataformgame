@@ -33,6 +33,14 @@ float caveNoise(int tx, int ty, uint32_t seed) {
     return core::fbm(tx / 64.0f, ty / 64.0f, seed + 2017u, 3);
 }
 
+float temperature(int tx, int ty, uint32_t seed) {
+    return core::fbm(tx / 512.0f, ty / 512.0f, seed + 3019u, 3);
+}
+
+float humidity(int tx, int ty, uint32_t seed) {
+    return core::fbm(tx / 384.0f, ty / 384.0f, seed + 4021u, 3);
+}
+
 bool isCave(int tx, int ty, uint32_t seed, int surfaceY, float mountain) {
     if (ty < surfaceY + 3) return false; // guard: nunca perto da superfície
     float depth = float(ty - surfaceY) / 25.0f;

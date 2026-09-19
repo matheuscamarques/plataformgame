@@ -33,6 +33,12 @@ float caveNoise(int tx, int ty, uint32_t seed);
 // por parâmetro (não recalcula: 2x por tile em chunk quente).
 bool isCave(int tx, int ty, uint32_t seed, int surfaceY, float mountain);
 
+// Bioma, commit 1: só as camadas (tileType não consulta ainda).
+// Frequências DIFERENTES de propósito: mesma frequência nas duas
+// geraria só a diagonal quente-úmido (biomas correlacionados).
+// Salts 3019/4021 livres (em uso: 1009, 2017, XORs, fbm +i*1013).
+float temperature(int tx, int ty, uint32_t seed); // features grandes
+float humidity(int tx, int ty, uint32_t seed);    // features médias
 // Mar: linha do mapa (tile row), não valor de noise. Calibrado por
 // histograma (3 seeds x 4000 cols, fração com surface > L):
 // L=25 => 29-41%, L=26 => 14-21%, L=27 => 8-10%. L=26 escolhido:
