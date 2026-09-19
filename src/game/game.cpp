@@ -83,6 +83,7 @@ void Game::run()
 
             input_.handleEvent(event);
         }
+        if (input_.pressed(support::Action::ToggleDebug)) overlay_.toggle();
         core::Time::beginFrame();
         int ticks = core::Time::consumeTicks();
         for (int i = 0; i < ticks; i++)
@@ -116,17 +117,6 @@ void Game::render()
     //view.zoom(-10.0f);
     window->setView(view);
     auto &objects = getWorld()->getPlatforms();
-    // draw total platforms text
-    sf::Text totalPlataformsTxt;
-    totalPlataformsTxt.setFont(font);
-    totalPlataformsTxt.setString("Total Platforms: " + std::to_string(objects.size()));
-    totalPlataformsTxt.setCharacterSize(20);
-    totalPlataformsTxt.setFillColor(sf::Color::Green);
-    totalPlataformsTxt.setPosition(player.get()->getX(), player.get()->getY() - 200);
-    totalPlataformsTxt.setOutlineColor(sf::Color::Black);
-    totalPlataformsTxt.setOutlineThickness(1);
-
-    window->draw(totalPlataformsTxt);
 
     // Desenha só o visível (+margem); sem quadtree no caminho.
     float vx0 = camPos.x - 60.0f, vy0 = camPos.y - 60.0f;
@@ -139,93 +129,7 @@ void Game::render()
 
     player.get()->draw(window);
 
-    // --- Debug do SpatialHash: query + células + contagens ---
-    Player *p = player.get();
-    float qx = p->getX() - BLOCK_SIZE;
-    float qy = p->getY() - BLOCK_SIZE;
-    float qw = p->getW() + BLOCK_SIZE * 2;
-    float qh = p->getH() + BLOCK_SIZE * 2;
-
-    sf::RectangleShape queryRect(sf::Vector2f(qw, qh));
-    queryRect.setPosition(qx, qy);
-    queryRect.setFillColor(sf::Color(0, 255, 0, 30));
-    queryRect.setOutlineColor(sf::Color::Green);
-    queryRect.setOutlineThickness(1.f);
-    window->draw(queryRect);
-
-    const float cs = support::Chunk::HASH_CELL;
-    std::vector<std::pair<int,int>> cells;
-    getWorld()->debugCells(qx, qy, qw, qh, cells);
-    for (auto &cell : cells) {
-        float cx = cell.first * cs;
-        float cy = cell.second * cs;
-
-        sf::RectangleShape cellRect(sf::Vector2f(cs, cs));
-        cellRect.setPosition(cx, cy);
-        cellRect.setFillColor(sf::Color::Transparent);
-        cellRect.setOutlineColor(sf::Color(64, 128, 255));
-        cellRect.setOutlineThickness(1.f);
-        window->draw(cellRect);
-
-        sf::Text t;
-        t.setFont(font);
-        t.setString(std::to_string(getWorld()->debugCellCount(cell.first, cell.second)));
-        t.setCharacterSize(12);
-        t.setFillColor(sf::Color::Yellow);
-        t.setOutlineColor(sf::Color::Black);
-        t.setOutlineThickness(1);
-        t.setPosition(cx + 4, cy + 4);
-        window->draw(t);
-    }
-
-    std::vector<Entity*> candidatos;
-    getWorld()->query(qx, qy, qw, qh, candidatos);
-    totalCandidatesSeen = candidatos.size();
-
-    // draw point
-//    sf::CircleShape shape(5.f);
-//    shape.setFillColor(sf::Color::Green);
-//    shape.setPosition(player.get()->getCenterX(), player.get()->getCenterY());
-//    window->draw(shape);
-
-    // draw point
-//    sf::CircleShape shape2(5.f);
-//    shape2.setFillColor(sf::Color::Green);
-//    shape2.setPosition(player.get()->getX(), player.get()->getY());
-//    window->draw(shape2);
-
-    // draw text im top player
-    sf::Text text;
-
-    text.setString("HASH: " + std::to_string(totalCandidatesSeen));
-    text.setCharacterSize(20);
-    text.setFont(font);
-    text.setFillColor(sf::Color::Green);
-    text.setOutlineColor(sf::Color::Black);
-    text.setOutlineThickness(1);
-    text.setPosition(player.get()->getX() - player.get()->getW()/2, player.get()->getY() - player.get()->getH()/2);
-    window->draw(text);
-
-    // DRAW CIRCLE
-//    sf::CircleShape Q1(10);
-//    Q1.setFillColor(sf::Color::Green);
-//    Q1.setPosition(player.get()->getCenterX() - 50, player.get()->getCenterY() - 50);
-//    window->draw(Q1);
-//
-//    sf::CircleShape Q2(10);
-//    Q2.setFillColor(sf::Color::Green);
-//    Q2.setPosition(player.get()->getCenterX(), player.get()->getCenterY() - 50);
-//    window->draw(Q2);
-//
-//    sf::CircleShape Q3(10);
-//    Q3.setFillColor(sf::Color::Green);
-//    Q3.setPosition(player.get()->getCenterX() - 50, player.get()->getCenterY());
-//    window->draw(Q3);
-//
-//    sf::CircleShape Q4(10);
-//    Q4.setFillColor(sf::Color::Green);
-//    Q4.setPosition(player.get()->getCenterX(), player.get()->getCenterY());
-//    window->draw(Q4);
+    overlay_.render(*window, font, *getWorld(), *player.get(), objects.size());
 
     window->display();
 }

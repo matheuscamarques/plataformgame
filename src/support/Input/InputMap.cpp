@@ -15,6 +15,7 @@ InputMap::InputMap() {
     bind(Action::Light,   sf::Keyboard::J);
     bind(Action::Heavy,   sf::Keyboard::K);
     bind(Action::Pause,   sf::Keyboard::Escape);
+    bind(Action::ToggleDebug, sf::Keyboard::F1);
 
     addBind(Action::Left,  sf::Keyboard::A);
     addBind(Action::Right, sf::Keyboard::D);
