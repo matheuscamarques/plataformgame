@@ -5,6 +5,8 @@
 Entity(PLAYER,0,0,50,50)
 {
     setFillColor(sf::Color::Red);
+    static auto schema = support::BodySchema::humanoid(50.f, 50.f);
+    body.attach(&schema);
     //this->setGravity(9.8f);
 }
 

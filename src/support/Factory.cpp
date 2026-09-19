@@ -17,6 +17,8 @@ std::unique_ptr<Slime> Factory::spawnEnemy(const std::string &kind,
     body.setFillColor(sf::Color(0, 200, 0));
 
     auto slime = std::make_unique<Slime>(std::move(body), std::move(ai));
+    static auto schema = BodySchema::humanoid(30.0f, 40.0f);
+    slime->bodyParts.attach(&schema);
     // S2: recursos default de trash (HP + postura; mana/stamina ignorados).
     slime->resources.isTrash = true;
     slime->resources.hp = 30;

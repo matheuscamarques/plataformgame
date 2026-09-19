@@ -4,6 +4,7 @@
 #include "./game.h"
 #include "../core/Log.h"
 #include "../core/Time.h"
+#include "../support/BodySystem.h"
 #include "../support/World/Generation.h"
 #include "../window/window.h"
 #include "../entities/player/player.h"
@@ -39,6 +40,8 @@ void Game::main()
 
     // Sistemas via scheduler; 2 slimes perto do spawn (determinístico).
     game->enemies_ = &game->scheduler_.add<support::EnemySystem>();
+    game->scheduler_.add<support::BodySystem>();
+    game->particles_ = &game->scheduler_.add<support::ParticleSystem>();
     game->enemies_->spawn("slime", (spawnTx - 6) * BLOCK_SIZE, 0.0f);
     game->enemies_->spawn("slime", (spawnTx + 6) * BLOCK_SIZE, 0.0f);
 
@@ -139,6 +142,24 @@ void Game::render()
 
     enemies_->forEach([&](support::Slime &s) { s.body.draw(window); });
 
+    particles_->render(*window);
+
+    // Debug draw das hitboxes por parte (só com overlay ligado).
+    if (overlay_.visible()) {
+        auto drawParts = [&](const support::Body &b) {
+            b.forEach([&](const support::PartState &st, const support::PartDef &) {
+                sf::RectangleShape r(sf::Vector2f(st.worldBox.width, st.worldBox.height));
+                r.setPosition(st.worldBox.left, st.worldBox.top);
+                r.setFillColor(sf::Color::Transparent);
+                r.setOutlineColor(sf::Color::Magenta);
+                r.setOutlineThickness(1.f);
+                window->draw(r);
+            });
+        };
+        drawParts(player.get()->body);
+        enemies_->forEach([&](support::Slime &s) { drawParts(s.bodyParts); });
+    }
+
     overlay_.render(*window, font, *getWorld(), *player.get(), objects.size());
 
     window->display();
@@ -151,6 +172,8 @@ void Game::tick() {
     p->moveDown  = input_.held(support::Action::Down);
     p->moveLeft  = input_.held(support::Action::Left);
     p->runFast   = input_.held(support::Action::RunFast);
+    if (p->moveLeft && !p->moveRight) p->facing = -1;
+    if (p->moveRight && !p->moveLeft) p->facing = 1;
     p->tick();
 
     // Mundo infinito: carrega/descarrega chunks em torno do tile do player.
@@ -175,7 +198,8 @@ void Game::tick() {
     }
 
     // Sistemas (inimigos etc.): scheduler com prioridade declarada.
-    support::GameContext ctx{getWorld(), p, &input_};
+    // BodySystem reconstrói hitboxes pós-movimento (priority 250).
+    support::GameContext ctx{getWorld(), p, &input_, enemies_};
     scheduler_.tick(1.0f / 30.0f, ctx);
 }
 

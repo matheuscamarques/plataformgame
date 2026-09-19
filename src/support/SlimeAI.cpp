@@ -47,6 +47,7 @@ void SlimeAI::onTick(Entity &e, float dt, GameContext &ctx) {
     hasLast_ = true;
 
     e.setVx(dir_ * speed);
+    e.facing = (dir_ >= 0.0f) ? 1 : -1;
 
     if (hopCooldown_ > 0) hopCooldown_--;
     if (grounded && hopCooldown_ <= 0) {

@@ -8,6 +8,7 @@
 #include "../core/System.h"
 #include "../entities/entity/entity.hpp"
 #include "Behavior.h"
+#include "Body.h"
 #include "EnemyResources.h"
 #include "GameContext.h"
 
@@ -21,6 +22,7 @@ struct Slime {
     Entity body;
     std::unique_ptr<Behavior> ai;
     EnemyResources resources;
+    Body bodyParts;
     bool grounded = false;
 
     Slime(Entity b, std::unique_ptr<Behavior> a)

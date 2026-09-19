@@ -44,6 +44,7 @@ class Entity : public Component
         float getCenterY();
     float x;
     float y;
+    int facing = 1; // -1 esquerda, +1 direita (BodySystem/render usam)
 private:
     float w;
         float vx;
