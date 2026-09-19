@@ -139,12 +139,26 @@ bool isCave(int tx, int ty, uint32_t seed, int surfaceY, float mountain) {
 }
 
 int tileType(int tx, int ty, uint32_t seed) {
-    int surface = surfaceHeight(tx, seed);
-    bool ocean = surface > SEA_LEVEL;
+    return tileType(tx, ty, seed, computeColumn(tx, seed));
+}
+
+ColumnData computeColumn(int tx, uint32_t seed) {
+    ColumnData col;
+    col.surface = surfaceHeight(tx, seed);
+    col.mountain = mountainMask(tx, 0, seed);
+    col.temperature = temperature(tx, col.surface, seed);
+    col.humidity = humidity(tx, col.surface, seed);
+    col.ocean = col.surface > SEA_LEVEL;
+    return col;
+}
+
+int tileType(int tx, int ty, uint32_t seed, const ColumnData &col) {
+    int surface = col.surface;
+    bool ocean = col.ocean;
     if (ty > surface) {
         // Ordem sagrada: caverna vence terra e pedra. Se isCave, é ar
         // mesmo dentro da zona de terra.
-        if (isCave(tx, ty, seed, surface, mountainMask(tx, 0, seed))) return 0;
+        if (isCave(tx, ty, seed, surface, col.mountain)) return 0;
         if (ty <= surface + DIRT_DEPTH) {
             // Sob o oceano, areia continua areia (praia não vira terra).
             if (ocean) return 6;
@@ -156,8 +170,7 @@ int tileType(int tx, int ty, uint32_t seed) {
     // Neve primeiro: pico alto e forte passa na frente do bioma.
     if (ty == surface) {
         if (snowcap(surface)) return 8;
-        Biome b = pickBiome(temperature(tx, surface, seed),
-                            humidity(tx, surface, seed),
+        Biome b = pickBiome(col.temperature, col.humidity,
                             ocean, isCoastal(surface));
         return biomeTopTile(b);
     }

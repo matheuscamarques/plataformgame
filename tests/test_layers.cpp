@@ -10,13 +10,15 @@ int main() {
     for (uint32_t seed : {1337u, 999u, 42u}) {
         int caveSamples = 0;
         for (int tx = -800; tx < 800; tx++) {
-            int s = surfaceHeight(tx, seed);
-            bool ocean = isOceanColumn(tx, seed);
+            ColumnData col = computeColumn(tx, seed);
+            int s = col.surface;
+            bool ocean = col.ocean;
 
             // 1. Topo == tile do bioma (ou neve).
             {
                 int top = tileType(tx, s, seed);
-                Biome b = pickBiome(temperature(tx, s, seed), humidity(tx, s, seed),
+                assert(top == tileType(tx, s, seed, col)); // sobrecarga idêntica
+                Biome b = pickBiome(col.temperature, col.humidity,
                                     ocean, isCoastal(s));
                 int expected = snowcap(s) ? 8 : biomeTopTile(b);
                 assert(top == expected);
@@ -26,7 +28,8 @@ int main() {
             for (int d = 1; d <= DIRT_DEPTH + 1; d++) {
                 int ty = s + d;
                 int t = tileType(tx, ty, seed);
-                bool cave = isCave(tx, ty, seed, s, mountainMask(tx, 0, seed));
+                assert(t == tileType(tx, ty, seed, col)); // sobrecarga idêntica
+                bool cave = isCave(tx, ty, seed, s, col.mountain);
                 if (cave) {
                     assert(t == 0); // 7. caverna vence terra e pedra
                     if (d < 10) caveSamples++;

@@ -28,11 +28,17 @@ void ChunkManager::generate(int cx, int cy) {
     auto c = std::make_unique<Chunk>();
     c->cx = cx;
     c->cy = cy;
+    // Uma ColumnData por coluna do chunk: surface/mask/clima/oceano
+    // calculados 1x e reusados nos 16 tiles (antes: por tile, ~16x noise).
+    support::ColumnData cols[Chunk::W];
+    for (int lx = 0; lx < Chunk::W; lx++) {
+        cols[lx] = support::computeColumn(cx * Chunk::W + lx, seed_);
+    }
     for (int ly = 0; ly < Chunk::H; ly++) {
         for (int lx = 0; lx < Chunk::W; lx++) {
             int tx = cx * Chunk::W + lx;
             int ty = cy * Chunk::H + ly;
-            int t = support::tileType(tx, ty, seed_);
+            int t = support::tileType(tx, ty, seed_, cols[lx]);
             c->setTileFromGeneration(lx, ly, t);
             if (t == 0) {
                 // Um lugar só para a linha d'água: SEA_LEVEL.

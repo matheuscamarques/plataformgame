@@ -8,7 +8,20 @@ namespace support {
 // inclusive para coords negativas. Salts: terreno usa XOR 0x9E3779B9 e
 // 0x51F37ED; camadas novas usam +1009/+2017/+3019 (domínios disjuntos).
 int surfaceHeight(int tx, uint32_t seed);
-int tileType(int tx, int ty, uint32_t seed); // 0 = vazio, 1..11 = sólido
+// 0 = vazio, 1..11 = sólido (6 areia, 8 neve, 9 grama, 10 terra, 11 pedra).
+int tileType(int tx, int ty, uint32_t seed);
+// Tudo que é por-coluna, calculado 1x: superfície, máscara, clima, oceano.
+// tileType(tx,ty) sem ColumnData existe só por compat (testes/viz) e
+// computa a coluna inline — em chunk quente use sempre a sobrecarga.
+struct ColumnData {
+    int surface = 0;
+    float mountain = 0.0f;
+    float temperature = 0.0f;
+    float humidity = 0.0f;
+    bool ocean = false;
+};
+ColumnData computeColumn(int tx, uint32_t seed);
+int tileType(int tx, int ty, uint32_t seed, const ColumnData &col);
 // IDs: 1..5 legado cosmético, 6 areia, 8 neve, 9 grama, 10 terra, 11 pedra.
 // Grama ocupou o 9 primeiro (pedido anterior); terra/pedra seguem 10/11
 // para nunca reutilizar ID existente.
