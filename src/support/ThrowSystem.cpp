@@ -68,9 +68,15 @@ void ThrowSystem::handleTileCollision(Throwable &t, GameContext &ctx) {
     if (!ctx.world->isSolid(tx, ty)) return;
 
     // Reverte ~1 frame e zera vertical, atrito na horizontal.
+    // Spark só em impacto de verdade: sem gate, os 4 substeps gerariam
+    // faísca todo tick enquanto a dinamite descansa no chão.
+    const float impactVy = t.vel.y;
     t.pos.y -= t.vel.y * (1.f / 60.f);
     t.vel.y = 0.f;
     t.vel.x *= 0.6f;
+    if (impactVy > 150.f && particles_) {
+        particles_->spawnHitSpark(t.pos);
+    }
 }
 
 void ThrowSystem::handleFuse(Throwable &t, GameContext &ctx) {

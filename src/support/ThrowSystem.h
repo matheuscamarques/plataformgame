@@ -28,6 +28,11 @@ public:
 
     std::size_t activeCount() const { return pool_.activeCount(); }
 
+    // Render/debug: itera os ativos sem expor o pool.
+    // (Pool::forEachActive é não-const; render também é.)
+    template <typename F>
+    void forEachActive(F &&fn) { pool_.forEachActive(fn); }
+
 private:
     core::Pool<Throwable> pool_{64};
     ExplosionSystem *explosions_ = nullptr;

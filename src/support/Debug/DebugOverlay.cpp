@@ -63,7 +63,8 @@ void DebugOverlay::render(sf::RenderWindow &window, const sf::Font &font,
     window.draw(totalPlataformsTxt);
 
     sf::Text text;
-    text.setString("HASH: " + std::to_string(candidatos.size()));
+    text.setString("HASH: " + std::to_string(candidatos.size())
+        + " TNT: " + std::to_string(player.dynamiteCount) + " (J)");
     text.setCharacterSize(20);
     text.setFont(font);
     text.setFillColor(sf::Color::Green);

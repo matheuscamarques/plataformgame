@@ -1,6 +1,7 @@
 #include "player.h"
 #include <iostream>
 #include "../../defines.h"
+#include "../../support/ThrowSystem.h"
  Player::Player() :
 Entity(PLAYER,0,0,50,50)
 {
@@ -117,4 +118,14 @@ void Player::tick() {
     // gravity
     setVy(9.8f);
     Entity::tick();
+}
+
+bool Player::tryThrow(support::ThrowSystem &throws) {
+    if (!throwCooldown.ready() || dynamiteCount <= 0) return false;
+    // Arco fixo na direção do facing; sem mira manual no MVP.
+    sf::Vector2f vel{220.f * static_cast<float>(facing), -320.f};
+    if (!throws.throwItem({getCenterX(), getCenterY()}, vel)) return false;
+    dynamiteCount--;
+    throwCooldown.trigger();
+    return true;
 }

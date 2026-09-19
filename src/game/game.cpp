@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include "./game.h"
@@ -147,6 +148,23 @@ void Game::render()
 
     enemies_->forEach([&](support::Slime &s) { s.body.draw(window); });
 
+    // Throwables visíveis: círculo com cor pelo fuse (verde→vermelho).
+    throws_->forEachActive([&](const support::Throwable &t) {
+        sf::CircleShape c(3.f);
+        c.setOrigin(3.f, 3.f);
+        c.setPosition(t.pos);
+        if (t.kind == support::ThrowKind::Dynamite) {
+            float r = std::clamp(t.fuse / 1.0f, 0.f, 1.f); // 1 cheio → 0 explodindo
+            c.setFillColor(sf::Color(
+                static_cast<sf::Uint8>(255 - 155 * r),
+                static_cast<sf::Uint8>(80 + 120 * r),
+                60));
+        } else {
+            c.setFillColor(sf::Color(200, 180, 60));
+        }
+        window->draw(c);
+    });
+
     particles_->render(*window);
 
     // Debug draw das hitboxes por parte (só com overlay ligado).
@@ -180,6 +198,12 @@ void Game::tick() {
     if (p->moveLeft && !p->moveRight) p->facing = -1;
     if (p->moveRight && !p->moveLeft) p->facing = 1;
     p->tick();
+
+    // S6: J (Action::Light, sem uso até aqui) arremessa dinamite.
+    // Cooldown cobre o edge por frame: pressed fica alto em todos os
+    // ticks do frame, o 2º tick já encontra cooldown rodando.
+    p->throwCooldown.tick(1.0f / 30.0f);
+    if (input_.pressed(support::Action::Light)) p->tryThrow(*throws_);
 
     // Mundo infinito: carrega/descarrega chunks em torno do tile do player.
     int playerTileX = static_cast<int>(std::floor(p->getX() / BLOCK_SIZE));
