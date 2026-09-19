@@ -19,7 +19,7 @@ class Player : public Entity
         // S6: verbo de arremesso. Cooldown tickado no Game::tick (1/30 fixo);
         // lógica aqui para ser testável sem Game/janela.
         core::Cooldown throwCooldown{0.5f};
-        int dynamiteCount = 5;
+        int dynamiteCount = 999;
 
         Player();
         void collide(Entity entity);

@@ -10,9 +10,9 @@ int main() {
     { // ThrowsWhenReady (inventário cai, cooldown arma, spawn ativo)
         Player p;
         ThrowSystem ts;
-        assert(p.dynamiteCount == 5 && p.throwCooldown.ready());
+        assert(p.dynamiteCount == 999 && p.throwCooldown.ready());
         assert(p.tryThrow(ts));
-        assert(p.dynamiteCount == 4);
+        assert(p.dynamiteCount == 998);
         assert(!p.throwCooldown.ready());
         assert(ts.activeCount() == 1u);
     }
@@ -21,7 +21,7 @@ int main() {
         ThrowSystem ts;
         assert(p.tryThrow(ts));
         assert(!p.tryThrow(ts));
-        assert(p.dynamiteCount == 4 && ts.activeCount() == 1u);
+        assert(p.dynamiteCount == 998 && ts.activeCount() == 1u);
     }
     { // ReadyAfterHalfSecond (14 ticks de 1/30 bloqueiam; folga libera)
         Player p;
@@ -31,7 +31,7 @@ int main() {
         assert(!p.throwCooldown.ready());
         p.throwCooldown.tick(1.f); // folga: evita resíduo float no limite exato
         assert(p.throwCooldown.ready() && p.tryThrow(ts));
-        assert(p.dynamiteCount == 3);
+        assert(p.dynamiteCount == 997);
     }
     { // EmptyInventoryThrowsNothing
         Player p;
@@ -46,7 +46,7 @@ int main() {
         for (int i = 0; i < 64; ++i) ts.throwItem({0.f, 0.f}, {0.f, 0.f});
         assert(ts.activeCount() == 64u);
         assert(!p.tryThrow(ts));
-        assert(p.dynamiteCount == 5 && p.throwCooldown.ready());
+        assert(p.dynamiteCount == 999 && p.throwCooldown.ready());
     }
     { // FacingDirectsThrow (esquerda = vx negativo)
         Player p;
