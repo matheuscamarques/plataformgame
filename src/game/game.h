@@ -6,7 +6,7 @@
 #include "vector"
 #include "../support/World/World.h"
 #include "../entities/player/player.h"
-#include "../camera/Camera.h"
+#include "../support/Camera/Camera.h"
 
 class Game : public Component
 {
@@ -25,7 +25,7 @@ private:
     sf::RenderWindow *window;
     std::unique_ptr<support::World> world;
     std::unique_ptr<Player> player;
-    Camera camera{0.0f, 0.0f};
+    support::Camera camera;
     //sf::View *view;
     bool running = false;
     void render();

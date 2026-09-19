@@ -103,9 +103,11 @@ void Game::render()
 
     window->clear(sf::Color(135, 206, 235));
     //view->setCenter(player.get()->getX(), player.get()->getY());
-    camera.tick(player.get()->getX(), player.get()->getY(), this->getW(), this->getH());
+    camera.setViewport(this->getW(), this->getH());
+    camera.follow(player.get()->getX(), player.get()->getY());
+    sf::Vector2f camPos = camera.position();
     auto view = window->getDefaultView();
-    view.move(camera.x, camera.y);
+    view.move(camPos.x, camPos.y);
     //view.zoom(-10.0f);
     window->setView(view);
     auto &objects = getWorld()->getPlatforms();
@@ -122,8 +124,8 @@ void Game::render()
     window->draw(totalPlataformsTxt);
 
     // Desenha só o visível (+margem); sem quadtree no caminho.
-    float vx0 = camera.x - 60.0f, vy0 = camera.y - 60.0f;
-    float vx1 = camera.x + this->getW() + 60.0f, vy1 = camera.y + this->getH() + 60.0f;
+    float vx0 = camPos.x - 60.0f, vy0 = camPos.y - 60.0f;
+    float vx1 = camPos.x + this->getW() + 60.0f, vy1 = camPos.y + this->getH() + 60.0f;
     for(Entity *entity : objects){
         if (entity->getX() + entity->getW() < vx0 || entity->getX() > vx1 ||
             entity->getY() + entity->getH() < vy0 || entity->getY() > vy1) continue;
