@@ -6,45 +6,28 @@
 #include "support/EnemySystem.h"
 #include "support/GameContext.h"
 
-// Contato: 10 de dano, i-frame 0.6s, empurrão, morto não bate.
+// Contato com telegraph 0.35s: morde após ~11 ticks colado (recolando
+// a cada tick, pois a separação ejeta). Separação em 1 tick.
 int main() {
     using namespace support;
+    auto recol = [](EnemySystem &e) {
+        e.forEach([](Slime &s) { s.body.setX(10.f); s.body.setY(10.f); });
+    };
 
-    { // ContactDamagesOnceThenIframesHold
+    { // DamagesAfterWindup + pushback (11 ticks colado → hp 90, x -6)
         Player p; // (0,0) 50x50
         EnemySystem enemies;
-        enemies.spawn("slime", 10.f, 10.f); // sobreposto
+        enemies.spawn("slime", 10.f, 10.f);
 
         ContactDamageSystem cs;
         GameContext ctx{};
         ctx.player = &p;
         ctx.enemies = &enemies;
 
-        cs.tick(1.f / 30.f, ctx);
-        assert(p.hp == 90);
-        // Recola o slime (foi ejetado) e encosta de novo: i-frame segura.
-        enemies.forEach([](Slime &s) { s.body.setX(10.f); s.body.setY(10.f); });
-        cs.tick(1.f / 30.f, ctx);
-        assert(p.hp == 90); // i-frame
-    }
-    { // IframesExpireThenDamageAgain + pushback
-        Player p;
-        EnemySystem enemies;
-        enemies.spawn("slime", 10.f, 10.f); // à direita do centro
-
-        ContactDamageSystem cs;
-        GameContext ctx{};
-        ctx.player = &p;
-        ctx.enemies = &enemies;
-
-        cs.tick(1.f / 30.f, ctx);
-        assert(p.hp == 90 && p.getX() == -6.f); // empurrado p/ longe
-        p.hurtIframes.tick(1.f);
-        // Recola o slime e encosta de novo.
-        enemies.forEach([](Slime &s) { s.body.setX(10.f); s.body.setY(10.f); });
-        p.setX(0.f);
-        cs.tick(1.f / 30.f, ctx);
-        assert(p.hp == 80);
+        for (int i = 0; i < 5; ++i) { recol(enemies); cs.tick(1.f / 30.f, ctx); }
+        assert(p.hp == 100); // windup (~0.18s) ainda não esgotou
+        for (int i = 0; i < 6; ++i) { recol(enemies); cs.tick(1.f / 30.f, ctx); }
+        assert(p.hp == 90 && p.getX() == -6.f);
     }
     { // DeadSlimeNoDamage + NoOverlapNoDamage
         Player p;
@@ -63,11 +46,10 @@ int main() {
         cs.tick(1.f / 30.f, ctx);
         assert(p.hp == 100);
     }
-
     { // SeparatesSlimeOut (1 tick: rects não se tocam mais)
-        Player p; // (0,0) 50x50
+        Player p;
         EnemySystem enemies;
-        enemies.spawn("slime", 10.f, 10.f); // sobreposto
+        enemies.spawn("slime", 10.f, 10.f);
 
         ContactDamageSystem cs;
         GameContext ctx{};

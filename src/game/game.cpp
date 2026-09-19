@@ -7,6 +7,7 @@
 #include "../core/Time.h"
 #include "../support/BodySystem.h"
 #include "../support/World/Generation.h"
+#include "../support/World/Stratum.h"
 #include "../window/window.h"
 #include "../entities/player/player.h"
 
@@ -40,7 +41,8 @@ void Game::main()
     LOG_INFO("Game", "boot ok, seed=" << WORLD_SEED << " spawnTx=" << spawnTx);
 
     // Sistemas via scheduler; 2 slimes perto do spawn (determinístico).
-    game->scheduler_.add<support::StratumManager>();
+    game->stratum_ = &game->scheduler_.add<support::StratumManager>();
+    game->run_.setStratumManager(game->stratum_);
     game->enemies_ = &game->scheduler_.add<support::EnemySystem>();
     game->scheduler_.add<support::BodySystem>();
     game->particles_ = &game->scheduler_.add<support::ParticleSystem>();
@@ -205,6 +207,50 @@ void Game::render()
 
     overlay_.render(*window, font, *getWorld(), *player.get(), objects.size());
 
+    // HUD em espaço de tela (view default): HP, TNT, estrato, morte/pause.
+    // Tosco de propósito; HUD bonito é polimento.
+    {
+        window->setView(window->getDefaultView());
+        Player *p = player.get();
+        const float ratio = static_cast<float>(p->hp) / static_cast<float>(p->hpMax);
+
+        sf::RectangleShape hpBg(sf::Vector2f(204.f, 20.f));
+        hpBg.setPosition(16.f, 16.f);
+        hpBg.setFillColor(sf::Color(40, 0, 0));
+        window->draw(hpBg);
+        sf::RectangleShape hpFg(sf::Vector2f(200.f * ratio, 16.f));
+        hpFg.setPosition(18.f, 18.f);
+        hpFg.setFillColor(sf::Color(200, 30, 30));
+        window->draw(hpFg);
+
+        auto text = [&](const std::string &s, float x, float y, int size = 18) {
+            sf::Text t;
+            t.setFont(font);
+            t.setString(s);
+            t.setCharacterSize(size);
+            t.setFillColor(sf::Color::White);
+            t.setOutlineColor(sf::Color::Black);
+            t.setOutlineThickness(1);
+            t.setPosition(x, y);
+            window->draw(t);
+        };
+        text("HP " + std::to_string(p->hp) + "/" + std::to_string(p->hpMax), 16.f, 38.f);
+        text("TNT:" + std::to_string(p->dynamiteCount) + " J  K melee", 16.f, 62.f);
+        const int pty = static_cast<int>(std::floor(p->getY() / BLOCK_SIZE));
+        text(std::string(support::stratumName(support::stratumAt(pty)))
+             + "  y" + std::to_string(pty), 16.f, 86.f);
+
+        if (run_.isDead()) {
+            sf::RectangleShape dim(sf::Vector2f(viewW_, viewH_));
+            dim.setFillColor(sf::Color(0, 0, 0, 160));
+            window->draw(dim);
+            text("VOCE MORREU", viewW_ * 0.5f - 110.f, viewH_ * 0.5f - 40.f, 36);
+            text("R para renascer no checkpoint", viewW_ * 0.5f - 170.f, viewH_ * 0.5f + 10.f, 20);
+        } else if (run_.isPaused()) {
+            text("PAUSADO (ESC)", viewW_ * 0.5f - 110.f, viewH_ * 0.5f - 20.f, 28);
+        }
+    }
+
     window->display();
 }
 
@@ -217,32 +263,38 @@ void Game::tick() {
     p->runFast   = input_.held(support::Action::RunFast);
     if (p->moveLeft && !p->moveRight) p->facing = -1;
     if (p->moveRight && !p->moveLeft) p->facing = 1;
-    p->tick();
 
-    // S6: J (Action::Light, sem uso até aqui) arremessa dinamite.
-    // Cooldown cobre o edge por frame: pressed fica alto em todos os
-    // ticks do frame, o 2º tick já encontra cooldown rodando.
-    p->throwCooldown.tick(1.0f / 30.0f);
-    if (input_.pressed(support::Action::Light)) p->tryThrow(*throws_);
+    // Run gate: morto/pausado congela movimento, mundo e scheduler.
+    // RunManager roda sempre (precisa ver o R).
+    const bool frozen = run_.isPaused() || run_.isDead();
+    if (!frozen) {
+        p->tick();
 
-    // Mundo infinito: carrega/descarrega chunks em torno do tile do player.
-    int playerTileX = static_cast<int>(std::floor(p->getX() / BLOCK_SIZE));
-    int playerTileY = static_cast<int>(std::floor(p->getY() / BLOCK_SIZE));
-    getWorld()->update(playerTileX, playerTileY);
+        // S6: J (Action::Light) arremessa dinamite.
+        // Cooldown cobre o edge por frame: pressed fica alto em todos os
+        // ticks do frame, o 2º tick já encontra cooldown rodando.
+        p->throwCooldown.tick(1.0f / 30.0f);
+        if (input_.pressed(support::Action::Light)) p->tryThrow(*throws_);
 
-    // Consulta o hash ao redor do player (1 tile de margem).
-    // Inclui água de propósito: Player::collide usa WATER para natação.
-    std::vector<Entity*> candidatos;
-    getWorld()->query(
-        p->getX() - BLOCK_SIZE,
-        p->getY() - BLOCK_SIZE,
-        p->getW() + BLOCK_SIZE * 2,
-        p->getH() + BLOCK_SIZE * 2,
-        candidatos);
+        // Mundo infinito: carrega/descarrega chunks em torno do tile do player.
+        int playerTileX = static_cast<int>(std::floor(p->getX() / BLOCK_SIZE));
+        int playerTileY = static_cast<int>(std::floor(p->getY() / BLOCK_SIZE));
+        getWorld()->update(playerTileX, playerTileY);
 
-    for (Entity *e : candidatos) {
-        if (p->isColide(*e)) {
-            p->collide(*e);
+        // Consulta o hash ao redor do player (1 tile de margem).
+        // Inclui água de propósito: Player::collide usa WATER para natação.
+        std::vector<Entity*> candidatos;
+        getWorld()->query(
+            p->getX() - BLOCK_SIZE,
+            p->getY() - BLOCK_SIZE,
+            p->getW() + BLOCK_SIZE * 2,
+            p->getH() + BLOCK_SIZE * 2,
+            candidatos);
+
+        for (Entity *e : candidatos) {
+            if (p->isColide(*e)) {
+                p->collide(*e);
+            }
         }
     }
 
@@ -261,7 +313,8 @@ void Game::tick() {
     });
     support::GameContext ctx{getWorld(), p, &input_, enemies_,
                              throws_, explodes_, drops_, &targets};
-    scheduler_.tick(1.0f / 30.0f, ctx);
+    run_.tick(1.0f / 30.0f, ctx);
+    if (!run_.isPaused() && !run_.isDead()) scheduler_.tick(1.0f / 30.0f, ctx);
 }
 
 support::World* Game::getWorld() {

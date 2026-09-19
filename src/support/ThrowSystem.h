@@ -28,6 +28,9 @@ public:
 
     std::size_t activeCount() const { return pool_.activeCount(); }
 
+    // Limpa todos (restart da run).
+    void clear() { pool_.releaseAll(); }
+
     // Render/debug: itera os ativos sem expor o pool.
     // (Pool::forEachActive é não-const; render também é.)
     template <typename F>

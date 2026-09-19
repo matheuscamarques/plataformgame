@@ -16,6 +16,7 @@
 #include "../support/ExplosionSystem.h"
 #include "../support/Input/InputMap.h"
 #include "../support/MeleeSystem.h"
+#include "../support/RunManager.h"
 #include "../support/StratumManager.h"
 #include "../support/ParticleSystem.h"
 #include "../support/ThrowSystem.h"
@@ -46,6 +47,8 @@ private:
     support::ExplosionSystem *explodes_ = nullptr; // observa; dono é o scheduler
     support::DeathSystem *deaths_ = nullptr; // observa; dono é o scheduler
     support::MeleeSystem *melee_ = nullptr; // observa; dono é o scheduler
+    support::StratumManager *stratum_ = nullptr; // observa; dono é o scheduler
+    support::RunManager run_; // valor: gate do tick (morte/pause)
     support::DropSystem *drops_ = nullptr; // observa; dono é o scheduler
     support::ParticleSystem *particles_ = nullptr; // observa; dono é o scheduler
     bool running = false;

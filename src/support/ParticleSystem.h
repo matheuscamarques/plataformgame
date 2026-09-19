@@ -30,6 +30,9 @@ public:
     std::size_t activeDebris() const { return debris_.activeCount(); }
     std::size_t activeDust()   const { return dust_.activeCount(); }
 
+    // Limpa tudo (restart da run).
+    void clear() { debris_.releaseAll(); dust_.releaseAll(); }
+
 private:
     core::Pool<Particle> debris_{512};
     core::Pool<Particle> dust_{4096};

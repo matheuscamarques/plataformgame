@@ -35,6 +35,10 @@ public:
     std::size_t activeCount() const { return pool_.activeCount(); }
     int totalCollected() const { return collected_; }
 
+    // Limpa orbes ativas (restart). collected_ é estatística da
+    // sessão e sobrevive (generoso, modelo C não especifica).
+    void clear() { pool_.releaseAll(); }
+
 private:
     core::Pool<XPOrb> pool_{128};
     int collected_ = 0;

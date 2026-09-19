@@ -29,6 +29,9 @@ struct Slime {
     core::Cooldown knockbackLock;
     // Último swing de melee que acertou (1 hit por swing por slime).
     int lastHitSwing = -1;
+    // Telegraph da mordida: conta de BITE_WINDUP até 0 SÓ em contato;
+    // sem contato recupera (0.5x). Cheio = ocioso (verde).
+    float biteWindup = 0.35f;
 
     Slime(Entity b, std::unique_ptr<Behavior> a)
         : body(std::move(b)), ai(std::move(a)) {}
@@ -56,6 +59,9 @@ public:
 
     void forEach(const std::function<void(Slime &)> &fn);
     std::size_t count() const { return slimes_.size(); }
+
+    // Limpa todos (restart da run). Slimes iniciais respawnam pelo caller.
+    void clear() { slimes_.clear(); }
 
     // Remove mortos; onDeath(pos do centro) por removido para juice
     // (partículas/drops no DeathSystem). Erase mora aqui, no dono.

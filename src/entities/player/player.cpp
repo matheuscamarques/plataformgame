@@ -138,6 +138,24 @@ bool Player::hurt(int dmg) {
     return true;
 }
 
+void Player::respawn(float x, float y) {
+    setX(x);
+    setY(y);
+    setVx(0.f);
+    setVy(0.f);
+    hp = hpMax;
+    hurtIframes.reset();
+    throwCooldown.reset();
+    dynamiteCount = 999;
+    meleePhase = MeleePhase::Idle;
+    meleeCombo = 0;
+    meleeTimer = 0.f;
+    facing = 1;
+    jumping = false;
+    jumpingRecharge = 0.f;
+    moveDown = moveUp = moveLeft = moveRight = runFast = false;
+}
+
 namespace {
 struct MeleeDef {
     float windup, active, recovery;

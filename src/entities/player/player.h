@@ -49,6 +49,10 @@ class Player : public Entity
         // hp trava em 0; morte/restart vêm no bloco B.
         bool hurt(int dmg);
 
+        // Reset completo para respawn (RunManager): HP, pos, vel,
+        // cooldowns, melee idle, inventário. Facing vira direita.
+        void respawn(float x, float y);
+
         // Inicia swing (Idle→combo 0) ou encadeia (Recovery→próximo).
         // Retorna false se já está em Windup/Active.
         bool startSwing();
