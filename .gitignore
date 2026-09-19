@@ -1,0 +1,15 @@
+# Build outputs (gerados pelo Makefile; nunca commitar)
+build/
+compiled/
+*.o
+*.d
+
+# Binário na raiz (legado do Makefile antigo)
+/plataformer
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
