@@ -16,6 +16,11 @@ int main() {
     assert(std::fabs(s->body.getX() - 100.0f) < 0.001f);
     assert(s->ai != nullptr);
 
+    // S2: recursos default de trash.
+    assert(s->resources.isTrash == true);
+    assert(s->resources.hp == 30 && s->resources.hpMax == 30);
+    assert(std::fabs(s->resources.posture - 20.0f) < 0.001f);
+
     auto none = Factory::spawnEnemy("dragon", 0.0f, 0.0f);
     assert(none == nullptr);
 

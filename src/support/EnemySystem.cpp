@@ -18,6 +18,8 @@ void EnemySystem::forEach(const std::function<void(Slime &)> &fn) {
 
 void EnemySystem::tick(float dt, GameContext &ctx) {
     for (auto &s : slimes_) {
+        // Recursos primeiro: o behavior já vê regen do frame e pode canPay.
+        s->resources.tick(dt);
         if (s->ai) s->ai->onTick(s->body, dt, ctx);
         physics(*s, ctx);
     }

@@ -8,6 +8,7 @@
 #include "../core/System.h"
 #include "../entities/entity/entity.hpp"
 #include "Behavior.h"
+#include "EnemyResources.h"
 #include "GameContext.h"
 
 namespace support {
@@ -19,6 +20,7 @@ class Behavior;
 struct Slime {
     Entity body;
     std::unique_ptr<Behavior> ai;
+    EnemyResources resources;
     bool grounded = false;
 
     Slime(Entity b, std::unique_ptr<Behavior> a)
