@@ -80,6 +80,9 @@ bool islandTile(int tx, int ty, uint32_t seed);
 // montanha alcança). t alto sem altitude é flanco, não pico.
 bool snowcap(int surface);
 
+// Minérios: Tile do veio ou Air (sem minério). Por tile (3D por natureza;
+// por coluna daria veios verticais artificiais). Ordem do raro pro comum.
+Tile pickOre(int tx, int ty, uint32_t seed, int surface, int depth);
 // Spawn: primeira coluna a partir de nearX com flanco de montanha
 // (uplift 8..20: terra garantida, nem mar nem pico). Determinístico.
 // Player cai do céu até a superfície — qualquer seed funciona.

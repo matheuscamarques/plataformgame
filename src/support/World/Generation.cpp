@@ -81,6 +81,24 @@ bool snowcap(int surface) {
     return surface <= 14;
 }
 
+Tile pickOre(int tx, int ty, uint32_t seed, int surface, int depth) {
+    (void)surface;
+    // Partição disjunta de r (ordem do raro): cada veio tem sua faixa.
+    // Alvos: diamante 0.15%, prata 0.25%, ouro ~0.8%, ferro 1%,
+    // cobre ~2.5% (raso), carvão ~2.5% (fundo).
+    float r = core::rand01(tx, ty, seed + 6067u);
+    if (r > 0.9985f && depth > 25) return Tile::OreDiamond;
+    if (r > 0.996f && depth > 15) return Tile::OreSilver;
+    if (r > 0.990f) return Tile::OreGold;
+    if (r > 0.980f) return Tile::OreIron;
+    if (depth <= 12) {
+        if (r > 0.955f) return Tile::OreCopper;
+    } else {
+        if (r > 0.955f) return Tile::OreCoal;
+    }
+    return Tile::Air;
+}
+
 int findSpawnTileX(int nearX, uint32_t seed) {
     // Flanco de montanha: uplift 8..20 (terra garantida: s <= 21 < mar).
     for (int d = 0; d <= 2000; d++) {
@@ -170,7 +188,9 @@ Tile tileType(int tx, int ty, uint32_t seed, const ColumnData &col) {
             if (ocean) return Tile::Sand;
             return Tile::Dirt; // terra
         }
-        return Tile::Stone; // pedra
+        // Pedra com minérios (raridade por profundidade, ordem do raro).
+        Tile ore = pickOre(tx, ty, seed, surface, ty - surface);
+        return ore != Tile::Air ? ore : Tile::Stone;
     }
     // Topo: clima da coluna na altura da superfície (não do tile fundo).
     // Neve primeiro: pico alto e forte passa na frente do bioma.

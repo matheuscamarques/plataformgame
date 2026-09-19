@@ -40,7 +40,8 @@ int main() {
                     if (ocean) assert(t == Tile::Sand);  // 5. sob oceano: areia
                     else assert(t == Tile::Dirt);        // 2. terra
                 } else {
-                    assert(t == Tile::Stone);            // 3. pedra
+                    // 3. pedra ou minério (pickOre só troca Stone por veio)
+                    assert(isSolid(t) && t != Tile::Dirt && t != Tile::Sand);
                 }
                 assert(tileType(tx, ty, seed) == t); // 6. determinismo
             }
