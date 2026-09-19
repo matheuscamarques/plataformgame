@@ -55,6 +55,13 @@ inline constexpr int TRENCH_DEPTH_MAX = 20;
 inline constexpr float SEAMOUNT_THRESHOLD = 0.70f;
 float trenchMask(int tx, int ty, uint32_t seed);
 
+// Cliff: corte vertical raro dentro de montanha. Frequência ALTA em X
+// (faixas finas) para não virar planalto. Cria o degrau que o wall-climb
+// precisa existir para escalar — sem cliff, montanha é rampa caminhável.
+inline constexpr float CLIFF_THRESHOLD = 0.80f;
+inline constexpr int CLIFF_HEIGHT = 4;
+float cliffMask(int tx, int ty, uint32_t seed);
+
 // Caverna: threshold base calibrado por histograma 2D (3 seeds,
 // área 800x200): >0.62 => ~18%, >0.55 => ~34%. Densidade cresce
 // com a profundidade via CAVE_DEPTH_FALLOFF (depth clampado em 1,

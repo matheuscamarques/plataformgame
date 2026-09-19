@@ -30,21 +30,30 @@ int surfaceHeight(int tx, uint32_t seed) {
         }
         // Vales entre cristas não viram oceano interno.
         if (base > SEA_LEVEL + 2) base = SEA_LEVEL + 2;
+        // Cliff: desce um degrau abrupto (parede lisa vertical).
+        // É o que transforma rampa caminhável em obstáculo de wall-climb.
+        if (cliffMask(tx, 0, seed) > CLIFF_THRESHOLD) {
+            base -= CLIFF_HEIGHT;
+        }
     }
     // Fossa primeiro (aprofunda), monte depois (sobe). Ordem fixa:
     // invertida, o monte cavaria dentro da fossa.
-    // Só em oceano (base > SEA_LEVEL): fora d'água não faz sentido.
-    if (base > SEA_LEVEL) {
+    // Só em oceano fora de montanha: em vale de range, a fossa furaria
+    // o clamp e criaria oceano interno. Rampa shore 0..1: sem ela, a
+    // coluna com base==SEA_LEVEL+1 ganharia +20 de uma vez na costa.
+    if (base > SEA_LEVEL && m <= MOUNTAIN_THRESHOLD) {
+        float shore = (base - SEA_LEVEL) / 4.0f;
+        if (shore > 1.0f) shore = 1.0f;
         float tr = trenchMask(tx, 0, seed);
         if (tr > TRENCH_THRESHOLD) {
             float tt = (tr - TRENCH_THRESHOLD) / (1.0f - TRENCH_THRESHOLD);
             // t^1.2: fundo mais chato que pico tem topo.
-            base += static_cast<int>(std::pow(tt, 1.2f) * TRENCH_DEPTH_MAX);
+            base += static_cast<int>(std::pow(tt, 1.2f) * TRENCH_DEPTH_MAX * shore);
         }
         float p = peakMask(tx, 0, seed);
         if (p > SEAMOUNT_THRESHOLD) {
             float pn = (p - SEAMOUNT_THRESHOLD) / (1.0f - SEAMOUNT_THRESHOLD);
-            base -= static_cast<int>(pn * pn * 10.0f); // sobe até 10, nunca emerge
+            base -= static_cast<int>(pn * pn * 10.0f * shore); // sobe até 10, nunca emerge
             if (base < SEA_LEVEL + 2) base = SEA_LEVEL + 2;
         }
     }
@@ -63,9 +72,15 @@ float trenchMask(int tx, int ty, uint32_t seed) {
     // Escala de lagoa: a decisão (surfaceHeight) usa a linha ty=0, e em
     // /1024 a fossa mais próxima ficava a 2000+ tiles em 2/3 seeds;
     // em /384 a taxa efetiva variava 0-3% (anti-correlação com oceano
-    // por mesma ordem de grandeza). Em /128 a taxa é 1.4-1.8% estável
-    // nas 3 seeds. Y anisotrópico só aparece no PNG.
+    // por mesma ordem de grandeza). Em /128 a taxa efetiva é 1.4-1.8%
+    // estável nas 3 seeds. Y anisotrópico só aparece no PNG.
     return core::fbm(tx / 128.0f, ty / 192.0f, seed + 8081u, 3);
+}
+
+float cliffMask(int tx, int ty, uint32_t seed) {
+    // Alta em X (cortes finos), baixa em Y (não espalha na vertical).
+    // Seed 9091 livre (em uso: 1009/2017/3019/4021/6067/7079/8081/XORs).
+    return core::fbm(tx / 48.0f, ty / 512.0f, seed + 9091u, 2);
 }
 
 float caveNoise(int tx, int ty, uint32_t seed) {
