@@ -30,7 +30,7 @@ int main() {
                 int s = surfaceHeight(tx, seed);
                 for (int ty = s + 3; ty < s + 20; ty++) {
                     // caverna rasa (acima da lava) e molhada
-                    if (ty > LAVA_LEVEL) continue;
+                    if (isLavaDepth(ty)) continue;
                     float m = mountainMask(tx, 0, seed);
                     if (!isCave(tx, ty, seed, s, m)) continue;
                     if (lakeWet(tx, ty, seed) <= 0.0f) continue;
@@ -48,7 +48,7 @@ int main() {
             int checked = 0;
             for (int tx = -2000; tx < 2000 && checked < 20; tx++) {
                 int s = surfaceHeight(tx, seed);
-                for (int ty = LAVA_LEVEL + 6; ty < WORLD_BOTTOM; ty++) {
+                for (int ty = LAVA_DEPTH_START + 6; ty < LAVA_DEPTH_START + 400; ty++) {
                     float m = mountainMask(tx, 0, seed);
                     if (!isCave(tx, ty, seed, s, m)) continue;
                     Tile t = tileType(tx, ty, seed);

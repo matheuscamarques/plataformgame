@@ -40,6 +40,7 @@ void Game::main()
     LOG_INFO("Game", "boot ok, seed=" << WORLD_SEED << " spawnTx=" << spawnTx);
 
     // Sistemas via scheduler; 2 slimes perto do spawn (determinístico).
+    game->scheduler_.add<support::StratumManager>();
     game->enemies_ = &game->scheduler_.add<support::EnemySystem>();
     game->scheduler_.add<support::BodySystem>();
     game->particles_ = &game->scheduler_.add<support::ParticleSystem>();

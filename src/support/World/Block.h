@@ -62,6 +62,10 @@ inline const std::array<BlockDef, TILE_COUNT> BLOCKS = {{
     /* DeadBush       */ {{120, 100,  60,255}, "dead_bush",       BlockKind::Deco},
     /* Mushroom       */ {{220, 100, 100,255}, "mushroom",        BlockKind::Deco},
     /* Glowshroom     */ {{100, 220, 220,255}, "glowshroom",      BlockKind::Deco},
+    /* OreCrystal     */ {{120, 230, 230,255}, "ore_crystal",     BlockKind::Solid},
+    /* OrePlatinum    */ {{225, 225, 235,255}, "ore_platinum",    BlockKind::Solid},
+    /* OreMithril     */ {{110, 200, 130,255}, "ore_mithril",     BlockKind::Solid},
+    /* OreAdamant     */ {{170,  40,  50,255}, "ore_adamant",     BlockKind::Solid},
 }};
 
 inline const BlockDef& blockDef(Tile t) {

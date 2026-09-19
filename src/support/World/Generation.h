@@ -114,8 +114,11 @@ float lakeWet(int tx, int ty, uint32_t seed); // [0,1]: 0 seco, 1 cheio
 // montanha alcança). t alto sem altitude é flanco, não pico.
 bool snowcap(int surface);
 
-// Minérios: Tile do veio ou Air (sem minério). Por tile (3D por natureza;
-// por coluna daria veios verticais artificiais). Ordem do raro pro comum.
+// Minérios: Tile do veio ou Air (sem minério). Faixas ABSOLUTAS de ty
+// (um veio por estrato: identidade por profundidade). Ordem de checagem
+// não importa (faixas disjuntas). Diamond/Coal viraram legado: continuam
+// no enum/blocos, mas não geram mais.
+// Thresholds herdados do esquema antigo (ordens de grandeza medidas).
 Tile pickOre(int tx, int ty, uint32_t seed, int surface, int depth);
 // Spawn: primeira coluna a partir de nearX com flanco de montanha
 // (uplift 8..20: terra garantida, nem mar nem pico). Determinístico.
@@ -152,19 +155,21 @@ struct TreeParams { int trunkH = 0; int canopyR = 0; };
 // Puro e mockável: surfaceY e bioma vêm de fora (teste injeta plano).
 // Inclinação usa surfaceHeight real dos vizinhos.
 bool treeWants(int tx, uint32_t seed, int surfaceY, Biome biome, TreeParams &out);
-// Mar: linha do mapa (tile row), não valor de noise. Calibrado por
-// histograma (3 seeds x 4000 cols, fração com surface > L):
-// L=25 => 29-41%, L=26 => 14-21%, L=27 => 8-10%. L=26 escolhido:
-// banda oceânica (26..surf) cai toda na regra de água legada (ty > 25),
-// sem buraco de ar na superfície da água. Não modifica altura nenhuma:
-// só decide o que fica entre surf e SEA_LEVEL.
-inline constexpr int SEA_LEVEL = 26;
-// Lava e fundo do mundo. Abaixo de LAVA_LEVEL, caverna vazia vira lava.
+// Lava e fundo do mundo. Caverna vira lava SÓ em isLavaDepth (estrato 6+):
+// estender o fundo sem isso inundaria tudo de lava a partir de ty=51.
 // Abaixo de WORLD_BOTTOM, tudo é bedrock (nada cava, nada é gerado).
-// Calibrar LAVA_LEVEL por PNG/feel (fração de lava no fundo), não por teste.
-inline constexpr int LAVA_LEVEL = SEA_LEVEL + 25;
-inline constexpr int WORLD_BOTTOM = 60;
-static_assert(LAVA_LEVEL > SEA_LEVEL + 5, "lava e mar não podem se cruzar");
+// Água de caverna só perto do mar (WATER_FILL_MAX): fundo inundado
+// também não faz sentido — caverna funda é ar (ou lava no estrato 6+).
+// Mar: linha do mapa (tile row). Histograma (3 seeds x 4000 cols):
+// L=26 => 14-21% de colunas oceânicas. Só decide o que fica entre
+// surf e SEA_LEVEL.
+inline constexpr int SEA_LEVEL = 26;
+inline constexpr int WATER_FILL_MAX = SEA_LEVEL + 12;
+inline constexpr int LAVA_DEPTH_START = 6200; // entrada do estrato 6
+inline constexpr int WORLD_BOTTOM = 12000;   // ~1h de descida
+static_assert(LAVA_DEPTH_START > WATER_FILL_MAX, "lava e água não podem se cruzar");
+static_assert(WORLD_BOTTOM > LAVA_DEPTH_START, "fundo abaixo da lava");
+inline bool isLavaDepth(int ty) { return ty >= LAVA_DEPTH_START; }
 // Coluna oceânica = terreno abaixo da linha do mar.
 inline bool isOceanColumn(int tx, uint32_t seed) {
     return surfaceHeight(tx, seed) > SEA_LEVEL;

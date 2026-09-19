@@ -180,18 +180,26 @@ bool treeWants(int tx, uint32_t seed, int surfaceY, Biome biome, TreeParams &out
 
 Tile pickOre(int tx, int ty, uint32_t seed, int surface, int depth) {
     (void)surface;
-    // Partição disjunta de r (ordem do raro): cada veio tem sua faixa.
-    // Alvos: diamante 0.15%, prata 0.25%, ouro ~0.8%, ferro 1%,
-    // cobre ~2.5% (raso), carvão ~2.5% (fundo).
+    (void)depth;
+    // Um veio por estrato, faixas absolutas disjuntas (ver Stratum.h).
+    // r uniforme por tile; thresholds ~1.5-4.5% da pedra do estrato.
     float r = core::rand01(tx, ty, seed + 6067u);
-    if (r > 0.9985f && depth > 25) return Tile::OreDiamond;
-    if (r > 0.996f && depth > 15) return Tile::OreSilver;
-    if (r > 0.990f) return Tile::OreGold;
-    if (r > 0.980f) return Tile::OreIron;
-    if (depth <= 12) {
+    if (ty >= 200 && ty < 1400) {
         if (r > 0.955f) return Tile::OreCopper;
-    } else {
-        if (r > 0.955f) return Tile::OreCoal;
+    } else if (ty >= 1400 && ty < 2600) {
+        if (r > 0.980f) return Tile::OreIron;
+    } else if (ty >= 2600 && ty < 3800) {
+        if (r > 0.996f) return Tile::OreSilver;
+    } else if (ty >= 3800 && ty < 5000) {
+        if (r > 0.990f) return Tile::OreGold;
+    } else if (ty >= 5000 && ty < 6200) {
+        if (r > 0.982f) return Tile::OreCrystal;
+    } else if (ty >= 6200 && ty < 7400) {
+        if (r > 0.984f) return Tile::OrePlatinum;
+    } else if (ty >= 7400 && ty < 8600) {
+        if (r > 0.986f) return Tile::OreMithril;
+    } else if (ty >= 8600 && ty < 9800) {
+        if (r > 0.988f) return Tile::OreAdamant;
     }
     return Tile::Air;
 }
@@ -289,10 +297,13 @@ Tile tileType(int tx, int ty, uint32_t seed, const ColumnData &col) {
         if (isCave(tx, ty, seed, surface, col.mountain)) {
             // Caverna funda vira lava, não ar. Com +5 de folga para a
             // boca não abrir direto na lava. Acima do surface, nunca.
-            if (ty > LAVA_LEVEL && ty > surface + 5) return Tile::Lava;
-            // Lago: caverna rasa com wetness vira água (funda é lava).
+            if (isLavaDepth(ty) && ty > surface + 5) return Tile::Lava;
+            // Lago pinta caverna já carvada em qualquer profundidade
+            // (poça subterrânea funda é feature, não bug).
             if (lakeWet(tx, ty, seed) > 0.0f) return Tile::Water;
-            return airOrWater(ty);
+            // Fora isso, água só perto do mar: caverna funda seca é ar.
+            if (ty >= SEA_LEVEL && ty <= WATER_FILL_MAX) return Tile::Water;
+            return Tile::Air;
         }
         if (ty <= surface + DIRT_DEPTH) {
             // Sob o oceano, areia continua areia (praia não vira terra).

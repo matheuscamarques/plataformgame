@@ -49,6 +49,10 @@ enum class Tile : uint8_t {
     DeadBush       = 36,
     Mushroom       = 37,
     Glowshroom     = 38,
+    OreCrystal     = 39, // estratos: veios por faixa absoluta de ty
+    OrePlatinum    = 40,
+    OreMithril     = 41,
+    OreAdamant     = 42,
 
     COUNT
 };
