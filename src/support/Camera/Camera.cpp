@@ -1,5 +1,7 @@
 #include "Camera.h"
 
+#include <cmath>
+
 #include "../../core/Math.h"
 
 namespace support {
@@ -10,12 +12,15 @@ void Camera::setViewport(float w, float h) {
 }
 
 void Camera::follow(float targetX, float targetY) {
-    float tx = pos_.x;
-    float ty = pos_.y;
-    if (targetX > viewW_ / 2.0f) tx = targetX - viewW_ / 2.0f;
-    if (targetY > viewH_ / 2.0f) ty = targetY - viewH_ / 2.0f;
-    pos_.x = core::lerp(pos_.x, tx, lerp_);
-    pos_.y = core::lerp(pos_.y, ty, lerp_);
+    float cx = pos_.x + viewW_ / 2.0f;
+    float cy = pos_.y + viewH_ / 2.0f;
+    float gx = pos_.x;
+    float gy = pos_.y;
+    // Fora da deadzone? Recentraliza nesse eixo (vale p/ ambos os lados).
+    if (std::fabs(targetX - cx) * 2.0f > deadzone_.x) gx = targetX - viewW_ / 2.0f;
+    if (std::fabs(targetY - cy) * 2.0f > deadzone_.y) gy = targetY - viewH_ / 2.0f;
+    pos_.x = core::lerp(pos_.x, gx, lerp_);
+    pos_.y = core::lerp(pos_.y, gy, lerp_);
 }
 
 sf::FloatRect Camera::viewRect() const {

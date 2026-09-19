@@ -8,15 +8,16 @@ namespace support {
 // Câmera 2D: segue um alvo e converte coords mundo <-> tela.
 // A posição é o canto superior-esquerdo da view em coords de mundo.
 //
-// Regra de follow (legado preservado): a câmera só sai da origem quando
-// o alvo passa da metade da viewport; o alvo fica centralizado depois.
-// setLerp(1) = snap imediato (comportamento atual); < 1 suaviza.
+// Follow simétrico com deadzone: a câmera centraliza o alvo, mas só se
+// move quando ele sai da deadzone em torno do centro atual. Funciona
+// nas duas direções (inclusive coords negativas).
 class Camera {
 public:
     Camera() = default;
 
     void setViewport(float w, float h);
     void setLerp(float factor) { lerp_ = factor; }
+    void setDeadzone(float w, float h) { deadzone_ = sf::Vector2f(w, h); }
 
     void follow(float targetX, float targetY);
 
@@ -27,6 +28,7 @@ public:
 
 private:
     sf::Vector2f pos_{0.f, 0.f};
+    sf::Vector2f deadzone_{0.f, 0.f};
     float viewW_ = 0.f;
     float viewH_ = 0.f;
     float lerp_ = 1.0f;
