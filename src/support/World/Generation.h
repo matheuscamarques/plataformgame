@@ -18,4 +18,15 @@ int tileType(int tx, int ty, uint32_t seed); // 0 = vazio, 1..5 = sólido
 inline constexpr float MOUNTAIN_THRESHOLD = 0.56f;
 float mountainMask(int tx, int ty, uint32_t seed);
 
+// Caverna: threshold base calibrado por histograma 2D (3 seeds,
+// área 800x200): >0.62 => ~18%, >0.55 => ~34%. Densidade cresce
+// com a profundidade via CAVE_DEPTH_FALLOFF (depth clampado em 1,
+// senão o Y infinito vira oco).
+inline constexpr float CAVE_BASE = 0.62f;
+inline constexpr float CAVE_DEPTH_FALLOFF = 0.10f;
+float caveNoise(int tx, int ty, uint32_t seed);
+// Guard primeiro: nunca acima de surfaceY + 2. surfaceY por parâmetro
+// (não recalcula surfaceHeight: 2x por tile em chunk quente).
+bool isCave(int tx, int ty, uint32_t seed, int surfaceY);
+
 } // namespace support
