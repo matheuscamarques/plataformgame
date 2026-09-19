@@ -143,14 +143,13 @@ void Game::render()
     window->setView(view);
     auto &objects = getWorld()->getPlatforms();
 
-    // Desenha só o visível (+margem); sem quadtree no caminho.
+    // Desenha só o visível (+margem), por range de chunks — não pela
+    // lista global (chunks modified pinned não encarecem o frame).
     float vx0 = camPos.x - 60.0f, vy0 = camPos.y - 60.0f;
     float vx1 = camPos.x + viewW_ + 60.0f, vy1 = camPos.y + viewH_ + 60.0f;
-    for(Entity *entity : objects){
-        if (entity->getX() + entity->getW() < vx0 || entity->getX() > vx1 ||
-            entity->getY() + entity->getH() < vy0 || entity->getY() > vy1) continue;
+    getWorld()->forEachEntityInRect(vx0, vy0, vx1, vy1, [&](Entity *entity) {
         entity->draw(window);
-    }
+    });
 
     player.get()->draw(window);
 

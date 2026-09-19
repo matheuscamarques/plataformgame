@@ -1,12 +1,13 @@
 #pragma once
+#include <cmath>
 #include <cstdint>
 #include <utility>
 #include <vector>
 
+#include "../../defines.h"
+#include "../../entities/entity/entity.hpp"
 #include "ChunkManager.h"
 #include "Tile.h"
-
-class Entity;
 
 namespace support {
 
@@ -46,6 +47,33 @@ public:
     // Espalha a query (x, y, w, h) pelos hashes dos chunks
     // carregados. 'out' é limpo antes. Sem duplicatas entre chunks.
     void query(float x, float y, float w, float h, std::vector<Entity*> &out);
+
+    // Culling de render: itera SÓ as entidades dos chunks que tocam o
+    // rect (x0,y0,x1,y1), com teste de sobreposição por entidade.
+    // O(n_visível), não O(carregado): chunks modified pinned pelo LRU
+    // não encarecem o frame. Chunks ausentes são pulados (sem load).
+    template <typename F>
+    void forEachEntityInRect(float x0, float y0, float x1, float y1, F &&fn) {
+        const float cw = static_cast<float>(Chunk::W) * BLOCK_SIZE;
+        const float ch = static_cast<float>(Chunk::H) * BLOCK_SIZE;
+        const int cx0 = static_cast<int>(std::floor(x0 / cw));
+        const int cx1 = static_cast<int>(std::floor(x1 / cw));
+        const int cy0 = static_cast<int>(std::floor(y0 / ch));
+        const int cy1 = static_cast<int>(std::floor(y1 / ch));
+        for (int cy = cy0; cy <= cy1; ++cy) {
+            for (int cx = cx0; cx <= cx1; ++cx) {
+                Chunk *c = chunks_.find(cx, cy);
+                if (!c) continue;
+                for (auto &slot : c->entities) {
+                    Entity *e = slot.get();
+                    if (e->getX() + e->getW() < x0 || e->getX() > x1 ||
+                        e->getY() + e->getH() < y0 || e->getY() > y1)
+                        continue;
+                    fn(e);
+                }
+            }
+        }
+    }
 
     // Debug visual do SpatialHash (grade em coords de mundo).
     void debugCells(float x, float y, float w, float h,
