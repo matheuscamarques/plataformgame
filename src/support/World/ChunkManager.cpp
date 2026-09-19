@@ -8,11 +8,6 @@
 
 namespace support {
 
-namespace {
-// Linha d'água em tiles do mundo (era `i > m/2` no mapa fixo 50x1000).
-const int WATER_ROW = 25;
-}
-
 ChunkManager::ChunkManager(uint32_t seed, int radius, std::size_t maxLoaded)
     : seed_(seed), radius_(radius), maxLoaded_(maxLoaded) {}
 
@@ -40,7 +35,8 @@ void ChunkManager::generate(int cx, int cy) {
             int t = support::tileType(tx, ty, seed_);
             c->setTileFromGeneration(lx, ly, t);
             if (t == 0) {
-                if (ty > WATER_ROW) {
+                // Um lugar só para a linha d'água: SEA_LEVEL.
+                if (ty >= SEA_LEVEL) {
                     auto water = std::make_unique<Entity>(
                         WATER, tx * BLOCK_SIZE, ty * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
                     water->setFillColor(sf::Color(0, 255, 255));
@@ -95,10 +91,16 @@ void ChunkManager::update(int centerTileX, int centerTileY) {
         }
     }
     // Descarrega fora do raio + 1 (margem contra churn na borda).
+    // Modificado nunca descarrega aqui (perderia mudança sem log nem
+    // crash); fica até o LRU decidir — que também o poupa.
     for (auto it = chunks_.begin(); it != chunks_.end();) {
         ChunkCoord c = chunkCoordFromKey(it->first);
         if (std::abs(c.x - center.x) > radius_ + 1 ||
             std::abs(c.y - center.y) > radius_ + 1) {
+            if (it->second->modified()) {
+                ++it;
+                continue;
+            }
             lruIndex_.erase(it->first);
             lru_.remove(it->first);
             it = chunks_.erase(it);
