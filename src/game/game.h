@@ -10,7 +10,7 @@
 #include "../support/Debug/DebugOverlay.h"
 #include "../support/Input/InputMap.h"
 
-class Game : public Component
+class Game
 {
 public:
     Game();
@@ -24,16 +24,19 @@ public:
     
 
 private:
-    sf::RenderWindow *window;
-    std::unique_ptr<support::World> world;
-    std::unique_ptr<Player> player;
-    support::Camera camera;
-    support::InputMap input_;
-    support::DebugOverlay overlay_;
-    //sf::View *view;
+    sf::RenderWindow *window; // emprestado: dono é Window
+    std::unique_ptr<support::World> world; // dono
+    std::unique_ptr<Player> player; // dono
+    support::Camera camera; // valor
+    support::InputMap input_; // valor
+    support::DebugOverlay overlay_; // valor
     bool running = false;
     void render();
     void tick();
 
+    // Tamanho da viewport. Futuro: AssetManager é dono de font;
+    // Game só pede por chave. Não criar AssetManager no B5.
+    float viewW_ = 0.0f;
+    float viewH_ = 0.0f;
     sf::Font font;
 };
