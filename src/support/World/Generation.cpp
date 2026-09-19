@@ -177,12 +177,20 @@ ColumnData computeColumn(int tx, uint32_t seed) {
 }
 
 Tile tileType(int tx, int ty, uint32_t seed, const ColumnData &col) {
+    // Bedrock vence tudo. Nenhuma camada cava aqui.
+    if (ty >= WORLD_BOTTOM) return Tile::Bedrock;
+
     int surface = col.surface;
     bool ocean = col.ocean;
     if (ty > surface) {
         // Ordem sagrada: caverna vence terra e pedra. Se isCave, é ar
         // mesmo dentro da zona de terra.
-        if (isCave(tx, ty, seed, surface, col.mountain)) return airOrWater(ty);
+        if (isCave(tx, ty, seed, surface, col.mountain)) {
+            // Caverna funda vira lava, não ar. Com +5 de folga para a
+            // boca não abrir direto na lava. Acima do surface, nunca.
+            if (ty > LAVA_LEVEL && ty > surface + 5) return Tile::Lava;
+            return airOrWater(ty);
+        }
         if (ty <= surface + DIRT_DEPTH) {
             // Sob o oceano, areia continua areia (praia não vira terra).
             if (ocean) return Tile::Sand;

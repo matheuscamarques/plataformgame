@@ -21,7 +21,7 @@ int main() {
         int strict = 0;
         for (int tx = -2000; tx < 2000; tx += 2) {
             int s = surfaceHeight(tx, seed);
-            for (int ty = s - 50; ty < s + 150; ty += 2) {
+            for (int ty = s - 50; ty < s + 150 && ty < WORLD_BOTTOM; ty += 2) {
                 // Invariante só vale onde o guard passa (ty >= s+3):
                 // na faixa do guard, uniform pode ser true e o tile sólido.
                 if (ty < s + 3) continue;
@@ -34,9 +34,10 @@ int main() {
                 if (!uniform && !isSolid(tile)) strict++;
             }
         }
-        // Validado em 3 seeds: strict fica em 1900-3300. Folga 3x;
-        // se CAVE_MOUNTAIN_BONUS mudar, revalida aqui.
-        assert(strict > 1000); // bônus abre cavernas de verdade
+        // Validado em 3 seeds: strict fica em 376-908 (bedrock corta a
+        // cauda funda da amostra). Folga 2x; se CAVE_MOUNTAIN_BONUS mudar,
+        // revalida aqui.
+        assert(strict > 200); // bônus abre cavernas de verdade
         std::printf("seed=%u monotonicidade OK (strict=%d)\n", seed, strict);
 
         // 2) Guard intacto nos picos: topo de montanha nunca é oco.

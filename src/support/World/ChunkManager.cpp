@@ -32,8 +32,10 @@ void ChunkManager::generate(int cx, int cy) {
             const BlockDef &def = support::blockDef(t);
             if (def.kind == support::BlockKind::Air) continue;
 
-            // Liquid (água) e Deco (futuro: tronco/folha) não colidem.
+            // Liquid (água, lava) e Deco (futuro: tronco/folha) não colidem.
+            // Lava distingue pelo ID (dano vai na Fase C).
             int entityKind = (def.kind == support::BlockKind::Solid) ? COLIDE
+                           : (t == support::Tile::Lava) ? LAVA
                            : (def.kind == support::BlockKind::Liquid) ? WATER : 0;
             auto e = std::make_unique<Entity>(
                 entityKind, tx * BLOCK_SIZE, ty * BLOCK_SIZE,

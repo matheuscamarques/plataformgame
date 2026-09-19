@@ -110,6 +110,12 @@ Tile biomeTopTile(Biome b);
 // sem buraco de ar na superfície da água. Não modifica altura nenhuma:
 // só decide o que fica entre surf e SEA_LEVEL.
 inline constexpr int SEA_LEVEL = 26;
+// Lava e fundo do mundo. Abaixo de LAVA_LEVEL, caverna vazia vira lava.
+// Abaixo de WORLD_BOTTOM, tudo é bedrock (nada cava, nada é gerado).
+// Calibrar LAVA_LEVEL por PNG/feel (fração de lava no fundo), não por teste.
+inline constexpr int LAVA_LEVEL = SEA_LEVEL + 25;
+inline constexpr int WORLD_BOTTOM = 60;
+static_assert(LAVA_LEVEL > SEA_LEVEL + 5, "lava e mar não podem se cruzar");
 // Coluna oceânica = terreno abaixo da linha do mar.
 inline bool isOceanColumn(int tx, uint32_t seed) {
     return surfaceHeight(tx, seed) > SEA_LEVEL;

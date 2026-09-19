@@ -45,12 +45,15 @@ int main() {
         float fFe = (float)fe / n, fCu = (float)cu / n, fCoal = (float)coal / n;
         std::printf("seed=%u dia=%.4f ag=%.4f au=%.4f fe=%.4f cu=%.4f coal=%.4f\n",
                     seed, fDia, fAg, fAu, fFe, fCu, fCoal);
-        assert(fDia > 0.0002f && fDia < 0.002f);
-        assert(fAg > 0.0005f && fAg < 0.005f);
-        assert(fAu > 0.002f && fAu < 0.015f);
-        assert(fFe > 0.003f && fFe < 0.02f);
-        assert(fCu > 0.001f && fCu < 0.01f);
-        assert(fCoal > 0.005f && fCoal < 0.04f);
+        // Bounds pós-bedrock (fileiras 60+ viraram Bedrock e saíram da
+        // população): dia 0.0002, ag 0.0009, au ~0.003, fe ~0.004,
+        // cu ~0.003, coal ~0.008. Margem 2-3x.
+        assert(fDia > 0.0001f && fDia < 0.001f);
+        assert(fAg > 0.0004f && fAg < 0.003f);
+        assert(fAu > 0.0015f && fAu < 0.01f);
+        assert(fFe > 0.002f && fFe < 0.012f);
+        assert(fCu > 0.0015f && fCu < 0.01f);
+        assert(fCoal > 0.003f && fCoal < 0.02f);
     }
 
     std::printf("ores test OK\n");
