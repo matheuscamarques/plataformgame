@@ -38,12 +38,22 @@ inline constexpr int DIRT_DEPTH = 3;
 inline constexpr float MOUNTAIN_THRESHOLD = 0.35f;
 float mountainMask(int tx, int ty, uint32_t seed);
 
-// Máscara de pico em [0,1]: fbm de frequência MUITO baixa. Define ONDE
-// tem Everest dentro da cordilheira. Só p>0.80 conta, e p³ garante que
-// só o extremo da cauda ganha altura: ~0.2-0.5% das montanhas têm pico.
-inline constexpr float PEAK_THRESHOLD = 0.80f;
+// Máscara de pico em [0,1]: fbm de frequência baixa (/512: blobs de
+// centenas de tiles, cobertura uniforme entre seeds). Define ONDE tem
+// Everest dentro da cordilheira e ONDE tem monte submarino no oceano.
+// Calibrado em linha 1D ty=0 (uso real): >0.75 => 2.8-11% por seed.
+// (Em /1024, a seed 1337 não passava de 0.70 nunca: loteria de slice.)
+inline constexpr float PEAK_THRESHOLD = 0.75f;
 inline constexpr float PEAK_BONUS = 25.0f;
 float peakMask(int tx, int ty, uint32_t seed);
+
+// Fossa oceânica: faixa alongada e funda (anisotrópica de propósito).
+// Threshold calibrado em uso real 1D: >0.70 => 4-14% das colunas.
+// Monte submarino reusa peakMask com threshold próprio.
+inline constexpr float TRENCH_THRESHOLD = 0.70f;
+inline constexpr int TRENCH_DEPTH_MAX = 20;
+inline constexpr float SEAMOUNT_THRESHOLD = 0.70f;
+float trenchMask(int tx, int ty, uint32_t seed);
 
 // Caverna: threshold base calibrado por histograma 2D (3 seeds,
 // área 800x200): >0.62 => ~18%, >0.55 => ~34%. Densidade cresce
