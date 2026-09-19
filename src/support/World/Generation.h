@@ -8,7 +8,7 @@ namespace support {
 // inclusive para coords negativas. Salts: terreno usa XOR 0x9E3779B9 e
 // 0x51F37ED; camadas novas usam +1009/+2017/+3019 (domínios disjuntos).
 int surfaceHeight(int tx, uint32_t seed);
-int tileType(int tx, int ty, uint32_t seed); // 0 = vazio, 1..8 = sólido (8 = neve)
+int tileType(int tx, int ty, uint32_t seed); // 0 = vazio, 1..9 = sólido (8 = neve, 9 = grama)
 
 // Máscara de montanha em [0,1]: manchas orgânicas via fbm.
 // Onde > MOUNTAIN_THRESHOLD, a superfície sobe (commit 1) e a caverna

@@ -96,8 +96,8 @@ int biomeTopTile(Biome b) {
         case Biome::Beach:     return 6;
         case Biome::Desert:    return 6;
         case Biome::Savanna:   return 5;
-        case Biome::Grassland: return 4;
-        case Biome::Forest:    return 2;
+        case Biome::Grassland: return 9; // terra com grama
+        case Biome::Forest:    return 9; // terra com grama
         case Biome::Taiga:     return 3;
         case Biome::Tundra:    return 1;
         default:               return 4;

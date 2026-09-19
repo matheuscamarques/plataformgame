@@ -38,6 +38,7 @@ int main() {
 
     // 3) Todos os 8 biomas aparecem no mundo real (range largo).
     bool seen[8] = {};
+    bool seenGrassTop = false;
     for (uint32_t seed : {1337u, 999u, 42u}) {
         for (int tx = -4000; tx < 4000; tx += 8) {
             int s = surfaceHeight(tx, seed);
@@ -60,10 +61,12 @@ int main() {
             // topo do mundo == topo do bioma (ou neve 8 nos picos)
             int expected = snowcap(tx, seed, s) ? 8 : biomeTopTile(b);
             assert(tileType(tx, s, seed) == expected);
+            if (expected == 9) seenGrassTop = true;
         }
     }
     for (int i = 0; i < 8; i++) assert(seen[i]);
     std::printf("biomas presentes OK (8/8)\n");
+    assert(seenGrassTop); // grama existe no mundo
 
     std::printf("biome test OK\n");
     return 0;
