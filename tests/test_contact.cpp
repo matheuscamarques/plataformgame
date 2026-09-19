@@ -1,5 +1,6 @@
 #include <cassert>
 #include <cstdio>
+#include <SFML/Graphics/Rect.hpp>
 #include "entities/player/player.h"
 #include "support/ContactDamageSystem.h"
 #include "support/EnemySystem.h"
@@ -21,6 +22,8 @@ int main() {
 
         cs.tick(1.f / 30.f, ctx);
         assert(p.hp == 90);
+        // Recola o slime (foi ejetado) e encosta de novo: i-frame segura.
+        enemies.forEach([](Slime &s) { s.body.setX(10.f); s.body.setY(10.f); });
         cs.tick(1.f / 30.f, ctx);
         assert(p.hp == 90); // i-frame
     }
@@ -37,7 +40,8 @@ int main() {
         cs.tick(1.f / 30.f, ctx);
         assert(p.hp == 90 && p.getX() == -6.f); // empurrado p/ longe
         p.hurtIframes.tick(1.f);
-        // Recoloca sobre o slime (foi empurrado) e encosta de novo.
+        // Recola o slime e encosta de novo.
+        enemies.forEach([](Slime &s) { s.body.setX(10.f); s.body.setY(10.f); });
         p.setX(0.f);
         cs.tick(1.f / 30.f, ctx);
         assert(p.hp == 80);
@@ -58,6 +62,27 @@ int main() {
 
         cs.tick(1.f / 30.f, ctx);
         assert(p.hp == 100);
+    }
+
+    { // SeparatesSlimeOut (1 tick: rects não se tocam mais)
+        Player p; // (0,0) 50x50
+        EnemySystem enemies;
+        enemies.spawn("slime", 10.f, 10.f); // sobreposto
+
+        ContactDamageSystem cs;
+        GameContext ctx{};
+        ctx.player = &p;
+        ctx.enemies = &enemies;
+
+        cs.tick(1.f / 30.f, ctx);
+        bool overlap = false;
+        enemies.forEach([&](Slime &s) {
+            const sf::FloatRect sb{s.body.getX(), s.body.getY(),
+                                   s.body.getW(), s.body.getH()};
+            const sf::FloatRect pb{p.getX(), p.getY(), p.getW(), p.getH()};
+            if (pb.intersects(sb)) overlap = true;
+        });
+        assert(!overlap);
     }
 
     std::printf("contact test OK\n");
