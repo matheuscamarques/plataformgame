@@ -16,6 +16,12 @@ void Player::collide(Entity bloco)
         jumping = true;
         return;
     }
+    // Lava não colide como parede (dano vem na Fase C).
+    if(
+        bloco.getName() == LAVA
+    ){
+        return;
+    }
     if (getBoundsTop().intersects(bloco)
     ) {
         setY(bloco.getY() + getH());
