@@ -16,10 +16,25 @@ void EnemySystem::forEach(const std::function<void(Slime &)> &fn) {
     for (auto &s : slimes_) fn(*s);
 }
 
+void EnemySystem::removeDead(const std::function<void(sf::Vector2f)> &onDeath) {
+    for (auto it = slimes_.begin(); it != slimes_.end(); ) {
+        if (!(*it)->resources.isDead()) { ++it; continue; }
+        sf::Vector2f pos{(*it)->body.getCenterX(), (*it)->body.getCenterY()};
+        it = slimes_.erase(it);
+        onDeath(pos);
+    }
+}
+
 void EnemySystem::tick(float dt, GameContext &ctx) {
     for (auto &s : slimes_) {
         // Recursos primeiro: o behavior já vê regen do frame e pode canPay.
         s->resources.tick(dt);
+        s->knockbackLock.tick(dt);
+        // Lock rodando: física integra o impulso, IA não toca em vel.
+        if (s->knockbackLock.running()) {
+            physics(*s, ctx);
+            continue;
+        }
         if (s->ai) s->ai->onTick(s->body, dt, ctx);
         physics(*s, ctx);
     }

@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "../defines.h"
+#include "../entities/entity/entity.hpp"
 #include "EnemyResources.h"
 #include "GameContext.h"
 #include "ParticleSystem.h"
@@ -15,6 +16,9 @@ float distSq(sf::Vector2f a, sf::Vector2f b) {
     const float dx = a.x - b.x, dy = a.y - b.y;
     return dx * dx + dy * dy;
 }
+
+// Tempo que a IA ignora vel (knockback visível antes do snap).
+constexpr float kKnockbackLockTime = 0.2f;
 } // namespace
 
 int ExplosionSystem::explode(sf::Vector2f center, const ExplosionDef &def, GameContext &ctx) {
@@ -72,6 +76,23 @@ bool ExplosionSystem::applyToTarget(const ExplosionTarget &t,
     }
     // Player não tem EnemyResources: HP próprio entra quando existir.
     // Por enquanto, conta como atingido sem aplicar dano.
+
+    // Knockback: impulso radial com falloff + pop up. Sem lock, a IA
+    // (setVx todo tick) apagaria o vx no frame seguinte — lock primeiro.
+    if (t.knockbackLock) t.knockbackLock->trigger(kKnockbackLockTime);
+    if (t.mover) {
+        const float dist = std::sqrt(distSq(t.center, center));
+        const float k = std::max(0.f, 1.f - dist / def.radius);
+
+        sf::Vector2f dir = t.center - center;
+        const float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+        if (len > 1.f) { dir.x /= len; dir.y /= len; }
+        else           { dir = {0.f, -1.f}; } // centro exato → pop up
+
+        t.mover->setVx(t.mover->getVx() + dir.x * def.knockback * k);
+        t.mover->setVy(t.mover->getVy() + dir.y * def.knockback * k * 0.5f
+                       - 80.f * k);
+    }
 
     return true;
 }

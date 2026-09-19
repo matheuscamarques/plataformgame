@@ -11,6 +11,7 @@ class InputMap;
 class EnemySystem;
 class ThrowSystem;
 class ExplosionSystem;
+class DropSystem;
 struct ExplosionTarget;
 
 // Visões (sem ownership) que os sistemas recebem por tick.
@@ -22,6 +23,7 @@ struct GameContext {
     EnemySystem *enemies = nullptr;
     ThrowSystem *throws = nullptr;
     ExplosionSystem *explodes = nullptr;
+    DropSystem *drops = nullptr;
 
     // Preenchido pelo Game antes de explosões (Player + Slimes).
     // Dono: Game (vive no stack do tick).

@@ -45,9 +45,13 @@ void Game::main()
     game->particles_ = &game->scheduler_.add<support::ParticleSystem>();
     game->throws_ = &game->scheduler_.add<support::ThrowSystem>();
     game->explodes_ = &game->scheduler_.add<support::ExplosionSystem>();
+    game->deaths_ = &game->scheduler_.add<support::DeathSystem>();
+    game->drops_ = &game->scheduler_.add<support::DropSystem>();
     game->throws_->setExplosionSystem(game->explodes_);
     game->throws_->setParticleSystem(game->particles_);
     game->explodes_->setParticleSystem(game->particles_);
+    game->deaths_->setDropSystem(game->drops_);
+    game->deaths_->setParticleSystem(game->particles_);
     game->enemies_->spawn("slime", (spawnTx - 6) * BLOCK_SIZE, 0.0f);
     game->enemies_->spawn("slime", (spawnTx + 6) * BLOCK_SIZE, 0.0f);
 
@@ -167,6 +171,8 @@ void Game::render()
 
     particles_->render(*window);
 
+    drops_->render(*window);
+
     // Debug draw das hitboxes por parte (só com overlay ligado).
     if (overlay_.visible()) {
         auto drawParts = [&](const support::Body &b) {
@@ -232,14 +238,15 @@ void Game::tick() {
     // ExplosionSystem durante o tick do ThrowSystem.
     std::vector<support::ExplosionTarget> targets;
     targets.push_back({sf::Vector2f(p->getCenterX(), p->getCenterY()),
-                       &p->body, nullptr, true});
+                       &p->body, nullptr, true, p, nullptr});
     enemies_->forEach([&](support::Slime &s) {
         if (s.resources.isDead()) return;
         targets.push_back({sf::Vector2f(s.body.getCenterX(), s.body.getCenterY()),
-                           &s.bodyParts, &s.resources, false});
+                           &s.bodyParts, &s.resources, false,
+                           &s.body, &s.knockbackLock});
     });
     support::GameContext ctx{getWorld(), p, &input_, enemies_,
-                             throws_, explodes_, &targets};
+                             throws_, explodes_, drops_, &targets};
     scheduler_.tick(1.0f / 30.0f, ctx);
 }
 

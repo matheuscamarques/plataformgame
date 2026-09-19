@@ -11,6 +11,7 @@
 #include "Body.h"
 #include "EnemyResources.h"
 #include "GameContext.h"
+#include "../core/Cooldown.h"
 
 namespace support {
 
@@ -24,6 +25,8 @@ struct Slime {
     EnemyResources resources;
     Body bodyParts;
     bool grounded = false;
+    // IA não sobrescreve vel enquanto roda (knockback visível).
+    core::Cooldown knockbackLock;
 
     Slime(Entity b, std::unique_ptr<Behavior> a)
         : body(std::move(b)), ai(std::move(a)) {}
@@ -51,6 +54,10 @@ public:
 
     void forEach(const std::function<void(Slime &)> &fn);
     std::size_t count() const { return slimes_.size(); }
+
+    // Remove mortos; onDeath(pos do centro) por removido para juice
+    // (partículas/drops no DeathSystem). Erase mora aqui, no dono.
+    void removeDead(const std::function<void(sf::Vector2f)> &onDeath);
 
 private:
     void physics(Slime &s, GameContext &ctx);

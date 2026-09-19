@@ -1,12 +1,14 @@
 #include <cassert>
+#include <cmath>
 #include <cstdio>
 #include <vector>
 #include "support/ExplosionSystem.h"
 #include "support/Body.h"
 #include "support/EnemyResources.h"
 #include "support/GameContext.h"
+#include "entities/entity/entity.hpp"
 
-// Explosão: raio, whiff, headshot 2x, knockback reservado.
+// Explosão: raio, whiff, headshot 2x, knockback no mover + lock.
 int main() {
     using namespace support;
 
@@ -107,6 +109,34 @@ int main() {
         // Centro longe do corpo: nenhuma parte no raio.
         int hit = es.explode({0.f, 0.f}, def, ctx);
         assert(hit == 0 && res.hp == 100);
+    }
+    { // KnockbackAppliedWhenMoverProvided (impulso + lock da IA)
+        ExplosionSystem es;
+        Body b;
+        auto s = BodySchema::humanoid(24.f, 12.f);
+        b.attach(&s);
+        b.rebuild({100.f, 100.f}, 1);
+
+        EnemyResources res;
+        res.hp = res.hpMax = 200;
+
+        Entity mover(0, 100.f, 100.f, 50.f, 50.f);
+        core::Cooldown lock;
+
+        std::vector<ExplosionTarget> targets;
+        targets.push_back({{106.f, 112.f}, &b, &res, false, &mover, &lock});
+
+        GameContext ctx{};
+        ctx.explosionTargets = &targets;
+
+        ExplosionDef def;
+        def.radius = 40.f;
+        def.knockback = 300.f;
+
+        int hit = es.explode({100.f, 100.f}, def, ctx);
+        assert(hit == 1);
+        assert(std::fabs(mover.getVx()) + std::fabs(mover.getVy()) > 0.f);
+        assert(lock.running()); // IA não apaga o impulso no próximo tick
     }
 
     std::printf("explosion test OK\n");
