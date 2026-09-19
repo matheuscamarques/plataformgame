@@ -137,6 +137,21 @@ enum class Biome { Ocean, Beach, Desert, Savanna, Grassland, Forest, Taiga, Tund
 Biome pickBiome(float temp, float humid, bool ocean, bool coastal);
 // Tile de topo para o bioma (subsolo não muda).
 Tile biomeTopTile(Biome b);
+
+// Árvores decorativas (sem colisão, sem dano — Fase C decide o resto).
+// Uma por grupo de colunas; tronco + copa elíptica; nunca enterra sólido
+// (quem estampa verifica Air). TREE_SPACING exported p/ range expandido.
+inline constexpr int TREE_SPACING = 4;
+inline constexpr int TREE_TRUNK_MIN = 4;
+inline constexpr int TREE_TRUNK_MAX = 7;
+inline constexpr int TREE_CANOPY_MIN = 2;
+inline constexpr int TREE_CANOPY_MAX = 3;
+inline constexpr int TREE_CANOPY_R_MAX = 3;
+inline constexpr int TREE_EXPAND = TREE_CANOPY_R_MAX + TREE_SPACING;
+struct TreeParams { int trunkH = 0; int canopyR = 0; };
+// Puro e mockável: surfaceY e bioma vêm de fora (teste injeta plano).
+// Inclinação usa surfaceHeight real dos vizinhos.
+bool treeWants(int tx, uint32_t seed, int surfaceY, Biome biome, TreeParams &out);
 // Mar: linha do mapa (tile row), não valor de noise. Calibrado por
 // histograma (3 seeds x 4000 cols, fração com surface > L):
 // L=25 => 29-41%, L=26 => 14-21%, L=27 => 8-10%. L=26 escolhido:

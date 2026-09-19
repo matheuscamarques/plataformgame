@@ -16,9 +16,14 @@ void Player::collide(Entity bloco)
         jumping = true;
         return;
     }
-    // Lava não colide como parede (dano vem na Fase C).
+    // Lava e deco não colidem como parede (dano vem na Fase C).
     if(
         bloco.getName() == LAVA
+    ){
+        return;
+    }
+    if(
+        bloco.getName() == TREE_TRUNK || bloco.getName() == TREE_LEAF
     ){
         return;
     }

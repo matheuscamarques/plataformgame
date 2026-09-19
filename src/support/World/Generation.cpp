@@ -149,6 +149,35 @@ bool snowcap(int surface) {
     return surface <= 14;
 }
 
+namespace {
+// Densidade por bioma (fração de colunas elegíveis que tentam árvore).
+float treeDensity(Biome b) {
+    switch (b) {
+        case Biome::Forest:    return 0.35f;
+        case Biome::Taiga:     return 0.28f;
+        case Biome::Savanna:   return 0.05f;
+        case Biome::Grassland: return 0.03f;
+        default:               return 0.0f; // oceano/praia/deserto/tundra
+    }
+}
+} // namespace
+
+bool treeWants(int tx, uint32_t seed, int surfaceY, Biome biome, TreeParams &out) {
+    float density = treeDensity(biome);
+    if (density <= 0.0f) return false;
+    // Salt 0x7A11*: disjunto dos demais (checados: todos os +N e XORs).
+    if (core::rand01(tx, 0x7A11, seed) >= density) return false;
+    // Inclinação: vizinhos reais, não o parâmetro (mock plano passa).
+    if (std::abs(surfaceHeight(tx - 1, seed) - surfaceY) > 1) return false;
+    if (std::abs(surfaceHeight(tx + 1, seed) - surfaceY) > 1) return false;
+    int trunkRange = TREE_TRUNK_MAX - TREE_TRUNK_MIN + 1;
+    out.trunkH = TREE_TRUNK_MIN + int(core::rand01(tx, 0x7A12, seed) * trunkRange) % trunkRange;
+    if (biome == Biome::Taiga) out.trunkH += 2; // conífera mais alta
+    int canopyRange = TREE_CANOPY_MAX - TREE_CANOPY_MIN + 1;
+    out.canopyR = TREE_CANOPY_MIN + int(core::rand01(tx, 0x7A13, seed) * canopyRange) % canopyRange;
+    return true;
+}
+
 Tile pickOre(int tx, int ty, uint32_t seed, int surface, int depth) {
     (void)surface;
     // Partição disjunta de r (ordem do raro): cada veio tem sua faixa.

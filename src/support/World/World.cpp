@@ -19,8 +19,10 @@ void World::update(int playerTileX, int playerTileY) {
         for (auto &slot : c->entities) {
             Entity *e = slot.get();
             activePlatforms_.push_back(e);
-            // Água e lava não colidem como parede (afogam/machucam: Fase C).
-            if (e->getName() != WATER && e->getName() != LAVA) activeColides_.push_back(e);
+            // Água, lava e deco não colidem como parede (Fase C dá dano).
+            if (e->getName() != WATER && e->getName() != LAVA &&
+                e->getName() != TREE_TRUNK && e->getName() != TREE_LEAF)
+                activeColides_.push_back(e);
         }
     }
 }
