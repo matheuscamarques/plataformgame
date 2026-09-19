@@ -1,5 +1,7 @@
 #include "Generation.h"
 
+#include <cmath>
+
 #include "../../core/Noise.h"
 
 namespace support {
@@ -14,8 +16,11 @@ int surfaceHeight(int tx, uint32_t seed) {
     int base = SURFACE_MID - 4 + static_cast<int>(relief * 9.0f);
     float m = mountainMask(tx, 0, seed);
     if (m > MOUNTAIN_THRESHOLD) {
+        // Raiz quadrada: a máscara passa a maior parte do tempo pouco
+        // acima do limiar; linear daria morros de 1-2 tiles (invisíveis).
+        // sqrt(t) dobra as montanhas visíveis com o mesmo degrau máximo.
         float t = (m - MOUNTAIN_THRESHOLD) / (1.0f - MOUNTAIN_THRESHOLD);
-        base -= static_cast<int>(t * 18.0f); // montanha sobe (y menor = mais alto)
+        base -= static_cast<int>(std::sqrt(t) * 18.0f); // y menor = mais alto
     }
     return base;
 }
