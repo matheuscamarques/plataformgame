@@ -19,6 +19,14 @@ SRCS := $(shell find $(SRC_DIR) -name '*.cpp')
 OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 DEPS := $(OBJS:.o=.d)
 
+# Objetos do jogo sem o main(): testes linkam contra eles.
+GAME_OBJS := $(filter-out $(OBJ_DIR)/main.o,$(OBJS))
+
+TEST_DIR := tests
+TEST_BUILD := $(BIN_DIR)/tests
+TEST_SRCS := $(sort $(wildcard $(TEST_DIR)/test_*.cpp))
+TEST_BINS := $(patsubst $(TEST_DIR)/%.cpp,$(TEST_BUILD)/%,$(TEST_SRCS))
+
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
@@ -46,6 +54,13 @@ start: all
 watch:
 	watch -n 2 $(MAKE) all
 
-.PHONY: all clean clear run start watch
+test: all $(TEST_BINS)
+	@set -e; for t in $(TEST_BINS); do echo "== $$t"; $$t; done
+
+$(TEST_BUILD)/%: $(TEST_DIR)/%.cpp $(GAME_OBJS)
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $< $(GAME_OBJS) -o $@ $(LDFLAGS) $(LDLIBS)
+
+.PHONY: all clean clear run start watch test
 
 -include $(DEPS)
