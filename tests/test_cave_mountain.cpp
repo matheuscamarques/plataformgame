@@ -32,6 +32,8 @@ int main() {
                 if (!uniform && tile == 0) strict++;
             }
         }
+        // Validado em 3 seeds: strict fica em 1900-3300. Folga 3x;
+        // se CAVE_MOUNTAIN_BONUS mudar, revalida aqui.
         assert(strict > 1000); // bônus abre cavernas de verdade
         std::printf("seed=%u monotonicidade OK (strict=%d)\n", seed, strict);
 

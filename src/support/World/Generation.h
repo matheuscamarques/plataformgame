@@ -71,7 +71,7 @@ float humidity(int tx, int ty, uint32_t seed);    // features médias
 // Nunca sobre o oceano. Substitui o ruído 3.5% que parecia "bloco voando".
 bool islandTile(int tx, int ty, uint32_t seed);
 
-// Neve no pico: só altitude (surface <= 10 exige uplift 11+, que só
+// Neve no pico: só altitude (surface <= 14 exige uplift alto, que só
 // montanha alcança). t alto sem altitude é flanco, não pico.
 bool snowcap(int surface);
 

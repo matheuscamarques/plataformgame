@@ -18,8 +18,10 @@ int main() {
     int prev = -1000, maxStep = 0, lo = 1000, hi = -1000;
     for (int j = -1200; j < 1200; j++) {
         int s = surfaceHeight(j, seed);
-        // base [21,30] menos até 18 de montanha
-        assert(s >= 25 - 4 - 18 && s <= 25 + 5);
+        // Fórmula real: base [21,29] - t*20 (0..20) - p^3*25 (0..25).
+        assert(s >= 21 - 20 - 25 && s <= 29);
+        // Clamp explícito: em zona de montanha nunca abaixo de SEA+2.
+        if (mountainMask(j, 0, seed) > MOUNTAIN_THRESHOLD) assert(s <= SEA_LEVEL + 2);
         if (s < lo) lo = s;
         if (s > hi) hi = s;
         if (prev != -1000) {
