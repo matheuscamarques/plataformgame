@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 
+#include "Tile.h"
+
 namespace support {
 
 // Regras de geração por tile do mundo (puras, sem SFML/Entity).
@@ -14,17 +16,8 @@ inline constexpr float RELIEF_AMP = 9.0f;
 // Alcance do falloff de caverna em tiles (depth satura em 1.0 aqui).
 inline constexpr float CAVE_DEPTH_RANGE = 40.0f;
 int surfaceHeight(int tx, uint32_t seed);
-// IDs de tile: um lugar só (paint/testes usam estes, não literais).
-inline constexpr int TILE_AIR = 0;
-inline constexpr int TILE_ISLAND = 2; // plataforma de ilha (único 1..5 vivo)
-inline constexpr int TILE_SAND = 6;
-inline constexpr int TILE_SNOW = 8;
-inline constexpr int TILE_GRASS = 9;
-inline constexpr int TILE_DIRT = 10;
-inline constexpr int TILE_STONE = 11;
-// (1,3,4,5 = legado cosmético, nada gera mais; paint mantém o mapa.)
-// 0 = vazio, demais = sólido.
-int tileType(int tx, int ty, uint32_t seed);
+// IDs em Tile.h (um lugar só). 0 = vazio; demais variam por tabela.
+Tile tileType(int tx, int ty, uint32_t seed);
 // Tudo que é por-coluna, calculado 1x: superfície, máscara, clima, oceano.
 // tileType(tx,ty) sem ColumnData existe só por compat (testes/viz) e
 // computa a coluna inline — em chunk quente use sempre a sobrecarga.
@@ -36,10 +29,7 @@ struct ColumnData {
     bool ocean = false;
 };
 ColumnData computeColumn(int tx, uint32_t seed);
-int tileType(int tx, int ty, uint32_t seed, const ColumnData &col);
-// IDs: 1..5 legado cosmético, 6 areia, 8 neve, 9 grama, 10 terra, 11 pedra.
-// Grama ocupou o 9 primeiro (pedido anterior); terra/pedra seguem 10/11
-// para nunca reutilizar ID existente.
+Tile tileType(int tx, int ty, uint32_t seed, const ColumnData &col);
 // Espessura da terra: constante (não noise). Compartilhada com o viz.
 inline constexpr int DIRT_DEPTH = 3;
 
@@ -98,7 +88,7 @@ int findSpawnTileX(int nearX, uint32_t seed);
 // Bioma: tabela de dupla entrada temperatura x umidade.
 // Thresholds = tercis globais medidos em 3 seeds (cada quadrante 8.5%+):
 // temp p33≈0.42/p66≈0.55, humid p33≈0.43/p66≈0.57. Fronteira estrita '>'
-// (== cai na faixa de baixo). Sem Snow: picos nevados ficam p/ depois.
+// (== cai na faixa de baixo).
 inline constexpr float T_HOT = 0.55f;
 inline constexpr float T_COLD = 0.42f;
 inline constexpr float H_DRY = 0.43f;
@@ -109,7 +99,7 @@ enum class Biome { Ocean, Beach, Desert, Savanna, Grassland, Forest, Taiga, Tund
 // Clima do tile (tx,ty); ocean/coastal têm precedência (mar virou bioma).
 Biome pickBiome(float temp, float humid, bool ocean, bool coastal);
 // Tile de topo para o bioma (subsolo não muda).
-int biomeTopTile(Biome b);
+Tile biomeTopTile(Biome b);
 // Mar: linha do mapa (tile row), não valor de noise. Calibrado por
 // histograma (3 seeds x 4000 cols, fração com surface > L):
 // L=25 => 29-41%, L=26 => 14-21%, L=27 => 8-10%. L=26 escolhido:

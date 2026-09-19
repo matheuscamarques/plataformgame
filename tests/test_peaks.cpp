@@ -17,8 +17,8 @@ int main() {
             // neve só em altitude que exige uplift (só montanha chega lá)
             assert(s <= 14);
             // pico é branco no mundo
-            assert(tileType(tx, s, seed) == 8);
-            assert(tileType(tx, s, seed) == 8); // determinístico
+            assert(tileType(tx, s, seed) == Tile::Snow);
+            assert(tileType(tx, s, seed) == Tile::Snow); // determinístico
         }
         float f = (float)snowCols / n;
         std::printf("seed=%u neve=%.4f\n", seed, f);

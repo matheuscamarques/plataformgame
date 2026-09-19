@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "ChunkManager.h"
+#include "Tile.h"
 
 class Entity;
 
@@ -32,8 +33,8 @@ public:
     void update(int playerTileX, int playerTileY);
 
     // Acesso por coordenada de tile de mundo (pode ser negativa).
-    // Não carrega chunk ausente — retorna 0 (ar).
-    int tileAt(int worldTileX, int worldTileY) const;
+    // Não carrega chunk ausente — retorna Air.
+    Tile tileAt(int worldTileX, int worldTileY) const;
     bool isSolid(int worldTileX, int worldTileY) const;
 
     // Espalha a query (x, y, w, h) pelos hashes dos chunks

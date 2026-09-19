@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include "core/Noise.h"
 #include "support/World/Generation.h"
+#include "support/World/Block.h"
 
 int main() {
     using namespace core;
@@ -31,19 +32,24 @@ int main() {
         prev = s;
         // coerência tileType x superfície
         for (int i = s - 2; i <= s + 2; i++) {
-            int t = tileType(j, i, seed);
-            if (i > s) assert(t != 0);                    // maciço sempre sólido
+            Tile t = tileType(j, i, seed);
+            if (i > s) assert(isSolid(t));                // maciço sempre sólido
             if (i == s) {
                 // topo decide por bioma (areia continua 6 na costa),
                 // ou neve 8 nos picos altos e fortes.
                 bool ocean = isOceanColumn(j, seed);
                 Biome b = pickBiome(temperature(j, s, seed), humidity(j, s, seed),
                                     ocean, isCoastal(s));
-                int expected = snowcap(s) ? 8 : biomeTopTile(b);
+                Tile expected = snowcap(s) ? Tile::Snow : biomeTopTile(b);
                 assert(t == expected);
-                if (isCoastal(s)) assert(t == 6);
+                if (isCoastal(s)) assert(t == Tile::Sand);
             }
-            if (i < s) assert(t == 0 || t == 2);          // ar ou plataforma
+            if (i < s) {
+                // ar, ilha — ou água na banda do oceano
+                bool waterOk = isOceanColumn(j, seed) && i >= SEA_LEVEL
+                               && t == Tile::Water;
+                assert(t == Tile::Air || t == Tile::IslandPlatform || waterOk);
+            }
             assert(tileType(j, i, seed) == t);            // determinístico
         }
     }

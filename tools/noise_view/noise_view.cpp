@@ -10,6 +10,7 @@
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include "support/World/Generation.h"
+#include "support/World/Block.h"
 #include "core/Noise.h"
 
 namespace {
@@ -20,28 +21,9 @@ sf::Uint8 gray(float v) {
     return static_cast<sf::Uint8>(v * 255.f);
 }
 
-sf::Color tileColor(int t) {
-    switch (t) {
-        case 0:  return sf::Color(10, 10, 10);
-        case 1:  return sf::Color(90, 90, 90);
-        case 2:  return sf::Color(146, 90, 43);
-        case 3:  return sf::Color(120, 60, 0);
-        case 4:  return sf::Color(159, 89, 30);
-        case 5:  return sf::Color(200, 120, 40);
-        case 6:  return sf::Color(194, 178, 128); // areia
-        case 8:  return sf::Color(235, 235, 245); // neve
-        case 9:  return sf::Color(106, 190, 48);  // grama
-        case 10: return sf::Color(139, 69, 19);   // terra
-        case 11: return sf::Color(128, 128, 128); // pedra
-        default: return sf::Color::Magenta;
-    }
-}
-
-// Azul de oceano: tile vazio entre o nível do mar e a superfície.
-bool isOceanWater(int tx, int ty, uint32_t seed) {
-    return support::isOceanColumn(tx, seed) &&
-           ty >= support::SEA_LEVEL &&
-           ty < support::surfaceHeight(tx, seed);
+// Cor vem da tabela (Block.h): um lugar só. Magenta = tipo novo sem cor.
+sf::Color tileColor(support::Tile t) {
+    return support::blockDef(t).color;
 }
 
 } // namespace
@@ -130,11 +112,8 @@ int main(int argc, char **argv) {
                 if (d < 0.f) d = 0.f;
                 px = sf::Color(gray(d), gray(d), gray(d));
             } else if (layer == "tiles") {
-                int t = support::tileType(tx, ty, seed);
-                if (t == 0 && isOceanWater(tx, ty, seed))
-                    px = sf::Color(20, 80, 200);
-                else
-                    px = tileColor(t);
+                // tileType já devolve Water na banda (sem isOceanWater).
+                px = tileColor(support::tileType(tx, ty, seed));
             } else {
                 std::printf("camada desconhecida: %s\n", layer.c_str());
                 return 2;

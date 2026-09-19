@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <initializer_list>
 #include "support/World/Generation.h"
+#include "support/World/Block.h"
 
 int main() {
     using namespace support;
@@ -21,8 +22,8 @@ int main() {
         for (int tx = -400; tx < 400; tx++) {
             int s = surfaceHeight(tx, seed);
             for (int ty = s - 4; ty <= s + 2; ty++) {
-                int t = tileType(tx, ty, seed);
-                if (ty >= s) assert(t != 0);
+                Tile t = tileType(tx, ty, seed);
+                if (ty >= s) assert(isSolid(t)); // topo/maciço: sempre sólido
                 assert(tileType(tx, ty, seed) == t); // determinístico
             }
         }
@@ -37,11 +38,12 @@ int main() {
             int s = surfaceHeight(tx, seed);
             for (int d = 0; d <= 10; d++) {
                 nShallow++;
-                if (tileType(tx, s + 3 + d, seed) == 0) shallow++;
+                // buraco = não-sólido (ar ou caverna inundada)
+                if (!isSolid(tileType(tx, s + 3 + d, seed))) shallow++;
             }
             for (int d = 15; d <= 25; d++) {
                 nDeep++;
-                if (tileType(tx, s + 3 + d, seed) == 0) deep++;
+                if (!isSolid(tileType(tx, s + 3 + d, seed))) deep++;
             }
         }
         float fShallow = (float)shallow / nShallow;

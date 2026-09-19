@@ -58,10 +58,10 @@ int main() {
                 default: break;
             }
             if (idx >= 0) seen[idx] = true;
-            // topo do mundo == topo do bioma (ou neve 8 nos picos)
-            int expected = snowcap(s) ? 8 : biomeTopTile(b);
+            // topo do mundo == topo do bioma (ou neve nos picos)
+            Tile expected = snowcap(s) ? Tile::Snow : biomeTopTile(b);
             assert(tileType(tx, s, seed) == expected);
-            if (expected == 9) seenGrassTop = true;
+            if (expected == Tile::Grass) seenGrassTop = true;
         }
     }
     for (int i = 0; i < 8; i++) assert(seen[i]);

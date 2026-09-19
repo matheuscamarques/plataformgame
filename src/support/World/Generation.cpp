@@ -108,17 +108,17 @@ Biome pickBiome(float temp, float humid, bool ocean, bool coastal) {
     return Biome::Taiga;
 }
 
-int biomeTopTile(Biome b) {
+Tile biomeTopTile(Biome b) {
     switch (b) {
-        case Biome::Ocean:     return TILE_SAND; // fundo do mar: areia
-        case Biome::Beach:     return TILE_SAND;
-        case Biome::Desert:    return TILE_SAND;
-        case Biome::Savanna:   return 5;
-        case Biome::Grassland: return TILE_GRASS; // terra com grama
-        case Biome::Forest:    return TILE_GRASS; // terra com grama
-        case Biome::Taiga:     return 3;
-        case Biome::Tundra:    return 1;
-        default:               return 4;
+        case Biome::Ocean:     return Tile::Sand; // fundo do mar: areia
+        case Biome::Beach:     return Tile::Sand;
+        case Biome::Desert:    return Tile::Sand;
+        case Biome::Savanna:   return Tile::SavannaTop;
+        case Biome::Grassland: return Tile::Grass; // terra com grama
+        case Biome::Forest:    return Tile::Grass; // terra com grama
+        case Biome::Taiga:     return Tile::TaigaTop;
+        case Biome::Tundra:    return Tile::TundraTop;
+        default:               return Tile::FallbackTop;
     }
 }
 
@@ -138,8 +138,14 @@ bool isCave(int tx, int ty, uint32_t seed, int surfaceY, float mountain) {
     return caveNoise(tx, ty, seed) > threshold;
 }
 
-int tileType(int tx, int ty, uint32_t seed) {
+Tile tileType(int tx, int ty, uint32_t seed) {
     return tileType(tx, ty, seed, computeColumn(tx, seed));
+}
+
+// Ar vira água abaixo do nível do mar (banda do oceano + cavernas fundas
+// inundadas). Um lugar só — ChunkManager não decide mais água.
+static Tile airOrWater(int ty) {
+    return ty >= SEA_LEVEL ? Tile::Water : Tile::Air;
 }
 
 ColumnData computeColumn(int tx, uint32_t seed) {
@@ -152,31 +158,31 @@ ColumnData computeColumn(int tx, uint32_t seed) {
     return col;
 }
 
-int tileType(int tx, int ty, uint32_t seed, const ColumnData &col) {
+Tile tileType(int tx, int ty, uint32_t seed, const ColumnData &col) {
     int surface = col.surface;
     bool ocean = col.ocean;
     if (ty > surface) {
         // Ordem sagrada: caverna vence terra e pedra. Se isCave, é ar
         // mesmo dentro da zona de terra.
-        if (isCave(tx, ty, seed, surface, col.mountain)) return TILE_AIR;
+        if (isCave(tx, ty, seed, surface, col.mountain)) return airOrWater(ty);
         if (ty <= surface + DIRT_DEPTH) {
             // Sob o oceano, areia continua areia (praia não vira terra).
-            if (ocean) return TILE_SAND;
-            return TILE_DIRT; // terra
+            if (ocean) return Tile::Sand;
+            return Tile::Dirt; // terra
         }
-        return TILE_STONE; // pedra
+        return Tile::Stone; // pedra
     }
     // Topo: clima da coluna na altura da superfície (não do tile fundo).
     // Neve primeiro: pico alto e forte passa na frente do bioma.
     if (ty == surface) {
-        if (snowcap(surface)) return TILE_SNOW;
+        if (snowcap(surface)) return Tile::Snow;
         Biome b = pickBiome(col.temperature, col.humidity,
                             ocean, isCoastal(surface));
         return biomeTopTile(b);
     }
     // Ilha flutuante coerente (ou nada): sem ruído de tile isolado.
-    if (ocean) return TILE_AIR;
-    return islandTile(tx, ty, seed) ? TILE_ISLAND : TILE_AIR;
+    if (ocean) return airOrWater(ty);
+    return islandTile(tx, ty, seed) ? Tile::IslandPlatform : airOrWater(ty);
 }
 
 } // namespace support

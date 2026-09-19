@@ -20,29 +20,28 @@ int main() {
             assert(ocean == (s > SEA_LEVEL));
 
             // Topo: areia na costa (inclui todo oceano), bioma fora dela.
-            int top = tileType(tx, s, seed);
+            Tile top = tileType(tx, s, seed);
             if (isCoastal(s)) {
-                assert(top == 6);
+                assert(top == Tile::Sand);
                 sandTops++;
             } else {
                 Biome b = pickBiome(temperature(tx, s, seed), humidity(tx, s, seed),
                                     ocean, false);
-                int expected = snowcap(s) ? 8 : biomeTopTile(b);
+                Tile expected = snowcap(s) ? Tile::Snow : biomeTopTile(b);
                 assert(top == expected);
             }
             if (ocean) {
                 oceanTops++;
-                assert(top == 6); // oceano é sempre costeiro (s <= SEA+3 aqui)
+                assert(top == Tile::Sand); // oceano é sempre costeiro (s <= SEA+3 aqui)
             }
 
-            // Nenhum sólido acima do nível do mar em coluna de oceano.
+            // Céu acima do mar: ar. Banda d'água: Tile::Water (vira entidade).
             if (ocean) {
                 for (int ty = s - 30; ty < SEA_LEVEL; ty++) {
-                    assert(tileType(tx, ty, seed) == 0);
+                    assert(tileType(tx, ty, seed) == Tile::Air);
                 }
-                // Banda d'água: vazia de sólido (vira entidade água).
                 for (int ty = SEA_LEVEL; ty < s; ty++) {
-                    assert(tileType(tx, ty, seed) == 0);
+                    assert(tileType(tx, ty, seed) == Tile::Water);
                 }
             }
 
@@ -51,11 +50,11 @@ int main() {
             if (!ocean) {
                 Biome b = pickBiome(temperature(tx, s, seed), humidity(tx, s, seed),
                                     false, isCoastal(s));
-                int expected = snowcap(s) ? 8 : biomeTopTile(b);
+                Tile expected = snowcap(s) ? Tile::Snow : biomeTopTile(b);
                 assert(top == expected);
                 for (int ty = s - 10; ty < s; ty++) {
-                    int t = tileType(tx, ty, seed);
-                    assert(t == 0 || t == 2);
+                    Tile t = tileType(tx, ty, seed);
+                    assert(t == Tile::Air || t == Tile::IslandPlatform);
                 }
             }
         }

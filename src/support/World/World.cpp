@@ -2,6 +2,7 @@
 
 #include "../../defines.h"
 #include "../../entities/entity/entity.hpp"
+#include "Block.h"
 
 namespace support {
 
@@ -23,15 +24,15 @@ void World::update(int playerTileX, int playerTileY) {
     }
 }
 
-int World::tileAt(int worldTileX, int worldTileY) const {
+Tile World::tileAt(int worldTileX, int worldTileY) const {
     ChunkCoord c = chunkCoordFromWorld(worldTileX, worldTileY, Chunk::W);
     const Chunk *chunk = chunks_.find(c.x, c.y);
-    if (!chunk) return 0;
+    if (!chunk) return Tile::Air;
     return chunk->tile(worldTileX - c.x * Chunk::W, worldTileY - c.y * Chunk::H);
 }
 
 bool World::isSolid(int worldTileX, int worldTileY) const {
-    return tileAt(worldTileX, worldTileY) != 0;
+    return support::isSolid(tileAt(worldTileX, worldTileY));
 }
 
 void World::query(float x, float y, float w, float h, std::vector<Entity*> &out) {

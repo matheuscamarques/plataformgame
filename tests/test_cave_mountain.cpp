@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <initializer_list>
 #include "support/World/Generation.h"
+#include "support/World/Block.h"
 
 // Commit 3: caverna modulada por montanha.
 //
@@ -24,12 +25,13 @@ int main() {
                 // Invariante só vale onde o guard passa (ty >= s+3):
                 // na faixa do guard, uniform pode ser true e o tile sólido.
                 if (ty < s + 3) continue;
-                float depth = (float)(ty - s) / 40.0f;
+                float depth = (float)(ty - s) / CAVE_DEPTH_RANGE;
                 if (depth > 1.f) depth = 1.f;
                 bool uniform = caveNoise(tx, ty, seed) > CAVE_BASE - depth * CAVE_DEPTH_FALLOFF;
-                int tile = tileType(tx, ty, seed);
-                if (uniform) assert(tile == 0);
-                if (!uniform && tile == 0) strict++;
+                Tile tile = tileType(tx, ty, seed);
+                // caverna-uniforme vira vazio (ar em cima, água inundada embaixo)
+                if (uniform) assert(!isSolid(tile));
+                if (!uniform && !isSolid(tile)) strict++;
             }
         }
         // Validado em 3 seeds: strict fica em 1900-3300. Folga 3x;
@@ -41,19 +43,20 @@ int main() {
         for (int tx = -1200; tx < 1200; tx++) {
             int s = surfaceHeight(tx, seed);
             for (int ty = s; ty <= s + 2; ty++) {
-                assert(tileType(tx, ty, seed) != 0);
+                assert(isSolid(tileType(tx, ty, seed)));
                 assert(tileType(tx, ty, seed) == tileType(tx, ty, seed));
             }
         }
 
         // 3) Teto GLOBAL no fundo (todas as colunas): rocha continua
         // sendo a maioria. Medido 0.34-0.36; 0.55 tem margem folgada.
+        // Vazios contam ar + água inundada (ambos são "não-rocha").
         int n = 0, caves = 0;
         for (int tx = -4000; tx < 4000; tx++) {
             int s = surfaceHeight(tx, seed);
             for (int d = 25; d <= 100; d++) {
                 n++;
-                if (tileType(tx, s + 3 + d, seed) == 0) caves++;
+                if (!isSolid(tileType(tx, s + 3 + d, seed))) caves++;
             }
         }
         float fDeep = (float)caves / n;

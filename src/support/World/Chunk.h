@@ -9,6 +9,7 @@
 #include "../../defines.h"
 #include "../../entities/entity/entity.hpp"
 #include "../Spatial/spatialhash.h"
+#include "Tile.h"
 
 namespace support {
 
@@ -25,26 +26,27 @@ struct Chunk {
 
     int cx = 0;
     int cy = 0;
-    // Tipos por tile local [0,W) x [0,H); 0 = vazio.
-    std::vector<int> tiles = std::vector<int>(W * H, 0);
+    // Tipos por tile local [0,W) x [0,H). uint8_t: 256B por chunk
+    // em vez de 1KB (32KB em vez de 128KB com 128 chunks).
+    std::vector<Tile> tiles = std::vector<Tile>(W * H, Tile::Air);
     // Entidades deste chunk (dono).
     std::vector<std::unique_ptr<Entity>> entities;
     // Índice espacial das entidades (views, sem ownership).
     SpatialHash hash{HASH_CELL};
 
-    int tile(int lx, int ly) const {
+    Tile tile(int lx, int ly) const {
         assert(lx >= 0 && lx < W && ly >= 0 && ly < H);
         return tiles[ly * W + lx];
     }
 
     // Escrita pós-geração: marca modified (chunk precisa persistir).
-    void setTile(int lx, int ly, int v) {
+    void setTile(int lx, int ly, Tile v) {
         tiles[ly * W + lx] = v;
         modified_ = true;
     }
 
     // Escrita da geração: estado inicial, NÃO é modificação.
-    void setTileFromGeneration(int lx, int ly, int v) {
+    void setTileFromGeneration(int lx, int ly, Tile v) {
         tiles[ly * W + lx] = v;
     }
 

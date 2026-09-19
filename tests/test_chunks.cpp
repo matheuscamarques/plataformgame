@@ -8,7 +8,7 @@
 static std::string snapshot(support::Chunk *c) {
     std::string s;
     s += std::to_string(c->cx) + "," + std::to_string(c->cy) + ";";
-    for (int t : c->tiles) { s += std::to_string(t) + ","; }
+    for (support::Tile t : c->tiles) { s += std::to_string(static_cast<int>(t)) + ","; }
     s += ";";
     for (auto &e : c->entities) {
         s += std::to_string((int)e->getX()) + "," + std::to_string((int)e->getY()) +

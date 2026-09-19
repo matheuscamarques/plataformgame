@@ -4,25 +4,13 @@
 #include <cstdlib>
 
 #include "../../defines.h"
+#include "Block.h"
 #include "Generation.h"
 
 namespace support {
 
 ChunkManager::ChunkManager(uint32_t seed, int radius, std::size_t maxLoaded)
     : seed_(seed), radius_(radius), maxLoaded_(maxLoaded) {}
-
-static void paint(Entity *e, int t) {
-    if (t == 1)      e->setFillColor(sf::Color(60, 60, 60));
-    else if (t == 2) e->setFillColor(sf::Color(146, 90, 43));
-    else if (t == 3) e->setFillColor(sf::Color(120, 60, 0));
-    else if (t == 4) e->setFillColor(sf::Color(159, 89, 30));
-    else if (t == 5) e->setFillColor(sf::Color(150, 75, 0));
-    else if (t == TILE_SAND) e->setFillColor(sf::Color(194, 178, 128)); // areia
-    else if (t == TILE_SNOW) e->setFillColor(sf::Color(235, 235, 245)); // neve
-    else if (t == TILE_GRASS) e->setFillColor(sf::Color(106, 190, 48)); // grama
-    else if (t == TILE_DIRT) e->setFillColor(sf::Color(139, 69, 19)); // terra
-    else if (t == TILE_STONE) e->setFillColor(sf::Color(128, 128, 128)); // pedra
-}
 
 void ChunkManager::generate(int cx, int cy) {
     auto c = std::make_unique<Chunk>();
@@ -38,24 +26,21 @@ void ChunkManager::generate(int cx, int cy) {
         for (int lx = 0; lx < Chunk::W; lx++) {
             int tx = cx * Chunk::W + lx;
             int ty = cy * Chunk::H + ly;
-            int t = support::tileType(tx, ty, seed_, cols[lx]);
+            Tile t = support::tileType(tx, ty, seed_, cols[lx]);
             c->setTileFromGeneration(lx, ly, t);
-            if (t == support::TILE_AIR) {
-                // Um lugar só para a linha d'água: SEA_LEVEL.
-                if (ty >= SEA_LEVEL) {
-                    auto water = std::make_unique<Entity>(
-                        WATER, tx * BLOCK_SIZE, ty * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-                    water->setFillColor(sf::Color(0, 255, 255));
-                    c->index(water.get());
-                    c->entities.push_back(std::move(water));
-                }
-                continue;
-            }
-            auto platform = std::make_unique<Entity>(
-                COLIDE, tx * BLOCK_SIZE, ty * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-            paint(platform.get(), t);
-            c->index(platform.get());
-            c->entities.push_back(std::move(platform));
+
+            const BlockDef &def = support::blockDef(t);
+            if (def.kind == support::BlockKind::Air) continue;
+
+            // Liquid (água) e Deco (futuro: tronco/folha) não colidem.
+            int entityKind = (def.kind == support::BlockKind::Solid) ? COLIDE
+                           : (def.kind == support::BlockKind::Liquid) ? WATER : 0;
+            auto e = std::make_unique<Entity>(
+                entityKind, tx * BLOCK_SIZE, ty * BLOCK_SIZE,
+                BLOCK_SIZE, BLOCK_SIZE);
+            e->setFillColor(def.color);
+            c->index(e.get());
+            c->entities.push_back(std::move(e));
         }
     }
     c->touch();

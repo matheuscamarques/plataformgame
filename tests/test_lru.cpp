@@ -13,7 +13,7 @@ int main() {
         assert(m.loadedCount() == 25);
         Chunk *c = m.find(0, 0);
         assert(c != nullptr && !c->modified());
-        c->setTile(0, 0, 1); // modificação de Feature (destruir bloco)
+        c->setTile(0, 0, Tile::Stone); // modificação de Feature (destruir bloco)
         assert(c->modified() && m.modifiedCount() == 1);
 
         m.update(5000, 5000);
@@ -30,7 +30,7 @@ int main() {
         auto loaded = m.loaded();
         assert(!loaded.empty());
         int cx = loaded.front()->cx, cy = loaded.front()->cy;
-        loaded.front()->setTile(0, 0, 1);
+        loaded.front()->setTile(0, 0, Tile::Stone);
         m.update(5000, 5000);
         assert(m.find(cx, cy) != nullptr); // modificado retido
         assert(m.modifiedCount() == 1);
