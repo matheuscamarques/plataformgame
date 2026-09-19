@@ -315,9 +315,11 @@ Tile tileType(int tx, int ty, uint32_t seed, const ColumnData &col) {
         // Ordem sagrada: caverna vence terra e pedra. Se isCave, é ar
         // mesmo dentro da zona de terra.
         if (isCave(tx, ty, seed, surface, col.mountain)) {
-            // Caverna funda vira lava, não ar. Com +5 de folga para a
-            // boca não abrir direto na lava. Acima do surface, nunca.
-            if (isLavaDepth(ty) && ty > surface + 5) return Tile::Lava;
+            // Poça de lava: fundo + wetness alta. Sem o gate, toda
+            // caverna funda virava lava (sopa laranja S6-S10).
+            if (isLavaDepth(ty) && ty > surface + 5 &&
+                lakeWet(tx, ty, seed) > LAVA_WET_THRESHOLD)
+                return Tile::Lava;
             // Lago pinta caverna já carvada em qualquer profundidade
             // (poça subterrânea funda é feature, não bug).
             if (lakeWet(tx, ty, seed) > 0.0f) return Tile::Water;

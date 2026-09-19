@@ -56,7 +56,10 @@ int main() {
         }
         float f = (float)lavaN / total;
         std::printf("seed=%u lava frac=%.3f\n", seed, f);
-        assert(f > 0.05f && f < 0.60f);
+        // Modelo poça (pós-oceano): lava existe (>1%) sem virar mar (<10%).
+        // Medido: 0.019-0.045 nas 3 seeds. Teto pega regressão ao oceano
+        // (era 0.35+); piso pega lava extinta.
+        assert(f > 0.01f && f < 0.10f);
     }
 
     std::printf("lava test OK\n");

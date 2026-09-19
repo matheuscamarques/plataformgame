@@ -169,6 +169,11 @@ bool treeWants(int tx, uint32_t seed, int surfaceY, Biome biome, TreeParams &out
 inline constexpr int SEA_LEVEL = 26;
 inline constexpr int WATER_FILL_MAX = SEA_LEVEL + 12;
 inline constexpr int LAVA_DEPTH_START = 6200; // entrada do estrato 6
+// Poça, não oceano: lava só onde lakeWet passa do limiar (opção B —
+// mais raro que água; hazard, não decoração). Medido: wet>0.15 em
+// caverna funda ≈ 8% das cavernas ⇒ ~3.3% da faixa (poças coerentes,
+// não pimenta). Piso do test_lava reflete o modelo novo, não o antigo.
+inline constexpr float LAVA_WET_THRESHOLD = 0.15f;
 inline constexpr int WORLD_BOTTOM = 12000;   // ~1h de descida
 static_assert(LAVA_DEPTH_START > WATER_FILL_MAX, "lava e água não podem se cruzar");
 static_assert(WORLD_BOTTOM > LAVA_DEPTH_START, "fundo abaixo da lava");

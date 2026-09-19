@@ -43,21 +43,28 @@ int main() {
             assert(found > 0);
         }
 
-        // 3) Lava continua vencendo onde é fundo, mesmo molhado.
+        // 3) Lava vence onde a poça manda, mesmo molhado; fora da poça, não.
         {
-            int checked = 0;
-            for (int tx = -2000; tx < 2000 && checked < 20; tx++) {
+            int lavaChecked = 0, airChecked = 0;
+            for (int tx = -2000; tx < 2000 && (lavaChecked < 20 || airChecked < 20); tx++) {
                 int s = surfaceHeight(tx, seed);
                 for (int ty = LAVA_DEPTH_START + 6; ty < LAVA_DEPTH_START + 400; ty++) {
                     float m = mountainMask(tx, 0, seed);
                     if (!isCave(tx, ty, seed, s, m)) continue;
-                    Tile t = tileType(tx, ty, seed);
-                    assert(t == Tile::Lava); // fundo: lava, nunca lago
-                    checked++;
-                    break;
+                    float w = lakeWet(tx, ty, seed);
+                    if (w > LAVA_WET_THRESHOLD && lavaChecked < 20) {
+                        assert(tileType(tx, ty, seed) == Tile::Lava);
+                        lavaChecked++;
+                        break;
+                    }
+                    if (w > 0.0f && w <= LAVA_WET_THRESHOLD && airChecked < 20) {
+                        assert(tileType(tx, ty, seed) != Tile::Lava);
+                        airChecked++;
+                        break;
+                    }
                 }
             }
-            assert(checked > 0);
+            assert(lavaChecked > 0 && airChecked > 0);
         }
     }
 
