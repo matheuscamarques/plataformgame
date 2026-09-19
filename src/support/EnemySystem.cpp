@@ -25,6 +25,19 @@ void EnemySystem::removeDead(const std::function<void(sf::Vector2f)> &onDeath) {
     }
 }
 
+std::size_t EnemySystem::despawnFar(float x, float y, float radius) {
+    std::size_t n = 0;
+    const float r2 = radius * radius;
+    for (auto it = slimes_.begin(); it != slimes_.end(); ) {
+        const float dx = (*it)->body.getCenterX() - x;
+        const float dy = (*it)->body.getCenterY() - y;
+        if (dx * dx + dy * dy <= r2) { ++it; continue; }
+        it = slimes_.erase(it);
+        ++n;
+    }
+    return n;
+}
+
 void EnemySystem::tick(float dt, GameContext &ctx) {
     for (auto &s : slimes_) {
         // Recursos primeiro: o behavior já vê regen do frame e pode canPay.

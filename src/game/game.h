@@ -17,6 +17,7 @@
 #include "../support/Input/InputMap.h"
 #include "../support/MeleeSystem.h"
 #include "../support/RunManager.h"
+#include "../support/SpawnSystem.h"
 #include "../support/StratumManager.h"
 #include "../support/ParticleSystem.h"
 #include "../support/ThrowSystem.h"

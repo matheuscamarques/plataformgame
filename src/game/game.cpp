@@ -52,6 +52,7 @@ void Game::main()
     game->melee_ = &game->scheduler_.add<support::MeleeSystem>();
     game->scheduler_.add<support::ContactDamageSystem>();
     game->drops_ = &game->scheduler_.add<support::DropSystem>();
+    game->scheduler_.add<support::SpawnSystem>(); // spawn contínuo (sem wiring)
     game->throws_->setExplosionSystem(game->explodes_);
     game->throws_->setParticleSystem(game->particles_);
     game->explodes_->setParticleSystem(game->particles_);

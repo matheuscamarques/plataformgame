@@ -67,6 +67,10 @@ public:
     // (partículas/drops no DeathSystem). Erase mora aqui, no dono.
     void removeDead(const std::function<void(sf::Vector2f)> &onDeath);
 
+    // Despawn por distância (economia do SpawnSystem). Remove além do
+    // raio (px) do ponto. Retorna quantos removeu.
+    std::size_t despawnFar(float x, float y, float radius);
+
 private:
     void physics(Slime &s, GameContext &ctx);
 
