@@ -15,20 +15,27 @@ int tileType(int tx, int ty, uint32_t seed); // 0 = vazio, 1..11 = sólido
 // Espessura da terra: constante (não noise). Compartilhada com o viz.
 inline constexpr int DIRT_DEPTH = 3;
 
-// Máscara de montanha em [0,1]: manchas orgânicas via fbm.
-// Onde > MOUNTAIN_THRESHOLD, a superfície sobe (commit 1) e a caverna
-// densifica (commit 3). Limiar calibrado por histograma: 3 seeds x 4000
-// colunas => fração 0.19-0.41. Não chutar threshold sem medir.
-// Varia em x (cordilheiras); ty existe para reuso 2D futuro.
-inline constexpr float MOUNTAIN_THRESHOLD = 0.56f;
+// Máscara de montanha em [0,1]: ridged multifractal (cristas, não manchas).
+// Define ONDE é montanha. Pico raro vem da peakMask abaixo.
+inline constexpr float MOUNTAIN_THRESHOLD = 0.35f;
 float mountainMask(int tx, int ty, uint32_t seed);
+
+// Máscara de pico em [0,1]: fbm de frequência MUITO baixa. Define ONDE
+// tem Everest dentro da cordilheira. Só p>0.80 conta, e p³ garante que
+// só o extremo da cauda ganha altura: ~0.2-0.5% das montanhas têm pico.
+inline constexpr float PEAK_THRESHOLD = 0.80f;
+inline constexpr float PEAK_BONUS = 25.0f;
+float peakMask(int tx, int ty, uint32_t seed);
 
 // Caverna: threshold base calibrado por histograma 2D (3 seeds,
 // área 800x200): >0.62 => ~18%, >0.55 => ~34%. Densidade cresce
 // com a profundidade via CAVE_DEPTH_FALLOFF (depth clampado em 1,
 // senão o Y infinito vira oco).
 inline constexpr float CAVE_BASE = 0.62f;
-inline constexpr float CAVE_DEPTH_FALLOFF = 0.10f;
+// Falloff fraco de propósito: threshold nunca desce abaixo da mediana
+// do noise (~0.49), senão a maioria vira oco (pedra vira exceção).
+// 0.06 => fundo plano ~= 0.56 (30%), fundo montanha ~= 0.50 (40%).
+inline constexpr float CAVE_DEPTH_FALLOFF = 0.06f;
 // Bônus de montanha e piso: pior caso 0.62-0.10-0.12=0.40 seria ~70%
 // oco no fundo; o piso segura em 0.45.
 inline constexpr float CAVE_MOUNTAIN_BONUS = 0.12f;
@@ -51,9 +58,9 @@ float humidity(int tx, int ty, uint32_t seed);    // features médias
 // Nunca sobre o oceano. Substitui o ruído 3.5% que parecia "bloco voando".
 bool islandTile(int tx, int ty, uint32_t seed);
 
-// Neve no pico: só onde a montanha é forte (t > 0.65) E alta
-// (surface <= 14). Raro de propósito (1-3% das colunas): pico, não campo.
-bool snowcap(int tx, uint32_t seed, int surface);
+// Neve no pico: só altitude (surface <= 10 exige uplift 11+, que só
+// montanha alcança). t alto sem altitude é flanco, não pico.
+bool snowcap(int surface);
 
 // Spawn: primeira coluna a partir de nearX com flanco de montanha
 // (uplift 8..20: terra garantida, nem mar nem pico). Determinístico.

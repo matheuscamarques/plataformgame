@@ -18,17 +18,28 @@ int surfaceHeight(int tx, uint32_t seed) {
     int base = SURFACE_MID - 4 + static_cast<int>(relief * 9.0f);
     float m = mountainMask(tx, 0, seed);
     if (m > MOUNTAIN_THRESHOLD) {
-        // Raiz quadrada: a máscara passa a maior parte do tempo pouco
-        // acima do limiar; linear daria morros de 1-2 tiles (invisíveis).
-        // sqrt(t) dobra as montanhas visíveis com o mesmo degrau máximo.
+        // Base comum: morro/montanha, 0-20 tiles.
         float t = (m - MOUNTAIN_THRESHOLD) / (1.0f - MOUNTAIN_THRESHOLD);
-        base -= static_cast<int>(std::sqrt(t) * 18.0f); // y menor = mais alto
+        base -= static_cast<int>(t * 20.0f);
+        // Bônus de pico: raro, cúbico — só o extremo da cauda conta.
+        // 1 Everest cercado de 6000m, não drama em toda crista.
+        float p = peakMask(tx, 0, seed);
+        if (p > PEAK_THRESHOLD) {
+            float pn = (p - PEAK_THRESHOLD) / (1.0f - PEAK_THRESHOLD);
+            base -= static_cast<int>(pn * pn * pn * PEAK_BONUS);
+        }
+        // Vales entre cristas não viram oceano interno.
+        if (base > SEA_LEVEL + 2) base = SEA_LEVEL + 2;
     }
     return base;
 }
 
 float mountainMask(int tx, int ty, uint32_t seed) {
-    return core::fbm(tx / 256.0f, ty / 256.0f, seed + 1009u, 3);
+    return core::ridgedFbm(tx / 384.0f, ty / 384.0f, seed + 1009u, 5);
+}
+
+float peakMask(int tx, int ty, uint32_t seed) {
+    return core::fbm(tx / 1024.0f, ty / 1024.0f, seed + 7079u, 3);
 }
 
 float caveNoise(int tx, int ty, uint32_t seed) {
@@ -51,16 +62,23 @@ bool islandTile(int tx, int ty, uint32_t seed) {
     int ox = g * G + int(core::rand01(g, 13, seed ^ SALT) * 24.0f); // 0..23
     int w = 4 + int(core::rand01(g, 29, seed ^ SALT) * 4.0f);       // 4..7
     if (tx < ox || tx >= ox + w) return false;
-    int cx = ox + w / 2;
-    if (isOceanColumn(cx, seed)) return false; // céu limpo sobre o mar
-    int hy = surfaceHeight(cx, seed) - 6 - int(core::rand01(g, 37, seed ^ SALT) * 5.0f);
+    // Vão livre: mínima e máxima do terreno no span. Ilha paira acima
+    // do ponto mais alto (nunca enterrada, nunca fragmentada) e some
+    // se encostar no mar. Tudo-ou-nada por ilha, sem fragmentos.
+    int sMin = 1000000, sMax = -1000000;
+    for (int x = ox; x < ox + w; x++) {
+        int s = surfaceHeight(x, seed);
+        if (s < sMin) sMin = s;
+        if (s > sMax) sMax = s;
+    }
+    if (sMax > SEA_LEVEL) return false; // céu limpo sobre o mar
+    int hy = sMin - 6 - int(core::rand01(g, 37, seed ^ SALT) * 5.0f);
     return ty == hy;
 }
 
-bool snowcap(int tx, uint32_t seed, int surface) {
-    float m = mountainMask(tx, 0, seed);
-    float t = (m - MOUNTAIN_THRESHOLD) / (1.0f - MOUNTAIN_THRESHOLD);
-    return t > 0.65f && surface <= 14;
+bool snowcap(int surface) {
+    // Só altitude: surface <= 14 exige uplift 15+ (só pico chega lá).
+    return surface <= 14;
 }
 
 int findSpawnTileX(int nearX, uint32_t seed) {
@@ -106,7 +124,9 @@ int biomeTopTile(Biome b) {
 
 bool isCave(int tx, int ty, uint32_t seed, int surfaceY, float mountain) {
     if (ty < surfaceY + 3) return false; // guard: nunca perto da superfície
-    float depth = float(ty - surfaceY) / 25.0f;
+    // Divisor 40 (não 25): falloff satura devagar; threshold fica acima
+    // da mediana (~0.49) em todo lugar — pedra continua sendo a maioria.
+    float depth = float(ty - surfaceY) / 40.0f;
     if (depth > 1.0f) depth = 1.0f; // Y infinito não pode virar oco
     // Ordem fixa: base -> falloff de profundidade -> bônus de montanha -> piso.
     float threshold = CAVE_BASE - depth * CAVE_DEPTH_FALLOFF;
@@ -135,7 +155,7 @@ int tileType(int tx, int ty, uint32_t seed) {
     // Topo: clima da coluna na altura da superfície (não do tile fundo).
     // Neve primeiro: pico alto e forte passa na frente do bioma.
     if (ty == surface) {
-        if (snowcap(tx, seed, surface)) return 8;
+        if (snowcap(surface)) return 8;
         Biome b = pickBiome(temperature(tx, surface, seed),
                             humidity(tx, surface, seed),
                             ocean, isCoastal(surface));

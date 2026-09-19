@@ -12,19 +12,17 @@ int main() {
         for (int tx = -2000; tx < 2000; tx++) {
             int s = surfaceHeight(tx, seed);
             n++;
-            if (!snowcap(tx, seed, s)) continue;
+            if (!snowcap(s)) continue;
             snowCols++;
-            // neve só em pico alto e forte
-            float m = mountainMask(tx, 0, seed);
-            float t = (m - MOUNTAIN_THRESHOLD) / (1.f - MOUNTAIN_THRESHOLD);
-            assert(t > 0.65f && s <= 14);
+            // neve só em altitude que exige uplift (só montanha chega lá)
+            assert(s <= 14);
             // pico é branco no mundo
             assert(tileType(tx, s, seed) == 8);
             assert(tileType(tx, s, seed) == 8); // determinístico
         }
         float f = (float)snowCols / n;
         std::printf("seed=%u neve=%.4f\n", seed, f);
-        assert(f > 0.005f && f < 0.06f); // raro: pico, não campo
+        assert(f > 0.005f && f < 0.05f); // raro: pico, não campo
 
         // spawn: flanco (uplift 8..20), perto, terra, determinístico
         int sx = findSpawnTileX(0, seed);

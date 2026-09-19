@@ -18,7 +18,7 @@ int main() {
                 int top = tileType(tx, s, seed);
                 Biome b = pickBiome(temperature(tx, s, seed), humidity(tx, s, seed),
                                     ocean, isCoastal(s));
-                int expected = snowcap(tx, seed, s) ? 8 : biomeTopTile(b);
+                int expected = snowcap(s) ? 8 : biomeTopTile(b);
                 assert(top == expected);
             }
 

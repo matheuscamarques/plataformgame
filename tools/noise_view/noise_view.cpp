@@ -49,7 +49,7 @@ bool isOceanWater(int tx, int ty, uint32_t seed) {
 int main(int argc, char **argv) {
     if (argc != 8) {
         std::printf("uso: %s seed x0 x1 y0 y1 camada saida.png\n", argv[0]);
-        std::printf("camadas: relief | mask | cave | overlay | temp | humid | biome_overlay | biomes | surface | tiles\n");
+        std::printf("camadas: relief | mask | peak | cave | overlay | temp | humid | biome_overlay | biomes | surface | tiles\n");
         return 2;
     }
     uint32_t seed = static_cast<uint32_t>(std::strtoul(argv[1], nullptr, 10));
@@ -79,6 +79,13 @@ int main(int argc, char **argv) {
                 float v = support::mountainMask(tx, ty, seed);
                 px = sf::Color(gray(v), gray(v), gray(v));
                 if (v > support::MOUNTAIN_THRESHOLD) sum += 1.0f;
+            } else if (layer == "peak") {
+                // Manchas enormes de baixa frequência, pouca variação interna.
+                float v = support::peakMask(tx, ty, seed);
+                px = sf::Color(gray(v), gray(v), gray(v));
+                if (v < lo) lo = v;
+                if (v > hi) hi = v;
+                sum += v;
             } else if (layer == "cave") {
                 float v = support::caveNoise(tx, ty, seed);
                 px = sf::Color(gray(v), gray(v), gray(v));
@@ -140,7 +147,7 @@ int main(int argc, char **argv) {
         std::printf("falha ao salvar %s\n", out.c_str());
         return 1;
     }
-    if (layer == "relief" || layer == "cave" || layer == "temp" || layer == "humid") {
+    if (layer == "relief" || layer == "cave" || layer == "temp" || layer == "humid" || layer == "peak") {
         int n = (x1 - x0) * (y1 - y0);
         std::printf("salvo %s (lo=%.3f hi=%.3f media=%.3f)\n", out.c_str(), lo, hi, sum / n);
     } else if (layer == "mask") {

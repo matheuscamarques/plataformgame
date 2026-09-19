@@ -37,7 +37,7 @@ int main() {
                 bool ocean = isOceanColumn(j, seed);
                 Biome b = pickBiome(temperature(j, s, seed), humidity(j, s, seed),
                                     ocean, isCoastal(s));
-                int expected = snowcap(j, seed, s) ? 8 : biomeTopTile(b);
+                int expected = snowcap(s) ? 8 : biomeTopTile(b);
                 assert(t == expected);
                 if (isCoastal(s)) assert(t == 6);
             }

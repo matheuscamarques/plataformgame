@@ -27,7 +27,7 @@ int main() {
             } else {
                 Biome b = pickBiome(temperature(tx, s, seed), humidity(tx, s, seed),
                                     ocean, false);
-                int expected = snowcap(tx, seed, s) ? 8 : biomeTopTile(b);
+                int expected = snowcap(s) ? 8 : biomeTopTile(b);
                 assert(top == expected);
             }
             if (ocean) {
@@ -51,7 +51,7 @@ int main() {
             if (!ocean) {
                 Biome b = pickBiome(temperature(tx, s, seed), humidity(tx, s, seed),
                                     false, isCoastal(s));
-                int expected = snowcap(tx, seed, s) ? 8 : biomeTopTile(b);
+                int expected = snowcap(s) ? 8 : biomeTopTile(b);
                 assert(top == expected);
                 for (int ty = s - 10; ty < s; ty++) {
                     int t = tileType(tx, ty, seed);

@@ -50,4 +50,23 @@ inline float fbm(float x, float y, uint32_t seed, int octaves = 4) {
     return sum / norm;
 }
 
+// Ridged multifractal: manchas viram cristas ramificadas com picos
+// afiados (montanhas de verdade, não colinas). Cada oitava vira crista
+// (1-|2n-1|), afina (^2), e detalhe fino só nasce onde já há crista (n*prev).
+inline float ridgedFbm(float x, float y, uint32_t seed, int octaves = 5) {
+    float sum = 0.0f, amp = 1.0f, freq = 1.0f, prev = 1.0f, norm = 0.0f;
+    for (int i = 0; i < octaves; ++i) {
+        float n = valueNoise2D(x * freq, y * freq, seed + static_cast<uint32_t>(i) * 1013u);
+        n = 1.0f - std::fabs(2.0f * n - 1.0f);
+        n = n * n;
+        n *= prev;
+        sum += n * amp;
+        norm += amp;
+        prev = n;
+        amp *= 0.5f;
+        freq *= 2.0f;
+    }
+    return norm > 0.0f ? sum / norm : 0.0f;
+}
+
 } // namespace core

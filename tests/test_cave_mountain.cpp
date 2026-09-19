@@ -5,26 +5,35 @@
 
 // Commit 3: caverna modulada por montanha.
 //
-// Nota de calibragem: a razão montanha/plano só é estável onde o bônus
-// é grande (t>=0.5) e o range é largo (+-4000 colunas). Com bônus médio
-// pequeno e range estreito, blobs de 64px dominam a estatística e a
-// razão varia 0.4-1.1 por seed — métrica errada, não código errado.
+// NOTA DE CALIBRAGEM (lição da autocorrelação, 4ª vez): densidade por
+// CLASSE (só colunas fortes) é loteria — colunas fortes são ~1% e
+// clusterizadas, e blobs de caverna têm 64px. ±4000 colunas medem ~100
+// colunas correlacionadas, não 8000 amostras. Por isso este teste
+// afirma MECANISMO (monotonicidade, sem variância) e usa agregado
+// GLOBAL (todas as colunas, estável 0.34-0.36) para o teto.
 int main() {
     using namespace support;
 
     for (uint32_t seed : {1337u, 999u, 42u}) {
-        // 1) Monotonicidade: flat => montanha, sempre (mecanismo, sem ruído).
+        // 1) Monotonicidade: caverna-uniforme => caverna-modulada.
+        // Sem variância: vale ponto a ponto ou o código está errado.
         int strict = 0;
-        for (int tx = -2000; tx < 2000; tx += 3) {
-            for (int ty = -50; ty < 150; ty += 3) {
-                int s = ty - 30; // surface fictícia p/ variar o depth
-                bool f = isCave(tx, ty, seed, s, 0.0f);
-                bool m = isCave(tx, ty, seed, s, 0.9f);
-                if (f) assert(m);
-                if (!f && m) strict++;
+        for (int tx = -2000; tx < 2000; tx += 2) {
+            int s = surfaceHeight(tx, seed);
+            for (int ty = s - 50; ty < s + 150; ty += 2) {
+                // Invariante só vale onde o guard passa (ty >= s+3):
+                // na faixa do guard, uniform pode ser true e o tile sólido.
+                if (ty < s + 3) continue;
+                float depth = (float)(ty - s) / 40.0f;
+                if (depth > 1.f) depth = 1.f;
+                bool uniform = caveNoise(tx, ty, seed) > CAVE_BASE - depth * CAVE_DEPTH_FALLOFF;
+                int tile = tileType(tx, ty, seed);
+                if (uniform) assert(tile == 0);
+                if (!uniform && tile == 0) strict++;
             }
         }
-        assert(strict > 10000); // bônus efetivamente abre cavernas
+        assert(strict > 1000); // bônus abre cavernas de verdade
+        std::printf("seed=%u monotonicidade OK (strict=%d)\n", seed, strict);
 
         // 2) Guard intacto nos picos: topo de montanha nunca é oco.
         for (int tx = -1200; tx < 1200; tx++) {
@@ -35,35 +44,19 @@ int main() {
             }
         }
 
-        // 3) Densidade: montanha FORTE (t>=0.5) vs plano, range largo.
-        int mN = 0, mCave = 0, fN = 0, fCave = 0, mDeepN = 0, mDeepCave = 0;
+        // 3) Teto GLOBAL no fundo (todas as colunas): rocha continua
+        // sendo a maioria. Medido 0.34-0.36; 0.55 tem margem folgada.
+        int n = 0, caves = 0;
         for (int tx = -4000; tx < 4000; tx++) {
             int s = surfaceHeight(tx, seed);
-            float m = mountainMask(tx, 0, seed);
-            float t = (m - MOUNTAIN_THRESHOLD) / (1.f - MOUNTAIN_THRESHOLD);
-            for (int d = 15; d <= 25; d++) {
-                int ty = s + 3 + d;
-                bool cave = tileType(tx, ty, seed) == 0;
-                if (t >= 0.5f) {
-                    mN++;
-                    if (cave) mCave++;
-                    if (d >= 20) {
-                        mDeepN++;
-                        if (cave) mDeepCave++;
-                    }
-                } else if (m <= MOUNTAIN_THRESHOLD) {
-                    fN++;
-                    if (cave) fCave++;
-                }
+            for (int d = 25; d <= 100; d++) {
+                n++;
+                if (tileType(tx, s + 3 + d, seed) == 0) caves++;
             }
         }
-        float fM = (float)mCave / mN;
-        float fF = (float)fCave / fN;
-        float fDeep = (float)mDeepCave / mDeepN;
-        std::printf("seed=%u mont=%.3f plano=%.3f razao=%.2f fundo-mont=%.3f\n",
-                    seed, fM, fF, fM / fF, fDeep);
-        assert(fM > fF * 1.3f);
-        assert(fDeep <= 0.70f); // teto global no fundo de montanha
+        float fDeep = (float)caves / n;
+        std::printf("seed=%u fundo-global=%.3f\n", seed, fDeep);
+        assert(fDeep <= 0.55f);
     }
 
     std::printf("cave mountain test OK\n");
