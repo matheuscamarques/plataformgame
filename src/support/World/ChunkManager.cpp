@@ -3,36 +3,18 @@
 #include <cmath>
 #include <cstdlib>
 
-#include "../../world/hash.h"
 #include "../../defines.h"
+#include "Generation.h"
 
 namespace support {
 
 namespace {
 // Linha d'água em tiles do mundo (era `i > m/2` no mapa fixo 50x1000).
 const int WATER_ROW = 25;
-// Meio da superfície (era `m/2` no mapa fixo).
-const int SURFACE_MID = 25;
 }
 
 ChunkManager::ChunkManager(uint32_t seed, int radius, std::size_t maxLoaded)
     : seed_(seed), radius_(radius), maxLoaded_(maxLoaded) {}
-
-int ChunkManager::tileType(int tx, int ty, uint32_t seed) {
-    float relief = valueNoise2D(tx * 0.02f, 3.7f, seed);
-    int surface = SURFACE_MID - 4 + static_cast<int>(relief * 9.0f);
-    if (ty > surface) {
-        float pick = rand01(tx, ty, seed ^ 0x9E3779B9u);
-        if (pick < 0.15f)      return 1;
-        else if (pick < 0.35f) return 2;
-        else if (pick < 0.55f) return 3;
-        else if (pick < 0.75f) return 4;
-        else                   return 5;
-    }
-    if (ty == surface) return 4;
-    float plat = rand01(tx, ty, seed ^ 0x51F37EDu);
-    return plat < 0.035f ? 2 : 0;
-}
 
 static void paint(Entity *e, int t) {
     if (t == 1)      e->setFillColor(sf::Color(60, 60, 60));
@@ -50,7 +32,7 @@ void ChunkManager::generate(int cx, int cy) {
         for (int lx = 0; lx < Chunk::W; lx++) {
             int tx = cx * Chunk::W + lx;
             int ty = cy * Chunk::H + ly;
-            int t = tileType(tx, ty, seed_);
+            int t = support::tileType(tx, ty, seed_);
             c->setTileFromGeneration(lx, ly, t);
             if (t == 0) {
                 if (ty > WATER_ROW) {

@@ -1,9 +1,10 @@
 #include <cassert>
 #include <cmath>
 #include <cstdio>
-#include "world/hash.h"
+#include "core/Noise.h"
 
 int main() {
+    using namespace core;
     // determinismo: mesma entrada, mesma saída
     assert(hash2(10, 20, 1337u) == hash2(10, 20, 1337u));
     assert(rand01(10, 20, 1337u) == rand01(10, 20, 1337u));

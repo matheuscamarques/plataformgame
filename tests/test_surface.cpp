@@ -1,8 +1,9 @@
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
-#include "world/hash.h"
+#include "core/Noise.h"
 int main() {
+    using namespace core;
     const int m = 50;
     uint32_t seed = 1337u;
     int prev = -100, maxStep = 0, solidBelow = 0, checked = 0;

@@ -38,7 +38,6 @@ public:
     int getRadius() const { return radius_; }
 
 private:
-    static int tileType(int tx, int ty, uint32_t seed);
     void generate(int cx, int cy);
     void touchKey(int64_t k);
     void evictIfNeeded();
