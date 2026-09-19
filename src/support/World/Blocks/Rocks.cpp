@@ -21,7 +21,9 @@ REGISTER_BLOCK({"basalt", Tile::Basalt, BlockKind::Solid, 60, 55, 55,
 REGISTER_BLOCK({"void_stone", Tile::VoidStone, BlockKind::Solid, 45, 35, 60,
                 S7 | S10, 0.f, true});
 REGISTER_BLOCK({"blood_rock", Tile::BloodRock, BlockKind::Solid, 85, 30, 40,
-                S8 | S9, 0.f, true}); // S9 temporário: PlasmaStone vem no C2
+                S8, 0.f, true});
+REGISTER_BLOCK({"plasma_stone", Tile::PlasmaStone, BlockKind::Solid, 120, 90, 50,
+                S9, 0.f, true}); // 2a: S9 deixa o temporário BloodRock
 
 // --- Flavors (1 por estrato S1..S5; hash01 com salt próprio) ---
 REGISTER_BLOCK({"pebbled_stone", Tile::PebbledStone, BlockKind::Solid, 100, 100, 105,

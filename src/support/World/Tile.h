@@ -64,6 +64,8 @@ enum class Tile : uint8_t {
     StreakedStone  = 50,
     Cobblestone    = 51,
     CrystalCluster = 52,
+    // 2a: base do S9 (tira o temporário BloodRock)
+    PlasmaStone    = 53,
 
     COUNT
 };

@@ -11,7 +11,7 @@ int main() {
     BlockRegistry &reg = BlockRegistry::instance();
 
     { // TenEntriesWithMatchingBlocksTable
-        assert(reg.all().size() == 10u);
+        assert(reg.all().size() == 11u);
         for (auto &e : reg.all()) {
             const BlockDef &b = blockDef(e.tile);
             assert(std::string_view(b.name) == std::string_view(e.name));
@@ -30,7 +30,7 @@ int main() {
         assert(reg.baseFor(6)->tile == Tile::Basalt);
         assert(reg.baseFor(7)->tile == Tile::VoidStone);
         assert(reg.baseFor(8)->tile == Tile::BloodRock);
-        assert(reg.baseFor(9)->tile == Tile::BloodRock); // temp: PlasmaStone C2
+        assert(reg.baseFor(9)->tile == Tile::PlasmaStone); // 2a: fix S9
         assert(reg.baseFor(10)->tile == Tile::VoidStone);
         assert(reg.find(Tile::Granite) != nullptr);
         assert(reg.find(Tile::Stone) == nullptr); // legado não registrado
@@ -42,7 +42,7 @@ int main() {
         assert(reg.raresFor(3).empty()); // raros vêm no C2
     }
     { // TileBudgetGuard (124 cabem em uint8_t com folga)
-        assert(static_cast<int>(Tile::COUNT) == 53);
+        assert(static_cast<int>(Tile::COUNT) == 54);
         assert(TILE_COUNT <= 200u);
     }
 

@@ -76,6 +76,7 @@ inline const std::array<BlockDef, TILE_COUNT> BLOCKS = {{
     /* StreakedStone  */ {{120, 130, 145,255}, "streaked_stone",  BlockKind::Solid},
     /* Cobblestone    */ {{110, 105,  95,255}, "cobblestone",     BlockKind::Solid},
     /* CrystalCluster */ {{ 80, 220, 230,255}, "crystal_cluster", BlockKind::Solid},
+    /* PlasmaStone    */ {{120,  90,  50,255}, "plasma_stone",    BlockKind::Solid},
 }};
 
 inline const BlockDef& blockDef(Tile t) {
