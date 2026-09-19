@@ -105,7 +105,10 @@ bool islandTile(int tx, int ty, uint32_t seed) {
     if (tx < ox || tx >= ox + w) return false;
     // Vão livre: mínima e máxima do terreno no span. Ilha paira acima
     // do ponto mais alto (nunca enterrada, nunca fragmentada) e some
-    // se encostar no mar. Tudo-ou-nada por ilha, sem fragmentos.
+    // se encostar no mar. Altura de pulo (~5 tiles): ilha a 3-4 do chão
+    // é alcançável; a 6+ vira decoração inalcançável ("voando").
+    // Desnível > 4 no vão também some (flutuaria alto sobre o vale).
+    // Tudo-ou-nada por ilha, sem fragmentos.
     int sMin = 1000000, sMax = -1000000;
     for (int x = ox; x < ox + w; x++) {
         int s = surfaceHeight(x, seed);
@@ -113,7 +116,8 @@ bool islandTile(int tx, int ty, uint32_t seed) {
         if (s > sMax) sMax = s;
     }
     if (sMax > SEA_LEVEL) return false; // céu limpo sobre o mar
-    int hy = sMin - 6 - int(core::rand01(g, 37, seed ^ SALT) * 5.0f);
+    if (sMax - sMin > 4) return false; // vão desigual: voaria alto
+    int hy = sMin - 3 - int(core::rand01(g, 37, seed ^ SALT) * 2.0f);
     return ty == hy;
 }
 
