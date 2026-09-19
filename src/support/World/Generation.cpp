@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "../../core/Noise.h"
+#include "ChunkKey.h"
 
 namespace support {
 
@@ -39,6 +40,20 @@ float temperature(int tx, int ty, uint32_t seed) {
 
 float humidity(int tx, int ty, uint32_t seed) {
     return core::fbm(tx / 384.0f, ty / 384.0f, seed + 4021u, 3);
+}
+
+bool islandTile(int tx, int ty, uint32_t seed) {
+    const int G = 40;
+    const uint32_t SALT = 0x6A09E667u; // bits de pi; disjunto dos demais salts
+    int g = floorDiv(tx, G);
+    if (core::rand01(g, 7, seed ^ SALT) > 0.45f) return false;
+    int ox = g * G + int(core::rand01(g, 13, seed ^ SALT) * 24.0f); // 0..23
+    int w = 4 + int(core::rand01(g, 29, seed ^ SALT) * 4.0f);       // 4..7
+    if (tx < ox || tx >= ox + w) return false;
+    int cx = ox + w / 2;
+    if (isOceanColumn(cx, seed)) return false; // céu limpo sobre o mar
+    int hy = surfaceHeight(cx, seed) - 6 - int(core::rand01(g, 37, seed ^ SALT) * 5.0f);
+    return ty == hy;
 }
 
 Biome pickBiome(float temp, float humid, bool ocean, bool coastal) {
@@ -107,10 +122,9 @@ int tileType(int tx, int ty, uint32_t seed) {
                             ocean, isCoastal(surface));
         return biomeTopTile(b);
     }
-    // Sem plataformas flutuantes sobre o oceano: céu limpo acima do mar.
+    // Ilha flutuante coerente (ou nada): sem ruído de tile isolado.
     if (ocean) return 0;
-    float plat = core::rand01(tx, ty, seed ^ 0x51F37EDu);
-    return plat < 0.035f ? 2 : 0; // plataformas esparsas, resto vazio
+    return islandTile(tx, ty, seed) ? 2 : 0;
 }
 
 } // namespace support

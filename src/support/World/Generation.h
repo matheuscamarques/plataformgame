@@ -8,7 +8,7 @@ namespace support {
 // inclusive para coords negativas. Salts: terreno usa XOR 0x9E3779B9 e
 // 0x51F37ED; camadas novas usam +1009/+2017/+3019 (domínios disjuntos).
 int surfaceHeight(int tx, uint32_t seed);
-int tileType(int tx, int ty, uint32_t seed); // 0 = vazio, 1..5 = sólido, 6 = areia
+int tileType(int tx, int ty, uint32_t seed); // 0 = vazio, 1..6 = sólido
 
 // Máscara de montanha em [0,1]: manchas orgânicas via fbm.
 // Onde > MOUNTAIN_THRESHOLD, a superfície sobe (commit 1) e a caverna
@@ -39,6 +39,12 @@ bool isCave(int tx, int ty, uint32_t seed, int surfaceY, float mountain);
 // Salts 3019/4021 livres (em uso: 1009, 2017, XORs, fbm +i*1013).
 float temperature(int tx, int ty, uint32_t seed); // features grandes
 float humidity(int tx, int ty, uint32_t seed);    // features médias
+
+// Ilha flutuante: plataforma horizontal 4-7 tiles, 6-10 acima da
+// superfície local. Uma por grupo de 40 colunas (45% dos grupos têm).
+// Determinística por grupo; pontas enterradas somem no morro (natural).
+// Nunca sobre o oceano. Substitui o ruído 3.5% que parecia "bloco voando".
+bool islandTile(int tx, int ty, uint32_t seed);
 
 // Bioma: tabela de dupla entrada temperatura x umidade.
 // Thresholds = tercis globais medidos em 3 seeds (cada quadrante 8.5%+):
