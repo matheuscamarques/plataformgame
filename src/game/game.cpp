@@ -149,6 +149,17 @@ void Game::render()
     // lista global (chunks modified pinned não encarecem o frame).
     float vx0 = camPos.x - 60.0f, vy0 = camPos.y - 60.0f;
     float vx1 = camPos.x + viewW_ + 60.0f, vy1 = camPos.y + viewH_ + 60.0f;
+    // Fundo chapado do estrato do player (1 draw; pop na fronteira
+    // marca a transição de propósito).
+    {
+        const int pty = static_cast<int>(std::floor(player.get()->getY() / BLOCK_SIZE));
+        const support::StratumBg bg =
+            support::stratumBg(support::stratumAt(pty));
+        sf::RectangleShape bgRect(sf::Vector2f(vx1 - vx0, vy1 - vy0));
+        bgRect.setPosition(vx0, vy0);
+        bgRect.setFillColor(sf::Color(bg.r, bg.g, bg.b));
+        window->draw(bgRect);
+    }
     getWorld()->forEachEntityInRect(vx0, vy0, vx1, vy1, [&](Entity *entity) {
         entity->draw(window);
     });

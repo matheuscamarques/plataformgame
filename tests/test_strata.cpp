@@ -72,6 +72,16 @@ int main() {
         assert(found > 0);
     }
 
+    { // BgContrastBetweenNeighbors (vizinhos distinguíveis a olho)
+        for (int s = 0; s + 1 < STRATUM_COUNT; ++s) {
+            StratumBg a = stratumBg(s), b = stratumBg(s + 1);
+            const int d = abs(a.r - b.r) + abs(a.g - b.g) + abs(a.b - b.b);
+            assert(d >= 25);
+        }
+        StratumBg sky = stratumBg(0);
+        assert(sky.r == 135 && sky.g == 206 && sky.b == 235); // céu intacto
+    }
+
     std::printf("strata test OK\n");
     return 0;
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 namespace support {
 
@@ -41,6 +42,26 @@ inline int checkpointTy(int s) {
     if (s <= 0) return 0;
     if (s >= STRATUM_COUNT) s = STRATUM_COUNT - 1;
     return STRATUM_TOP[s - 1];
+}
+
+// Cor chapada de fundo por estrato (1 draw no render; Scaler futuro
+// reusa a mesma cor nas extensões). S0 = céu atual (superfície intacta).
+struct StratumBg { uint8_t r, g, b; };
+inline StratumBg stratumBg(int s) {
+    switch (s) {
+        case 0:  return {135, 206, 235};
+        case 1:  return {60, 40, 30};
+        case 2:  return {40, 50, 35};
+        case 3:  return {45, 45, 55};
+        case 4:  return {55, 40, 30};
+        case 5:  return {40, 55, 65};
+        case 6:  return {70, 25, 20};
+        case 7:  return {25, 20, 35};
+        case 8:  return {55, 15, 25};
+        case 9:  return {80, 70, 40};
+        case 10: return {15, 15, 20};
+        default: return {20, 20, 30};
+    }
 }
 
 } // namespace support
