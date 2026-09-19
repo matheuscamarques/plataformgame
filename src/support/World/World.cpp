@@ -38,6 +38,23 @@ bool World::isSolid(int worldTileX, int worldTileY) const {
     return support::isSolid(tileAt(worldTileX, worldTileY));
 }
 
+bool World::breakTile(int worldTileX, int worldTileY, Tile *broken) {
+    ChunkCoord c = chunkCoordFromWorld(worldTileX, worldTileY, Chunk::W);
+    Chunk *chunk = chunks_.find(c.x, c.y);
+    if (!chunk) return false;
+    const int lx = worldTileX - c.x * Chunk::W;
+    const int ly = worldTileY - c.y * Chunk::H;
+    const Tile cur = chunk->tile(lx, ly);
+    // Só Sólido e Deco quebram. Ar não há o que fazer; Bedrock é
+    // indestrutível; Liquid (água/lava) a explosão não toca.
+    if (cur == Tile::Air || cur == Tile::Bedrock) return false;
+    if (isLiquid(cur)) return false;
+    if (broken) *broken = cur;
+    chunk->setTile(lx, ly, Tile::Air); // marca modified: persiste no LRU
+    chunk->removeEntitiesAt(worldTileX, worldTileY);
+    return true;
+}
+
 void World::query(float x, float y, float w, float h, std::vector<Entity*> &out) {
     out.clear();
     std::vector<Entity*> found;

@@ -42,6 +42,11 @@ void Game::main()
     game->enemies_ = &game->scheduler_.add<support::EnemySystem>();
     game->scheduler_.add<support::BodySystem>();
     game->particles_ = &game->scheduler_.add<support::ParticleSystem>();
+    game->throws_ = &game->scheduler_.add<support::ThrowSystem>();
+    game->explodes_ = &game->scheduler_.add<support::ExplosionSystem>();
+    game->throws_->setExplosionSystem(game->explodes_);
+    game->throws_->setParticleSystem(game->particles_);
+    game->explodes_->setParticleSystem(game->particles_);
     game->enemies_->spawn("slime", (spawnTx - 6) * BLOCK_SIZE, 0.0f);
     game->enemies_->spawn("slime", (spawnTx + 6) * BLOCK_SIZE, 0.0f);
 
@@ -199,7 +204,18 @@ void Game::tick() {
 
     // Sistemas (inimigos etc.): scheduler com prioridade declarada.
     // BodySystem reconstrói hitboxes pós-movimento (priority 250).
-    support::GameContext ctx{getWorld(), p, &input_, enemies_};
+    // Alvos de explosão: montados aqui (Player + Slimes), lidos pelo
+    // ExplosionSystem durante o tick do ThrowSystem.
+    std::vector<support::ExplosionTarget> targets;
+    targets.push_back({sf::Vector2f(p->getCenterX(), p->getCenterY()),
+                       &p->body, nullptr, true});
+    enemies_->forEach([&](support::Slime &s) {
+        if (s.resources.isDead()) return;
+        targets.push_back({sf::Vector2f(s.body.getCenterX(), s.body.getCenterY()),
+                           &s.bodyParts, &s.resources, false});
+    });
+    support::GameContext ctx{getWorld(), p, &input_, enemies_,
+                             throws_, explodes_, &targets};
     scheduler_.tick(1.0f / 30.0f, ctx);
 }
 

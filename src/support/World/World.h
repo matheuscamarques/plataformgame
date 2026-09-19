@@ -37,6 +37,12 @@ public:
     Tile tileAt(int worldTileX, int worldTileY) const;
     bool isSolid(int worldTileX, int worldTileY) const;
 
+    // Quebra um tile: vira Air, marca modified (persiste via LRU),
+    // remove a entidade e devolve o tipo anterior em `broken`
+    // (para partícula com a cor certa). Bedrock nunca quebra.
+    // Chunk ausente -> false.
+    bool breakTile(int worldTileX, int worldTileY, Tile *broken = nullptr);
+
     // Espalha a query (x, y, w, h) pelos hashes dos chunks
     // carregados. 'out' é limpo antes. Sem duplicatas entre chunks.
     void query(float x, float y, float w, float h, std::vector<Entity*> &out);

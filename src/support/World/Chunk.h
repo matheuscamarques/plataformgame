@@ -57,6 +57,26 @@ struct Chunk {
 
     void index(Entity *e) { hash.insert(e); }
 
+    // Remove entidades exatamente neste tile (pós-quebra). Também tira
+    // do hash (posição atual — entidade estática não se moveu).
+    // Retorna quantas removeu.
+    int removeEntitiesAt(int worldTileX, int worldTileY) {
+        int n = 0;
+        for (auto it = entities.begin(); it != entities.end();) {
+            Entity *e = it->get();
+            const int ex = static_cast<int>(e->getX() / BLOCK_SIZE);
+            const int ey = static_cast<int>(e->getY() / BLOCK_SIZE);
+            if (ex != worldTileX || ey != worldTileY) {
+                ++it;
+                continue;
+            }
+            hash.remove(e);
+            it = entities.erase(it);
+            ++n;
+        }
+        return n;
+    }
+
 private:
     bool modified_ = false;
     std::chrono::steady_clock::time_point lastAccess_{};

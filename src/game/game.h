@@ -10,8 +10,10 @@
 #include "../support/Camera/Camera.h"
 #include "../support/Debug/DebugOverlay.h"
 #include "../support/EnemySystem.h"
+#include "../support/ExplosionSystem.h"
 #include "../support/Input/InputMap.h"
 #include "../support/ParticleSystem.h"
+#include "../support/ThrowSystem.h"
 
 class Game
 {
@@ -35,6 +37,8 @@ private:
     support::DebugOverlay overlay_; // valor
     core::SystemScheduler scheduler_; // dono dos Systems
     support::EnemySystem *enemies_ = nullptr; // observa; dono é o scheduler
+    support::ThrowSystem *throws_ = nullptr; // observa; dono é o scheduler
+    support::ExplosionSystem *explodes_ = nullptr; // observa; dono é o scheduler
     support::ParticleSystem *particles_ = nullptr; // observa; dono é o scheduler
     bool running = false;
     void render();
