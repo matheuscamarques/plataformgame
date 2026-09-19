@@ -59,8 +59,11 @@ struct Chunk {
 
     // Remove entidades exatamente neste tile (pós-quebra). Também tira
     // do hash (posição atual — entidade estática não se moveu).
+    // removed (opcional): recebe os ponteiros destruídos para o dono
+    // expurgar views (World::activePlatforms_/activeColides_).
     // Retorna quantas removeu.
-    int removeEntitiesAt(int worldTileX, int worldTileY) {
+    int removeEntitiesAt(int worldTileX, int worldTileY,
+                         std::vector<Entity *> *removed = nullptr) {
         int n = 0;
         for (auto it = entities.begin(); it != entities.end();) {
             Entity *e = it->get();
@@ -71,6 +74,7 @@ struct Chunk {
                 continue;
             }
             hash.remove(e);
+            if (removed) removed->push_back(e);
             it = entities.erase(it);
             ++n;
         }

@@ -1,5 +1,8 @@
 #include "World.h"
 
+#include <algorithm>
+#include <vector>
+
 #include "../../defines.h"
 #include "../../entities/entity/entity.hpp"
 #include "Block.h"
@@ -51,7 +54,23 @@ bool World::breakTile(int worldTileX, int worldTileY, Tile *broken) {
     if (isLiquid(cur)) return false;
     if (broken) *broken = cur;
     chunk->setTile(lx, ly, Tile::Air); // marca modified: persiste no LRU
-    chunk->removeEntitiesAt(worldTileX, worldTileY);
+    // Expurga as views: a Entity morre aqui, mas activePlatforms_/
+    // activeColides_ só seriam rebuilt no próximo update() — o render
+    // do frame atual dereferenciaria (segfault do J).
+    std::vector<Entity *> removed;
+    removed.reserve(4);
+    chunk->removeEntitiesAt(worldTileX, worldTileY, &removed);
+    if (!removed.empty()) {
+        auto expunge = [&](std::vector<Entity *> &v) {
+            v.erase(std::remove_if(v.begin(), v.end(), [&](Entity *e) {
+                for (Entity *r : removed)
+                    if (r == e) return true;
+                return false;
+            }), v.end());
+        };
+        expunge(activePlatforms_);
+        expunge(activeColides_);
+    }
     return true;
 }
 
