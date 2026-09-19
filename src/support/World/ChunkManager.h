@@ -32,6 +32,13 @@ public:
     std::vector<Chunk *> loaded();
     std::vector<const Chunk *> loaded() const;
 
+    // Evict de modifieds ociosos (opção A): a cratera some após idle
+    // e o chunk regenera do seed ao voltar. update() chama com o
+    // default; teste injeta idle menor. Usa lastAccess_ (touch() já
+    // atualiza todo update na janela — player nunca evicta a si).
+    void evictIdleModified(float maxIdleSeconds);
+    static constexpr float kModifiedEvictIdleSeconds = 120.f;
+
     size_t loadedCount() const { return chunks_.size(); }
     size_t modifiedCount() const;
     uint32_t getSeed() const { return seed_; }

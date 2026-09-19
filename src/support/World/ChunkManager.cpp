@@ -1,5 +1,6 @@
 #include "ChunkManager.h"
 
+#include <chrono>
 #include <cmath>
 #include <cstdlib>
 
@@ -159,7 +160,29 @@ void ChunkManager::update(int centerTileX, int centerTileY) {
             ++it;
         }
     }
+    evictIdleModified(kModifiedEvictIdleSeconds);
     evictIfNeeded();
+}
+
+void ChunkManager::evictIdleModified(float maxIdleSeconds) {
+    const auto now = std::chrono::steady_clock::now();
+    for (auto it = chunks_.begin(); it != chunks_.end();) {
+        if (!it->second->modified()) {
+            ++it;
+            continue;
+        }
+        const std::chrono::duration<float> idle = now - it->second->lastAccess();
+        if (idle.count() <= maxIdleSeconds) {
+            ++it;
+            continue;
+        }
+        const auto lruIt = lruIndex_.find(it->first);
+        if (lruIt != lruIndex_.end()) {
+            lru_.erase(lruIt->second);
+            lruIndex_.erase(lruIt);
+        }
+        it = chunks_.erase(it);
+    }
 }
 
 void ChunkManager::evictIfNeeded() {
