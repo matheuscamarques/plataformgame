@@ -65,7 +65,10 @@ void Game::run()
     int updates = 0;
 
     while (running && window->isOpen())
-    {   
+    {
+        // Ordem: beginFrame ANTES do pollEvent, senão o edge morre
+        // antes do primeiro tick ler (e há N ticks por frame).
+        input_.beginFrame();
         sf::Event event{};
         while (window->pollEvent(event))
         {
@@ -77,6 +80,8 @@ void Game::run()
                 sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
                 window->setView(sf::View(visibleArea));
             }
+
+            input_.handleEvent(event);
         }
         core::Time::beginFrame();
         int ticks = core::Time::consumeTicks();
@@ -227,11 +232,11 @@ void Game::render()
 
 void Game::tick() {
     Player *p = player.get();
-    p->moveRight = sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
-    p->moveUp    = sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
-    p->moveDown  = sf::Keyboard::isKeyPressed(sf::Keyboard::Down);
-    p->moveLeft  = sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
-    p->runFast   = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
+    p->moveRight = input_.held(support::Action::Right);
+    p->moveUp    = input_.held(support::Action::Up);
+    p->moveDown  = input_.held(support::Action::Down);
+    p->moveLeft  = input_.held(support::Action::Left);
+    p->runFast   = input_.held(support::Action::RunFast);
     p->tick();
 
     // Mundo infinito: carrega/descarrega chunks em torno do tile do player.
