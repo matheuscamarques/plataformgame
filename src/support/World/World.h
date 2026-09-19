@@ -1,11 +1,11 @@
 #pragma once
 #include <cstdint>
-#include <memory>
 #include <utility>
 #include <vector>
 
-#include "../../entities/entity/entity.hpp"
 #include "ChunkManager.h"
+
+class Entity;
 
 namespace support {
 
@@ -45,9 +45,10 @@ public:
                     std::vector<std::pair<int,int>> &out);
     int debugCellCount(int cx, int cy);
 
-    // Views não-owning para as entidades dos chunks ativos.
-    std::vector<Entity*> & getPlatforms();
-    std::vector<Entity*> & getColidePlatforms();
+        // Views não-owning para as entidades dos chunks ativos.
+        // Const-ref: dá pra mutar as entidades, não o vetor.
+        const std::vector<Entity*> & getPlatforms();
+        const std::vector<Entity*> & getColidePlatforms();
 
     // Debug / métricas.
     std::size_t loadedChunkCount() const { return chunks_.loadedCount(); }

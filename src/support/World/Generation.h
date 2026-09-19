@@ -7,8 +7,23 @@ namespace support {
 // Toda função é determinística em (tile, seed): mesmo input, mesmo output,
 // inclusive para coords negativas. Salts: terreno usa XOR 0x9E3779B9 e
 // 0x51F37ED; camadas novas usam +1009/+2017/+3019 (domínios disjuntos).
+// Calibragem do relevo base (o que você mexe para afinar o terreno).
+inline constexpr float RELIEF_FREQ = 0.02f;
+inline constexpr float RELIEF_Y = 3.7f;
+inline constexpr float RELIEF_AMP = 9.0f;
+// Alcance do falloff de caverna em tiles (depth satura em 1.0 aqui).
+inline constexpr float CAVE_DEPTH_RANGE = 40.0f;
 int surfaceHeight(int tx, uint32_t seed);
-// 0 = vazio, 1..11 = sólido (6 areia, 8 neve, 9 grama, 10 terra, 11 pedra).
+// IDs de tile: um lugar só (paint/testes usam estes, não literais).
+inline constexpr int TILE_AIR = 0;
+inline constexpr int TILE_ISLAND = 2; // plataforma de ilha (único 1..5 vivo)
+inline constexpr int TILE_SAND = 6;
+inline constexpr int TILE_SNOW = 8;
+inline constexpr int TILE_GRASS = 9;
+inline constexpr int TILE_DIRT = 10;
+inline constexpr int TILE_STONE = 11;
+// (1,3,4,5 = legado cosmético, nada gera mais; paint mantém o mapa.)
+// 0 = vazio, demais = sólido.
 int tileType(int tx, int ty, uint32_t seed);
 // Tudo que é por-coluna, calculado 1x: superfície, máscara, clima, oceano.
 // tileType(tx,ty) sem ColumnData existe só por compat (testes/viz) e

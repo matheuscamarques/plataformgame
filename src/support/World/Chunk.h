@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <chrono>
 #include <cstdint>
 #include <memory>
@@ -31,7 +32,10 @@ struct Chunk {
     // Índice espacial das entidades (views, sem ownership).
     SpatialHash hash{HASH_CELL};
 
-    int tile(int lx, int ly) const { return tiles[ly * W + lx]; }
+    int tile(int lx, int ly) const {
+        assert(lx >= 0 && lx < W && ly >= 0 && ly < H);
+        return tiles[ly * W + lx];
+    }
 
     // Escrita pós-geração: marca modified (chunk precisa persistir).
     void setTile(int lx, int ly, int v) {

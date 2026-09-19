@@ -1,6 +1,7 @@
 #include "World.h"
 
 #include "../../defines.h"
+#include "../../entities/entity/entity.hpp"
 
 namespace support {
 
@@ -55,11 +56,11 @@ int World::debugCellCount(int cx, int cy) {
     return total;
 }
 
-std::vector<Entity*> & World::getPlatforms() {
+const std::vector<Entity*> & World::getPlatforms() {
     return activePlatforms_;
 }
 
-std::vector<Entity*> & World::getColidePlatforms() {
+const std::vector<Entity*> & World::getColidePlatforms() {
     return activeColides_;
 }
 

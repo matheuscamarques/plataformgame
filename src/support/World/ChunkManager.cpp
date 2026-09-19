@@ -17,11 +17,11 @@ static void paint(Entity *e, int t) {
     else if (t == 3) e->setFillColor(sf::Color(120, 60, 0));
     else if (t == 4) e->setFillColor(sf::Color(159, 89, 30));
     else if (t == 5) e->setFillColor(sf::Color(150, 75, 0));
-    else if (t == 6) e->setFillColor(sf::Color(194, 178, 128)); // areia costeira
-    else if (t == 8) e->setFillColor(sf::Color(235, 235, 245)); // neve no pico
-    else if (t == 9) e->setFillColor(sf::Color(106, 190, 48)); // grama
-    else if (t == 10) e->setFillColor(sf::Color(139, 69, 19)); // terra
-    else if (t == 11) e->setFillColor(sf::Color(128, 128, 128)); // pedra
+    else if (t == TILE_SAND) e->setFillColor(sf::Color(194, 178, 128)); // areia
+    else if (t == TILE_SNOW) e->setFillColor(sf::Color(235, 235, 245)); // neve
+    else if (t == TILE_GRASS) e->setFillColor(sf::Color(106, 190, 48)); // grama
+    else if (t == TILE_DIRT) e->setFillColor(sf::Color(139, 69, 19)); // terra
+    else if (t == TILE_STONE) e->setFillColor(sf::Color(128, 128, 128)); // pedra
 }
 
 void ChunkManager::generate(int cx, int cy) {
@@ -40,7 +40,7 @@ void ChunkManager::generate(int cx, int cy) {
             int ty = cy * Chunk::H + ly;
             int t = support::tileType(tx, ty, seed_, cols[lx]);
             c->setTileFromGeneration(lx, ly, t);
-            if (t == 0) {
+            if (t == support::TILE_AIR) {
                 // Um lugar só para a linha d'água: SEA_LEVEL.
                 if (ty >= SEA_LEVEL) {
                     auto water = std::make_unique<Entity>(
@@ -107,8 +107,11 @@ void ChunkManager::update(int centerTileX, int centerTileY) {
                 ++it;
                 continue;
             }
-            lruIndex_.erase(it->first);
-            lru_.remove(it->first);
+            auto lruIt = lruIndex_.find(it->first);
+            if (lruIt != lruIndex_.end()) {
+                lru_.erase(lruIt->second);
+                lruIndex_.erase(lruIt);
+            }
             it = chunks_.erase(it);
         } else {
             ++it;

@@ -14,8 +14,8 @@ const int SURFACE_MID = 25;
 }
 
 int surfaceHeight(int tx, uint32_t seed) {
-    float relief = core::valueNoise2D(tx * 0.02f, 3.7f, seed); // [0,1] suave
-    int base = SURFACE_MID - 4 + static_cast<int>(relief * 9.0f);
+    float relief = core::valueNoise2D(tx * RELIEF_FREQ, RELIEF_Y, seed); // [0,1] suave
+    int base = SURFACE_MID - 4 + static_cast<int>(relief * RELIEF_AMP);
     float m = mountainMask(tx, 0, seed);
     if (m > MOUNTAIN_THRESHOLD) {
         // Base comum: morro/montanha, 0-20 tiles.
@@ -110,12 +110,12 @@ Biome pickBiome(float temp, float humid, bool ocean, bool coastal) {
 
 int biomeTopTile(Biome b) {
     switch (b) {
-        case Biome::Ocean:     return 6; // fundo do mar: areia
-        case Biome::Beach:     return 6;
-        case Biome::Desert:    return 6;
+        case Biome::Ocean:     return TILE_SAND; // fundo do mar: areia
+        case Biome::Beach:     return TILE_SAND;
+        case Biome::Desert:    return TILE_SAND;
         case Biome::Savanna:   return 5;
-        case Biome::Grassland: return 9; // terra com grama
-        case Biome::Forest:    return 9; // terra com grama
+        case Biome::Grassland: return TILE_GRASS; // terra com grama
+        case Biome::Forest:    return TILE_GRASS; // terra com grama
         case Biome::Taiga:     return 3;
         case Biome::Tundra:    return 1;
         default:               return 4;
@@ -126,7 +126,7 @@ bool isCave(int tx, int ty, uint32_t seed, int surfaceY, float mountain) {
     if (ty < surfaceY + 3) return false; // guard: nunca perto da superfície
     // Divisor 40 (não 25): falloff satura devagar; threshold fica acima
     // da mediana (~0.49) em todo lugar — pedra continua sendo a maioria.
-    float depth = float(ty - surfaceY) / 40.0f;
+    float depth = float(ty - surfaceY) / CAVE_DEPTH_RANGE;
     if (depth > 1.0f) depth = 1.0f; // Y infinito não pode virar oco
     // Ordem fixa: base -> falloff de profundidade -> bônus de montanha -> piso.
     float threshold = CAVE_BASE - depth * CAVE_DEPTH_FALLOFF;
@@ -158,25 +158,25 @@ int tileType(int tx, int ty, uint32_t seed, const ColumnData &col) {
     if (ty > surface) {
         // Ordem sagrada: caverna vence terra e pedra. Se isCave, é ar
         // mesmo dentro da zona de terra.
-        if (isCave(tx, ty, seed, surface, col.mountain)) return 0;
+        if (isCave(tx, ty, seed, surface, col.mountain)) return TILE_AIR;
         if (ty <= surface + DIRT_DEPTH) {
             // Sob o oceano, areia continua areia (praia não vira terra).
-            if (ocean) return 6;
-            return 10; // terra
+            if (ocean) return TILE_SAND;
+            return TILE_DIRT; // terra
         }
-        return 11; // pedra
+        return TILE_STONE; // pedra
     }
     // Topo: clima da coluna na altura da superfície (não do tile fundo).
     // Neve primeiro: pico alto e forte passa na frente do bioma.
     if (ty == surface) {
-        if (snowcap(surface)) return 8;
+        if (snowcap(surface)) return TILE_SNOW;
         Biome b = pickBiome(col.temperature, col.humidity,
                             ocean, isCoastal(surface));
         return biomeTopTile(b);
     }
     // Ilha flutuante coerente (ou nada): sem ruído de tile isolado.
-    if (ocean) return 0;
-    return islandTile(tx, ty, seed) ? 2 : 0;
+    if (ocean) return TILE_AIR;
+    return islandTile(tx, ty, seed) ? TILE_ISLAND : TILE_AIR;
 }
 
 } // namespace support
