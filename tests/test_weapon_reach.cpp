@@ -4,6 +4,8 @@
 
 #include "entities/Player/Player.h"
 #include "support/Combat/Body.h"
+#include "support/Combat/BodySystem.h"
+#include "support/GameContext.h"
 
 using namespace support;
 
@@ -45,6 +47,29 @@ int main() {
         p.body.rebuild({100.f, 100.f}, 1);
         sf::FloatRect box = p.meleeHitbox();
         assert(box.width <= 0.f && box.height <= 0.f);
+    }
+    { // AxeVsSwordReach (arma diferente = alcance diferente, sem lógica nova)
+        // Espada: swing 16px de largura a 2.5x = 40px.
+        // Machado: idle 8px de largura a 2.5x = 20px.
+        auto reachOf = [](const std::string &weaponId) {
+            Player p;
+            p.loadout.equipped = true;
+            p.loadout.weaponId = weaponId;
+            p.meleePhase = MeleePhase::Active;
+            p.currentFrameId = SpriteFrameId::PlayerPunch;
+            p.facing = 1;
+            GameContext ctx{};
+            ctx.player = &p;
+            BodySystem sys;
+            sys.tick(1.f / 30.f, ctx);
+            const PartState *w = p.body.find(BodyPartId::Weapon);
+            assert(w != nullptr);
+            return w->worldBox.width;
+        };
+        const float sword = reachOf("sword");
+        const float axe = reachOf("axe");
+        assert(near(sword, 40.f) && near(axe, 20.f));
+        assert(sword > axe);
     }
 
     std::printf("weapon reach test OK\n");

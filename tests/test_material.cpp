@@ -51,6 +51,9 @@ int main() {
         for (int y = 0; y < kLegsH; ++y) {
             assert(std::strlen(kIronLegsIdle[y]) == static_cast<std::size_t>(kLegsW));
         }
+        for (int y = 0; y < kSwordH; ++y) {
+            assert(std::strlen(kIronAxeIdle[y]) == static_cast<std::size_t>(kSwordW));
+        }
     }
     { // EquipHasInk (nenhuma peça vazia)
         auto hasInk = [](const char *const *f, int h) {
@@ -62,6 +65,7 @@ int main() {
             return false;
         };
         assert(hasInk(kIronSwordIdle, kSwordH));
+        assert(hasInk(kIronAxeIdle, kSwordH));
         assert(hasInk(kIronSwordSwing, kSwordSwingH));
         assert(hasInk(kIronHelmIdle, kHelmH));
         assert(hasInk(kIronChestIdle, kChestH));

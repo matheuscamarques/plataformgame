@@ -390,18 +390,23 @@ void Game::drawPlayerWeapon() {
     const float handY = arm->worldBox.top + arm->worldBox.height * 0.5f;
     const sf::Texture *tex = &sprites_.swordIdle[m];
     float originX = 4.f, originY = 20.f;
-    switch (p->meleePhase) {
-        case MeleePhase::Windup:
-            tex = &sprites_.swordWindup[m];
-            break;
-        case MeleePhase::Active:
-        case MeleePhase::Recovery:
-            tex = &sprites_.swordSwing[m];
-            originX = 5.f;
-            originY = 5.f;
-            break;
-        default:
-            break;
+    if (p->loadout.weaponId == "axe") {
+        // Machado só tem idle: mesma textura em toda fase (sem swing).
+        tex = &sprites_.axeIdle[m];
+    } else {
+        switch (p->meleePhase) {
+            case MeleePhase::Windup:
+                tex = &sprites_.swordWindup[m];
+                break;
+            case MeleePhase::Active:
+            case MeleePhase::Recovery:
+                tex = &sprites_.swordSwing[m];
+                originX = 5.f;
+                originY = 5.f;
+                break;
+            default:
+                break;
+        }
     }
     sf::Sprite spr;
     spr.setTexture(*tex);

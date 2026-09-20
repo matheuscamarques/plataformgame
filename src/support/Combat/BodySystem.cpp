@@ -23,9 +23,16 @@ sf::FloatRect computeWeaponBbox(Player &p) {
     if (p.meleePhase != MeleePhase::Active &&
         p.meleePhase != MeleePhase::Recovery)
         return {baseX, baseY, 0.f, 0.f};
-    // Swing 16x8 com origem na guarda (5,5).
-    const float sw = 16.f * s, sh = 8.f * s;
-    const float ox = 5.f * s, oy = 5.f * s;
+    // Dimensões por arma: espada 16x8 na guarda (5,5); machado 8x20
+    // centrado no cabo (4,10). Alcance difere sem lógica nova.
+    float sw = 16.f * s, sh = 8.f * s;
+    float ox = 5.f * s, oy = 5.f * s;
+    if (p.loadout.weaponId == "axe") {
+        sw = 8.f * s;
+        sh = 20.f * s;
+        ox = 4.f * s;
+        oy = 10.f * s;
+    }
     float left, top;
     if (p.facing >= 0) {
         left = baseX - ox;

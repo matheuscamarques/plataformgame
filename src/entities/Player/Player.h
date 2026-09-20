@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <SFML/Graphics/Rect.hpp>
 #include "entities/Entity.hpp"
 #include "support/Combat/Body.h"
@@ -17,6 +19,9 @@ struct Loadout {
     core::MaterialId chest = core::MaterialId::Iron;
     core::MaterialId legs = core::MaterialId::Iron;
     bool equipped = true;
+    // Identidade da arma ("sword", "axe", ...). Material continua em
+    // weapon acima; forma/dimensões derivam daqui. Vira registry com 3+.
+    std::string weaponId = "sword";
 };
 
 // Fase do swing atual. Idle = sem ataque em curso.

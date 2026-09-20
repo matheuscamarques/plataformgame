@@ -394,6 +394,29 @@ inline const char *const kIronSwordIdle[] = {
     "........",
 };
 
+inline const char *const kIronAxeIdle[] = {
+    "..WWWW..",
+    "..WwwW..",
+    "..WwwW..",
+    "...WwW..",
+    "....w...",
+    "....w...",
+    "....w...",
+    "....w...",
+    "....w...",
+    "....w...",
+    "....w...",
+    "..GGGG..",
+    "....w...",
+    "....w...",
+    "....GG..",
+    "....GG..",
+    "........",
+    "........",
+    "........",
+    "........",
+};
+
 inline const char *const kIronSwordWindup[] = {
     "........",
     "........",
@@ -478,6 +501,7 @@ struct SpriteSet {
     sf::Texture swordIdle[kMats];
     sf::Texture swordWindup[kMats];
     sf::Texture swordSwing[kMats];
+    sf::Texture axeIdle[kMats];
     sf::Texture helm[kMats];
     sf::Texture chest[kMats];
     sf::Texture legs[kMats];
@@ -528,6 +552,7 @@ inline SpriteSet build() {
         s.swordIdle[m] = core::makeSprite(kIronSwordIdle, kSwordW, kSwordH, pal, 5);
         s.swordWindup[m] = core::makeSprite(kIronSwordWindup, kSwordW, kSwordH, pal, 5);
         s.swordSwing[m] = core::makeSprite(kIronSwordSwing, kSwordSwingW, kSwordSwingH, pal, 5);
+        s.axeIdle[m] = core::makeSprite(kIronAxeIdle, kSwordW, kSwordH, pal, 5);
         s.helm[m] = core::makeSprite(kIronHelmIdle, kHelmW, kHelmH, pal, 5);
         s.chest[m] = core::makeSprite(kIronChestIdle, kChestW, kChestH, pal, 5);
         s.legs[m] = core::makeSprite(kIronLegsIdle, kLegsW, kLegsH, pal, 5);
