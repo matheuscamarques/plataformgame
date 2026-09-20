@@ -1,6 +1,8 @@
 #include "SlimeAI.h"
 #include "BehaviorRegistry.h"
+#include "EnemySystem.h"
 #include "GameContext.h"
+#include "SkillSystem.h"
 
 #include <cmath>
 
@@ -18,16 +20,22 @@ constexpr float AGGRO_X = 400.0f;
 constexpr float AGGRO_Y = 400.0f;
 } // namespace
 
-void SlimeAI::onTick(Entity &e, float dt, GameContext &ctx) {
+void SlimeAI::onTick(Enemy &e, float dt, GameContext &ctx) {
     (void)dt;
     Player *p = ctx.player;
 
     bool chase = false;
-    float dx = 0.0f;
+    float dx = 0.0f, dy = 0.0f;
     if (p) {
-        dx = p->getCenterX() - e.getCenterX();
-        float dy = p->getCenterY() - e.getCenterY();
+        dx = p->getCenterX() - e.body.getCenterX();
+        dy = p->getCenterY() - e.body.getCenterY();
         chase = std::fabs(dx) < AGGRO_X && std::fabs(dy) < AGGRO_Y;
+    }
+
+    // Skill ranged: cospe entre 40 e 220px (cooldown+stamina no tryUse).
+    if (p) {
+        const float dist = std::sqrt(dx * dx + dy * dy);
+        if (dist > 40.f && dist < 220.f) SkillSystem::tryUse(e, ctx, "slime_spit");
     }
 
     float speed = chase ? CHASE_SPEED : PATROL_SPEED;
@@ -42,16 +50,16 @@ void SlimeAI::onTick(Entity &e, float dt, GameContext &ctx) {
     }
 
     // Travou na parede (tentou andar e não saiu do lugar)? Vira.
-    if (hasLast_ && std::fabs(e.getX() - lastX_) < 0.5f) dir_ = -dir_;
-    lastX_ = e.getX();
+    if (hasLast_ && std::fabs(e.body.getX() - lastX_) < 0.5f) dir_ = -dir_;
+    lastX_ = e.body.getX();
     hasLast_ = true;
 
-    e.setVx(dir_ * speed);
-    e.facing = (dir_ >= 0.0f) ? 1 : -1;
+    e.body.setVx(dir_ * speed);
+    e.body.facing = (dir_ >= 0.0f) ? 1 : -1;
 
     if (hopCooldown_ > 0) hopCooldown_--;
     if (grounded && hopCooldown_ <= 0) {
-        e.setVy(HOP_VY);
+        e.body.setVy(HOP_VY);
         grounded = false;
         hopCooldown_ = HOP_COOLDOWN;
     }

@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "../defines.h"
+#include "SkillSystem.h"
 #include "World/World.h"
 
 namespace support {
@@ -46,12 +47,14 @@ void EnemySystem::tick(float dt, GameContext &ctx) {
         // Recursos primeiro: o behavior já vê regen do frame e pode canPay.
         s->resources.tick(dt);
         s->knockbackLock.tick(dt);
+        // Cooldowns de skill antes do behavior (ele vê o estado atualizado).
+        SkillSystem::tick(*s, dt);
         // Lock rodando: física integra o impulso, IA não toca em vel.
         if (s->knockbackLock.running()) {
             physics(*s, ctx);
             continue;
         }
-        if (s->ai) s->ai->onTick(s->body, dt, ctx);
+        if (s->ai) s->ai->onTick(*s, dt, ctx);
         physics(*s, ctx);
     }
 }

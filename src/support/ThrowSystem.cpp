@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "../defines.h"
+#include "../entities/player/player.h"
 #include "ExplosionSystem.h"
 #include "GameContext.h"
 #include "ParticleSystem.h"
@@ -56,6 +57,24 @@ void ThrowSystem::tick(float dt, GameContext &ctx) {
                 handleFuse(t, ctx);
                 pool_.release(&t); // seguro: release dentro do forEach
             }
+            return;
+        }
+
+        // Sem fuse (spit): impacto no player + expira parado.
+        // Dinamite sempre tem fuse > 0 até explodir: este ramo não a toca.
+        if (t.kind == ThrowKind::Spit && ctx.player) {
+            Player *pl = ctx.player;
+            if (t.pos.x >= pl->getX() && t.pos.x <= pl->getX() + pl->getW() &&
+                t.pos.y >= pl->getY() && t.pos.y <= pl->getY() + pl->getH()) {
+                pl->hurt(t.damage);
+                if (particles_) particles_->spawnHitSpark(t.pos);
+                pool_.release(&t);
+                return;
+            }
+        }
+        if (t.fuse <= 0.f && t.resting) {
+            if (particles_) particles_->spawnHitSpark(t.pos); // poof
+            pool_.release(&t);
         }
     });
 }

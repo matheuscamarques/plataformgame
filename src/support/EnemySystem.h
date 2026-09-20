@@ -3,6 +3,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "../core/System.h"
@@ -32,6 +33,8 @@ struct Enemy {
     // Telegraph da mordida: conta de BITE_WINDUP até 0 SÓ em contato;
     // sem contato recupera (0.5x). Cheio = ocioso (verde).
     float biteWindup = 0.35f;
+    // Cooldowns de skills (SkillSystem, opção 3b): morrem com o Enemy.
+    std::unordered_map<std::string, core::Cooldown> skillCds;
 
     Enemy(Entity b, std::unique_ptr<Behavior> a)
         : body(std::move(b)), ai(std::move(a)) {}

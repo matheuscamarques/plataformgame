@@ -11,7 +11,7 @@ namespace support {
 class SlimeAI : public Behavior {
 public:
     const char *name() const override { return "SlimeAI"; }
-    void onTick(Entity &e, float dt, GameContext &ctx) override;
+    void onTick(Enemy &e, float dt, GameContext &ctx) override;
     void setGrounded(bool g) override { grounded = g; }
 
     bool grounded = false;

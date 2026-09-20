@@ -37,7 +37,7 @@ public:
     explicit DwarfAI(Config cfg) : cfg_(cfg) {}
 
     const char *name() const override { return "DwarfAI"; }
-    void onTick(Entity &e, float dt, GameContext &ctx) override;
+    void onTick(Enemy &e, float dt, GameContext &ctx) override;
 
     // Observabilidade de teste (não API de gameplay).
     DwarfState state() const { return state_; }
@@ -55,9 +55,9 @@ private:
     core::Cooldown meleeCd_{0.8f};
 
     void changeState(DwarfState s, float duration = 0.f);
-    void tickPatrol(Entity &e, float dt, GameContext &ctx);
-    void tickCombat(Entity &e, float dt, GameContext &ctx);
-    void throwDynamite(Entity &e, GameContext &ctx);
+    void tickPatrol(Enemy &e, float dt, GameContext &ctx);
+    void tickCombat(Enemy &e, float dt, GameContext &ctx);
+    void throwDynamite(Enemy &e, GameContext &ctx);
 };
 
 } // namespace support

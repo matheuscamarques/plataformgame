@@ -7,7 +7,8 @@ namespace support {
 enum class ThrowKind : uint8_t {
     Dynamite,
     GoldNugget,   // stub — passivo futuro
-    Rock          // stub — variação futura
+    Rock,         // stub — variação futura
+    Spit          // projétil de slime: linear, sem fuse, dano no impacto
 };
 
 struct Throwable {

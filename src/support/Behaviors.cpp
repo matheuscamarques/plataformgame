@@ -1,4 +1,14 @@
 #include "EnemyArchetype.h"
+#include "Skill.h"
+
+#include <cmath>
+
+#include <SFML/System/Vector2.hpp>
+
+#include "../entities/player/player.h"
+#include "EnemySystem.h"
+#include "GameContext.h"
+#include "ThrowSystem.h"
 
 // Slime (trash) + anão básico (elite). Terceiro inimigo = append aqui
 // + 1 arquivo Behavior. Zero edição em Factory/SpawnSystem.
@@ -44,4 +54,35 @@ REGISTER_ENEMY_ARCHETYPE("dwarf", [] {
     a.spawnWeight = 0.3f; // unificado S3+ (era 15/30 — tuning junto)
     a.maxAlive = 1;
     return a;
+}());
+
+// Cuspe de slime: projétil linear (sem gravidade/fuse), dano no impacto.
+// Valida o mecanismo SkillRegistry; anão ganha as dele no Elite.
+REGISTER_SKILL("slime_spit", [] {
+    support::SkillDef s;
+    s.name = "Spit";
+    s.cooldown = 1.8f;
+    s.telegraph = 0.20f;
+    s.staminaCost = 5.f;
+    s.isRanged = true;
+    s.maxRange = 220.f;
+    s.baseWeight = 1.0f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx) {
+        if (!ctx.player || !ctx.throws) return;
+        sf::Vector2f from{self.body.getCenterX(), self.body.getCenterY()};
+        sf::Vector2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
+        sf::Vector2f dir = to - from;
+        const float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+        if (len < 1.f) return;
+        dir /= len;
+        auto *t = ctx.throws->throwItem(from, dir * 260.f, support::ThrowKind::Spit);
+        if (t) {
+            t->gravity = 0.f;
+            t->fuse = -1.f; // sem fuse: expira parado (ThrowSystem libera)
+            t->damage = 8;
+            t->radius = 0.f;
+            t->tilesRadius = 0;
+        }
+    };
+    return s;
 }());
