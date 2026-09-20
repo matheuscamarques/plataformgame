@@ -151,6 +151,12 @@ void Player::tick() {
     if (meleeAnimT > 0.f) meleeAnimT -= 1.0f / 30.0f;
     if (throwAnimT > 0.f) throwAnimT -= 1.0f / 30.0f;
 
+    // Cooldowns do Player, tickados pelo Player (1 só lugar).
+    // Sem o hurtIframes aqui, i-frames nunca expiram e o sprite
+    // trava em kPlayerHurt (pick tem hurt como 1ª prioridade).
+    hurtIframes.tick(1.0f / 30.0f);
+    throwCooldown.tick(1.0f / 30.0f);
+
     Entity::tick();
 }
 

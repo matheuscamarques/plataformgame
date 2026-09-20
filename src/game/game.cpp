@@ -368,7 +368,7 @@ void Game::tick() {
         // S6: J (Action::Light) arremessa dinamite.
         // Cooldown cobre o edge por frame: pressed fica alto em todos os
         // ticks do frame, o 2º tick já encontra cooldown rodando.
-        p->throwCooldown.tick(1.0f / 30.0f);
+        // (throwCooldown é tickado no Player::tick, junto dos outros.)
         if (input_.pressed(support::Action::Light)) p->tryThrow(*throws_);
 
         // Mundo infinito: carrega/descarrega chunks em torno do tile do player.

@@ -89,6 +89,7 @@ int main() {
         };
         auto firstK = [&](const char *const *f) { return firstRowWith(f, kPlayerH, 'K'); };
         assert(firstK(kPlayerMelee) == firstK(kPlayerIdle));
+        assert(firstK(kPlayerThrow) == firstK(kPlayerIdle));
         auto firstC = [&](const char *const *f) { return firstRowWith(f, kDwarfH, 'C'); };
         assert(firstC(kDwarfThrow) == firstC(kDwarfIdle));
     }

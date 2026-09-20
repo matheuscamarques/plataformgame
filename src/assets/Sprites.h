@@ -116,10 +116,8 @@ inline const char *const kPlayerJump[] = {
 };
 
 inline const char *const kPlayerThrow[] = {
-    ".........TT.",
-    ".........tT.",
-    "....KKKK.S..",
-    "..KKKKKKK.S.",
+    "....KKKK..TT",
+    "..KKKKKKKKtT",
     "..KSSSSSSK..",
     "..KSESSESK..",
     "..KSSSSSSK..",
@@ -135,6 +133,8 @@ inline const char *const kPlayerThrow[] = {
     "...BB..BB...",
     "...BB..BB...",
     "...BB..BB...",
+    "............",
+    "............",
     "............",
 };
 
