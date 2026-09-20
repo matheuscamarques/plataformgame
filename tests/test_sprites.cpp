@@ -46,13 +46,13 @@ int main() {
         }
     }
     { // PalettesNonEmpty (toda sprite tem pixel visível, não é vazio)
-        assert(kPlayerPalCount == 9u && kSlimePalCount == 5u && kDwarfPalCount == 10u);
-        assert(has(kPlayerIdle, kPlayerH, 'S'));
-        assert(has(kPlayerJump, kPlayerH, 'S'));
+        assert(kPlayerPalCount == 10u && kSlimePalCount == 5u && kDwarfPalCount == 11u);
+        assert(has(kPlayerIdle, kPlayerH, 'F'));
+        assert(has(kPlayerJump, kPlayerH, 'H'));
         assert(has(kPlayerThrow, kPlayerH, 'T'));
-        assert(has(kPlayerPunch, kPlayerH, 'S'));
+        assert(has(kPlayerPunch, kPlayerH, 'H'));
         assert(has(kSlimeIdle, kSlimeH, 'G'));
-        assert(has(kDwarfIdle, kDwarfH, 'H'));
+        assert(has(kDwarfIdle, kDwarfH, 'R'));
         assert(has(kDwarfThrow, kDwarfH, 'D'));
         assert(has(kDwarfMelee, kDwarfH, 'W'));
     }
@@ -65,10 +65,10 @@ int main() {
         assert(!has(kPlayerPunch, kPlayerH, 'W'));
     }
     { // WalkFramesDifferInArms (braços em lados opostos)
-        assert(kPlayerWalkA[8][1] == 'S');
+        assert(kPlayerWalkA[8][1] == 'H');
         assert(kPlayerWalkA[8][10] == '.');
         assert(kPlayerWalkB[8][1] == '.');
-        assert(kPlayerWalkB[8][10] == 'S');
+        assert(kPlayerWalkB[8][10] == 'H');
     }
     { // PunchBodyAlignsWithIdle (cabeça na mesma row: sem crouch)
         auto firstRowWith = [](const char *const *f, int h, char c) {
@@ -80,12 +80,12 @@ int main() {
         auto firstK = [&](const char *const *f) { return firstRowWith(f, kPlayerH, 'K'); };
         assert(firstK(kPlayerPunch) == firstK(kPlayerIdle));
     }
-    { // PunchHasExtendedFist (≥2 'S' nas cols 10-11 em alguma row)
+    { // PunchHasExtendedFist (≥2 'H' nas cols 10-11 em alguma row)
         int maxS = 0;
         for (int y = 0; y < kPlayerH; ++y) {
             int cnt = 0;
             for (int x = 10; x <= 11; ++x) {
-                if (kPlayerPunch[y][x] == 'S') ++cnt;
+                if (kPlayerPunch[y][x] == 'H') ++cnt;
             }
             if (cnt > maxS) maxS = cnt;
         }

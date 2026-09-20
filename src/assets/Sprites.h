@@ -15,7 +15,8 @@ inline constexpr int kPlayerH = 20;
 inline const core::PaletteEntry kPlayerPal[] = {
     {'.', {0, 0, 0, 0}, core::BodyPartId::None},
     {'K', {30, 20, 20}, core::BodyPartId::None},
-    {'S', {230, 180, 140}, core::BodyPartId::ArmR},
+    {'F', {230, 180, 140}, core::BodyPartId::Head},
+    {'H', {230, 180, 140}, core::BodyPartId::ArmR},
     {'E', {20, 15, 15}, core::BodyPartId::Head},
     {'C', {60, 90, 160}, core::BodyPartId::Torso},
     {'B', {50, 35, 30}, core::BodyPartId::LegR},
@@ -23,19 +24,19 @@ inline const core::PaletteEntry kPlayerPal[] = {
     {'T', {220, 60, 50}, core::BodyPartId::Weapon},
     {'t', {90, 30, 25}, core::BodyPartId::Weapon},
 };
-inline constexpr std::size_t kPlayerPalCount = 9;
+inline constexpr std::size_t kPlayerPalCount = 10;
 
 inline const char *const kPlayerIdle[] = {
     "....KKKK....",
     "..KKKKKKKK..",
-    "..KSSSSSSK..",
-    "..KSESSESK..",
-    "..KSSSSSSK..",
-    "...SSSSSS...",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFK..",
+    "...FFFFFF...",
     "..CCCCCCCC..",
-    ".SCCCCCCCCS.",
-    ".SCCCCCCCCS.",
-    ".SCCCCCCCCS.",
+    ".HCCCCCCCCH.",
+    ".HCCCCCCCCH.",
+    ".HCCCCCCCCH.",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
@@ -51,14 +52,14 @@ inline const char *const kPlayerIdle[] = {
 inline const char *const kPlayerWalkA[] = {
     "....KKKK....",
     "..KKKKKKKK..",
-    "..KSSSSSSK..",
-    "..KSESSESK..",
-    "..KSSSSSSK..",
-    "...SSSSSS...",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFK..",
+    "...FFFFFF...",
     "..CCCCCCCC..",
-    ".SCCCCCCCC..",
-    ".SCCCCCCCC..",
-    ".SCCCCCCCC..",
+    ".HCCCCCCCC..",
+    ".HCCCCCCCC..",
+    ".HCCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
@@ -74,14 +75,14 @@ inline const char *const kPlayerWalkA[] = {
 inline const char *const kPlayerWalkB[] = {
     "....KKKK....",
     "..KKKKKKKK..",
-    "..KSSSSSSK..",
-    "..KSESSESK..",
-    "..KSSSSSSK..",
-    "...SSSSSS...",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFK..",
+    "...FFFFFF...",
     "..CCCCCCCC..",
-    "..CCCCCCCCS.",
-    "..CCCCCCCCS.",
-    "..CCCCCCCCS.",
+    "..CCCCCCCCH.",
+    "..CCCCCCCCH.",
+    "..CCCCCCCCH.",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
@@ -94,13 +95,13 @@ inline const char *const kPlayerWalkB[] = {
     "............",
 };
 inline const char *const kPlayerJump[] = {
-    ".S........S.",
-    ".S.KKKKKK.S.",
-    ".SKKKKKKKKS.",
-    "..KSSSSSSK..",
-    "..KSESSESK..",
-    "..KSSSSSSK..",
-    "...SSSSSS...",
+    ".H........H.",
+    ".H.KKKKKK.H.",
+    ".HKKKKKKKKH.",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFK..",
+    "...FFFFFF...",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
@@ -119,13 +120,13 @@ inline const char *const kPlayerJump[] = {
 inline const char *const kPlayerThrow[] = {
     "....KKKK..TT",
     "..KKKKKKKKtT",
-    "..KSSSSSSK..",
-    "..KSESSESK..",
-    "..KSSSSSSK..",
-    "...SSSSSS...",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFK..",
+    "...FFFFFF...",
     "..CCCCCCCC..",
-    ".SCCCCCCCC..",
-    ".SCCCCCCCC..",
+    ".HCCCCCCCC..",
+    ".HCCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "...CCCCCC...",
@@ -142,14 +143,14 @@ inline const char *const kPlayerThrow[] = {
 inline const char *const kPlayerPunch[] = {
     "....KKKK....",
     "..KKKKKKKK..",
-    "..KSSSSSSK..",
-    "..KSESSESK..",
-    "..KSSSSSSK..",
-    "...SSSSSS...",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFK..",
+    "...FFFFFF...",
     "..CCCCCCCC..",
-    "..CCCCCCCCS.",
-    "..CCCCCCCCSS",
-    "..CCCCCCCCS.",
+    "..CCCCCCCCH.",
+    "..CCCCCCCCHH",
+    "..CCCCCCCCH.",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
@@ -163,13 +164,13 @@ inline const char *const kPlayerPunch[] = {
 };
 
 inline const char *const kPlayerHurt[] = {
-    ".S........S.",
-    ".S.KKKKKK.S.",
-    ".SKKKKKKKKS.",
-    "..KSSSSSSK..",
-    "..KSESSESK..",
-    "..KSSSSSSK..",
-    "...SSSSSS...",
+    ".H........H.",
+    ".H.KKKKKK.H.",
+    ".HKKKKKKKKH.",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFK..",
+    "...FFFFFF...",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
@@ -193,12 +194,12 @@ inline const char *const kPlayerDeath[] = {
     "............",
     "............",
     "....KKKK....",
-    "..KSSSSSSK..",
-    "..KSESSESK..",
-    "..KSSSSSSK..",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFK..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
-    ".SCCCCCCCCS.",
+    ".HCCCCCCCCH.",
     "..CCCCCCCC..",
     "...CCCCCC...",
     "..CC....CC..",
@@ -255,28 +256,29 @@ inline constexpr int kDwarfH = 18;
 inline const core::PaletteEntry kDwarfPal[] = {
     {'.', {0, 0, 0, 0}, core::BodyPartId::None},
     {'K', {20, 15, 10}, core::BodyPartId::None},
-    {'S', {230, 180, 140}, core::BodyPartId::ArmR},
+    {'F', {230, 180, 140}, core::BodyPartId::Head},
+    {'H', {230, 180, 140}, core::BodyPartId::ArmR},
     {'E', {20, 20, 20}, core::BodyPartId::Head},
-    {'H', {140, 90, 60}, core::BodyPartId::Head},
+    {'R', {140, 90, 60}, core::BodyPartId::Head},
     {'C', {120, 130, 150}, core::BodyPartId::Head},
     {'T', {90, 60, 40}, core::BodyPartId::Torso},
     {'B', {50, 35, 30}, core::BodyPartId::LegR},
     {'W', {180, 180, 190}, core::BodyPartId::Weapon},
     {'D', {220, 60, 50}, core::BodyPartId::Weapon},
 };
-inline constexpr std::size_t kDwarfPalCount = 10;
+inline constexpr std::size_t kDwarfPalCount = 11;
 
 #define DWARF_TOP_IDLE       \
     "....CCCCCC....",       \
     "...CCCCCCCC...",       \
-    "...CSSSSSSC...",       \
-    "...SESSSSES...",       \
-    "....SSSSSS....",       \
-    "...HHHHHHHH...",       \
-    "..HHHHHHHHHH..",       \
-    "..HHHHHHHHHH..",       \
-    ".SHHHHHHHHHHS.",       \
-    ".TTTHHHHHHTTT.",       \
+    "...CFFFFFFC...",       \
+    "...FEFFFFEF...",       \
+    "....FFFFFF....",       \
+    "...RRRRRRRR...",       \
+    "..RRRRRRRRRR..",       \
+    "..RRRRRRRRRR..",       \
+    ".HRRRRRRRRRRH.",       \
+    ".TTTRRRRRRTTT.",       \
     ".TTTTTTTTTTTT.",       \
     ".TTTTTTTTTTTT.",       \
     ".TTTTTTTTTTTT.",       \
@@ -300,14 +302,14 @@ inline const char *const kDwarfWalkB[] = {DWARF_TOP_IDLE, DWARF_LEGS_WALK};
 inline const char *const kDwarfThrow[] = {
     "....CCCCCC....",
     "...CCCCCCCC...",
-    "...CSSSSSSC...",
-    "...SESSSSES...",
-    "....SSSSSS....",
-    "...HHHHHHHH...",
-    "..HHHHHHHHHH..",
-    "..HHHHHHHHHH.D",
-    ".SHHHHHHHHHHSD",
-    ".TTTHHHHHHTTT.",
+    "...CFFFFFFC...",
+    "...FEFFFFEF...",
+    "....FFFFFF....",
+    "...RRRRRRRR...",
+    "..RRRRRRRRRR..",
+    "..RRRRRRRRRR.D",
+    ".HRRRRRRRRRRHD",
+    ".TTTRRRRRRTTT.",
     ".TTTTTTTTTTTT.",
     ".TTTTTTTTTTTT.",
     ".TTTTTTTTTTTT.",
@@ -322,14 +324,14 @@ inline const char *const kDwarfMelee[] = {
     "..........W...",
     "....CCCCCCW...",
     "...CCCCCCCC...",
-    "...CSSSSSSC...",
-    "...SESSSSES...",
-    "....SSSSSS....",
-    "...HHHHHHHH...",
-    "..HHHHHHHHHH..",
-    "..HHHHHHHHHH..",
-    ".SHHHHHHHHHHS.",
-    ".TTTHHHHHHTTT.",
+    "...CFFFFFFC...",
+    "...FEFFFFEF...",
+    "....FFFFFF....",
+    "...RRRRRRRR...",
+    "..RRRRRRRRRR..",
+    "..RRRRRRRRRR..",
+    ".HRRRRRRRRRRH.",
+    ".TTTRRRRRRTTT.",
     ".TTTTTTTTTTTT.",
     ".TTTTTTTTTTTT.",
     "..TTTTTTTTTT..",
