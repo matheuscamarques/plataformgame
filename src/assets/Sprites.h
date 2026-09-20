@@ -1,6 +1,7 @@
 #pragma once
 #include <cstddef>
 
+#include "core/Material.h"
 #include "core/sprite_from_ascii.h"
 
 namespace sprites {
@@ -337,6 +338,106 @@ inline const char *const kDwarfMelee[] = {
     "..BBB....BBB..",
 };
 
+// ============================================================
+// EQUIPAMENTO — forma compartilhada, 1 textura por material.
+// Espada 8x20 (idle/windup), 16x8 (swing); elmo 12x5; peitoral 12x8;
+// perneiras 12x6. Paleta de 5 entradas (., W, w, G, E) por material.
+inline constexpr int kSwordW = 8;
+inline constexpr int kSwordH = 20;
+inline constexpr int kSwordSwingW = 16;
+inline constexpr int kSwordSwingH = 8;
+inline constexpr int kHelmW = 12;
+inline constexpr int kHelmH = 5;
+inline constexpr int kChestW = 12;
+inline constexpr int kChestH = 8;
+inline constexpr int kLegsW = 12;
+inline constexpr int kLegsH = 6;
+
+inline const char *const kIronSwordIdle[] = {
+    "....WWWW",
+    "....WwwW",
+    "....WwwW",
+    "....WwwW",
+    "....WwwW",
+    "....WwwW",
+    "....WwwW",
+    "....WwwW",
+    "....WwwW",
+    "....WwwW",
+    "....WwwW",
+    "..GGGGGG",
+    "....ww..",
+    "....ww..",
+    "....ww..",
+    "....GG..",
+    "....GG..",
+    "........",
+    "........",
+    "........",
+};
+
+inline const char *const kIronSwordWindup[] = {
+    "........",
+    "........",
+    "WWWW....",
+    ".WwwW...",
+    ".WwwW...",
+    "..WwwW..",
+    "..WwwW..",
+    "...WwwW.",
+    "...WwwW.",
+    "....WwwW",
+    "....WwwW",
+    "....WwwW",
+    "..GGGGGG",
+    "....ww..",
+    "....ww..",
+    "....GG..",
+    "....GG..",
+    "........",
+    "........",
+    "........",
+};
+
+inline const char *const kIronSwordSwing[] = {
+    "................",
+    "................",
+    "................",
+    "................",
+    "..GGGGGGWWWWWWWW",
+    "..GGGGGGwwwwwwww",
+    "....wwww........",
+    "....GG..........",
+};
+
+inline const char *const kIronHelmIdle[] = {
+    "GGGGGGGGGGGG",
+    "GwwwwwwwwwwG",
+    "GwwwwwwwwwwG",
+    "Gw..EE..EEwG",
+    "Gw........wG",
+};
+
+inline const char *const kIronChestIdle[] = {
+    "wwwwwwwwwwww",
+    "wWWWWWWWWWWw",
+    "wWWWWWWWWWWw",
+    "wWWGGGGGGWWw",
+    "wWWGGGGGGWWw",
+    "wWWWWWWWWWWw",
+    "wwwwwwwwwwww",
+    ".wwwwwwwwww.",
+};
+
+inline const char *const kIronLegsIdle[] = {
+    "..wwww.wwww.",
+    "..wWWw.wWWw.",
+    "..wWWw.wWWw.",
+    "..wWWw.wWWw.",
+    "..wGGw.wGGw.",
+    "..wwww.wwww.",
+};
+
 struct SpriteSet {
     sf::Texture playerIdle;
     sf::Texture playerWalkA;
@@ -353,6 +454,15 @@ struct SpriteSet {
     sf::Texture dwarfWalkB;
     sf::Texture dwarfThrow;
     sf::Texture dwarfMelee;
+
+    // Equipment — 1 textura por (peça × material).
+    static constexpr int kMats = static_cast<int>(core::MaterialId::COUNT);
+    sf::Texture swordIdle[kMats];
+    sf::Texture swordWindup[kMats];
+    sf::Texture swordSwing[kMats];
+    sf::Texture helm[kMats];
+    sf::Texture chest[kMats];
+    sf::Texture legs[kMats];
 };
 
 // Roda 1x no boot (precisa de contexto GL — nunca em teste headless).
@@ -384,6 +494,24 @@ inline SpriteSet build() {
                                     kDwarfPal, kDwarfPalCount);
     s.dwarfMelee = core::makeSprite(kDwarfMelee, kDwarfW, kDwarfH,
                                     kDwarfPal, kDwarfPalCount);
+
+    // Paleta de equipamento por material: 5 entradas fixas (., W, w, G, E).
+    for (int m = 0; m < SpriteSet::kMats; ++m) {
+        const auto &c = core::materialColors(static_cast<core::MaterialId>(m));
+        core::PaletteEntry pal[5] = {
+            {'.', {0, 0, 0, 0}},
+            {'W', c.main},
+            {'w', c.dark},
+            {'G', c.accent},
+            {'E', {20, 15, 15}},
+        };
+        s.swordIdle[m] = core::makeSprite(kIronSwordIdle, kSwordW, kSwordH, pal, 5);
+        s.swordWindup[m] = core::makeSprite(kIronSwordWindup, kSwordW, kSwordH, pal, 5);
+        s.swordSwing[m] = core::makeSprite(kIronSwordSwing, kSwordSwingW, kSwordSwingH, pal, 5);
+        s.helm[m] = core::makeSprite(kIronHelmIdle, kHelmW, kHelmH, pal, 5);
+        s.chest[m] = core::makeSprite(kIronChestIdle, kChestW, kChestH, pal, 5);
+        s.legs[m] = core::makeSprite(kIronLegsIdle, kLegsW, kLegsH, pal, 5);
+    }
     return s;
 }
 

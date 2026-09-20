@@ -60,6 +60,8 @@ private:
     void render();
     void tick();
     void drawPlayerSprite();
+    void drawPlayerEquipment();
+    void drawPlayerWeapon();
     void drawEnemiesSprites();
 
     // Tamanho da viewport. Futuro: AssetManager é dono de font;

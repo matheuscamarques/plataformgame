@@ -4,9 +4,19 @@
 #include "entities/Entity.hpp"
 #include "support/Combat/Body.h"
 #include "core/Cooldown.h"
+#include "core/Material.h"
 
 namespace sf { class Texture; }
 namespace support { class ThrowSystem; }
+
+// Loadout: 1 material p/ peça (forma compartilhada). Começa de ferro.
+struct Loadout {
+    core::MaterialId weapon = core::MaterialId::Iron;
+    core::MaterialId helm = core::MaterialId::Iron;
+    core::MaterialId chest = core::MaterialId::Iron;
+    core::MaterialId legs = core::MaterialId::Iron;
+    bool equipped = true;
+};
 
 // Fase do swing atual. Idle = sem ataque em curso.
 enum class MeleePhase : uint8_t { Idle, Windup, Active, Recovery };
@@ -39,6 +49,7 @@ class Player : public Entity
         int hp = 100;
         int hpMax = 100;
         core::Cooldown hurtIframes;
+        Loadout loadout; // público — mesmo padrão de hp, dynamiteCount
 
         // Melee light 3-hit. Estado avançado pelo MeleeSystem (tem dt).
         MeleePhase meleePhase = MeleePhase::Idle;

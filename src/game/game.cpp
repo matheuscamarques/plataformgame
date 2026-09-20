@@ -174,6 +174,8 @@ void Game::render()
     });
 
     drawPlayerSprite();
+    drawPlayerEquipment(); // elmo, peitoral, perneiras
+    drawPlayerWeapon();    // espada por cima
     drawEnemiesSprites();
 
     // Barks com fade 1.5s acima da cabeça (texto; áudio futuro).
@@ -271,6 +273,7 @@ void Game::render()
         };
         text("HP " + std::to_string(p->hp) + "/" + std::to_string(p->hpMax), 16.f, 38.f);
         text("TNT:" + std::to_string(p->dynamiteCount) + " J  K melee", 16.f, 62.f);
+        text(std::string("Mat: ") + core::materialName(p->loadout.weapon), 16.f, 110.f);
         const int pty = static_cast<int>(std::floor(p->getY() / BLOCK_SIZE));
         text(std::string(support::stratumName(support::stratumAt(pty)))
              + "  y" + std::to_string(pty), 16.f, 86.f);
@@ -308,6 +311,63 @@ void Game::drawPlayerSprite() {
     spr.setOrigin(sprites::kPlayerW * 0.5f, static_cast<float>(sprites::kPlayerH));
     spr.setPosition(p->getCenterX(), p->getY() + p->getH());
     spr.setScale(static_cast<float>(p->facing) * s, s);
+    window->draw(spr);
+}
+
+void Game::drawPlayerEquipment() {
+    Player *p = player.get();
+    if (run_.isDead() || !p->loadout.equipped) return;
+    const float s = p->getH() / static_cast<float>(sprites::kPlayerH);
+    const float px = p->getCenterX();
+    const float py = p->getY() + p->getH();
+    const float f = static_cast<float>(p->facing);
+    auto drawOverlay = [&](const sf::Texture &tex, int tw, int th, float offY) {
+        sf::Sprite spr;
+        spr.setTexture(tex);
+        spr.setOrigin(tw * 0.5f, static_cast<float>(th));
+        spr.setPosition(px, py - offY * s);
+        spr.setScale(s * f, s);
+        window->draw(spr);
+    };
+    const int mLegs = static_cast<int>(p->loadout.legs);
+    const int mChest = static_cast<int>(p->loadout.chest);
+    const int mHelm = static_cast<int>(p->loadout.helm);
+    drawOverlay(sprites_.legs[mLegs], sprites::kLegsW,
+                sprites::kLegsH, sprites::kLegsH);
+    drawOverlay(sprites_.chest[mChest], sprites::kChestW,
+                sprites::kChestH, 14.f);
+    drawOverlay(sprites_.helm[mHelm], sprites::kHelmW,
+                sprites::kHelmH, 20.f);
+}
+
+void Game::drawPlayerWeapon() {
+    Player *p = player.get();
+    if (run_.isDead() || !p->loadout.equipped) return;
+    const int m = static_cast<int>(p->loadout.weapon);
+    const float s = p->getH() / static_cast<float>(sprites::kPlayerH);
+    const float f = static_cast<float>(p->facing);
+    const sf::Texture *tex = &sprites_.swordIdle[m];
+    float originX = 4.f, originY = 20.f;
+    switch (p->meleePhase) {
+        case MeleePhase::Windup:
+            tex = &sprites_.swordWindup[m];
+            break;
+        case MeleePhase::Active:
+        case MeleePhase::Recovery:
+            tex = &sprites_.swordSwing[m];
+            originX = 5.f;
+            originY = 5.f;
+            break;
+        default:
+            break;
+    }
+    const float handX = p->getCenterX() + 4.f * f * s;
+    const float handY = p->getY() + p->getH() * 0.5f;
+    sf::Sprite spr;
+    spr.setTexture(*tex);
+    spr.setOrigin(originX, originY);
+    spr.setPosition(handX, handY);
+    spr.setScale(s * f, s);
     window->draw(spr);
 }
 
@@ -372,6 +432,16 @@ void Game::tick() {
         // ticks do frame, o 2º tick já encontra cooldown rodando.
         // (throwCooldown é tickado no Player::tick, junto dos outros.)
         if (input_.pressed(support::Action::Light)) p->tryThrow(*throws_);
+
+        // M: cicla material do set inteiro (debug visual).
+        if (input_.pressed(support::Action::CycleMaterial)) {
+            int m = static_cast<int>(p->loadout.weapon);
+            m = (m + 1) % static_cast<int>(core::MaterialId::COUNT);
+            p->loadout.weapon = static_cast<core::MaterialId>(m);
+            p->loadout.helm = p->loadout.weapon;
+            p->loadout.chest = p->loadout.weapon;
+            p->loadout.legs = p->loadout.weapon;
+        }
 
         // Mundo infinito: carrega/descarrega chunks em torno do tile do player.
         int playerTileX = static_cast<int>(std::floor(p->getX() / BLOCK_SIZE));
