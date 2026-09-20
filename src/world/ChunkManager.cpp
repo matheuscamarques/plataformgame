@@ -4,7 +4,7 @@
 #include <cmath>
 #include <cstdlib>
 
-#include "../defines.h"
+#include "defines.h"
 #include "Block.h"
 #include "Generation.h"
 

@@ -1,7 +1,7 @@
 #include <cassert>
 #include <cstdio>
 #include "entities/player/player.h"
-#include "support/ThrowSystem.h"
+#include "support/Effects/ThrowSystem.h"
 
 // S6: tryThrow com cooldown, inventário, facing e pool cheio.
 int main() {

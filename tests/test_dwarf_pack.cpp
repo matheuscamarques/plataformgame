@@ -3,14 +3,14 @@
 #include <string>
 #include <vector>
 #include "entities/player/player.h"
-#include "support/Barks.h"
-#include "support/EnemySystem.h"
-#include "support/ExplosionSystem.h"
+#include "support/Enemies/Barks.h"
+#include "support/Enemies/EnemySystem.h"
+#include "support/Combat/ExplosionSystem.h"
 #include "support/GameContext.h"
-#include "support/PatienceSystem.h"
-#include "support/Skill.h"
-#include "support/UtilityAI.h"
-#include "support/VariantRegistry.h"
+#include "support/Progression/PatienceSystem.h"
+#include "support/Skills/Skill.h"
+#include "support/Skills/UtilityAI.h"
+#include "support/Enemies/VariantRegistry.h"
 #include "world/Generation.h"
 #include "world/World.h"
 

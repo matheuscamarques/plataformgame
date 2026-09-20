@@ -1,8 +1,8 @@
 #include <cassert>
 #include <cstdio>
 #include "entities/player/player.h"
-#include "support/ContactDamageSystem.h"
-#include "support/EnemySystem.h"
+#include "support/Combat/ContactDamageSystem.h"
+#include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
 
 // Telegraph 0.35s: windup conta só em contato, recupera sem, morde e

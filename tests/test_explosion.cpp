@@ -2,9 +2,9 @@
 #include <cmath>
 #include <cstdio>
 #include <vector>
-#include "support/ExplosionSystem.h"
-#include "support/Body.h"
-#include "support/EnemyResources.h"
+#include "support/Combat/ExplosionSystem.h"
+#include "support/Combat/Body.h"
+#include "support/Enemies/EnemyResources.h"
 #include "support/GameContext.h"
 #include "entities/entity/entity.hpp"
 

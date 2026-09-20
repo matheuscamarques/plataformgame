@@ -6,8 +6,8 @@
 #include <memory>
 #include <vector>
 
-#include "../defines.h"
-#include "../entities/entity/entity.hpp"
+#include "defines.h"
+#include "entities/entity/entity.hpp"
 #include "../support/Spatial/spatialhash.h"
 #include "Tile.h"
 

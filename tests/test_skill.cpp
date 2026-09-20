@@ -1,11 +1,11 @@
 #include <cassert>
 #include <cstdio>
 #include "entities/player/player.h"
-#include "support/EnemySystem.h"
+#include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
-#include "support/Skill.h"
-#include "support/SkillSystem.h"
-#include "support/ThrowSystem.h"
+#include "support/Skills/Skill.h"
+#include "support/Skills/SkillSystem.h"
+#include "support/Effects/ThrowSystem.h"
 #include "world/World.h"
 
 // Skill impossível de pagar (custo 9999) p/ testar gate de recursos.

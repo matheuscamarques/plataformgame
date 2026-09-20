@@ -4,8 +4,8 @@
 #include <utility>
 #include <vector>
 
-#include "../defines.h"
-#include "../entities/entity/entity.hpp"
+#include "defines.h"
+#include "entities/entity/entity.hpp"
 #include "ChunkManager.h"
 #include "Tile.h"
 

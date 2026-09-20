@@ -1,6 +1,6 @@
 #include <cassert>
 #include <cstdio>
-#include "support/BehaviorRegistry.h"
+#include "support/Enemies/BehaviorRegistry.h"
 
 // Registry: slime registrado via macro, desconhecido dá null.
 int main() {

@@ -1,7 +1,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdio>
-#include "support/EnemySystem.h"
+#include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
 #include "world/World.h"
 #include "entities/player/player.h"

@@ -2,8 +2,8 @@
 
 #include <SFML/Graphics/Rect.hpp>
 #include "../entity/entity.hpp"
-#include "../../support/Body.h"
-#include "../../core/Cooldown.h"
+#include "support/Combat/Body.h"
+#include "core/Cooldown.h"
 
 namespace support { class ThrowSystem; }
 

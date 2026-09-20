@@ -2,8 +2,8 @@
 #include <cstdio>
 #include <SFML/Graphics/Rect.hpp>
 #include "entities/player/player.h"
-#include "support/ContactDamageSystem.h"
-#include "support/EnemySystem.h"
+#include "support/Combat/ContactDamageSystem.h"
+#include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
 
 // Contato com telegraph 0.35s: morde após ~11 ticks colado (recolando

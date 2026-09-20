@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "../../core/Math.h"
+#include "core/Math.h"
 
 namespace support {
 

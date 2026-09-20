@@ -1,7 +1,7 @@
 #include <cassert>
 #include <cstdio>
 #include "entities/player/player.h"
-#include "support/DropSystem.h"
+#include "support/Progression/DropSystem.h"
 #include "support/GameContext.h"
 
 // Drops: spawn, expiração sem player, coleta, magnetismo, teto do pool.

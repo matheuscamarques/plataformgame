@@ -1,7 +1,7 @@
 #include <cassert>
 #include <cstdio>
-#include "support/ThrowSystem.h"
-#include "support/ExplosionSystem.h"
+#include "support/Effects/ThrowSystem.h"
+#include "support/Combat/ExplosionSystem.h"
 #include "support/GameContext.h"
 
 // Throw: spawn, gravidade, fuse, teto do pool.

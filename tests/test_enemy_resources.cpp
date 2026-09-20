@@ -1,7 +1,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdio>
-#include "support/EnemyResources.h"
+#include "support/Enemies/EnemyResources.h"
 
 using support::Cost;
 using support::EnemyResources;

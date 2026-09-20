@@ -1,6 +1,6 @@
 
 #include "./entity.hpp"
-#include "../../defines.h"
+#include "defines.h"
 
 
 Entity::Entity(int name,float x, float y, float w, float h) : Component(name,sf::Vector2f(x, y), sf::Vector2f(w, h)){

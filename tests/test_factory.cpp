@@ -1,7 +1,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdio>
-#include "support/EnemySystem.h"
+#include "support/Enemies/EnemySystem.h"
 #include "defines.h"
 
 // Factory cria slime 40x30 verde nomeado; kind inválido dá null.

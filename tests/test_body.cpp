@@ -1,6 +1,6 @@
 #include <cassert>
 #include <cstdio>
-#include "support/Body.h"
+#include "support/Combat/Body.h"
 
 // Body por partes: schema, rebuild, facing, multiplicadores.
 int main() {

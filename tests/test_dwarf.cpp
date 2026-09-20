@@ -3,14 +3,14 @@
 #include <cstdio>
 #include <string>
 #include "entities/player/player.h"
-#include "support/BehaviorRegistry.h"
-#include "support/DeathSystem.h"
-#include "support/DwarfAI.h"
-#include "support/EnemyArchetype.h"
-#include "support/EnemySystem.h"
+#include "support/Enemies/BehaviorRegistry.h"
+#include "support/Combat/DeathSystem.h"
+#include "support/Enemies/DwarfAI.h"
+#include "support/Enemies/EnemyArchetype.h"
+#include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
-#include "support/SpawnSystem.h"
-#include "support/ThrowSystem.h"
+#include "support/Enemies/SpawnSystem.h"
+#include "support/Effects/ThrowSystem.h"
 #include "world/Generation.h"
 #include "world/World.h"
 

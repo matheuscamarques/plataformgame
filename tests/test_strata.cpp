@@ -2,7 +2,7 @@
 #include <cstdio>
 #include "entities/player/player.h"
 #include "support/GameContext.h"
-#include "support/StratumManager.h"
+#include "support/Progression/StratumManager.h"
 #include "world/Generation.h"
 #include "world/Stratum.h"
 #include "world/World.h"

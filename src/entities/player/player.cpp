@@ -1,7 +1,7 @@
 #include "player.h"
 #include <iostream>
-#include "../../defines.h"
-#include "../../support/ThrowSystem.h"
+#include "defines.h"
+#include "support/Effects/ThrowSystem.h"
 
 namespace {
 // Queda livre: acelera 2px/tick² até 25px/tick (750px/s, ~2.5x os 9.8

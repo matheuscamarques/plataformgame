@@ -1,9 +1,9 @@
 #include <cassert>
 #include <cstdio>
 #include "entities/player/player.h"
-#include "support/EnemySystem.h"
+#include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
-#include "support/MeleeSystem.h"
+#include "support/Combat/MeleeSystem.h"
 
 // Melee K: windup→active→recovery, 1 hit por swing, combo encadeia.
 int main() {

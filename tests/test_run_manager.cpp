@@ -1,13 +1,13 @@
 #include <cassert>
 #include <cstdio>
 #include "entities/player/player.h"
-#include "support/DropSystem.h"
-#include "support/EnemySystem.h"
+#include "support/Progression/DropSystem.h"
+#include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
 #include "support/Input/InputMap.h"
-#include "support/RunManager.h"
-#include "support/StratumManager.h"
-#include "support/ThrowSystem.h"
+#include "support/Progression/RunManager.h"
+#include "support/Progression/StratumManager.h"
+#include "support/Effects/ThrowSystem.h"
 #include "world/World.h"
 
 static sf::Event keyEvent(sf::Event::EventType t, sf::Keyboard::Key k) {

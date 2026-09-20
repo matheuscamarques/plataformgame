@@ -1,6 +1,6 @@
 #include <cassert>
 #include <cstdio>
-#include "support/ParticleSystem.h"
+#include "support/Effects/ParticleSystem.h"
 #include "support/GameContext.h"
 
 // Partículas: spawn, expiração, pool sob stress, faísca curta.

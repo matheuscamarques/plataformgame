@@ -1,8 +1,8 @@
 #include <cassert>
 #include <cstdio>
-#include "support/DeathSystem.h"
-#include "support/DropSystem.h"
-#include "support/EnemySystem.h"
+#include "support/Combat/DeathSystem.h"
+#include "support/Progression/DropSystem.h"
+#include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
 
 // Death: remove morto, mantém vivo, dropa XP (sistemas reais, sem mock).

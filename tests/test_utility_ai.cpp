@@ -3,10 +3,10 @@
 #include <string>
 #include <vector>
 #include "entities/player/player.h"
-#include "support/EnemySystem.h"
+#include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
-#include "support/Skill.h"
-#include "support/UtilityAI.h"
+#include "support/Skills/Skill.h"
+#include "support/Skills/UtilityAI.h"
 
 // Especial de teste: +100 com hp<20%, -50 caso contrário.
 REGISTER_SKILL("test_special", [] {

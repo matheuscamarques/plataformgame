@@ -1,7 +1,7 @@
 #pragma once
 #include <cstddef>
 
-#include "../core/sprite_from_ascii.h"
+#include "core/sprite_from_ascii.h"
 
 namespace sprites {
 

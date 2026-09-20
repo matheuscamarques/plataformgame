@@ -1,9 +1,9 @@
 #include <cassert>
 #include <cstdio>
 #include <string>
-#include "support/BodySchemaRegistry.h"
-#include "support/EnemyArchetype.h"
-#include "support/EnemySystem.h"
+#include "support/Combat/BodySchemaRegistry.h"
+#include "support/Enemies/EnemyArchetype.h"
+#include "support/Enemies/EnemySystem.h"
 
 // Archetypes: slime + anão registrados com dados que dirigem
 // Factory (cor/hitbox/schema/recursos) e SpawnSystem (faixa/peso/cap).

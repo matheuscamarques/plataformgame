@@ -1,9 +1,9 @@
 #include <cassert>
 #include <cstdio>
 #include "entities/player/player.h"
-#include "support/EnemySystem.h"
+#include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
-#include "support/SpawnSystem.h"
+#include "support/Enemies/SpawnSystem.h"
 #include "world/Generation.h"
 #include "world/World.h"
 

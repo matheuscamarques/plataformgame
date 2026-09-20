@@ -2,14 +2,14 @@
 #include <cstdio>
 #include "core/System.h"
 #include "entities/player/player.h"
-#include "support/BodySystem.h"
-#include "support/DeathSystem.h"
-#include "support/DropSystem.h"
-#include "support/EnemySystem.h"
-#include "support/ExplosionSystem.h"
+#include "support/Combat/BodySystem.h"
+#include "support/Combat/DeathSystem.h"
+#include "support/Progression/DropSystem.h"
+#include "support/Enemies/EnemySystem.h"
+#include "support/Combat/ExplosionSystem.h"
 #include "support/GameContext.h"
-#include "support/ParticleSystem.h"
-#include "support/ThrowSystem.h"
+#include "support/Effects/ParticleSystem.h"
+#include "support/Effects/ThrowSystem.h"
 #include "world/World.h"
 
 // Loop jogável ponta a ponta: throw → explode → slime morre →

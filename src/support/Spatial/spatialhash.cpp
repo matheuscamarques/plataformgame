@@ -1,5 +1,5 @@
 #include "spatialhash.h"
-#include "../../entities/entity/entity.hpp"
+#include "entities/entity/entity.hpp"
 
 namespace support {
 
