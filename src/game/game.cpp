@@ -290,9 +290,15 @@ void Game::render()
 
 void Game::drawPlayerSprite() {
     Player *p = player.get();
-    const sf::Texture *tex = game::pickPlayerFrame(
-        p->jumping, p->getVx(), p->meleeAnimT > 0.f, p->throwAnimT > 0.f,
-        sprites_, p->walkFrame);
+    const sf::Texture *tex;
+    if (run_.isDead()) {
+        tex = &sprites_.playerDeath;
+    } else {
+        tex = game::pickPlayerFrame(p->jumping, p->getVx(),
+                                    p->hurtIframes.running(),
+                                    p->meleeAnimT > 0.f, p->throwAnimT > 0.f,
+                                    sprites_, p->walkFrame);
+    }
     // Escala p/ altura da entidade (50px), aspecto preservado.
     const float s = p->getH() / static_cast<float>(sprites::kPlayerH);
     sf::Sprite spr;

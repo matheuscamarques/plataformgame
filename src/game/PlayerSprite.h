@@ -13,10 +13,12 @@ class Player;
 namespace game {
 
 inline const sf::Texture *pickPlayerFrame(bool onGround, float vx,
+                                          bool hurt,
                                           bool attackingMelee,
                                           bool attackingThrow,
                                           const sprites::SpriteSet &sp,
                                           int walkFrame) {
+    if (hurt) return &sp.playerHurt;
     if (attackingMelee) return &sp.playerMelee;
     if (attackingThrow) return &sp.playerThrow;
     if (!onGround) return &sp.playerJump;

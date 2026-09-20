@@ -85,11 +85,11 @@ inline const char *const kPlayerWalkB[] = {
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "...CCCCCC...",
-    "...CC..CC...",
-    "...CC..CC...",
-    "...BB..BB...",
-    "...BB..BB...",
-    "...BB..BB...",
+    "..CC....CC..",
+    "..CC....CC..",
+    ".BB......BB.",
+    ".BB......BB.",
+    ".BB......BB.",
     "............",
 };
 inline const char *const kPlayerJump[] = {
@@ -139,17 +139,17 @@ inline const char *const kPlayerThrow[] = {
 };
 
 inline const char *const kPlayerMelee[] = {
-    "............",
-    "............",
-    "..........W.",
-    "....KKKK.W..",
-    "..KKKKKKKK..",
-    "..KSSSSSSK..",
-    "..KSESSESK..",
-    "..KSSSSSSK..",
-    "...SSSSSS...",
+    "....KKKK..W.",
+    "..KKKKKKKKW.",
+    "..KSSSSSSKW.",
+    "..KSESSESKW.",
+    "..KSSSSSSKW.",
+    "...SSSSSSSW.",
     "..CCCCCCCC..",
-    ".SCCCCCCCCSW",
+    ".SCCCCCCCC..",
+    ".SCCCCCCCC..",
+    ".SCCCCCCCC..",
+    "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "...CCCCCC...",
@@ -158,6 +158,52 @@ inline const char *const kPlayerMelee[] = {
     "...BB..BB...",
     "...BB..BB...",
     "...BB..BB...",
+    "............",
+};
+
+inline const char *const kPlayerHurt[] = {
+    ".S........S.",
+    ".S.KKKKKK.S.",
+    ".SKKKKKKKKS.",
+    "..KSSSSSSK..",
+    "..KSESSESK..",
+    "..KSSSSSSK..",
+    "...SSSSSS...",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CC..CC...",
+    "..CC....CC..",
+    "..BB....BB..",
+    "............",
+    "............",
+    "............",
+};
+
+inline const char *const kPlayerDeath[] = {
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "....KKKK....",
+    "..KSSSSSSK..",
+    "..KSESSESK..",
+    "..KSSSSSSK..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".SCCCCCCCCS.",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "..CC....CC..",
+    "..CC....CC..",
+    ".BB......BB.",
+    "BB........BB",
     "............",
 };
 
@@ -251,15 +297,15 @@ inline const char *const kDwarfIdle[] = {DWARF_TOP_IDLE, DWARF_LEGS_IDLE};
 inline const char *const kDwarfWalkA[] = {DWARF_TOP_IDLE, DWARF_LEGS_IDLE};
 inline const char *const kDwarfWalkB[] = {DWARF_TOP_IDLE, DWARF_LEGS_WALK};
 inline const char *const kDwarfThrow[] = {
-    "...........D..",
+    "....CCCCCC....",
     "...CCCCCCCC...",
     "...CSSSSSSC...",
     "...SESSSSES...",
     "....SSSSSS....",
     "...HHHHHHHH...",
     "..HHHHHHHHHH..",
-    "..HHHHHHHHHH..",
-    ".SHHHHHHHHHHS.",
+    "..HHHHHHHHHH.D",
+    ".SHHHHHHHHHHSD",
     ".TTTHHHHHHTTT.",
     ".TTTTTTTTTTTT.",
     ".TTTTTTTTTTTT.",
@@ -298,6 +344,8 @@ struct SpriteSet {
     sf::Texture playerJump;
     sf::Texture playerThrow;
     sf::Texture playerMelee;
+    sf::Texture playerHurt;
+    sf::Texture playerDeath;
     sf::Texture slimeIdle;
     sf::Texture slimeSquash;
     sf::Texture dwarfIdle;
@@ -320,6 +368,8 @@ inline SpriteSet build() {
     s.playerJump = P(kPlayerJump);
     s.playerThrow = P(kPlayerThrow);
     s.playerMelee = P(kPlayerMelee);
+    s.playerHurt = P(kPlayerHurt);
+    s.playerDeath = P(kPlayerDeath);
     s.slimeIdle = core::makeSprite(kSlimeIdle, kSlimeW, kSlimeH,
                                    kSlimePal, kSlimePalCount);
     s.slimeSquash = core::makeSprite(kSlimeSquash, kSlimeW, kSlimeH,
