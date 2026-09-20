@@ -7,7 +7,7 @@
 
 #include "core/Random.h"
 #include "defines.h"
-#include "entities/player/player.h"
+#include "entities/Player/Player.h"
 #include "EnemySystem.h"
 #include "EnemyArchetype.h"
 #include "support/GameContext.h"

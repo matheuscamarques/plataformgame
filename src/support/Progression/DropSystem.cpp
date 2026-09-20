@@ -4,7 +4,7 @@
 #include <cmath>
 
 #include "core/Random.h"
-#include "entities/player/player.h"
+#include "entities/Player/Player.h"
 #include "support/GameContext.h"
 
 namespace support {

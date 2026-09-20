@@ -3,7 +3,7 @@
 #include <cmath>
 
 #include "defines.h"
-#include "entities/player/player.h"
+#include "entities/Player/Player.h"
 #include "support/GameContext.h"
 #include "world/Stratum.h"
 

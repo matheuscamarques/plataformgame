@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <vector>
 #include "support/Spatial/spatialhash.h"
-#include "entities/entity/entity.hpp"
+#include "entities/Entity.hpp"
 
 int main() {
     support::SpatialHash h(100.0f);

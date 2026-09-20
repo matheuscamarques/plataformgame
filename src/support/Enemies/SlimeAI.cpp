@@ -6,7 +6,7 @@
 
 #include <cmath>
 
-#include "entities/player/player.h"
+#include "entities/Player/Player.h"
 
 namespace support {
 

@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <string>
 #include <vector>
-#include "entities/player/player.h"
+#include "entities/Player/Player.h"
 #include "support/Enemies/Barks.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/Combat/ExplosionSystem.h"

@@ -1,7 +1,7 @@
 #include <cassert>
 #include <cstdio>
-#include "entities/entity/entity.hpp"
-#include "entities/player/player.h"
+#include "entities/Entity.hpp"
+#include "entities/Player/Player.h"
 #include "defines.h"
 
 // Lava não colide como parede (igual água). Dano vem na Fase C.

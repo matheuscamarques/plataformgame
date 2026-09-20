@@ -1,7 +1,7 @@
 #include "DebugOverlay.h"
 
 #include "defines.h"
-#include "entities/player/player.h"
+#include "entities/Player/Player.h"
 #include "../../world/World.h"
 #include "../../world/Chunk.h"
 

@@ -4,7 +4,7 @@
 #include <string>
 
 #include "defines.h"
-#include "entities/entity/entity.hpp"
+#include "entities/Entity.hpp"
 #include "support/Enemies/EnemyResources.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"

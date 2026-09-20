@@ -1,8 +1,8 @@
 #include <cstdio>
 #include <memory>
 #include <vector>
-#include "entities/entity/entity.hpp"
-#include "entities/player/player.h"
+#include "entities/Entity.hpp"
+#include "entities/Player/Player.h"
 #include "defines.h"
 int main() {
     std::vector<std::unique_ptr<Entity>> world;

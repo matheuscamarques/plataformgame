@@ -6,7 +6,7 @@
 #include "vector"
 #include "core/System.h"
 #include "world/World.h"
-#include "entities/player/player.h"
+#include "entities/Player/Player.h"
 #include "../support/Camera/Camera.h"
 #include "support/Combat/ContactDamageSystem.h"
 #include "../support/Debug/DebugOverlay.h"
@@ -21,7 +21,7 @@
 #include "support/Progression/StratumManager.h"
 #include "support/Effects/ParticleSystem.h"
 #include "support/Effects/ThrowSystem.h"
-#include "Sprites.h"
+#include "assets/Sprites.h"
 
 class Game
 {

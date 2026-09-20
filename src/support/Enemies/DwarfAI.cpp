@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-#include "entities/player/player.h"
+#include "entities/Player/Player.h"
 #include "BehaviorRegistry.h"
 #include "Barks.h"
 #include "support/Enemies/EnemySystem.h"

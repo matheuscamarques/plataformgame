@@ -4,7 +4,7 @@
 #include <string>
 
 #include "core/Cooldown.h"
-#include "entities/entity/entity.hpp"
+#include "entities/Entity.hpp"
 #include "Barks.h"
 #include "Behavior.h"
 

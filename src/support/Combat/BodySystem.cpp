@@ -2,7 +2,7 @@
 
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
-#include "entities/player/player.h"
+#include "entities/Player/Player.h"
 
 namespace support {
 

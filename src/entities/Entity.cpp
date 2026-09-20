@@ -1,5 +1,5 @@
 
-#include "./entity.hpp"
+#include "Entity.hpp"
 #include "defines.h"
 
 

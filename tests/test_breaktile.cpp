@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "defines.h"
-#include "entities/entity/entity.hpp"
+#include "entities/Entity.hpp"
 #include "world/Block.h"
 #include "world/World.h"
 

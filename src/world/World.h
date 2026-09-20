@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "defines.h"
-#include "entities/entity/entity.hpp"
+#include "entities/Entity.hpp"
 #include "ChunkManager.h"
 #include "Tile.h"
 

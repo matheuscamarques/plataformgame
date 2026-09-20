@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics/Texture.hpp>
 
-#include "Sprites.h"
+#include "assets/Sprites.h"
 
 class Player;
 

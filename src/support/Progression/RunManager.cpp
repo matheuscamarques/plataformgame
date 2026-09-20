@@ -3,7 +3,7 @@
 #include <cmath>
 
 #include "defines.h"
-#include "entities/player/player.h"
+#include "entities/Player/Player.h"
 #include "support/Progression/DropSystem.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"

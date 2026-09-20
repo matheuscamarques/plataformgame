@@ -3,7 +3,7 @@
 #include <cstdio>
 #include <vector>
 #include "world/World.h"
-#include "entities/player/player.h"
+#include "entities/Player/Player.h"
 #include "defines.h"
 
 int main() {

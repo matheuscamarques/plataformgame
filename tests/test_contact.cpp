@@ -1,7 +1,7 @@
 #include <cassert>
 #include <cstdio>
 #include <SFML/Graphics/Rect.hpp>
-#include "entities/player/player.h"
+#include "entities/Player/Player.h"
 #include "support/Combat/ContactDamageSystem.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"

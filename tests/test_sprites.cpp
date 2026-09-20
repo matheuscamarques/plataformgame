@@ -1,8 +1,8 @@
 #include <cassert>
 #include <cstdio>
 #include <cstring>
-#include "game/PlayerSprite.h"
-#include "game/Sprites.h"
+#include "assets/PlayerSprite.h"
+#include "assets/Sprites.h"
 // ASCII art: widths exatas (linha errada = sprite deslocada), telegraphs
 // exclusivos e prioridade de pick. build() NÃO é chamado (textura exige
 // contexto GL, sem teste headless — compara endereços em SpriteSet vazio).

@@ -1,6 +1,6 @@
 #include <cassert>
 #include <cstdio>
-#include "entities/player/player.h"
+#include "entities/Player/Player.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
 #include "support/Enemies/SpawnSystem.h"

@@ -2,7 +2,7 @@
 #include <cmath>
 #include <cstdio>
 #include <string>
-#include "entities/player/player.h"
+#include "entities/Player/Player.h"
 #include "support/Enemies/BehaviorRegistry.h"
 #include "support/Combat/DeathSystem.h"
 #include "support/Enemies/DwarfAI.h"

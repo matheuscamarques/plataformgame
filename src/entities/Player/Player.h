@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics/Rect.hpp>
-#include "../entity/entity.hpp"
+#include "entities/Entity.hpp"
 #include "support/Combat/Body.h"
 #include "core/Cooldown.h"
 

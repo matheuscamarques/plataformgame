@@ -6,7 +6,7 @@
 #include "support/Combat/Body.h"
 #include "support/Enemies/EnemyResources.h"
 #include "support/GameContext.h"
-#include "entities/entity/entity.hpp"
+#include "entities/Entity.hpp"
 
 // Explosão: raio, whiff, headshot 2x, knockback no mover + lock.
 int main() {

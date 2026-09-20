@@ -4,7 +4,7 @@
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
 #include "world/World.h"
-#include "entities/player/player.h"
+#include "entities/Player/Player.h"
 #include "defines.h"
 
 // 50 slimes x 600 ticks: sem crash, todos pousados, nenhum caiu do mundo.

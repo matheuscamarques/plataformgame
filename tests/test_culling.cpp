@@ -3,7 +3,7 @@
 #include <cstdio>
 #include <vector>
 
-#include "entities/entity/entity.hpp"
+#include "entities/Entity.hpp"
 #include "world/World.h"
 
 // Culling de render: forEachEntityInRect == filtro força-bruta da lista

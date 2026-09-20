@@ -1,6 +1,6 @@
 #include <cassert>
 #include <cstdio>
-#include "entities/player/player.h"
+#include "entities/Player/Player.h"
 #include "support/GameContext.h"
 #include "support/Progression/StratumManager.h"
 #include "world/Generation.h"

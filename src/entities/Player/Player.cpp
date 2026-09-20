@@ -1,4 +1,4 @@
-#include "player.h"
+#include "Player.h"
 #include <iostream>
 #include "defines.h"
 #include "support/Effects/ThrowSystem.h"

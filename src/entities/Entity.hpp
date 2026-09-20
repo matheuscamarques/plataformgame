@@ -4,7 +4,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/OpenGL.hpp>
 #include <map>
-#include "../../component/component.h"
+#include "component/component.h"
 
 class Entity : public Component
 {

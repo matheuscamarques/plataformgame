@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "core/System.h"
-#include "entities/entity/entity.hpp"
+#include "entities/Entity.hpp"
 #include "Behavior.h"
 #include "support/Combat/Body.h"
 #include "EnemyResources.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "entities/entity/entity.hpp"
+#include "entities/Entity.hpp"
 #include "Behavior.h"
 
 namespace support {

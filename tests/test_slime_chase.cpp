@@ -4,7 +4,7 @@
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
 #include "world/World.h"
-#include "entities/player/player.h"
+#include "entities/Player/Player.h"
 #include "defines.h"
 
 // Enemy persegue player próximo: fase 1 pousa longe, fase 2 aproxima.

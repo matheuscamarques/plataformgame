@@ -9,9 +9,9 @@
 #include "support/Enemies/DwarfAI.h"
 #include "world/Generation.h"
 #include "world/Stratum.h"
-#include "PlayerSprite.h"
+#include "assets/PlayerSprite.h"
 #include "../window/window.h"
-#include "entities/player/player.h"
+#include "entities/Player/Player.h"
 
 namespace {
 constexpr uint32_t WORLD_SEED = 1337u;

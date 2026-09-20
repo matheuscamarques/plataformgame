@@ -1,7 +1,7 @@
 #include <cassert>
 #include <cstdio>
 #include "core/System.h"
-#include "entities/player/player.h"
+#include "entities/Player/Player.h"
 #include "support/Combat/BodySystem.h"
 #include "support/Combat/DeathSystem.h"
 #include "support/Progression/DropSystem.h"
