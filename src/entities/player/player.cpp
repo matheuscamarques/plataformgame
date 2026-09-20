@@ -2,6 +2,13 @@
 #include <iostream>
 #include "../../defines.h"
 #include "../../support/ThrowSystem.h"
+
+namespace {
+// Queda livre: acelera 2px/tick² até 25px/tick (750px/s, ~2.5x os 9.8
+// fixos de antes). Terminal < 50px do tile: sem tunelamento.
+constexpr float kGravity = 2.0f;
+constexpr float kTerminalVelocity = 25.0f;
+}
  Player::Player() :
 Entity(PLAYER,0,0,50,50)
 {
@@ -39,12 +46,14 @@ void Player::collide(Entity bloco)
     if (getBoundsTop().intersects(bloco)
     ) {
         setY(bloco.getY() + getH());
+        if (getVy() < 0.f) setVy(0.f); // bonk: teto zera subida (senão gruda)
     }
 
     if (getBoundsBottom().intersects(bloco)) {
         setY(bloco.getY() - getH());
         moveDown = false;
         jumping = true;
+        setVy(0.f); // pouso mata a queda (gravidade reacumula se sair)
     } else if(jumping){
          moveDown = true;
     }
@@ -64,14 +73,16 @@ void Player::collide(Component bloco)
     if (getBoundsTop().intersects(bloco)
             ) {
         setY(bloco.getY() + getH());
+        if (getVy() < 0.f) setVy(0.f); // bonk: teto zera subida (senão gruda)
     }
 
     if (getBoundsBottom().intersects(bloco)) {
         setY(bloco.getY() - getH());
         moveDown = false;
         jumping = true;
+        setVy(0.f); // pouso mata a queda (gravidade reacumula se sair)
     } else if(jumping){
-        moveDown = true;
+         moveDown = true;
     }
 
     if (getBoundsRight().intersects(bloco)) {
@@ -101,8 +112,16 @@ void Player::tick() {
 
     float vxRunSpeed = runFast ? 5.0f : 0.0f;
 
-    if(!moveUp && !moveDown){
-        setVy(0.0f);
+    // Gravidade com arrasto: acelera até a velocidade terminal.
+    // No pulo (teleporte) mantém 9.8 (pulo idêntico ao antigo); fora
+    // dele, acumula. Pouso zera no collide(); knockback p/ cima faz
+    // arco (soma e cai).
+    if (moveUp && jumping) {
+        setVy(9.8f);
+    } else {
+        float vy = getVy() + kGravity;
+        if (vy > kTerminalVelocity) vy = kTerminalVelocity;
+        setVy(vy);
     }
 
     if(moveLeft){
@@ -128,8 +147,6 @@ void Player::tick() {
         walkTimer = 0.f;
     }
 
-    // gravity
-    setVy(9.8f);
     Entity::tick();
 }
 
