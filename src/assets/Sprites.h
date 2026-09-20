@@ -138,17 +138,17 @@ inline const char *const kPlayerThrow[] = {
     "............",
 };
 
-inline const char *const kPlayerMelee[] = {
-    "....KKKK..W.",
-    "..KKKKKKKKW.",
-    "..KSSSSSSKW.",
-    "..KSESSESKW.",
-    "..KSSSSSSKW.",
-    "...SSSSSSSW.",
+inline const char *const kPlayerPunch[] = {
+    "....KKKK....",
+    "..KKKKKKKK..",
+    "..KSSSSSSK..",
+    "..KSESSESK..",
+    "..KSSSSSSK..",
+    "...SSSSSS...",
     "..CCCCCCCC..",
-    ".SCCCCCCCC..",
-    ".SCCCCCCCC..",
-    ".SCCCCCCCC..",
+    "..CCCCCCCCS.",
+    "..CCCCCCCCSS",
+    "..CCCCCCCCS.",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
@@ -343,7 +343,7 @@ struct SpriteSet {
     sf::Texture playerWalkB;
     sf::Texture playerJump;
     sf::Texture playerThrow;
-    sf::Texture playerMelee;
+    sf::Texture playerPunch;
     sf::Texture playerHurt;
     sf::Texture playerDeath;
     sf::Texture slimeIdle;
@@ -367,7 +367,7 @@ inline SpriteSet build() {
     s.playerWalkB = P(kPlayerWalkB);
     s.playerJump = P(kPlayerJump);
     s.playerThrow = P(kPlayerThrow);
-    s.playerMelee = P(kPlayerMelee);
+    s.playerPunch = P(kPlayerPunch);
     s.playerHurt = P(kPlayerHurt);
     s.playerDeath = P(kPlayerDeath);
     s.slimeIdle = core::makeSprite(kSlimeIdle, kSlimeW, kSlimeH,

@@ -5,6 +5,7 @@
 #include "support/Combat/Body.h"
 #include "core/Cooldown.h"
 
+namespace sf { class Texture; }
 namespace support { class ThrowSystem; }
 
 // Fase do swing atual. Idle = sem ataque em curso.
@@ -21,6 +22,9 @@ class Player : public Entity
         float walkTimer = 0.f;
         float meleeAnimT = 0.f; // >0 = frame melee (0.3s)
         float throwAnimT = 0.f; // >0 = frame throw (0.4s)
+        // Frame do melee atual (arma equipada). nullptr = soco.
+        // Arma futura = 1 linha ao equipar; pick/render não mudam.
+        const sf::Texture *meleeTex = nullptr;
         static constexpr float kMeleeAnimDur = 0.30f;
         static constexpr float kThrowAnimDur = 0.40f;
 

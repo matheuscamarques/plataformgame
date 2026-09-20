@@ -96,6 +96,7 @@ void Game::run()
     if (!spritesBuilt_) {
         sprites_ = sprites::build();
         spritesBuilt_ = true;
+        player->meleeTex = &sprites_.playerPunch; // default = soco
     }
     float lastStat = 0.0f;
     int frames = 0;
@@ -296,7 +297,8 @@ void Game::drawPlayerSprite() {
     } else {
         tex = game::pickPlayerFrame(p->jumping, p->getVx(),
                                     p->hurtIframes.running(),
-                                    p->meleeAnimT > 0.f, p->throwAnimT > 0.f,
+                                    p->meleeAnimT > 0.f, p->meleeTex,
+                                    p->throwAnimT > 0.f,
                                     sprites_, p->walkFrame);
     }
     // Escala p/ altura da entidade (50px), aspecto preservado.
