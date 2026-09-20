@@ -30,7 +30,7 @@ int main() {
         assert(s != nullptr && s->isRanged);
         assert(s->cooldown == 1.8f && s->maxRange == 220.f);
         assert(SkillRegistry::instance().find("nope") == nullptr);
-        assert(SkillRegistry::instance().keys().size() == 4u); // +dwarfs+test
+        assert(SkillRegistry::instance().keys().size() == 8u); // +dwarfs+test
     }
     { // TryUseFailsWithoutResources (custo 9999, nem Elite paga)
         EnemySystem enemies;

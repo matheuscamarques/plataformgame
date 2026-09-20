@@ -169,6 +169,22 @@ void Game::render()
 
     enemies_->forEach([&](support::Enemy &s) { s.body.draw(window); });
 
+    // Barks com fade 1.5s acima da cabeça (texto; áudio futuro).
+    enemies_->forEach([&](support::Enemy &s) {
+        if (s.barkTimer <= 0.f || s.currentBark.empty()) return;
+        sf::Text t;
+        t.setFont(font);
+        t.setString(s.currentBark);
+        t.setCharacterSize(14);
+        const sf::Uint8 a = static_cast<sf::Uint8>(
+            255.f * std::max(0.f, std::min(1.f, s.barkTimer / 1.5f)));
+        t.setFillColor(sf::Color(255, 240, 200, a));
+        t.setOutlineColor(sf::Color(0, 0, 0, a));
+        t.setOutlineThickness(1);
+        t.setPosition(s.body.getX() - 20.f, s.body.getY() - 24.f);
+        window->draw(t);
+    });
+
     // Throwables visíveis: círculo com cor pelo fuse (verde→vermelho).
     throws_->forEachActive([&](const support::Throwable &t) {
         sf::CircleShape c(3.f);

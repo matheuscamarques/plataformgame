@@ -9,6 +9,7 @@
 #include "EnemySystem.h"
 #include "GameContext.h"
 #include "ThrowSystem.h"
+#include "World/World.h"
 
 // Slime (trash) + anão básico (elite). Terceiro inimigo = append aqui
 // + 1 arquivo Behavior. Zero edição em Factory/SpawnSystem.
@@ -46,7 +47,7 @@ REGISTER_ENEMY_ARCHETYPE("dwarf", [] {
     a.staminaMax = 40.f;
     a.staminaRegen = 20.f;
     a.staminaRegenDelay = 0.8f;
-    a.manaMax = 0.f;
+    a.manaMax = 20.f; // especial custa 20 (recursos da definição, §2)
     a.manaRegen = 1.0f;
     a.manaRegenDelay = 2.0f;
     a.minStratum = 3;
@@ -106,7 +107,12 @@ REGISTER_SKILL("dwarf_dynamite", [] {
         const float dir = (to.x < from.x) ? -1.f : 1.f;
         auto *t = ctx.throws->throwItem(from, {dir * 180.f, -320.f},
                                         support::ThrowKind::Dynamite);
-        if (t) t->fuse = 0.8f;
+        if (t) {
+            t->fuse = 0.8f;
+            t->damage = static_cast<int>(25.f * self.damageMult);
+            t->radius = 40.f;
+            t->gravity = 600.f;
+        }
     };
     return s;
 }());
@@ -126,7 +132,126 @@ REGISTER_SKILL("dwarf_melee", [] {
         if (!ctx.player) return;
         const float dx = ctx.player->getCenterX() - self.body.getCenterX();
         const float dy = ctx.player->getCenterY() - self.body.getCenterY();
-        if (dx * dx + dy * dy < 48.f * 48.f) ctx.player->hurt(12);
+        if (dx * dx + dy * dy < 48.f * 48.f)
+            ctx.player->hurt(static_cast<int>(12.f * self.damageMult));
+    };
+    return s;
+}());
+
+// Bomba de Fumaça: dash para trás (via knockbackLock: física integra,
+// IA pausa 0.25s). Nuvem visual pendente (sem SmokeSystem).
+REGISTER_SKILL("dwarf_smoke", [] {
+    support::SkillDef s;
+    s.name = "Fumaca";
+    s.cooldown = 8.f;
+    s.telegraph = 0.30f;
+    s.manaCost = 5.f;
+    s.staminaCost = 10.f;
+    s.isRanged = true;
+    s.minRange = 32.f;
+    s.maxRange = 200.f;
+    s.baseWeight = 6.f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx) {
+        if (!ctx.player) return;
+        const float dir =
+            (ctx.player->getCenterX() < self.body.getCenterX()) ? 1.f : -1.f;
+        self.body.setVx(dir * 8.f);
+        self.knockbackLock.trigger(0.25f);
+    };
+    return s;
+}());
+
+// Barril Rolante: bomba lenta que detona no fuse (sem quique ainda).
+REGISTER_SKILL("dwarf_barrel", [] {
+    support::SkillDef s;
+    s.name = "Barril";
+    s.cooldown = 6.f;
+    s.telegraph = 0.50f;
+    s.manaCost = 10.f;
+    s.staminaCost = 20.f;
+    s.isRanged = true;
+    s.minRange = 48.f;
+    s.maxRange = 240.f;
+    s.baseWeight = 8.f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx) {
+        if (!ctx.throws || !ctx.player) return;
+        sf::Vector2f from{self.body.getCenterX(), self.body.getCenterY()};
+        const float dir = (ctx.player->getCenterX() < from.x) ? -1.f : 1.f;
+        auto *t = ctx.throws->throwItem(from, {dir * 200.f, 0.f},
+                                        support::ThrowKind::Barrel);
+        if (t) {
+            t->fuse = 2.0f;
+            t->damage = static_cast<int>(20.f * self.damageMult);
+            t->radius = 32.f;
+            t->gravity = 400.f;
+        }
+    };
+    return s;
+}());
+
+// Escavação: teleporta 128px na direção do player (se houver ar) e
+// quebra 3x3 nas duas pontas. Sem invencibilidade ainda.
+REGISTER_SKILL("dwarf_dig", [] {
+    support::SkillDef s;
+    s.name = "Escavacao";
+    s.cooldown = 12.f;
+    s.telegraph = 0.60f;
+    s.manaCost = 15.f;
+    s.staminaCost = 25.f;
+    s.isRanged = true;
+    s.minRange = 0.f;
+    s.maxRange = 400.f;
+    s.baseWeight = 4.f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx) {
+        if (!ctx.player || !ctx.world) return;
+        const float dir = (ctx.player->getCenterX() < self.body.getCenterX())
+                              ? -1.f
+                              : 1.f;
+        const float nx = self.body.getCenterX() + dir * 128.f;
+        const float ny = self.body.getCenterY();
+        const int ntx = static_cast<int>(nx / 50.f);
+        const int nty = static_cast<int>(ny / 50.f);
+        auto break3x3 = [&](int cx, int cy) {
+            for (int dy = -1; dy <= 1; ++dy)
+                for (int dx = -1; dx <= 1; ++dx)
+                    ctx.world->breakTile(cx + dx, cy + dy);
+        };
+        break3x3(static_cast<int>(self.body.getCenterX() / 50.f),
+                 static_cast<int>(self.body.getCenterY() / 50.f));
+        if (!ctx.world->isSolid(ntx, nty)) {
+            self.body.setX(nx - self.body.getW() * 0.5f);
+            break3x3(ntx, nty);
+        }
+    };
+    return s;
+}());
+
+// Desabamento: linha de destruição 6 tiles à frente + 40 de dano.
+// Trigger por UtilityAI (isSpecial + hp<20%) ou nível 5.
+REGISTER_SKILL("dwarf_collapse", [] {
+    support::SkillDef s;
+    s.name = "Desabamento";
+    s.cooldown = 25.f;
+    s.telegraph = 1.80f;
+    s.manaCost = 20.f;
+    s.staminaCost = 40.f;
+    s.isSpecial = true;
+    s.isRanged = true;
+    s.minRange = 0.f;
+    s.maxRange = 300.f;
+    s.baseWeight = 5.f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx) {
+        if (!ctx.world || !ctx.player) return;
+        const float dir = (ctx.player->getCenterX() < self.body.getCenterX())
+                              ? -1.f
+                              : 1.f;
+        const float cx = self.body.getCenterX();
+        const int ty = static_cast<int>(self.body.getCenterY() / 50.f);
+        for (int i = 1; i <= 6; ++i) {
+            const int tx = static_cast<int>((cx + dir * i * 50.f) / 50.f);
+            for (int dy = -2; dy <= 2; ++dy) ctx.world->breakTile(tx, ty + dy);
+        }
+        ctx.player->hurt(static_cast<int>(40.f * self.damageMult));
     };
     return s;
 }());

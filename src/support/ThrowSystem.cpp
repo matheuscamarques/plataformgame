@@ -1,12 +1,15 @@
 #include "ThrowSystem.h"
 
 #include <cmath>
+#include <string>
 
 #include "../defines.h"
 #include "../entities/player/player.h"
+#include "EnemySystem.h"
 #include "ExplosionSystem.h"
 #include "GameContext.h"
 #include "ParticleSystem.h"
+#include "PatienceSystem.h"
 #include "World/World.h"
 
 namespace support {
@@ -75,6 +78,18 @@ void ThrowSystem::tick(float dt, GameContext &ctx) {
         if (t.fuse <= 0.f && t.resting) {
             if (particles_) particles_->spawnHitSpark(t.pos); // poof
             pool_.release(&t);
+        }
+
+        // Pepita parada perto de anão: vínculo (3 estágios no sistema).
+        // Player ainda não joga pepita — mecanismo pronto, item pendente.
+        if (t.kind == ThrowKind::GoldNugget && t.resting && ctx.enemies) {
+            ctx.enemies->forEach([&](Enemy &s) {
+                if (!s.ai || std::string(s.ai->name()) != "DwarfAI") return;
+                const float dx = t.pos.x - s.body.getCenterX();
+                const float dy = t.pos.y - s.body.getCenterY();
+                if (dx * dx + dy * dy < 150.f * 150.f)
+                    patienceOnNugget(s.patience);
+            });
         }
     });
 }

@@ -8,7 +8,8 @@ enum class ThrowKind : uint8_t {
     Dynamite,
     GoldNugget,   // stub — passivo futuro
     Rock,         // stub — variação futura
-    Spit          // projétil de slime: linear, sem fuse, dano no impacto
+    Spit,         // projétil de slime: linear, sem fuse, dano no impacto
+    Barrel        // barril do anão: rola, detona no fuse (sem quique ainda)
 };
 
 struct Throwable {

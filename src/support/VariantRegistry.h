@@ -1,0 +1,65 @@
+#pragma once
+#include <SFML/Graphics/Color.hpp>
+#include <algorithm>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+namespace support {
+
+// Variante por profundidade: S3→nv1 ... S7+→nv5. Puramente dado;
+// Factory aplica (hp/dano/skills), DwarfAI não conhece nível.
+struct VariantDef {
+    int level = 1;
+    int hpBonus = 0;
+    float damageMult = 1.f;
+    float postureBonus = 0.f;
+    std::vector<std::string> extraSkills;
+    sf::Color auraColor{0, 0, 0, 0};
+    bool eyesGlow = false;
+    int beardTier = 0;
+};
+
+class VariantRegistry {
+public:
+    static VariantRegistry &instance() {
+        static VariantRegistry r;
+        return r;
+    }
+
+    void add(const std::string &archetype, VariantDef v) {
+        byArch_[archetype].push_back(std::move(v));
+    }
+
+    const VariantDef *forDepth(const std::string &archetype, int stratum) const {
+        auto it = byArch_.find(archetype);
+        if (it == byArch_.end()) return nullptr;
+        const int level = std::clamp(stratum - 2, 1, 5);
+        for (auto &v : it->second)
+            if (v.level == level) return &v;
+        return nullptr;
+    }
+
+private:
+    std::unordered_map<std::string, std::vector<VariantDef>> byArch_;
+};
+
+inline void registerDefaultVariants() {
+    auto &r = VariantRegistry::instance();
+    // Base tem {dynamite, melee}: L2 só escala número (extras {}).
+    r.add("dwarf", {1, 0, 1.00f, 0.f, {}, {}, false, 0});
+    r.add("dwarf", {2, 10, 1.10f, 2.f, {}, {}, false, 1});
+    r.add("dwarf", {3, 20, 1.20f, 4.f, {"dwarf_smoke"}, {60, 60, 60, 80}, false, 2});
+    r.add("dwarf", {4, 30, 1.35f, 6.f, {"dwarf_barrel"}, {120, 40, 40, 80}, false, 3});
+    r.add("dwarf",
+          {5, 40, 1.50f, 8.f, {"dwarf_dig", "dwarf_collapse"}, {200, 40, 40, 100}, true, 4});
+}
+
+namespace {
+struct VariantAutoReg {
+    VariantAutoReg() { registerDefaultVariants(); }
+};
+static VariantAutoReg variantAutoRegInstance;
+} // namespace
+
+} // namespace support

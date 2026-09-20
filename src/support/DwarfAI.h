@@ -5,6 +5,7 @@
 
 #include "../core/Cooldown.h"
 #include "../entities/entity/entity.hpp"
+#include "Barks.h"
 #include "Behavior.h"
 
 namespace support {
@@ -39,6 +40,7 @@ public:
 
     const char *name() const override { return "DwarfAI"; }
     void onTick(Enemy &e, float dt, GameContext &ctx) override;
+    void onTakeHit(Enemy &e, int applied, GameContext &ctx) override;
 
     // Observabilidade de teste (não API de gameplay).
     DwarfState state() const { return state_; }
@@ -55,10 +57,12 @@ private:
     // Skill escolhida no Recover, executada no fim do windup.
     // Cooldown/custo moram no SkillSystem (skillCds), não aqui.
     std::string pendingSkill_;
+    int lastWarning_ = 0; // último aviso de paciência com bark
 
     void changeState(DwarfState s, float duration = 0.f);
     void tickPatrol(Enemy &e, float dt, GameContext &ctx);
     void tickCombat(Enemy &e, float dt, GameContext &ctx);
+    void emitBark(Enemy &e, BarkId id);
 };
 
 } // namespace support

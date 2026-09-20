@@ -4,8 +4,10 @@
 
 #include "../entities/player/player.h"
 #include "BehaviorRegistry.h"
+#include "Barks.h"
 #include "EnemySystem.h"
 #include "GameContext.h"
+#include "PatienceSystem.h"
 #include "Skill.h"
 #include "SkillSystem.h"
 #include "ThrowSystem.h"
@@ -15,10 +17,8 @@ namespace support {
 
 namespace {
 constexpr float kAlertTime = 0.4f;
-constexpr float kThrowWindup = 0.30f;
 constexpr float kThrowRelease = 0.10f;
 constexpr float kRecoverTime = 0.60f;
-constexpr float kMeleeWindup = 0.25f;
 constexpr float kMeleeRecover = 0.40f;
 // Velocidades em px/tick (física integra vx direto, como SlimeAI:
 // patrol 3.0, chase 6.0 — NÃO px/s).
@@ -44,6 +44,23 @@ void DwarfAI::onTick(Enemy &e, float dt, GameContext &ctx) {
         homed_ = true;
     }
     stateTimer_.tick(dt);
+    e.barkCd.tick(dt);
+    if (e.barkTimer > 0.f) e.barkTimer -= dt;
+    patienceTick(e.patience, dt);
+
+    // Traição consome: volta hostil uma vez, com bark.
+    if (patienceShouldBetray(e.patience)) {
+        e.patience.betrayed = false;
+        lastWarning_ = 0;
+        emitBark(e, BarkId::Betrayal);
+    }
+    // Avisos sobem com warningLevel (o sistema só avisa após reconhecer).
+    if (e.patience.warningLevel != lastWarning_) {
+        lastWarning_ = e.patience.warningLevel;
+        if (lastWarning_ == 1) emitBark(e, BarkId::Warning1);
+        else if (lastWarning_ == 2) emitBark(e, BarkId::Warning2);
+        else if (lastWarning_ >= 3) emitBark(e, BarkId::Warning3);
+    }
 
     const sf::Vector2f c{e.body.getCenterX(), e.body.getCenterY()};
     const sf::Vector2f pp = ctx.player
@@ -51,9 +68,19 @@ void DwarfAI::onTick(Enemy &e, float dt, GameContext &ctx) {
         : home_;
     const float dp = ctx.player ? dist(c, pp) : 1e9f;
 
+    // Passivo (estágio 3): não ataca, segue a ~200px.
+    if (e.patience.passiveStage == 3 && ctx.player) {
+        e.body.setVx(0.f);
+        if (dp > 220.f) e.body.setVx((pp.x < c.x ? -1.f : 1.f) * kPatrolSpeed);
+        e.body.facing = (pp.x < c.x) ? -1 : 1;
+        if (state_ != DwarfState::Patrol) changeState(DwarfState::Patrol);
+        return;
+    }
+
     if (state_ == DwarfState::Patrol || state_ == DwarfState::Retreat) {
         if (ctx.player && dp < cfg_.aggroRange) {
             changeState(DwarfState::Alert, kAlertTime);
+            emitBark(e, BarkId::Alert);
         } else if (state_ == DwarfState::Patrol) {
             tickPatrol(e, dt, ctx);
         } else {
@@ -108,23 +135,25 @@ void DwarfAI::tickCombat(Enemy &e, float /*dt*/, GameContext &ctx) {
             if (!stateTimer_.ready()) return;
             // Decisão data-driven: UtilityAI escolhe, flags disparam o estado.
             // Cooldown/recursos/custos moram no SkillSystem (tryUse paga).
+            // Windup honra o telegraph da skill (collapse: 1.8s).
             const SkillDef *chosen = UtilityAI::choose(e, ctx, e.skillIds);
             if (!chosen) {
                 const float dir = (pp.x < c.x) ? -1.f : 1.f;
                 e.body.setVx(dir * kApproachSpeed);
             } else if (chosen->isMelee) {
                 pendingSkill_ = chosen->id;
-                changeState(DwarfState::Melee, kMeleeWindup);
+                changeState(DwarfState::Melee, chosen->telegraph);
             } else {
                 pendingSkill_ = chosen->id;
-                changeState(DwarfState::ThrowWindup, kThrowWindup);
+                changeState(DwarfState::ThrowWindup, chosen->telegraph);
             }
             break;
         }
         case DwarfState::ThrowWindup: {
             e.body.setVx(0.f);
             if (stateTimer_.ready()) {
-                SkillSystem::tryUse(e, ctx, pendingSkill_);
+                if (SkillSystem::tryUse(e, ctx, pendingSkill_))
+                    emitBark(e, BarkId::Attack);
                 changeState(DwarfState::ThrowRelease, kThrowRelease);
             }
             break;
@@ -145,6 +174,18 @@ void DwarfAI::tickCombat(Enemy &e, float /*dt*/, GameContext &ctx) {
         }
         default: break;
     }
+}
+
+void DwarfAI::onTakeHit(Enemy &e, int /*applied*/, GameContext & /*ctx*/) {
+    emitBark(e, BarkId::Hurt); // bark tem o próprio cooldown (1.5s)
+}
+
+void DwarfAI::emitBark(Enemy &e, BarkId id) {
+    if (!e.barkCd.ready()) return;
+    e.currentBark =
+        BarkRegistry::instance().pick(id, static_cast<uint32_t>(e.body.getCenterX()));
+    e.barkTimer = 1.5f;
+    e.barkCd.trigger();
 }
 
 SUPPORT_REGISTER_BEHAVIOR("dwarf", DwarfAI);

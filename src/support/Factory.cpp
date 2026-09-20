@@ -1,5 +1,7 @@
 #include "EnemySystem.h"
 
+#include <cmath>
+
 #include <SFML/Graphics/Color.hpp>
 
 #include "../defines.h"
@@ -7,6 +9,8 @@
 #include "BodySchemaRegistry.h"
 #include "EnemyArchetype.h"
 #include "SlimeAI.h"
+#include "VariantRegistry.h"
+#include "World/Stratum.h"
 
 namespace support {
 
@@ -45,6 +49,19 @@ std::unique_ptr<Enemy> Factory::spawnEnemy(const std::string &kind,
     e->resources.manaRegenDelay = core::Cooldown(a->manaRegenDelay);
 
     e->skillIds = a->skills;
+
+    // Variante por profundidade (dano/hp/skills extras). Slime não tem
+    // variantes: forDepth retorna null e nada muda.
+    const int stratum = stratumAt(static_cast<int>(std::floor(y / BLOCK_SIZE)));
+    if (const VariantDef *v = VariantRegistry::instance().forDepth(kind, stratum)) {
+        e->variantLevel = v->level;
+        e->damageMult = v->damageMult;
+        e->resources.hp += v->hpBonus;
+        e->resources.hpMax += v->hpBonus;
+        e->resources.posture += v->postureBonus;
+        e->resources.postureMax += v->postureBonus;
+        for (auto &sk : v->extraSkills) e->skillIds.push_back(sk);
+    }
 
     if (ctx && e->ai) e->ai->onSpawn(*e, *ctx);
     return e;

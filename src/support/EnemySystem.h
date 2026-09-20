@@ -12,6 +12,7 @@
 #include "Body.h"
 #include "EnemyResources.h"
 #include "GameContext.h"
+#include "PatienceSystem.h"
 #include "../core/Cooldown.h"
 
 namespace support {
@@ -40,6 +41,15 @@ struct Enemy {
     // Última skill usada (UtilityAI penaliza repetição).
     std::string lastSkillId;
     float lastSkillAge = 999.f;
+    // Variante por profundidade (Factory aplica; Elite escala aqui).
+    int variantLevel = 1;
+    float damageMult = 1.f;
+    // Barks (texto com fade; áudio futuro).
+    std::string currentBark;
+    float barkTimer = 0.f;
+    core::Cooldown barkCd{1.5f};
+    // Pavio curto + vínculo (DwarfAI tica; eventos entregam).
+    PatienceState patience;
 
     Enemy(Entity b, std::unique_ptr<Behavior> a)
         : body(std::move(b)), ai(std::move(a)) {}
