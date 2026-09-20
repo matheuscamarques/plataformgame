@@ -435,6 +435,7 @@ void Game::tick() {
 
         // M: cicla material do set inteiro (debug visual).
         if (input_.pressed(support::Action::CycleMaterial)) {
+            input_.consume(support::Action::CycleMaterial);
             int m = static_cast<int>(p->loadout.weapon);
             m = (m + 1) % static_cast<int>(core::MaterialId::COUNT);
             p->loadout.weapon = static_cast<core::MaterialId>(m);

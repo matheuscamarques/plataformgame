@@ -49,6 +49,14 @@ public:
     bool pressed (Action a) const; // edge: subiu neste tick
     bool released(Action a) const; // edge: desceu neste tick
 
+    // Consome o edge: pressed() volta a false até o próximo aperto real.
+    // Evita duplo-disparo com N ticks por frame (fixed-step): quem consome
+    // (ex.: tecla M) chama 1x e os ticks seguintes do frame não repetem.
+    void consume(Action a) {
+        if (!indexValid(a)) return;
+        curr_[static_cast<std::size_t>(a)] = false;
+    }
+
     // Eixos para movimento e IA.
     // Retorna -1, 0 ou 1. Combina Left/Right e Up/Down.
     float axisX() const;
