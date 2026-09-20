@@ -14,8 +14,8 @@ constexpr float CHASE_SPEED = 6.0f;
 constexpr int FLIP_TICKS = 90;
 constexpr int HOP_COOLDOWN = 80;
 constexpr float HOP_VY = -30.0f;
-constexpr float AGGRO_X = 800.0f;
-constexpr float AGGRO_Y = 800.0f;
+constexpr float AGGRO_X = 400.0f;
+constexpr float AGGRO_Y = 400.0f;
 } // namespace
 
 void SlimeAI::onTick(Entity &e, float dt, GameContext &ctx) {
