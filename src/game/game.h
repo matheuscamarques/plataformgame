@@ -5,7 +5,7 @@
 #include <memory>
 #include "vector"
 #include "../core/System.h"
-#include "../support/World/World.h"
+#include "../world/World.h"
 #include "../entities/player/player.h"
 #include "../support/Camera/Camera.h"
 #include "../support/ContactDamageSystem.h"

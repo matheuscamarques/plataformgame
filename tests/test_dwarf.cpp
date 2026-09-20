@@ -11,8 +11,8 @@
 #include "support/GameContext.h"
 #include "support/SpawnSystem.h"
 #include "support/ThrowSystem.h"
-#include "support/World/Generation.h"
-#include "support/World/World.h"
+#include "world/Generation.h"
+#include "world/World.h"
 
 // Anão básico: registro, factory Elite, patrulha, aggro, throw, melee, morte.
 int main() {

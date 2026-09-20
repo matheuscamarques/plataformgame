@@ -1,8 +1,8 @@
 #include <cassert>
 #include <cstdio>
 #include <initializer_list>
-#include "support/World/Generation.h"
-#include "support/World/Block.h"
+#include "world/Generation.h"
+#include "world/Block.h"
 
 // Subsurface layering: topo | terra x DIRT_DEPTH | pedra. Caverna e água vencem.
 int main() {

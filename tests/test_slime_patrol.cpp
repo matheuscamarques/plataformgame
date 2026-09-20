@@ -3,7 +3,7 @@
 #include <cstdio>
 #include "support/EnemySystem.h"
 #include "support/GameContext.h"
-#include "support/World/World.h"
+#include "world/World.h"
 #include "entities/player/player.h"
 #include "defines.h"
 

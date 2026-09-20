@@ -1,7 +1,7 @@
 #include <cassert>
 #include <cstdio>
 #include <initializer_list>
-#include "support/World/Generation.h"
+#include "world/Generation.h"
 
 // Ilhas: runs horizontais 4-7, nunca sobre oceano, nunca no maciço.
 int main() {

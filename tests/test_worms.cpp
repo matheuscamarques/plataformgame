@@ -2,8 +2,8 @@
 #include <cstdio>
 #include <initializer_list>
 #include <vector>
-#include "support/World/Generation.h"
-#include "support/World/Block.h"
+#include "world/Generation.h"
+#include "world/Block.h"
 
 // Worms: túneis conectados (iso-linha), bocas na superfície, independentes.
 int main() {

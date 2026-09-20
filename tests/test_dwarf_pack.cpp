@@ -11,8 +11,8 @@
 #include "support/Skill.h"
 #include "support/UtilityAI.h"
 #include "support/VariantRegistry.h"
-#include "support/World/Generation.h"
-#include "support/World/World.h"
+#include "world/Generation.h"
+#include "world/World.h"
 
 // Pacote anão: variant por estrato, 6 skills, paciência, barks, special.
 int main() {

@@ -3,8 +3,8 @@
 #include <cstdlib>
 #include <initializer_list>
 #include "core/Noise.h"
-#include "support/World/Generation.h"
-#include "support/World/Block.h"
+#include "world/Generation.h"
+#include "world/Block.h"
 
 int main() {
     using namespace core;

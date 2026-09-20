@@ -1,7 +1,7 @@
 #include <cassert>
 #include <cstdio>
 #include <initializer_list>
-#include "support/World/Generation.h"
+#include "world/Generation.h"
 
 // Commit 2 biomas: tabela clima->bioma + topo por bioma.
 int main() {

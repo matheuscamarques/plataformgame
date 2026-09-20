@@ -9,7 +9,7 @@
 #include "EnemySystem.h"
 #include "GameContext.h"
 #include "ThrowSystem.h"
-#include "World/World.h"
+#include "../world/World.h"
 
 // Slime (trash) + anão básico (elite). Terceiro inimigo = append aqui
 // + 1 arquivo Behavior. Zero edição em Factory/SpawnSystem.

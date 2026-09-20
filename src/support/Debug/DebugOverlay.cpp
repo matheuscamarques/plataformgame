@@ -2,8 +2,8 @@
 
 #include "../../defines.h"
 #include "../../entities/player/player.h"
-#include "../World/World.h"
-#include "../World/Chunk.h"
+#include "../../world/World.h"
+#include "../../world/Chunk.h"
 
 namespace support {
 

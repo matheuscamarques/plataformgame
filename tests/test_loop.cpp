@@ -10,7 +10,7 @@
 #include "support/GameContext.h"
 #include "support/ParticleSystem.h"
 #include "support/ThrowSystem.h"
-#include "support/World/World.h"
+#include "world/World.h"
 
 // Loop jogável ponta a ponta: throw → explode → slime morre →
 // orb dropa → player coleta. Mesmas prioridades e fiação do Game.

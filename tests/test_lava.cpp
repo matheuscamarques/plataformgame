@@ -1,7 +1,7 @@
 #include <cassert>
 #include <cstdio>
 #include <initializer_list>
-#include "support/World/Generation.h"
+#include "world/Generation.h"
 
 // Lava só no fundo (ty>=6200), bedrock em 12000. Faixas amostradas,
 // nunca sweep completo (o fundo agora tem 12k tiles).

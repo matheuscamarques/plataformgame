@@ -1,9 +1,9 @@
 #include <cassert>
 #include <cstdio>
 #include <string_view>
-#include "support/World/Block.h"
-#include "support/World/BlockRegistry.h"
-#include "support/World/Tile.h"
+#include "world/Block.h"
+#include "world/BlockRegistry.h"
+#include "world/Tile.h"
 
 // Registry: 10 entradas, base por estrato, sync com BLOCKS[].
 int main() {

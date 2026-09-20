@@ -11,8 +11,8 @@
 #include "EnemySystem.h"
 #include "EnemyArchetype.h"
 #include "GameContext.h"
-#include "World/Stratum.h"
-#include "World/World.h"
+#include "../world/Stratum.h"
+#include "../world/World.h"
 
 namespace support {
 

@@ -1,7 +1,7 @@
 #include <cassert>
 #include <cstdio>
 #include <initializer_list>
-#include "support/World/Generation.h"
+#include "world/Generation.h"
 
 // Um veio por estrato, faixas absolutas disjuntas. Superfície (ty<200)
 // não tem minério; Diamond/Coal são legado (não geram).

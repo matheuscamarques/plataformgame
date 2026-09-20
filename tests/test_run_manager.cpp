@@ -8,7 +8,7 @@
 #include "support/RunManager.h"
 #include "support/StratumManager.h"
 #include "support/ThrowSystem.h"
-#include "support/World/World.h"
+#include "world/World.h"
 
 static sf::Event keyEvent(sf::Event::EventType t, sf::Keyboard::Key k) {
     sf::Event e{};

@@ -10,7 +10,7 @@
 #include "GameContext.h"
 #include "ParticleSystem.h"
 #include "PatienceSystem.h"
-#include "World/World.h"
+#include "../world/World.h"
 
 namespace support {
 

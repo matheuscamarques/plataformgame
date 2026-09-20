@@ -10,7 +10,7 @@
 #include "EnemyArchetype.h"
 #include "SlimeAI.h"
 #include "VariantRegistry.h"
-#include "World/Stratum.h"
+#include "../world/Stratum.h"
 
 namespace support {
 

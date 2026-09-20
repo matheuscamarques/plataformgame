@@ -3,9 +3,9 @@
 #include "entities/player/player.h"
 #include "support/GameContext.h"
 #include "support/StratumManager.h"
-#include "support/World/Generation.h"
-#include "support/World/Stratum.h"
-#include "support/World/World.h"
+#include "world/Generation.h"
+#include "world/Stratum.h"
+#include "world/World.h"
 
 // Estratos: cobertura contígua até 12000, checkpoints desvendam e
 // respawn volta ao mais fundo. Geração funda funciona.

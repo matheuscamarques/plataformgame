@@ -3,7 +3,7 @@
 #include <cmath>
 #include <initializer_list>
 
-#include "../../core/Noise.h"
+#include "../core/Noise.h"
 #include "BlockRegistry.h"
 #include "ChunkKey.h"
 #include "Stratum.h"

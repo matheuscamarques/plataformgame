@@ -1,7 +1,7 @@
 #include <cassert>
 #include <cstdio>
 #include <string_view>
-#include "support/World/Block.h"
+#include "world/Block.h"
 
 // Tabela completa: todo Tile tem nome e cor (menos Air).
 // Bloco novo sem entrada aqui passa vazio pra produção.

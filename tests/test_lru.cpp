@@ -1,6 +1,6 @@
 #include <cassert>
 #include <cstdio>
-#include "support/World/ChunkManager.h"
+#include "world/ChunkManager.h"
 
 // BUG1 da review: update() descartava chunk modificado sem checar.
 int main() {

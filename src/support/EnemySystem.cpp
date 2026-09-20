@@ -4,7 +4,7 @@
 
 #include "../defines.h"
 #include "SkillSystem.h"
-#include "World/World.h"
+#include "../world/World.h"
 
 namespace support {
 

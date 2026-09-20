@@ -5,8 +5,8 @@
 
 #include "defines.h"
 #include "entities/entity/entity.hpp"
-#include "support/World/Block.h"
-#include "support/World/World.h"
+#include "world/Block.h"
+#include "world/World.h"
 
 // Regressão do segfault ao apertar J: breakTile destruía a Entity do
 // chunk mas deixava o ponteiro em activePlatforms_/activeColides_ até

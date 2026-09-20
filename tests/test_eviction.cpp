@@ -1,7 +1,7 @@
 #include <cassert>
 #include <cstdio>
-#include "support/World/ChunkManager.h"
-#include "support/World/Tile.h"
+#include "world/ChunkManager.h"
+#include "world/Tile.h"
 
 // Eviction A: modified ocioso evicta (cratera some, regenera do seed);
 // modificado fresco e chunk na janela sobrevivem.

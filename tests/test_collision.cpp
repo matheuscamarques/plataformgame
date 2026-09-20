@@ -2,7 +2,7 @@
 #include <cmath>
 #include <cstdio>
 #include <vector>
-#include "support/World/World.h"
+#include "world/World.h"
 #include "entities/player/player.h"
 #include "defines.h"
 

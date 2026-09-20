@@ -3,8 +3,8 @@
 #include <algorithm>
 #include <vector>
 
-#include "../../defines.h"
-#include "../../entities/entity/entity.hpp"
+#include "../defines.h"
+#include "../entities/entity/entity.hpp"
 #include "Block.h"
 
 namespace support {

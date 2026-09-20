@@ -4,8 +4,8 @@
 #include "support/EnemySystem.h"
 #include "support/GameContext.h"
 #include "support/SpawnSystem.h"
-#include "support/World/Generation.h"
-#include "support/World/World.h"
+#include "world/Generation.h"
+#include "world/World.h"
 
 // Player assentado no solo (pés no topo do chão).
 static void settle(Player &p, support::World &w, int tx) {

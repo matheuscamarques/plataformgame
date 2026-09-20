@@ -5,7 +5,7 @@
 #include "../defines.h"
 #include "../entities/player/player.h"
 #include "GameContext.h"
-#include "World/Stratum.h"
+#include "../world/Stratum.h"
 
 namespace support {
 

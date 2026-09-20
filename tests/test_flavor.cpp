@@ -1,8 +1,8 @@
 #include <cassert>
 #include <cstdio>
 #include "core/Noise.h"
-#include "support/World/Block.h"
-#include "support/World/Generation.h"
+#include "world/Block.h"
+#include "world/Generation.h"
 
 // Flavor: determinístico, fração calibrada, ore intacto, superfície intacta.
 int main() {

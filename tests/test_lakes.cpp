@@ -1,7 +1,7 @@
 #include <cassert>
 #include <cstdio>
 #include <initializer_list>
-#include "support/World/Generation.h"
+#include "world/Generation.h"
 
 // Lagos pintam ar já carvado: seco fora do limiar, água onde molhado.
 int main() {

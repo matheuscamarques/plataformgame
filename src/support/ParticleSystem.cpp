@@ -5,7 +5,7 @@
 
 #include "../core/Random.h"
 #include "../defines.h"
-#include "World/World.h"
+#include "../world/World.h"
 
 namespace support {
 

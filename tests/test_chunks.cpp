@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <string>
 #include <vector>
-#include "support/World/ChunkManager.h"
+#include "world/ChunkManager.h"
 
 // Snapshot textual de um chunk: tiles + posição/tipo das entidades.
 static std::string snapshot(support::Chunk *c) {

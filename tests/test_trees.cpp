@@ -3,8 +3,8 @@
 #include <initializer_list>
 #include <algorithm>
 #include <vector>
-#include "support/World/Generation.h"
-#include "support/World/World.h"
+#include "world/Generation.h"
+#include "world/World.h"
 #include "defines.h"
 
 // Árvores decorativas: sem colisão, determinísticas, sem seam entre chunks.

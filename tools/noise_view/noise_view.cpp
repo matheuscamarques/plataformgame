@@ -9,8 +9,8 @@
 #include <string>
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/Color.hpp>
-#include "support/World/Generation.h"
-#include "support/World/Block.h"
+#include "world/Generation.h"
+#include "world/Block.h"
 #include "core/Noise.h"
 
 namespace {

@@ -6,7 +6,7 @@
 #include "support/Skill.h"
 #include "support/SkillSystem.h"
 #include "support/ThrowSystem.h"
-#include "support/World/World.h"
+#include "world/World.h"
 
 // Skill impossível de pagar (custo 9999) p/ testar gate de recursos.
 REGISTER_SKILL("test_expensive", [] {

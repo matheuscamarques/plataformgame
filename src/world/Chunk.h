@@ -6,9 +6,9 @@
 #include <memory>
 #include <vector>
 
-#include "../../defines.h"
-#include "../../entities/entity/entity.hpp"
-#include "../Spatial/spatialhash.h"
+#include "../defines.h"
+#include "../entities/entity/entity.hpp"
+#include "../support/Spatial/spatialhash.h"
 #include "Tile.h"
 
 namespace support {

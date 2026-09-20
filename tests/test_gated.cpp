@@ -1,8 +1,8 @@
 #include <cassert>
 #include <cstdio>
-#include "support/World/BlockRegistry.h"
-#include "support/World/Generation.h"
-#include "support/World/Tile.h"
+#include "world/BlockRegistry.h"
+#include "world/Generation.h"
+#include "world/Tile.h"
 
 // Gated (generates=false): VolcanicBomb e SolarFlare existem no registry
 // e na BLOCKS, mas nunca saem do hook.

@@ -10,8 +10,8 @@
 #include "Input/InputMap.h"
 #include "StratumManager.h"
 #include "ThrowSystem.h"
-#include "World/Stratum.h"
-#include "World/World.h"
+#include "../world/Stratum.h"
+#include "../world/World.h"
 
 namespace support {
 

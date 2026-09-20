@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "entities/entity/entity.hpp"
-#include "support/World/World.h"
+#include "world/World.h"
 
 // Culling de render: forEachEntityInRect == filtro força-bruta da lista
 // global, visitando só chunks do rect (pinned modified não encarece).
