@@ -9,6 +9,7 @@
 #include "../support/DwarfAI.h"
 #include "../support/World/Generation.h"
 #include "../support/World/Stratum.h"
+#include "PlayerSprite.h"
 #include "../window/window.h"
 #include "../entities/player/player.h"
 
@@ -289,12 +290,9 @@ void Game::render()
 
 void Game::drawPlayerSprite() {
     Player *p = player.get();
-    const sf::Texture *tex = &sprites_.playerIdle;
-    if (!p->jumping) {
-        tex = &sprites_.playerJump; // no ar
-    } else if (p->moveLeft || p->moveRight) {
-        tex = &sprites_.playerWalk[p->walkFrame % 4];
-    }
+    const sf::Texture *tex = game::pickPlayerFrame(
+        p->jumping, p->getVx(), p->meleeAnimT > 0.f, p->throwAnimT > 0.f,
+        sprites_, p->walkFrame);
     // Escala p/ altura da entidade (50px), aspecto preservado.
     const float s = p->getH() / static_cast<float>(sprites::kPlayerH);
     sf::Sprite spr;

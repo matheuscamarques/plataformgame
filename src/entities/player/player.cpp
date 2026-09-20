@@ -147,6 +147,10 @@ void Player::tick() {
         walkTimer = 0.f;
     }
 
+    // Timers de ataque (frames telegraph).
+    if (meleeAnimT > 0.f) meleeAnimT -= 1.0f / 30.0f;
+    if (throwAnimT > 0.f) throwAnimT -= 1.0f / 30.0f;
+
     Entity::tick();
 }
 
@@ -157,6 +161,7 @@ bool Player::tryThrow(support::ThrowSystem &throws) {
     if (!throws.throwItem({getCenterX(), getCenterY()}, vel)) return false;
     dynamiteCount--;
     throwCooldown.trigger();
+    throwAnimT = kThrowAnimDur;
     return true;
 }
 
@@ -213,6 +218,7 @@ bool Player::startSwing() {
     meleePhase = MeleePhase::Windup;
     meleeTimer = kLight[meleeCombo].windup;
     meleeSwingId++;
+    meleeAnimT = kMeleeAnimDur;
     return true;
 }
 

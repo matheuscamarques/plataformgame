@@ -1,17 +1,25 @@
 #include <cassert>
 #include <cstdio>
 #include <cstring>
+#include "game/PlayerSprite.h"
 #include "game/Sprites.h"
 
-// ASCII art: widths exatas (linha errada = sprite deslocada) e paletas.
-// build() NÃO é chamado (textura exige contexto GL, sem teste headless).
+// ASCII art: widths exatas (linha errada = sprite deslocada), telegraphs
+// exclusivos e prioridade de pick. build() NÃO é chamado (textura exige
+// contexto GL, sem teste headless — compara endereços em SpriteSet vazio).
 int main() {
     using namespace sprites;
+    auto has = [](const char *const *f, int h, char c) {
+        for (int y = 0; y < h; ++y) {
+            if (std::strchr(f[y], c)) return true;
+        }
+        return false;
+    };
 
-    { // PlayerWidths (12x20 todos os frames)
+    { // PlayerWidths (12x20, 6 frames)
         const char *const *frames[] = {
-            kPlayerIdle, kPlayerWalk0, kPlayerWalk1, kPlayerWalk2,
-            kPlayerWalk3, kPlayerJump
+            kPlayerIdle, kPlayerWalkA, kPlayerWalkB,
+            kPlayerJump, kPlayerThrow, kPlayerMelee
         };
         for (auto f : frames) {
             for (int y = 0; y < kPlayerH; ++y) {
@@ -38,21 +46,40 @@ int main() {
         }
     }
     { // PalettesNonEmpty (toda sprite tem pixel visível, não é vazio)
-        assert(kPlayerPalCount == 6u && kSlimePalCount == 5u && kDwarfPalCount == 10u);
-        auto hasInk = [](const char *const *f, int h) {
-            for (int y = 0; y < h; ++y) {
-                for (const char *c = f[y]; *c; ++c) {
-                    if (*c != '.') return true;
-                }
-            }
-            return false;
-        };
-        assert(hasInk(kPlayerIdle, kPlayerH));
-        assert(hasInk(kPlayerJump, kPlayerH));
-        assert(hasInk(kSlimeIdle, kSlimeH));
-        assert(hasInk(kDwarfIdle, kDwarfH));
-        assert(hasInk(kDwarfThrow, kDwarfH));
-        assert(hasInk(kDwarfMelee, kDwarfH));
+        assert(kPlayerPalCount == 9u && kSlimePalCount == 5u && kDwarfPalCount == 10u);
+        assert(has(kPlayerIdle, kPlayerH, 'S'));
+        assert(has(kPlayerJump, kPlayerH, 'S'));
+        assert(has(kPlayerThrow, kPlayerH, 'T'));
+        assert(has(kPlayerMelee, kPlayerH, 'W'));
+        assert(has(kSlimeIdle, kSlimeH, 'G'));
+        assert(has(kDwarfIdle, kDwarfH, 'H'));
+        assert(has(kDwarfThrow, kDwarfH, 'D'));
+        assert(has(kDwarfMelee, kDwarfH, 'W'));
+    }
+    { // OnlyThrowHasTNT + OnlyMeleeHasSword (telegraphs exclusivos)
+        assert(has(kPlayerThrow, kPlayerH, 'T'));
+        assert(!has(kPlayerIdle, kPlayerH, 'T'));
+        assert(!has(kPlayerMelee, kPlayerH, 'T'));
+        assert(!has(kPlayerJump, kPlayerH, 'T'));
+        assert(has(kPlayerMelee, kPlayerH, 'W'));
+        assert(!has(kPlayerThrow, kPlayerH, 'W'));
+        assert(!has(kPlayerIdle, kPlayerH, 'W'));
+        assert(!has(kPlayerJump, kPlayerH, 'W'));
+    }
+    { // WalkFramesDifferInArms (braços em lados opostos)
+        assert(kPlayerWalkA[8][1] == 'S');
+        assert(kPlayerWalkA[8][10] == '.');
+        assert(kPlayerWalkB[8][1] == '.');
+        assert(kPlayerWalkB[8][10] == 'S');
+    }
+    { // PickPriority (melee > throw > jump > walk > idle)
+        SpriteSet sp{};
+        assert(game::pickPlayerFrame(true, 0.f, true, true, sp, 0) == &sp.playerMelee);
+        assert(game::pickPlayerFrame(false, 0.f, false, true, sp, 0) == &sp.playerThrow);
+        assert(game::pickPlayerFrame(false, 0.f, false, false, sp, 0) == &sp.playerJump);
+        assert(game::pickPlayerFrame(true, 100.f, false, false, sp, 0) == &sp.playerWalkA);
+        assert(game::pickPlayerFrame(true, 100.f, false, false, sp, 1) == &sp.playerWalkB);
+        assert(game::pickPlayerFrame(true, 0.f, false, false, sp, 0) == &sp.playerIdle);
     }
 
     std::printf("sprites test OK\n");

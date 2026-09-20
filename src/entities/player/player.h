@@ -19,6 +19,10 @@ class Player : public Entity
         float jumpingRecharge = 0.0f;
         int walkFrame = 0; // 0..3 (sprite walk); 0 parado
         float walkTimer = 0.f;
+        float meleeAnimT = 0.f; // >0 = frame melee (0.3s)
+        float throwAnimT = 0.f; // >0 = frame throw (0.4s)
+        static constexpr float kMeleeAnimDur = 0.30f;
+        static constexpr float kThrowAnimDur = 0.40f;
 
         support::Body body; // hitboxes por parte (rebuild via BodySystem)
 

@@ -1,5 +1,4 @@
 #pragma once
-#include <array>
 #include <cstddef>
 
 #include "../core/sprite_from_ascii.h"
@@ -19,64 +18,23 @@ inline const core::PaletteEntry kPlayerPal[] = {
     {'E', {20, 15, 15}},
     {'C', {60, 90, 160}},
     {'B', {50, 35, 30}},
+    {'W', {190, 190, 200}},
+    {'T', {220, 60, 50}},
+    {'t', {90, 30, 25}},
 };
-inline constexpr std::size_t kPlayerPalCount = 6;
+inline constexpr std::size_t kPlayerPalCount = 9;
 
-#define PLAYER_TOP_NEUTRAL   \
-    "....KKKK....",          \
-    "..KKKKKKKK..",          \
-    "..KSSSSSSK..",          \
-    "..KSESSESK..",          \
-    "..KSSSSSSK..",          \
-    "...SSSSSS...",          \
-    "....SSSS....",          \
-    "...CCCCCC...",          \
-    "..CCCCCCCC..",          \
-    ".SCCCCCCCCS.",          \
-    "..CCCCCCCC..",          \
-    "..CCCCCCCC..",          \
-    "..CCCCCCCC..",          \
-    "...CCCCCC..."
-
-#define PLAYER_LEGS_IDLE    \
-    "...CC..CC...",         \
-    "...CC..CC...",         \
-    "...BB..BB...",         \
-    "...BB..BB...",         \
-    "...BB..BB...",         \
-    "............"
-
-#define PLAYER_LEGS_WALK_R  \
-    "..CC...CC...",         \
-    ".CC.....CC..",         \
-    "BB.......BB.",         \
-    "BB.......BB.",         \
-    "............",         \
-    "............"
-
-#define PLAYER_LEGS_WALK_L  \
-    "...CC...CC..",         \
-    "..CC.....CC.",         \
-    ".BB.......BB",         \
-    ".BB.......BB",         \
-    "............",         \
-    "............"
-
-inline const char *const kPlayerIdle[] = {PLAYER_TOP_NEUTRAL, PLAYER_LEGS_IDLE};
-inline const char *const kPlayerWalk0[] = {PLAYER_TOP_NEUTRAL, PLAYER_LEGS_IDLE};
-inline const char *const kPlayerWalk1[] = {PLAYER_TOP_NEUTRAL, PLAYER_LEGS_WALK_R};
-inline const char *const kPlayerWalk2[] = {PLAYER_TOP_NEUTRAL, PLAYER_LEGS_IDLE};
-inline const char *const kPlayerWalk3[] = {PLAYER_TOP_NEUTRAL, PLAYER_LEGS_WALK_L};
-inline const char *const kPlayerJump[] = {
+inline const char *const kPlayerIdle[] = {
     "....KKKK....",
     "..KKKKKKKK..",
     "..KSSSSSSK..",
     "..KSESSESK..",
     "..KSSSSSSK..",
     "...SSSSSS...",
-    "....SSSS....",
-    ".SCCCCCCCCS.",
     "..CCCCCCCC..",
+    ".SCCCCCCCCS.",
+    ".SCCCCCCCCS.",
+    ".SCCCCCCCCS.",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
@@ -85,8 +43,121 @@ inline const char *const kPlayerJump[] = {
     "...CC..CC...",
     "...BB..BB...",
     "...BB..BB...",
-    "....BBBB....",
+    "...BB..BB...",
     "............",
+};
+
+inline const char *const kPlayerWalkA[] = {
+    "....KKKK....",
+    "..KKKKKKKK..",
+    "..KSSSSSSK..",
+    "..KSESSESK..",
+    "..KSSSSSSK..",
+    "...SSSSSS...",
+    "..CCCCCCCC..",
+    ".SCCCCCCCC..",
+    ".SCCCCCCCC..",
+    ".SCCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CC..CC...",
+    "...CC..CC...",
+    "...BB..BB...",
+    "...BB..BB...",
+    "...BB..BB...",
+    "............",
+};
+
+inline const char *const kPlayerWalkB[] = {
+    "....KKKK....",
+    "..KKKKKKKK..",
+    "..KSSSSSSK..",
+    "..KSESSESK..",
+    "..KSSSSSSK..",
+    "...SSSSSS...",
+    "..CCCCCCCC..",
+    "..CCCCCCCCS.",
+    "..CCCCCCCCS.",
+    "..CCCCCCCCS.",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CC..CC...",
+    "...CC..CC...",
+    "...BB..BB...",
+    "...BB..BB...",
+    "...BB..BB...",
+    "............",
+};
+inline const char *const kPlayerJump[] = {
+    ".S........S.",
+    ".S.KKKKKK.S.",
+    ".SKKKKKKKKS.",
+    "..KSSSSSSK..",
+    "..KSESSESK..",
+    "..KSSSSSSK..",
+    "...SSSSSS...",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CC..CC...",
+    "..BB....BB..",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline const char *const kPlayerThrow[] = {
+    ".........TT.",
+    ".........tT.",
+    "....KKKK.S..",
+    "..KKKKKKK.S.",
+    "..KSSSSSSK..",
+    "..KSESSESK..",
+    "..KSSSSSSK..",
+    "...SSSSSS...",
+    "..CCCCCCCC..",
+    ".SCCCCCCCC..",
+    ".SCCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CC..CC...",
+    "...CC..CC...",
+    "...BB..BB...",
+    "...BB..BB...",
+    "...BB..BB...",
+    "............",
+};
+
+inline const char *const kPlayerMelee[] = {
+    "............",
+    "............",
+    "..........W.",
+    "....KKKK.W..",
+    "..KKKKKKKK..",
+    "..KSSSSSSK..",
+    "..KSESSESK..",
+    "..KSSSSSSK..",
+    "...SSSSSS...",
+    "..CCCCCCCC..",
+    ".SCCCCCCCCSW",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CC..CC...",
+    "...CC..CC...",
+    "...BB..BB...",
+    "...BB..BB...",
+    "...BB..BB...",
     "............",
 };
 
@@ -221,9 +292,12 @@ inline const char *const kDwarfMelee[] = {
 };
 
 struct SpriteSet {
-    std::array<sf::Texture, 4> playerWalk;
     sf::Texture playerIdle;
+    sf::Texture playerWalkA;
+    sf::Texture playerWalkB;
     sf::Texture playerJump;
+    sf::Texture playerThrow;
+    sf::Texture playerMelee;
     sf::Texture slimeIdle;
     sf::Texture slimeSquash;
     sf::Texture dwarfIdle;
@@ -236,18 +310,16 @@ struct SpriteSet {
 // Roda 1x no boot (precisa de contexto GL — nunca em teste headless).
 inline SpriteSet build() {
     SpriteSet s;
-    s.playerIdle = core::makeSprite(kPlayerIdle, kPlayerW, kPlayerH,
-                                    kPlayerPal, kPlayerPalCount);
-    s.playerWalk[0] = core::makeSprite(kPlayerWalk0, kPlayerW, kPlayerH,
-                                       kPlayerPal, kPlayerPalCount);
-    s.playerWalk[1] = core::makeSprite(kPlayerWalk1, kPlayerW, kPlayerH,
-                                       kPlayerPal, kPlayerPalCount);
-    s.playerWalk[2] = core::makeSprite(kPlayerWalk2, kPlayerW, kPlayerH,
-                                       kPlayerPal, kPlayerPalCount);
-    s.playerWalk[3] = core::makeSprite(kPlayerWalk3, kPlayerW, kPlayerH,
-                                       kPlayerPal, kPlayerPalCount);
-    s.playerJump = core::makeSprite(kPlayerJump, kPlayerW, kPlayerH,
-                                    kPlayerPal, kPlayerPalCount);
+    auto P = [](const char *const *rows) {
+        return core::makeSprite(rows, kPlayerW, kPlayerH,
+                                kPlayerPal, kPlayerPalCount);
+    };
+    s.playerIdle = P(kPlayerIdle);
+    s.playerWalkA = P(kPlayerWalkA);
+    s.playerWalkB = P(kPlayerWalkB);
+    s.playerJump = P(kPlayerJump);
+    s.playerThrow = P(kPlayerThrow);
+    s.playerMelee = P(kPlayerMelee);
     s.slimeIdle = core::makeSprite(kSlimeIdle, kSlimeW, kSlimeH,
                                    kSlimePal, kSlimePalCount);
     s.slimeSquash = core::makeSprite(kSlimeSquash, kSlimeW, kSlimeH,
