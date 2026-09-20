@@ -61,7 +61,7 @@ int main() {
         for (int i = 0; i < 900 && enemies.count() == 0u; ++i)
             ss.tick(1.f / 30.f, ctx); // até 20 janelas: alguma acerta chão
         assert(enemies.count() > 0u);
-        enemies.forEach([&](Slime &s) {
+        enemies.forEach([&](Enemy &s) {
             const int tx = static_cast<int>(s.body.getX() / 50.f);
             const int ty = static_cast<int>(s.body.getY() / 50.f);
             // Tile do slime livre (pés caem na física depois, sem enterrar).

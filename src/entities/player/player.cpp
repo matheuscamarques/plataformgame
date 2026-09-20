@@ -25,7 +25,7 @@ void Player::collide(Entity bloco)
     ){
         return;
     }
-    // Slime não empurra o player (dano de contato vem na Fase C).
+    // Enemy não empurra o player (dano de contato vem na Fase C).
     if(
         bloco.getName() == SLIME
     ){

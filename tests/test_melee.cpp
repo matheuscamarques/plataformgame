@@ -22,7 +22,7 @@ int main() {
         assert(p.startSwing());
         for (int i = 0; i < 6; ++i) ms.tick(1.f / 30.f, ctx);
         int hp = -1;
-        enemies.forEach([&](Slime &s) { hp = s.resources.hp; });
+        enemies.forEach([&](Enemy &s) { hp = s.resources.hp; });
         assert(hp == 22);
     }
     { // WhiffsWhenFar
@@ -38,7 +38,7 @@ int main() {
         assert(p.startSwing());
         for (int i = 0; i < 6; ++i) ms.tick(1.f / 30.f, ctx);
         int hp = -1;
-        enemies.forEach([&](Slime &s) { hp = s.resources.hp; });
+        enemies.forEach([&](Enemy &s) { hp = s.resources.hp; });
         assert(hp == 30);
     }
     { // ChainsComboInRecovery (combo 0 → 1, dano 10)
@@ -60,7 +60,7 @@ int main() {
         // Deixa o combo 1 acertar (slime ainda vivo com 22).
         for (int i = 0; i < 10; ++i) ms.tick(1.f / 30.f, ctx);
         int hp = -1;
-        enemies.forEach([&](Slime &s) { hp = s.resources.hp; });
+        enemies.forEach([&](Enemy &s) { hp = s.resources.hp; });
         assert(hp == 12); // 22 - 10
     }
     { // MidSwingIgnoresNewPress

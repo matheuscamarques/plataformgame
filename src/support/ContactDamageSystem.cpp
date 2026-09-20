@@ -12,7 +12,7 @@ namespace support {
 namespace {
 constexpr int kContactDamage = 10;
 constexpr float kPushBack = 6.f; // px, direto na posição
-constexpr float kBiteWindup = 0.35f; // telegraph da mordida (Slime::biteWindup)
+constexpr float kBiteWindup = 0.35f; // telegraph da mordida (Enemy::biteWindup)
 constexpr float kWindupRecover = 0.5f; // fração que recupera sem contato
 } // namespace
 
@@ -21,7 +21,7 @@ void ContactDamageSystem::tick(float dt, GameContext &ctx) {
     if (!p || !ctx.enemies) return;
 
     const sf::FloatRect pb{p->getX(), p->getY(), p->getW(), p->getH()};
-    ctx.enemies->forEach([&](Slime &s) {
+    ctx.enemies->forEach([&](Enemy &s) {
         if (s.resources.isDead()) return;
         sf::FloatRect sb{s.body.getX(), s.body.getY(),
                          s.body.getW(), s.body.getH()};

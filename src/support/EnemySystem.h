@@ -17,9 +17,9 @@ namespace support {
 
 class Behavior;
 
-// Slime = corpo (Entity) + identidade (Behavior via registry).
+// Enemy = corpo (Entity) + identidade (Behavior via registry).
 // Dono: EnemySystem. Física: EnemySystem. Desenho: Game via forEach.
-struct Slime {
+struct Enemy {
     Entity body;
     std::unique_ptr<Behavior> ai;
     EnemyResources resources;
@@ -33,7 +33,7 @@ struct Slime {
     // sem contato recupera (0.5x). Cheio = ocioso (verde).
     float biteWindup = 0.35f;
 
-    Slime(Entity b, std::unique_ptr<Behavior> a)
+    Enemy(Entity b, std::unique_ptr<Behavior> a)
         : body(std::move(b)), ai(std::move(a)) {}
 };
 
@@ -42,12 +42,12 @@ struct Slime {
 class Factory {
 public:
     // kind desconhecido -> nullptr (nunca crash).
-    static std::unique_ptr<Slime> spawnEnemy(const std::string &kind,
+    static std::unique_ptr<Enemy> spawnEnemy(const std::string &kind,
                                              float x, float y);
 
 private:
     // Anão básico (branch explícito; archetype registry só com o 2º tipo).
-    static std::unique_ptr<Slime> spawnDwarf(std::unique_ptr<Behavior> ai,
+    static std::unique_ptr<Enemy> spawnDwarf(std::unique_ptr<Behavior> ai,
                                              float x, float y);
 };
 
@@ -62,7 +62,7 @@ public:
     // kind desconhecido = ignorado (Factory retorna null).
     void spawn(const std::string &kind, float x, float y);
 
-    void forEach(const std::function<void(Slime &)> &fn);
+    void forEach(const std::function<void(Enemy &)> &fn);
     std::size_t count() const { return slimes_.size(); }
 
     // Limpa todos (restart da run). Slimes iniciais respawnam pelo caller.
@@ -77,9 +77,9 @@ public:
     std::size_t despawnFar(float x, float y, float radius);
 
 private:
-    void physics(Slime &s, GameContext &ctx);
+    void physics(Enemy &s, GameContext &ctx);
 
-    std::vector<std::unique_ptr<Slime>> slimes_;
+    std::vector<std::unique_ptr<Enemy>> slimes_;
 };
 
 } // namespace support

@@ -34,7 +34,7 @@ std::string SpawnSystem::pickKind(int stratum, float roll) {
 
 bool SpawnSystem::hasLiveDwarf(EnemySystem &enemies) {
     bool found = false;
-    enemies.forEach([&](Slime &s) {
+    enemies.forEach([&](Enemy &s) {
         if (!s.resources.isDead() && s.ai && s.ai->name() == std::string("DwarfAI"))
             found = true;
     });

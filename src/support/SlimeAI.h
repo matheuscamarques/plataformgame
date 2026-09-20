@@ -5,7 +5,7 @@
 
 namespace support {
 
-// Slime: patrulha (vai-e-volta com timer + vira na parede) e persegue
+// SlimeAI: patrulha (vai-e-volta com timer + vira na parede) e persegue
 // o player no alcance, pulando com cooldown. Física (gravidade/snap)
 // fica no EnemySystem; aqui só intenção (vx) e pulo.
 class SlimeAI : public Behavior {

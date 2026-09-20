@@ -39,7 +39,7 @@ int main() {
     deaths.setDropSystem(&drops);
     deaths.setParticleSystem(&particles);
 
-    // Slime colado no player: orb nasce dentro do raio de coleta.
+    // Enemy colado no player: orb nasce dentro do raio de coleta.
     enemies.spawn("slime", player.getCenterX(), player.getCenterY());
 
     // 5 dinamites letais em sequência (fuse curto, dano 100).
@@ -54,7 +54,7 @@ int main() {
             std::vector<ExplosionTarget> targets;
             targets.push_back({{player.getCenterX(), player.getCenterY()},
                                &player.body, nullptr, true, &player, nullptr});
-            enemies.forEach([&](Slime &s) {
+            enemies.forEach([&](Enemy &s) {
                 if (s.resources.isDead()) return;
                 targets.push_back({{s.body.getCenterX(), s.body.getCenterY()},
                                    &s.bodyParts, &s.resources, false,

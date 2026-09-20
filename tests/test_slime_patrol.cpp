@@ -7,7 +7,7 @@
 #include "entities/player/player.h"
 #include "defines.h"
 
-// Slime patrulha sem player por perto: anda (distância acumulada) e pousa.
+// Enemy patrulha sem player por perto: anda (distância acumulada) e pousa.
 int main() {
     using namespace support;
 
@@ -24,18 +24,18 @@ int main() {
     float traveled = 0.0f, prevX = 100.0f;
     for (int t = 0; t < 300; t++) {
         float px = 0.0f, py = 0.0f;
-        enemies.forEach([&](Slime &s) { px = s.body.getX(); py = s.body.getY(); });
+        enemies.forEach([&](Enemy &s) { px = s.body.getX(); py = s.body.getY(); });
         world.update(static_cast<int>(std::floor(px / BLOCK_SIZE)),
                      static_cast<int>(std::floor(py / BLOCK_SIZE)));
         enemies.tick(1.0f / 30.0f, ctx);
-        enemies.forEach([&](Slime &s) {
+        enemies.forEach([&](Enemy &s) {
             traveled += std::fabs(s.body.getX() - prevX);
             prevX = s.body.getX();
             assert(s.body.getY() > 0.0f && s.body.getY() < 20000.0f);
         });
     }
     bool grounded = false;
-    enemies.forEach([&](Slime &s) { grounded = s.grounded; });
+    enemies.forEach([&](Enemy &s) { grounded = s.grounded; });
     std::printf("slime patrol test OK (traveled=%.1f grounded=%d)\n",
                 traveled, (int)grounded);
     assert(traveled > 300.0f); // andou de verdade (flips não zeram distância)

@@ -11,7 +11,7 @@
 int main() {
     using namespace support;
     auto recol = [](EnemySystem &e) {
-        e.forEach([](Slime &s) { s.body.setX(10.f); s.body.setY(10.f); });
+        e.forEach([](Enemy &s) { s.body.setX(10.f); s.body.setY(10.f); });
     };
 
     { // DamagesAfterWindup + pushback (11 ticks colado → hp 90, x -6)
@@ -34,7 +34,7 @@ int main() {
         EnemySystem enemies;
         enemies.spawn("slime", 10.f, 10.f);
         enemies.spawn("slime", 500.f, 500.f);
-        enemies.forEach([](Slime &s) {
+        enemies.forEach([](Enemy &s) {
             if (s.body.getX() < 100.f) s.resources.takeDamage(9999);
         });
 
@@ -58,7 +58,7 @@ int main() {
 
         cs.tick(1.f / 30.f, ctx);
         bool overlap = false;
-        enemies.forEach([&](Slime &s) {
+        enemies.forEach([&](Enemy &s) {
             const sf::FloatRect sb{s.body.getX(), s.body.getY(),
                                    s.body.getW(), s.body.getH()};
             const sf::FloatRect pb{p.getX(), p.getY(), p.getW(), p.getH()};

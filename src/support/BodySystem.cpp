@@ -13,7 +13,7 @@ void BodySystem::tick(float /*dt*/, GameContext &ctx) {
             ctx.player->facing);
     }
     if (ctx.enemies) {
-        ctx.enemies->forEach([](Slime &s) {
+        ctx.enemies->forEach([](Enemy &s) {
             s.bodyParts.rebuild({s.body.getX(), s.body.getY()},
                                 s.body.facing);
         });

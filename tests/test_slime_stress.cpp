@@ -25,7 +25,7 @@ int main() {
 
     for (int t = 0; t < 600; t++) {
         // mundo segue cada slime (como o Game segue o player)
-        enemies.forEach([&](Slime &s) {
+        enemies.forEach([&](Enemy &s) {
             world.update(static_cast<int>(std::floor(s.body.getX() / BLOCK_SIZE)),
                          static_cast<int>(std::floor(s.body.getY() / BLOCK_SIZE)));
         });
@@ -33,7 +33,7 @@ int main() {
     }
 
     int grounded = 0;
-    enemies.forEach([&](Slime &s) {
+    enemies.forEach([&](Enemy &s) {
         assert(s.body.getY() > 0.0f && s.body.getY() < 20000.0f);
         if (s.grounded) grounded++;
     });

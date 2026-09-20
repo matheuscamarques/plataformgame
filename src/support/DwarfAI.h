@@ -12,7 +12,7 @@ namespace support {
 // perto, recua quando o player sai. Sem interrupt-on-hit (Behavior não
 // tem hook de dano — Recover 0.6s é a janela de punish). Sem skills,
 // sem paciência, sem variante: isso é Anão Elite.
-// Estado mora aqui (como SlimeAI guarda dir_); corpo/recursos no Slime.
+// Estado mora aqui (como SlimeAI guarda dir_); corpo/recursos no Enemy.
 enum class DwarfState : uint8_t {
     Patrol,
     Alert,

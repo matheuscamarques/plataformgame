@@ -25,7 +25,7 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
 
     const int dmg = p->meleeDamage();
     const float post = p->meleePosture();
-    ctx.enemies->forEach([&](Slime &s) {
+    ctx.enemies->forEach([&](Enemy &s) {
         if (s.resources.isDead()) return;
         if (s.lastHitSwing == p->meleeSwingId) return; // 1 hit por swing
         const sf::FloatRect sb{s.body.getX(), s.body.getY(),

@@ -10,11 +10,11 @@
 int main() {
     using namespace support;
     auto recol = [](EnemySystem &e) {
-        e.forEach([](Slime &s) { s.body.setX(10.f); s.body.setY(10.f); });
+        e.forEach([](Enemy &s) { s.body.setX(10.f); s.body.setY(10.f); });
     };
     auto windup = [](EnemySystem &e) {
         float w = -1.f;
-        e.forEach([&](Slime &s) { w = s.biteWindup; });
+        e.forEach([&](Enemy &s) { w = s.biteWindup; });
         return w;
     };
 
@@ -58,7 +58,7 @@ int main() {
         for (int i = 0; i < 5; ++i) { recol(enemies); cs.tick(1.f / 30.f, ctx); }
         const float partial = windup(enemies);
         assert(partial < 0.35f);
-        enemies.forEach([](Slime &s) { s.body.setX(500.f); s.body.setY(500.f); });
+        enemies.forEach([](Enemy &s) { s.body.setX(500.f); s.body.setY(500.f); });
         cs.tick(1.f / 30.f, ctx);
         const float after = windup(enemies);
         assert(after > partial && after <= 0.35f);
@@ -74,7 +74,7 @@ int main() {
         ctx.enemies = &enemies;
 
         for (int i = 0; i < 5; ++i) { recol(enemies); cs.tick(1.f / 30.f, ctx); }
-        enemies.forEach([](Slime &s) { s.body.setX(500.f); s.body.setY(500.f); });
+        enemies.forEach([](Enemy &s) { s.body.setX(500.f); s.body.setY(500.f); });
         for (int i = 0; i < 60; ++i) cs.tick(1.f / 30.f, ctx);
         assert(windup(enemies) == 0.35f);
     }

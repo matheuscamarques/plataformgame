@@ -15,11 +15,11 @@ int main() {
     using namespace support;
     // Trava Y (sem mundo não há chão; X livre p/ patrulha/aproximação).
     auto pinY = [](EnemySystem &e) {
-        e.forEach([](Slime &s) { s.body.setY(100.f); s.body.setVy(0.f); });
+        e.forEach([](Enemy &s) { s.body.setY(100.f); s.body.setVy(0.f); });
     };
     auto dwarfState = [](EnemySystem &e) {
         DwarfState st = DwarfState::Patrol;
-        e.forEach([&](Slime &s) {
+        e.forEach([&](Enemy &s) {
             if (auto *d = dynamic_cast<DwarfAI *>(s.ai.get())) st = d->state();
         });
         return st;
@@ -48,7 +48,7 @@ int main() {
         ctx.enemies = &enemies;
         for (int i = 0; i < 150; ++i) { pinY(enemies); enemies.tick(1.f / 30.f, ctx); }
         float hx = -1.f;
-        enemies.forEach([&](Slime &s) { hx = s.body.getX(); });
+        enemies.forEach([&](Enemy &s) { hx = s.body.getX(); });
         assert(std::fabs(hx - 100.f) <= 106.f);
         assert(dwarfState(enemies) == DwarfState::Patrol);
     }
@@ -116,7 +116,7 @@ int main() {
     { // DeathRemovesDwarf (caminho genérico do DeathSystem)
         EnemySystem enemies;
         enemies.spawn("dwarf", 0.f, 0.f);
-        enemies.forEach([](Slime &s) { s.resources.takeDamage(9999); });
+        enemies.forEach([](Enemy &s) { s.resources.takeDamage(9999); });
         DeathSystem ds;
         GameContext ctx{};
         ctx.enemies = &enemies;
@@ -134,7 +134,7 @@ int main() {
         assert(!SpawnSystem::hasLiveDwarf(enemies));
         enemies.spawn("dwarf", 0.f, 0.f);
         assert(SpawnSystem::hasLiveDwarf(enemies));
-        enemies.forEach([](Slime &s) { s.resources.takeDamage(9999); });
+        enemies.forEach([](Enemy &s) { s.resources.takeDamage(9999); });
         assert(!SpawnSystem::hasLiveDwarf(enemies)); // morto não conta
     }
 

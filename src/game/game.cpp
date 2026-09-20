@@ -167,7 +167,7 @@ void Game::render()
 
     player.get()->draw(window);
 
-    enemies_->forEach([&](support::Slime &s) { s.body.draw(window); });
+    enemies_->forEach([&](support::Enemy &s) { s.body.draw(window); });
 
     // Throwables visíveis: círculo com cor pelo fuse (verde→vermelho).
     throws_->forEachActive([&](const support::Throwable &t) {
@@ -214,7 +214,7 @@ void Game::render()
             });
         };
         drawParts(player.get()->body);
-        enemies_->forEach([&](support::Slime &s) { drawParts(s.bodyParts); });
+        enemies_->forEach([&](support::Enemy &s) { drawParts(s.bodyParts); });
     }
 
     overlay_.render(*window, font, *getWorld(), *player.get(), objects.size());
@@ -317,7 +317,7 @@ void Game::tick() {
     std::vector<support::ExplosionTarget> targets;
     targets.push_back({sf::Vector2f(p->getCenterX(), p->getCenterY()),
                        &p->body, nullptr, true, p, nullptr});
-    enemies_->forEach([&](support::Slime &s) {
+    enemies_->forEach([&](support::Enemy &s) {
         if (s.resources.isDead()) return;
         targets.push_back({sf::Vector2f(s.body.getCenterX(), s.body.getCenterY()),
                            &s.bodyParts, &s.resources, false,

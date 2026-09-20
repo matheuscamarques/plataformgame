@@ -13,7 +13,7 @@ int main() {
         EnemySystem enemies;
         enemies.spawn("slime", 0.f, 0.f);
         assert(enemies.count() == 1u);
-        enemies.forEach([](Slime &s) { s.resources.takeDamage(9999); });
+        enemies.forEach([](Enemy &s) { s.resources.takeDamage(9999); });
 
         GameContext ctx{};
         ctx.enemies = &enemies;
@@ -36,7 +36,7 @@ int main() {
     { // SpawnsDropOnDeath (sem particles: null-safe)
         EnemySystem enemies;
         enemies.spawn("slime", 0.f, 0.f);
-        enemies.forEach([](Slime &s) { s.resources.takeDamage(9999); });
+        enemies.forEach([](Enemy &s) { s.resources.takeDamage(9999); });
 
         DropSystem drops;
         DeathSystem ds;

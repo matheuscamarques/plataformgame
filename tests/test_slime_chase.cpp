@@ -7,7 +7,7 @@
 #include "entities/player/player.h"
 #include "defines.h"
 
-// Slime persegue player próximo: fase 1 pousa longe, fase 2 aproxima.
+// Enemy persegue player próximo: fase 1 pousa longe, fase 2 aproxima.
 int main() {
     using namespace support;
 
@@ -23,7 +23,7 @@ int main() {
     auto step = [&](int n) {
         for (int t = 0; t < n; t++) {
             float px = 0.0f, py = 0.0f;
-            enemies.forEach([&](Slime &s) { px = s.body.getX(); py = s.body.getY(); });
+            enemies.forEach([&](Enemy &s) { px = s.body.getX(); py = s.body.getY(); });
             world.update(static_cast<int>(std::floor(px / BLOCK_SIZE)),
                          static_cast<int>(std::floor(py / BLOCK_SIZE)));
             enemies.tick(1.0f / 30.0f, ctx);
@@ -31,7 +31,7 @@ int main() {
     };
     auto slimePos = [&]() {
         float x = 0.0f, y = 0.0f;
-        enemies.forEach([&](Slime &s) { x = s.body.getX(); y = s.body.getY(); });
+        enemies.forEach([&](Enemy &s) { x = s.body.getX(); y = s.body.getY(); });
         return std::make_pair(x, y);
     };
 

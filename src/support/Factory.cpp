@@ -8,7 +8,7 @@
 
 namespace support {
 
-std::unique_ptr<Slime> Factory::spawnEnemy(const std::string &kind,
+std::unique_ptr<Enemy> Factory::spawnEnemy(const std::string &kind,
                                             float x, float y) {
     auto ai = BehaviorRegistry::instance().create(kind);
     if (!ai) return nullptr;
@@ -18,7 +18,7 @@ std::unique_ptr<Slime> Factory::spawnEnemy(const std::string &kind,
     Entity body(SLIME, x, y, 40.0f, 30.0f);
     body.setFillColor(sf::Color(0, 200, 0));
 
-    auto slime = std::make_unique<Slime>(std::move(body), std::move(ai));
+    auto slime = std::make_unique<Enemy>(std::move(body), std::move(ai));
     static auto schema = BodySchema::humanoid(30.0f, 40.0f);
     slime->bodyParts.attach(&schema);
     // S2: recursos default de trash (HP + postura; mana/stamina ignorados).
@@ -35,12 +35,12 @@ std::unique_ptr<Slime> Factory::spawnEnemy(const std::string &kind,
 // Anão básico: Elite (4 recursos), schema dwarf, corpo marrom.
 // Nome de colisão SLIME de propósito (Q2): sem bloqueio até playtest
 // dizer se o Elite deve ser parede. Cor vem daqui, não de Tile.
-std::unique_ptr<Slime> Factory::spawnDwarf(std::unique_ptr<Behavior> ai,
+std::unique_ptr<Enemy> Factory::spawnDwarf(std::unique_ptr<Behavior> ai,
                                            float x, float y) {
     Entity body(SLIME, x, y, 36.0f, 44.0f);
     body.setFillColor(sf::Color(139, 90, 43));
 
-    auto dwarf = std::make_unique<Slime>(std::move(body), std::move(ai));
+    auto dwarf = std::make_unique<Enemy>(std::move(body), std::move(ai));
     static auto schema = BodySchema::dwarf();
     dwarf->bodyParts.attach(&schema);
     dwarf->resources.isTrash = false;

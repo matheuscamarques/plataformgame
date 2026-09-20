@@ -12,7 +12,7 @@ void EnemySystem::spawn(const std::string &kind, float x, float y) {
     if (s) slimes_.push_back(std::move(s));
 }
 
-void EnemySystem::forEach(const std::function<void(Slime &)> &fn) {
+void EnemySystem::forEach(const std::function<void(Enemy &)> &fn) {
     for (auto &s : slimes_) fn(*s);
 }
 
@@ -53,7 +53,7 @@ void EnemySystem::tick(float dt, GameContext &ctx) {
     }
 }
 
-void EnemySystem::physics(Slime &s, GameContext &ctx) {
+void EnemySystem::physics(Enemy &s, GameContext &ctx) {
     Entity &e = s.body;
     e.setVy(std::min(e.getVy() + 9.8f, 20.0f));
     e.setX(e.getX() + e.getVx());
