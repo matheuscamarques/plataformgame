@@ -1,6 +1,7 @@
 #include "SpawnSystem.h"
 
 #include <cmath>
+#include <string>
 
 #include "../core/Random.h"
 #include "../defines.h"
@@ -13,7 +14,7 @@
 namespace support {
 
 int SpawnSystem::budgetForStratum(int s) {
-    // Densidade cai com a profundidade (outros inimigos entram depois).
+    // Densidade cai com a profundidade. Tabela real (era stub 100).
     switch (s) {
         case 0: return 3;
         case 1: return 4;
@@ -23,6 +24,21 @@ int SpawnSystem::budgetForStratum(int s) {
         case 5: return 2;
         default: return 2;
     }
+}
+
+std::string SpawnSystem::pickKind(int stratum, float roll) {
+    const float dwarfW =
+        stratum >= 5 ? 0.30f : (stratum >= 3 ? 0.15f : 0.f);
+    return roll < dwarfW ? "dwarf" : "slime";
+}
+
+bool SpawnSystem::hasLiveDwarf(EnemySystem &enemies) {
+    bool found = false;
+    enemies.forEach([&](Slime &s) {
+        if (!s.resources.isDead() && s.ai && s.ai->name() == std::string("DwarfAI"))
+            found = true;
+    });
+    return found;
 }
 
 void SpawnSystem::tick(float dt, GameContext &ctx) {
@@ -39,8 +55,9 @@ void SpawnSystem::tick(float dt, GameContext &ctx) {
 
     if (ctx.enemies->count() >= kGlobalCap) return;
     const int ty = static_cast<int>(std::floor(py / BLOCK_SIZE));
+    const int stratum = stratumAt(ty);
     if (static_cast<std::size_t>(ctx.enemies->count()) >=
-        static_cast<std::size_t>(budgetForStratum(stratumAt(ty))))
+        static_cast<std::size_t>(budgetForStratum(stratum)))
         return;
 
     // Posição: anel 600-1000px ao lado, depois chão para baixo.
@@ -61,7 +78,10 @@ void SpawnSystem::tick(float dt, GameContext &ctx) {
         if (tyy * BLOCK_SIZE >= top * BLOCK_SIZE + kGroundScan) return; // sem chão
         sy = static_cast<float>(tyy) * BLOCK_SIZE;
     }
-    ctx.enemies->spawn("slime", sx, sy);
+    // Sorteio slime/anão por estrato; cap de 1 anão (Q1).
+    std::string kind = pickKind(stratum, core::randRange(0.f, 1.f));
+    if (kind == "dwarf" && hasLiveDwarf(*ctx.enemies)) kind = "slime";
+    ctx.enemies->spawn(kind, sx, sy);
 }
 
 } // namespace support

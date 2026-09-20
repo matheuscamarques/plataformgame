@@ -44,6 +44,11 @@ public:
     // kind desconhecido -> nullptr (nunca crash).
     static std::unique_ptr<Slime> spawnEnemy(const std::string &kind,
                                              float x, float y);
+
+private:
+    // Anão básico (branch explícito; archetype registry só com o 2º tipo).
+    static std::unique_ptr<Slime> spawnDwarf(std::unique_ptr<Behavior> ai,
+                                             float x, float y);
 };
 
 // Opera os slimes: IA + física (gravidade, snap no chão via SpatialHash).

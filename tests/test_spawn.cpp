@@ -38,8 +38,10 @@ int main() {
         ctx.enemies = &enemies;
         ctx.world = &world;
 
-        for (int i = 0; i < 600; ++i) ss.tick(1.f / 30.f, ctx); // ~20s
-        // S0 budget 3 (+2 iniciais? não: parte de 0) → exatamente 3.
+        // Budget real S0=3: roda até encher (scan tem sorte; tabela é lei).
+        for (int i = 0; i < 2400 && enemies.count() < 3u; ++i)
+            ss.tick(1.f / 30.f, ctx);
+        // S0 budget 3 (parte de 0) → exatamente 3.
         assert(enemies.count() == 3u);
         for (int i = 0; i < 200; ++i) ss.tick(1.f / 30.f, ctx);
         assert(enemies.count() == 3u); // não passa do budget
