@@ -1,12 +1,15 @@
 #include "ExplosionSystem.h"
 
 #include <cmath>
+#include <string>
 
 #include "../defines.h"
 #include "../entities/entity/entity.hpp"
 #include "EnemyResources.h"
+#include "EnemySystem.h"
 #include "GameContext.h"
 #include "ParticleSystem.h"
+#include "PatienceSystem.h"
 #include "World/World.h"
 
 namespace support {
@@ -104,6 +107,10 @@ void ExplosionSystem::breakTilesInCircle(sf::Vector2f center, int tilesRadius, G
     const int cy = static_cast<int>(std::floor(center.y / BLOCK_SIZE));
     const float r2 = static_cast<float>(tilesRadius * tilesRadius);
 
+    // Paciência: 1 call por explosão (não por tile — senão 1 blast =
+    // traição instantânea). Minério pesa mais que pedra.
+    bool brokeOre = false;
+    bool brokeAny = false;
     for (int ty = cy - tilesRadius; ty <= cy + tilesRadius; ++ty) {
         for (int tx = cx - tilesRadius; tx <= cx + tilesRadius; ++tx) {
             const int dx = tx - cx;
@@ -119,7 +126,21 @@ void ExplosionSystem::breakTilesInCircle(sf::Vector2f center, int tilesRadius, G
                 // Cor do tile quebrado (primário = tipo real).
                 particles_->spawnTileBreak(tileCenter, static_cast<int>(broken), 0, 0);
             }
+            if (broken == Tile::Air) continue; // nada quebrou aqui
+            brokeAny = true;
+            if (isOreTile(broken)) brokeOre = true;
         }
+    }
+    // mineração → paciência: só anão que já reconheceu liga (sistema
+    // filtra estágio/distância). Pá própria (dig/collapse) não passa
+    // por aqui: usam World::breakTile direto.
+    if (brokeAny && ctx.enemies) {
+        ctx.enemies->forEach([&](Enemy &s) {
+            if (!s.ai || std::string(s.ai->name()) != "DwarfAI") return;
+            const float dx = center.x - s.body.getCenterX();
+            const float dy = center.y - s.body.getCenterY();
+            patienceOnMine(s.patience, brokeOre, std::sqrt(dx * dx + dy * dy));
+        });
     }
 }
 

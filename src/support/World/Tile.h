@@ -147,4 +147,23 @@ enum class Tile : uint8_t {
 
 inline constexpr std::size_t TILE_COUNT = static_cast<std::size_t>(Tile::COUNT);
 
+// Minério de verdade (patienceOnMine corta mais fundo com minério).
+inline bool isOreTile(Tile t) {
+    switch (t) {
+        case Tile::OreCopper:
+        case Tile::OreIron:
+        case Tile::OreGold:
+        case Tile::OreCoal:
+        case Tile::OreSilver:
+        case Tile::OreDiamond:
+        case Tile::OreCrystal:
+        case Tile::OrePlatinum:
+        case Tile::OreMithril:
+        case Tile::OreAdamant:
+            return true;
+        default:
+            return false;
+    }
+}
+
 } // namespace support

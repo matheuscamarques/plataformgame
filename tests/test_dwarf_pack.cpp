@@ -5,11 +5,14 @@
 #include "entities/player/player.h"
 #include "support/Barks.h"
 #include "support/EnemySystem.h"
+#include "support/ExplosionSystem.h"
 #include "support/GameContext.h"
 #include "support/PatienceSystem.h"
 #include "support/Skill.h"
 #include "support/UtilityAI.h"
 #include "support/VariantRegistry.h"
+#include "support/World/Generation.h"
+#include "support/World/World.h"
 
 // Pacote anão: variant por estrato, 6 skills, paciência, barks, special.
 int main() {
@@ -100,6 +103,49 @@ int main() {
             }
             assert(dig && col);
         });
+    }
+
+    { // ExplosionMiningReachesPatience (1 blast perto = -8, longe = 0)
+        World world(1337u);
+        const int s0 = support::surfaceHeight(0, 1337u);
+        world.update(0, s0);
+        EnemySystem enemies;
+        // Anão assentado que já reconheceu (estágio 2) + slime junto.
+        enemies.spawn("dwarf", 0.f, static_cast<float>(s0 - 1) * 50.f);
+        enemies.spawn("slime", 50.f, static_cast<float>(s0 - 1) * 50.f);
+        enemies.forEach([](Enemy &e) { e.patience.passiveStage = 2; });
+
+        ExplosionSystem ex;
+        GameContext ctx{};
+        ctx.world = &world;
+        ctx.enemies = &enemies;
+        ExplosionDef def;
+        def.radius = 40.f;
+        def.damage = 0;
+        def.tilesRadius = 3; // 29 tiles: algum sólido quebra (não-água)
+        float dx = 0.f, dy = 0.f;
+        enemies.forEach([&](Enemy &e) {
+            if (std::string(e.ai->name()) == "DwarfAI") {
+                dx = e.body.getCenterX();
+                dy = e.body.getCenterY();
+            }
+        });
+        ex.explode({dx, dy}, def, ctx);
+        enemies.forEach([&](Enemy &e) {
+            if (std::string(e.ai->name()) == "DwarfAI") {
+                assert(e.patience.value == 92.f); // pedra perto: -8
+            } else {
+                assert(e.patience.value == 100.f); // slime não liga
+            }
+        });
+        // Longe (>128px): sem efeito mesmo reconhecendo.
+        enemies.forEach([](Enemy &e) {
+            e.patience.value = 100.f;
+            e.body.setX(e.body.getX() + 2000.f);
+        });
+        ex.explode({dx, dy}, def, ctx);
+        enemies.forEach(
+            [&](Enemy &e) { assert(e.patience.value == 100.f); });
     }
 
     std::printf("dwarf pack test OK\n");
