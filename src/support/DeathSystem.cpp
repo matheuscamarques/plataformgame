@@ -14,7 +14,7 @@ void DeathSystem::tick(float /*dt*/, GameContext &ctx) {
     ctx.enemies->removeDead([&](sf::Vector2f pos) {
         if (particles_) particles_->spawnTileBreak(pos, 0, 0, 0);
         if (drops_)     drops_->spawnXP(pos, 1);
-    });
+    }, &ctx);
 }
 
 } // namespace support

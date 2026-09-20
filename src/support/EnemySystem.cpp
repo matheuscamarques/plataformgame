@@ -7,8 +7,9 @@
 
 namespace support {
 
-void EnemySystem::spawn(const std::string &kind, float x, float y) {
-    auto s = Factory::spawnEnemy(kind, x, y);
+void EnemySystem::spawn(const std::string &kind, float x, float y,
+                        GameContext *ctx) {
+    auto s = Factory::spawnEnemy(kind, x, y, ctx);
     if (s) slimes_.push_back(std::move(s));
 }
 
@@ -16,9 +17,11 @@ void EnemySystem::forEach(const std::function<void(Enemy &)> &fn) {
     for (auto &s : slimes_) fn(*s);
 }
 
-void EnemySystem::removeDead(const std::function<void(sf::Vector2f)> &onDeath) {
+void EnemySystem::removeDead(const std::function<void(sf::Vector2f)> &onDeath,
+                             GameContext *ctx) {
     for (auto it = slimes_.begin(); it != slimes_.end(); ) {
         if (!(*it)->resources.isDead()) { ++it; continue; }
+        if (ctx && (*it)->ai) (*it)->ai->onDeath(**it, *ctx);
         sf::Vector2f pos{(*it)->body.getCenterX(), (*it)->body.getCenterY()};
         it = slimes_.erase(it);
         onDeath(pos);

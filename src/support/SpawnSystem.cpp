@@ -2,11 +2,14 @@
 
 #include <cmath>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "../core/Random.h"
 #include "../defines.h"
 #include "../entities/player/player.h"
 #include "EnemySystem.h"
+#include "EnemyArchetype.h"
 #include "GameContext.h"
 #include "World/Stratum.h"
 #include "World/World.h"
@@ -26,20 +29,18 @@ int SpawnSystem::budgetForStratum(int s) {
     }
 }
 
-std::string SpawnSystem::pickKind(int stratum, float roll) {
-    const float dwarfW =
-        stratum >= 5 ? 0.30f : (stratum >= 3 ? 0.15f : 0.f);
-    return roll < dwarfW ? "dwarf" : "slime";
-}
-
-bool SpawnSystem::hasLiveDwarf(EnemySystem &enemies) {
-    bool found = false;
+namespace {
+// Vivos do behavior (compara Behavior::name(); O(n) por janela).
+int countAlive(EnemySystem &enemies, const std::string &behaviorName) {
+    int n = 0;
     enemies.forEach([&](Enemy &s) {
-        if (!s.resources.isDead() && s.ai && s.ai->name() == std::string("DwarfAI"))
-            found = true;
+        if (!s.resources.isDead() && s.ai &&
+            std::string(s.ai->name()) == behaviorName)
+            ++n;
     });
-    return found;
+    return n;
 }
+} // namespace
 
 void SpawnSystem::tick(float dt, GameContext &ctx) {
     Player *p = ctx.player;
@@ -60,6 +61,33 @@ void SpawnSystem::tick(float dt, GameContext &ctx) {
         static_cast<std::size_t>(budgetForStratum(stratum)))
         return;
 
+    // Candidatos data-driven: faixa + maxAlive por archetype, peso
+    // ponderado. Sorteio único por janela.
+    struct Cand {
+        std::string key;
+        float weight;
+    };
+    std::vector<Cand> cands;
+    float totalW = 0.f;
+    for (const auto &key : ArchetypeRegistry::instance().keys()) {
+        const EnemyArchetype *a = ArchetypeRegistry::instance().find(key);
+        if (!a) continue;
+        if (stratum < a->minStratum || stratum > a->maxStratum) continue;
+        if (countAlive(*ctx.enemies, a->behaviorName) >= a->maxAlive) continue;
+        cands.push_back({key, a->spawnWeight});
+        totalW += a->spawnWeight;
+    }
+    if (cands.empty()) return;
+    float r = core::randRange(0.f, totalW);
+    std::string kind = cands.front().key;
+    for (auto &c : cands) {
+        r -= c.weight;
+        if (r <= 0.f) {
+            kind = c.key;
+            break;
+        }
+    }
+
     // Posição: anel 600-1000px ao lado, depois chão para baixo.
     // Sem mundo (teste): spawna no ar na altura do player.
     const float side = core::randRange(0.f, 1.f) < 0.5f ? -1.f : 1.f;
@@ -78,10 +106,7 @@ void SpawnSystem::tick(float dt, GameContext &ctx) {
         if (tyy * BLOCK_SIZE >= top * BLOCK_SIZE + kGroundScan) return; // sem chão
         sy = static_cast<float>(tyy) * BLOCK_SIZE;
     }
-    // Sorteio slime/anão por estrato; cap de 1 anão (Q1).
-    std::string kind = pickKind(stratum, core::randRange(0.f, 1.f));
-    if (kind == "dwarf" && hasLiveDwarf(*ctx.enemies)) kind = "slime";
-    ctx.enemies->spawn(kind, sx, sy);
+    ctx.enemies->spawn(kind, sx, sy, &ctx);
 }
 
 } // namespace support

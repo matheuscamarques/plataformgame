@@ -37,18 +37,15 @@ struct Enemy {
         : body(std::move(b)), ai(std::move(a)) {}
 };
 
-// Factory consome o BehaviorRegistry por string: inimigo novo não
-// edita Factory, CombatSystem nem Game (só registra o Behavior).
+// Factory consome ArchetypeRegistry por string: inimigo novo = 1
+// REGISTER_ENEMY_ARCHETYPE + 1 Behavior. Zero branch, zero edição aqui.
 class Factory {
 public:
-    // kind desconhecido -> nullptr (nunca crash).
+    // kind desconhecido OU behavior ausente -> nullptr (nunca crash).
+    // ctx opcional: com ctx, dispara ai->onSpawn (SpawnSystem passa).
     static std::unique_ptr<Enemy> spawnEnemy(const std::string &kind,
-                                             float x, float y);
-
-private:
-    // Anão básico (branch explícito; archetype registry só com o 2º tipo).
-    static std::unique_ptr<Enemy> spawnDwarf(std::unique_ptr<Behavior> ai,
-                                             float x, float y);
+                                             float x, float y,
+                                             GameContext *ctx = nullptr);
 };
 
 // Opera os slimes: IA + física (gravidade, snap no chão via SpatialHash).
@@ -60,7 +57,9 @@ public:
     void tick(float dt, GameContext &ctx) override;
 
     // kind desconhecido = ignorado (Factory retorna null).
-    void spawn(const std::string &kind, float x, float y);
+    // ctx repassado à Factory p/ onSpawn (SpawnSystem passa o seu).
+    void spawn(const std::string &kind, float x, float y,
+               GameContext *ctx = nullptr);
 
     void forEach(const std::function<void(Enemy &)> &fn);
     std::size_t count() const { return slimes_.size(); }
@@ -70,7 +69,9 @@ public:
 
     // Remove mortos; onDeath(pos do centro) por removido para juice
     // (partículas/drops no DeathSystem). Erase mora aqui, no dono.
-    void removeDead(const std::function<void(sf::Vector2f)> &onDeath);
+    // Com ctx, dispara ai->onDeath antes do erase (hook opcional).
+    void removeDead(const std::function<void(sf::Vector2f)> &onDeath,
+                    GameContext *ctx = nullptr);
 
     // Despawn por distância (economia do SpawnSystem). Remove além do
     // raio (px) do ponto. Retorna quantos removeu.

@@ -31,8 +31,9 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
         const sf::FloatRect sb{s.body.getX(), s.body.getY(),
                                s.body.getW(), s.body.getH()};
         if (!box.intersects(sb)) return;
-        s.resources.takeDamage(dmg);
+        const int applied = s.resources.takeDamage(dmg);
         s.resources.damagePosture(post);
+        if (applied > 0 && s.ai) s.ai->onTakeHit(s, applied, ctx);
         s.lastHitSwing = p->meleeSwingId;
         if (particles_) {
             particles_->spawnHitSpark(

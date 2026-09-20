@@ -1,14 +1,18 @@
 #include <cassert>
 #include <cmath>
 #include <cstdio>
+#include <string>
 #include "entities/player/player.h"
 #include "support/BehaviorRegistry.h"
 #include "support/DeathSystem.h"
 #include "support/DwarfAI.h"
+#include "support/EnemyArchetype.h"
 #include "support/EnemySystem.h"
 #include "support/GameContext.h"
 #include "support/SpawnSystem.h"
 #include "support/ThrowSystem.h"
+#include "support/World/Generation.h"
+#include "support/World/World.h"
 
 // Anão básico: registro, factory Elite, patrulha, aggro, throw, melee, morte.
 int main() {
@@ -123,19 +127,41 @@ int main() {
         ds.tick(0.f, ctx);
         assert(enemies.count() == 0u);
     }
-    { // PickKindByStratum (puro, determinístico)
-        assert(SpawnSystem::pickKind(1, 0.5f) == "slime");
-        assert(SpawnSystem::pickKind(2, 0.0f) == "slime");
-        assert(SpawnSystem::pickKind(3, 0.1f) == "dwarf");
-        assert(SpawnSystem::pickKind(3, 0.2f) == "slime");
-        assert(SpawnSystem::pickKind(5, 0.29f) == "dwarf");
-        assert(SpawnSystem::pickKind(5, 0.5f) == "slime");
+    { // ArchetypeDataDrivesSpawn (dwarf S3+, peso 0.3, cap via maxAlive)
+        const EnemyArchetype *d = ArchetypeRegistry::instance().find("dwarf");
+        assert(d != nullptr);
+        assert(d->minStratum == 3 && d->maxStratum == 99);
+        assert(d->maxAlive == 1);
+        const EnemyArchetype *s = ArchetypeRegistry::instance().find("slime");
+        assert(s != nullptr && s->minStratum == 0);
+    }
+    { // DwarfCapBlocksSecond (1 vivo → novos spawns são slime)
+        Player p;
+        int s0 = support::surfaceHeight(0, 1337u);
+        p.setX(0.f);
+        p.setY(static_cast<float>(s0 - 1) * 50.f);
         EnemySystem enemies;
-        assert(!SpawnSystem::hasLiveDwarf(enemies));
+        SpawnSystem ss;
+        World world(1337u);
+        world.update(0, s0);
         enemies.spawn("dwarf", 0.f, 0.f);
-        assert(SpawnSystem::hasLiveDwarf(enemies));
-        enemies.forEach([](Enemy &s) { s.resources.takeDamage(9999); });
-        assert(!SpawnSystem::hasLiveDwarf(enemies)); // morto não conta
+        GameContext ctx{};
+        ctx.player = &p;
+        ctx.enemies = &enemies;
+        ctx.world = &world;
+        auto dwarfs = [&]() {
+            int n = 0;
+            enemies.forEach([&](Enemy &e) {
+                if (e.ai && std::string(e.ai->name()) == "DwarfAI" &&
+                    !e.resources.isDead())
+                    ++n;
+            });
+            return n;
+        };
+        for (int i = 0; i < 1200 && enemies.count() < 2u; ++i)
+            ss.tick(1.f / 30.f, ctx);
+        assert(enemies.count() >= 2u); // slimes chegaram
+        assert(dwarfs() == 1);         // nenhum anão novo (cap)
     }
 
     std::printf("dwarf test OK\n");
