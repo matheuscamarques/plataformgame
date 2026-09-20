@@ -53,6 +53,7 @@ REGISTER_ENEMY_ARCHETYPE("dwarf", [] {
     a.maxStratum = 99;
     a.spawnWeight = 0.3f; // unificado S3+ (era 15/30 — tuning junto)
     a.maxAlive = 1;
+    a.skills = {"dwarf_dynamite", "dwarf_melee"};
     return a;
 }());
 
@@ -83,6 +84,49 @@ REGISTER_SKILL("slime_spit", [] {
             t->radius = 0.f;
             t->tilesRadius = 0;
         }
+    };
+    return s;
+}());
+
+// Dinamite do anão: arco na direção do player, fuse 0.8s.
+REGISTER_SKILL("dwarf_dynamite", [] {
+    support::SkillDef s;
+    s.name = "Dinamite";
+    s.cooldown = 1.8f;
+    s.telegraph = 0.30f;
+    s.staminaCost = 5.f;
+    s.isRanged = true;
+    s.minRange = 48.f;
+    s.maxRange = 128.f;
+    s.baseWeight = 10.f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx) {
+        if (!ctx.player || !ctx.throws) return;
+        sf::Vector2f from{self.body.getCenterX(), self.body.getCenterY()};
+        sf::Vector2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
+        const float dir = (to.x < from.x) ? -1.f : 1.f;
+        auto *t = ctx.throws->throwItem(from, {dir * 180.f, -320.f},
+                                        support::ThrowKind::Dynamite);
+        if (t) t->fuse = 0.8f;
+    };
+    return s;
+}());
+
+// Picaretada: dano direto com re-cheque de alcance no impacto.
+REGISTER_SKILL("dwarf_melee", [] {
+    support::SkillDef s;
+    s.name = "Picaretada";
+    s.cooldown = 0.8f;
+    s.telegraph = 0.25f;
+    s.staminaCost = 15.f;
+    s.isMelee = true;
+    s.minRange = 0.f;
+    s.maxRange = 40.f;
+    s.baseWeight = 15.f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx) {
+        if (!ctx.player) return;
+        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
+        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
+        if (dx * dx + dy * dy < 48.f * 48.f) ctx.player->hurt(12);
     };
     return s;
 }());

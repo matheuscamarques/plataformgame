@@ -20,11 +20,14 @@ bool tryUse(Enemy &self, GameContext &ctx, const std::string &skillId) {
     self.resources.pay(c);
     def->execute(self, ctx);
     cd.trigger(def->cooldown);
+    self.lastSkillId = skillId;
+    self.lastSkillAge = 0.f;
     return true;
 }
 
 void tick(Enemy &self, float dt) {
     for (auto &kv : self.skillCds) kv.second.tick(dt);
+    self.lastSkillAge += dt;
 }
 
 void clear(Enemy &self) {

@@ -35,6 +35,11 @@ struct Enemy {
     float biteWindup = 0.35f;
     // Cooldowns de skills (SkillSystem, opção 3b): morrem com o Enemy.
     std::unordered_map<std::string, core::Cooldown> skillCds;
+    // Skills do archetype (Factory copia). Vazio = behavior manual.
+    std::vector<std::string> skillIds;
+    // Última skill usada (UtilityAI penaliza repetição).
+    std::string lastSkillId;
+    float lastSkillAge = 999.f;
 
     Enemy(Entity b, std::unique_ptr<Behavior> a)
         : body(std::move(b)), ai(std::move(a)) {}

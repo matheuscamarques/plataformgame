@@ -34,6 +34,9 @@ struct EnemyArchetype {
     int maxStratum = 99;
     float spawnWeight = 1.0f;
     int maxAlive = 100;
+
+    // Skills disponíveis (IDs no SkillRegistry). Vazio = behavior manual.
+    std::vector<std::string> skills;
 };
 
 class ArchetypeRegistry {

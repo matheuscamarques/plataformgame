@@ -6,7 +6,10 @@
 #include "BehaviorRegistry.h"
 #include "EnemySystem.h"
 #include "GameContext.h"
+#include "Skill.h"
+#include "SkillSystem.h"
 #include "ThrowSystem.h"
+#include "UtilityAI.h"
 
 namespace support {
 
@@ -17,7 +20,6 @@ constexpr float kThrowRelease = 0.10f;
 constexpr float kRecoverTime = 0.60f;
 constexpr float kMeleeWindup = 0.25f;
 constexpr float kMeleeRecover = 0.40f;
-constexpr float kMeleeDamage = 12.f;
 // Velocidades em px/tick (física integra vx direto, como SlimeAI:
 // patrol 3.0, chase 6.0 — NÃO px/s).
 constexpr float kPatrolSpeed = 2.0f;
@@ -42,8 +44,6 @@ void DwarfAI::onTick(Enemy &e, float dt, GameContext &ctx) {
         homed_ = true;
     }
     stateTimer_.tick(dt);
-    throwCd_.tick(dt);
-    meleeCd_.tick(dt);
 
     const sf::Vector2f c{e.body.getCenterX(), e.body.getCenterY()};
     const sf::Vector2f pp = ctx.player
@@ -106,20 +106,25 @@ void DwarfAI::tickCombat(Enemy &e, float /*dt*/, GameContext &ctx) {
         case DwarfState::Recover: {
             e.body.setVx(0.f);
             if (!stateTimer_.ready()) return;
-            if (dp < cfg_.meleeRange && meleeCd_.ready()) {
-                changeState(DwarfState::Melee, kMeleeWindup);
-            } else if (dp < cfg_.throwRange && throwCd_.ready()) {
-                changeState(DwarfState::ThrowWindup, kThrowWindup);
-            } else {
+            // Decisão data-driven: UtilityAI escolhe, flags disparam o estado.
+            // Cooldown/recursos/custos moram no SkillSystem (tryUse paga).
+            const SkillDef *chosen = UtilityAI::choose(e, ctx, e.skillIds);
+            if (!chosen) {
                 const float dir = (pp.x < c.x) ? -1.f : 1.f;
                 e.body.setVx(dir * kApproachSpeed);
+            } else if (chosen->isMelee) {
+                pendingSkill_ = chosen->id;
+                changeState(DwarfState::Melee, kMeleeWindup);
+            } else {
+                pendingSkill_ = chosen->id;
+                changeState(DwarfState::ThrowWindup, kThrowWindup);
             }
             break;
         }
         case DwarfState::ThrowWindup: {
             e.body.setVx(0.f);
             if (stateTimer_.ready()) {
-                throwDynamite(e, ctx);
+                SkillSystem::tryUse(e, ctx, pendingSkill_);
                 changeState(DwarfState::ThrowRelease, kThrowRelease);
             }
             break;
@@ -127,7 +132,6 @@ void DwarfAI::tickCombat(Enemy &e, float /*dt*/, GameContext &ctx) {
         case DwarfState::ThrowRelease: {
             e.body.setVx(0.f);
             if (stateTimer_.ready()) {
-                throwCd_.trigger();
                 changeState(DwarfState::Recover, kRecoverTime);
             }
             break;
@@ -135,24 +139,12 @@ void DwarfAI::tickCombat(Enemy &e, float /*dt*/, GameContext &ctx) {
         case DwarfState::Melee: {
             e.body.setVx(0.f);
             if (!stateTimer_.ready()) return;
-            if (dp < cfg_.meleeRange + 8.f && ctx.player) {
-                ctx.player->hurt(static_cast<int>(kMeleeDamage));
-            }
-            meleeCd_.trigger();
+            SkillSystem::tryUse(e, ctx, pendingSkill_);
             changeState(DwarfState::Recover, kMeleeRecover);
             break;
         }
         default: break;
     }
-}
-
-void DwarfAI::throwDynamite(Enemy &e, GameContext &ctx) {
-    if (!ctx.throws || !ctx.player) return;
-    const sf::Vector2f from{e.body.getCenterX(), e.body.getCenterY()};
-    const float dx = ctx.player->getCenterX() - from.x;
-    const float dir = (dx < 0.f) ? -1.f : 1.f;
-    // Arco na direção do player (unidades px/s do Throwable).
-    ctx.throws->throwItem(from, {dir * 180.f, -320.f});
 }
 
 SUPPORT_REGISTER_BEHAVIOR("dwarf", DwarfAI);

@@ -63,13 +63,14 @@ private:
 } // namespace support
 
 #define _REG_SKILL_CONCAT(a, b) a##b
-#define _REG_SKILL_NAME(line) _REG_SKILL_CONCAT(AutoRegSkill_, line)
+#define _REG_SKILL_TYPE(line) _REG_SKILL_CONCAT(AutoRegSkill_, line)
+#define _REG_SKILL_INST(line) _REG_SKILL_CONCAT(autoRegSkillInstance_, line)
 #define REGISTER_SKILL(key, ...)                                            \
     namespace {                                                             \
-    struct _REG_SKILL_NAME(__LINE__) {                                       \
-        _REG_SKILL_NAME(__LINE__)() {                                       \
+    struct _REG_SKILL_TYPE(__LINE__) {                                       \
+        _REG_SKILL_TYPE(__LINE__)() {                                       \
             ::support::SkillRegistry::instance().add(key, __VA_ARGS__);     \
         }                                                                   \
     };                                                                      \
-    static _REG_SKILL_NAME(__LINE__) _REG_SKILL_CONCAT(autoRegSkill_, __LINE__); \
+    static _REG_SKILL_TYPE(__LINE__) _REG_SKILL_INST(__LINE__);             \
     }

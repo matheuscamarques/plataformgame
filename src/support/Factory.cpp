@@ -44,6 +44,8 @@ std::unique_ptr<Enemy> Factory::spawnEnemy(const std::string &kind,
     e->resources.manaRegen = a->manaRegen;
     e->resources.manaRegenDelay = core::Cooldown(a->manaRegenDelay);
 
+    e->skillIds = a->skills;
+
     if (ctx && e->ai) e->ai->onSpawn(*e, *ctx);
     return e;
 }

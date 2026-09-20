@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 #include "../core/Cooldown.h"
 #include "../entities/entity/entity.hpp"
@@ -29,8 +30,8 @@ public:
         int hp = 60;
         float aggroRange = 200.f; // px
         float homeRadius = 96.f;  // px
-        float throwRange = 128.f; // px
-        float meleeRange = 32.f;  // px
+        // Alcances moram nas skills (dwarf_dynamite/dwarf_melee),
+        // não aqui — UtilityAI decide por range da skill.
     };
 
     DwarfAI() = default;
@@ -51,13 +52,13 @@ private:
     int patrolDir_ = 1;
 
     core::Cooldown stateTimer_;
-    core::Cooldown throwCd_{1.8f};
-    core::Cooldown meleeCd_{0.8f};
+    // Skill escolhida no Recover, executada no fim do windup.
+    // Cooldown/custo moram no SkillSystem (skillCds), não aqui.
+    std::string pendingSkill_;
 
     void changeState(DwarfState s, float duration = 0.f);
     void tickPatrol(Enemy &e, float dt, GameContext &ctx);
     void tickCombat(Enemy &e, float dt, GameContext &ctx);
-    void throwDynamite(Enemy &e, GameContext &ctx);
 };
 
 } // namespace support
