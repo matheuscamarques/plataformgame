@@ -1,0 +1,26 @@
+#include "WeaponRegistry.h"
+
+using namespace support;
+
+REGISTER_WEAPON("sword", [] {
+    WeaponDef d;
+    d.spriteW = 16;
+    d.spriteH = 8;
+    d.originX = 5.f;
+    d.originY = 5.f;
+    d.handOffsetX = 4.f;
+    d.handOffsetY = 8.f;
+    return d;
+});
+
+REGISTER_WEAPON("axe", [] {
+    WeaponDef d;
+    d.spriteW = 8;
+    d.spriteH = 20;
+    d.originX = 4.f;
+    d.originY = 10.f;
+    d.handOffsetX = 4.f;
+    d.handOffsetY = 8.f;
+    d.hasSwingPhases = false; // só idle, sem swing
+    return d;
+});

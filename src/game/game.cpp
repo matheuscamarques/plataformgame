@@ -6,6 +6,7 @@
 #include "core/Log.h"
 #include "core/Time.h"
 #include "support/Combat/BodySystem.h"
+#include "support/Combat/WeaponRegistry.h"
 #include "support/Enemies/DwarfAI.h"
 #include "world/Generation.h"
 #include "world/Stratum.h"
@@ -390,8 +391,11 @@ void Game::drawPlayerWeapon() {
     const float handY = arm->worldBox.top + arm->worldBox.height * 0.5f;
     const sf::Texture *tex = &sprites_.swordIdle[m];
     float originX = 4.f, originY = 20.f;
-    if (p->loadout.weaponId == "axe") {
-        // Machado só tem idle: mesma textura em toda fase (sem swing).
+    // Machado só tem idle: mesma textura em toda fase (dado no registry).
+    const support::WeaponDef *wd =
+        support::WeaponRegistry::instance().find(p->loadout.weaponId);
+    const bool phased = !wd || wd->hasSwingPhases;
+    if (!phased) {
         tex = &sprites_.axeIdle[m];
     } else {
         switch (p->meleePhase) {

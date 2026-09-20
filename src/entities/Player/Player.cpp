@@ -1,6 +1,7 @@
 #include "Player.h"
 #include <iostream>
 #include "defines.h"
+#include "support/Combat/WeaponRegistry.h"
 #include "support/Effects/ThrowSystem.h"
 
 namespace {
@@ -134,6 +135,9 @@ void Player::tick() {
         setVx(0.0f);
     }
 
+    // Mira segue o input todo tick; o swing congela a sua (snapshot).
+    aimDir = support::resolveAim(moveUp, moveDown, moveLeft, moveRight, facing);
+
     // Walk anim (10fps, só no chão): parado volta ao frame 0.
     // jumping=true = no chão (pode pular); false = no ar.
     if ((moveLeft || moveRight) && jumping) {
@@ -213,6 +217,24 @@ constexpr MeleeDef kLight[3] = {
 };
 } // namespace
 
+namespace {
+// Rect local ao centro do player por direção (Y cresce p/ baixo).
+// Só vale com arma; soco usa kLight (reto, sem direcionalidade).
+struct AimHitboxLocal {
+    float cx, cy, w, h;
+};
+constexpr AimHitboxLocal kAimHitbox[8] = {
+    {20.f, 0.f, 20.f, 14.f},   // E
+    {14.f, -14.f, 18.f, 14.f}, // NE
+    {0.f, -20.f, 14.f, 20.f},  // N
+    {-14.f, -14.f, 18.f, 14.f},// NW
+    {-20.f, 0.f, 20.f, 14.f},  // W
+    {-14.f, 14.f, 18.f, 14.f}, // SW
+    {0.f, 20.f, 14.f, 20.f},   // S
+    {14.f, 14.f, 18.f, 14.f},  // SE
+};
+} // namespace
+
 bool Player::startSwing() {
     if (meleePhase == MeleePhase::Idle) {
         meleeCombo = 0;
@@ -225,6 +247,7 @@ bool Player::startSwing() {
     meleeTimer = kLight[meleeCombo].windup;
     meleeSwingId++;
     meleeAnimT = kMeleeAnimDur;
+    swingAim = aimDir; // congela direção do próximo golpe
     return true;
 }
 
@@ -249,14 +272,25 @@ MeleePhase Player::updateMelee(float dt) {
 sf::FloatRect Player::meleeHitbox() {
     if (meleePhase != MeleePhase::Active) return sf::FloatRect{};
 
-    // A: arma equipada manda (bbox real do Body, mesma do desenho).
+    // Com arma: 8 rects por swingAim (snapshot; input não move o golpe).
+    // E espelha X por facing (à frente); demais, direção da tela.
+    // Tamanho escala pelo sprite da arma (espada 16x8, machado 8x20):
+    // arma diferente, alcance diferente — sem lógica nova.
     if (loadout.equipped) {
-        if (const auto *w = body.find(support::BodyPartId::Weapon)) {
-            if (w->worldBox.width > 1.f) return w->worldBox;
+        const auto &hb = kAimHitbox[static_cast<int>(swingAim)];
+        float ws = 1.f, hs = 1.f;
+        if (const auto *wd =
+                support::WeaponRegistry::instance().find(loadout.weaponId)) {
+            ws = wd->spriteW / 16.f;
+            hs = wd->spriteH / 8.f;
         }
+        const float w = hb.w * ws, h = hb.h * hs;
+        const float cx = getCenterX() + hb.cx * static_cast<float>(facing);
+        const float cy = getCenterY() + hb.cy;
+        return sf::FloatRect{cx - w * 0.5f, cy - h * 0.5f, w, h};
     }
 
-    // Fallback: sem arma válida, usa o schema estático (kLight, soco).
+    // Fallback: soco. Mantém kLight[] — sem direcionalidade (soco é reto).
     const MeleeDef &d = kLight[meleeCombo];
     const float cx = getCenterX() + static_cast<float>(facing) * (getW() * 0.5f + d.hx * 0.5f);
     const float cy = getCenterY();

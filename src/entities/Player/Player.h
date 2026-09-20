@@ -4,6 +4,7 @@
 
 #include <SFML/Graphics/Rect.hpp>
 #include "entities/Entity.hpp"
+#include "support/Combat/AimDir.h"
 #include "support/Combat/Body.h"
 #include "support/Combat/SpriteFrame.h"
 #include "core/Cooldown.h"
@@ -66,6 +67,19 @@ class Player : public Entity
         int meleeCombo = 0;
         float meleeTimer = 0.f;
         int meleeSwingId = 0;
+
+        // Mira em 8 vias (input) + snapshot do swing (hitbox não segue
+        // o input no meio do golpe).
+        support::AimDir aimDir = support::AimDir::E;
+        support::AimDir swingAim = support::AimDir::E;
+
+        // Seam para parry (sem chamador ainda — CombatSystem consome
+        // quando rebate existir). Janela = início do Active.
+        bool parryWindowActive() const {
+            return meleePhase == MeleePhase::Active
+                && meleeTimer > kParryWindowStart;
+        }
+        static constexpr float kParryWindowStart = 0.06f;
 
         Player();
         void collide(Entity entity);

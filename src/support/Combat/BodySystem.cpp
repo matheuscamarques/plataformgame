@@ -1,6 +1,7 @@
 #include "BodySystem.h"
 
 #include "assets/SpriteFrameRegistry.h"
+#include "support/Combat/WeaponRegistry.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
 #include "entities/Player/Player.h"
@@ -17,21 +18,26 @@ sf::FloatRect computeWeaponBbox(Player &p) {
     const float s = p.getH() / 20.f; // kPlayerH
     const float handX = arm->worldBox.left + arm->worldBox.width * 0.5f;
     const float handY = arm->worldBox.top + arm->worldBox.height * 0.5f;
-    const float baseX = handX + 4.f * static_cast<float>(p.facing) * s;
-    const float baseY = handY + 8.f;
+    // Offsets por arma via registry (mesma matemática de antes).
+    float handOX = 4.f, handOY = 8.f;
+    if (const auto *wd0 = WeaponRegistry::instance().find(p.loadout.weaponId)) {
+        handOX = wd0->handOffsetX;
+        handOY = wd0->handOffsetY;
+    }
+    const float baseX = handX + handOX * static_cast<float>(p.facing) * s;
+    const float baseY = handY + handOY;
     // Só Active/Recovery estendem; resto, arma recolhida (nulo).
     if (p.meleePhase != MeleePhase::Active &&
         p.meleePhase != MeleePhase::Recovery)
         return {baseX, baseY, 0.f, 0.f};
-    // Dimensões por arma: espada 16x8 na guarda (5,5); machado 8x20
-    // centrado no cabo (4,10). Alcance difere sem lógica nova.
+    // Dimensões por arma via registry (sem if por id).
     float sw = 16.f * s, sh = 8.f * s;
     float ox = 5.f * s, oy = 5.f * s;
-    if (p.loadout.weaponId == "axe") {
-        sw = 8.f * s;
-        sh = 20.f * s;
-        ox = 4.f * s;
-        oy = 10.f * s;
+    if (const auto *wd = WeaponRegistry::instance().find(p.loadout.weaponId)) {
+        sw = wd->spriteW * s;
+        sh = wd->spriteH * s;
+        ox = wd->originX * s;
+        oy = wd->originY * s;
     }
     float left, top;
     if (p.facing >= 0) {

@@ -14,18 +14,17 @@ bool near(float a, float b) { return std::fabs(a - b) < 0.01f; }
 } // namespace
 
 int main() {
-    { // MeleeHitboxFromBodyWeapon (arma equipada + Active = bbox do Body)
-        Player p;
+    { // MeleeHitboxFromSwingAim (arma + Active = rect E por snapshot)
+        Player p; // (0,0,50,50), centro (25,25), facing 1, swingAim E
         p.loadout.equipped = true;
         p.meleePhase = MeleePhase::Active;
         BodySchema s = BodySchema::humanoid(50.f, 50.f);
         p.body.attach(&s);
         p.body.rebuild({100.f, 100.f}, 1);
-        if (auto *w = const_cast<PartState *>(p.body.find(BodyPartId::Weapon))) {
-            w->worldBox = {130.f, 120.f, 24.f, 8.f};
-        }
+        // E = {20,0,20,14}: cx=45, cy=25 → {35,18,20,14}.
         sf::FloatRect box = p.meleeHitbox();
-        assert(near(box.left, 130.f) && near(box.width, 24.f));
+        assert(near(box.left, 35.f) && near(box.width, 20.f));
+        assert(near(box.top, 18.f) && near(box.height, 14.f));
     }
     { // FallbackToLightWhenNoWeapon (sem equipamento = kLight, soco)
         Player p;
