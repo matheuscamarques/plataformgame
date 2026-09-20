@@ -10,6 +10,7 @@
 #include "entities/Entity.hpp"
 #include "Behavior.h"
 #include "support/Combat/Body.h"
+#include "support/Combat/SpriteFrame.h"
 #include "EnemyResources.h"
 #include "support/GameContext.h"
 #include "support/Progression/PatienceSystem.h"
@@ -50,6 +51,9 @@ struct Enemy {
     core::Cooldown barkCd{1.5f};
     // Pavio curto + vínculo (DwarfAI tica; eventos entregam).
     PatienceState patience;
+    // Frame atual (id leve). Game::tick preenche; BodySystem deriva
+    // hitboxes; render mapeia p/ textura. None = fallback schema.
+    SpriteFrameId currentFrameId = SpriteFrameId::None;
 
     Enemy(Entity b, std::unique_ptr<Behavior> a)
         : body(std::move(b)), ai(std::move(a)) {}

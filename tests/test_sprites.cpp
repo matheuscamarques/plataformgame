@@ -107,18 +107,39 @@ int main() {
     { // WalkLegsDiffer (B abre as pernas)
         assert(std::strcmp(kPlayerWalkA[15], kPlayerWalkB[15]) != 0);
     }
-    { // PickPriority (hurt > melee > throw > jump > walk > idle)
+    { // ResolvePriority (hurt > melee > throw > jump > walk > idle)
+        using support::SpriteFrameId;
+        assert(game::resolvePlayerSprite(true, 0.f, true, true, true, 0)
+               == SpriteFrameId::PlayerHurt);
+        assert(game::resolvePlayerSprite(false, 0.f, false, true, true, 0)
+               == SpriteFrameId::PlayerPunch);
+        assert(game::resolvePlayerSprite(true, 0.f, false, false, true, 0)
+               == SpriteFrameId::PlayerThrow);
+        assert(game::resolvePlayerSprite(false, 0.f, false, false, false, 0)
+               == SpriteFrameId::PlayerJump);
+        assert(game::resolvePlayerSprite(true, 100.f, false, false, false, 0)
+               == SpriteFrameId::PlayerWalkA);
+        assert(game::resolvePlayerSprite(true, 100.f, false, false, false, 1)
+               == SpriteFrameId::PlayerWalkB);
+        assert(game::resolvePlayerSprite(true, 0.f, false, false, false, 0)
+               == SpriteFrameId::PlayerIdle);
+    }
+    { // TextureForFrameMapsEveryId (todo id resolve p/ textura existente)
         SpriteSet sp{};
         const sf::Texture *fake =
             reinterpret_cast<const sf::Texture *>(0x1234);
-        assert(game::pickPlayerFrame(true, 0.f, true, true, fake, true, sp, 0) == &sp.playerHurt);
-        assert(game::pickPlayerFrame(false, 0.f, false, true, fake, true, sp, 0) == fake);
-        assert(game::pickPlayerFrame(false, 0.f, false, true, nullptr, true, sp, 0) == &sp.playerPunch);
-        assert(game::pickPlayerFrame(true, 0.f, false, false, nullptr, true, sp, 0) == &sp.playerThrow);
-        assert(game::pickPlayerFrame(false, 0.f, false, false, nullptr, false, sp, 0) == &sp.playerJump);
-        assert(game::pickPlayerFrame(true, 100.f, false, false, nullptr, false, sp, 0) == &sp.playerWalkA);
-        assert(game::pickPlayerFrame(true, 100.f, false, false, nullptr, false, sp, 1) == &sp.playerWalkB);
-        assert(game::pickPlayerFrame(true, 0.f, false, false, nullptr, false, sp, 0) == &sp.playerIdle);
+        assert(game::textureForFrame(support::SpriteFrameId::PlayerIdle, sp)
+               == &sp.playerIdle);
+        assert(game::textureForFrame(support::SpriteFrameId::DwarfThrow, sp)
+               == &sp.dwarfThrow);
+        assert(game::textureForFrame(support::SpriteFrameId::SlimeSquash, sp)
+               == &sp.slimeSquash);
+        assert(game::textureForFrame(support::SpriteFrameId::PlayerPunch, sp, fake)
+               == fake); // seam de arma preservado
+        assert(game::textureForFrame(support::SpriteFrameId::PlayerPunch, sp)
+               == &sp.playerPunch); // fallback soco
+        assert(game::textureForFrame(support::SpriteFrameId::None, sp)
+               == &sp.playerIdle);
     }
 
     std::printf("sprites test OK\n");

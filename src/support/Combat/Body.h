@@ -1,15 +1,19 @@
 #pragma once
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 
+#include "core/BodyPart.h"
+
+namespace core {
+struct PaletteEntry;
+}
+
 namespace support {
 
-enum class BodyPartId : uint8_t {
-    Head, Torso, ArmL, ArmR, LegL, LegR, Weapon,
-    COUNT
-};
+using core::BodyPartId;
 
 struct PartDef {
     BodyPartId   id;
@@ -43,12 +47,25 @@ struct Body {
     std::vector<PartState> parts;
     int facing = 1;
 
+    // Cache da derivação por sprite: só re-varre se frame/facing mudar.
+    const char* const* cachedRows = nullptr;
+    int cachedW = 0, cachedH = 0, cachedFacing = 0;
+    std::vector<sf::FloatRect> cachedRelBoxes; // em coords de sprite
+
     void attach(const BodySchema* s) {
         schema = s;
         parts.resize(s ? s->parts.size() : 0);
     }
 
     void rebuild(sf::Vector2f topLeftPos, int facing_);
+
+    // Hitbox = bbox dos pixels de cada parte no sprite atual.
+    // Sem pixels p/ parte => fallback no schema (comportamento antigo).
+    void rebuildFromSprite(
+        sf::Vector2f entityTopLeft, sf::Vector2f aabbSize,
+        const char* const* rows, int spriteW, int spriteH,
+        const core::PaletteEntry* pal, std::size_t palCount,
+        int facing_);
     const PartState* find(BodyPartId id) const;
 
     // Itera (estado, definição) em lockstep.

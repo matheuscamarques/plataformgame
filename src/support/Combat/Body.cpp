@@ -1,5 +1,9 @@
 #include "Body.h"
 
+#include <cmath>
+
+#include "core/sprite_from_ascii.h"
+
 namespace support {
 
 BodySchema BodySchema::humanoid(float height, float width) {
@@ -66,6 +70,98 @@ const PartState* Body::find(BodyPartId id) const {
     for (const auto& p : parts)
         if (p.id == id) return &p;
     return nullptr;
+}
+
+void Body::rebuildFromSprite(
+    sf::Vector2f entityTopLeft, sf::Vector2f aabbSize,
+    const char* const* rows, int sw, int sh,
+    const core::PaletteEntry* pal, std::size_t palN,
+    int facing_)
+{
+    if (!schema || !rows || sw <= 0 || sh <= 0) return;
+    facing = facing_;
+
+    const bool same = (rows == cachedRows)
+                   && (sw == cachedW) && (sh == cachedH)
+                   && (facing_ == cachedFacing);
+
+    if (!same) {
+        cachedRows = rows;
+        cachedW = sw;
+        cachedH = sh;
+        cachedFacing = facing_;
+        cachedRelBoxes.assign(schema->parts.size(), sf::FloatRect{});
+
+        for (std::size_t pi = 0; pi < schema->parts.size(); ++pi) {
+            const core::BodyPartId target = schema->parts[pi].id;
+            int minX = sw, minY = sh, maxX = -1, maxY = -1;
+
+            for (int y = 0; y < sh; ++y) {
+                const char* row = rows[y];
+                for (int x = 0; x < sw; ++x) {
+                    core::BodyPartId cp = core::BodyPartId::None;
+                    for (std::size_t k = 0; k < palN; ++k) {
+                        if (pal[k].ch == row[x]) { cp = pal[k].part; break; }
+                    }
+                    if (cp != target) continue;
+                    if (x < minX) minX = x;
+                    if (y < minY) minY = y;
+                    if (x > maxX) maxX = x;
+                    if (y > maxY) maxY = y;
+                }
+            }
+
+            if (maxX < 0) {
+                cachedRelBoxes[pi] = {-1e6f, -1e6f, 0.f, 0.f}; // fallback
+            } else {
+                cachedRelBoxes[pi] = {
+                    static_cast<float>(minX) - sw * 0.5f,
+                    static_cast<float>(minY) - sh * 0.5f,
+                    static_cast<float>(maxX - minX + 1),
+                    static_cast<float>(maxY - minY + 1)
+                };
+            }
+        }
+    }
+
+    parts.resize(schema->parts.size());
+    const float scale = aabbSize.y / static_cast<float>(sh);
+    const float cx = entityTopLeft.x + aabbSize.x * 0.5f;
+    const float cy = entityTopLeft.y + aabbSize.y * 0.5f;
+
+    for (std::size_t i = 0; i < schema->parts.size(); ++i) {
+        const PartDef& def = schema->parts[i];
+        const sf::FloatRect& rel = cachedRelBoxes[i];
+        PartState& s = parts[i];
+        s.id = def.id;
+
+        if (rel.left < -1e5f) {
+            // Fallback: schema estático (comportamento antigo).
+            s.worldBox = {
+                cx + def.offset.x * static_cast<float>(facing) - def.size.x * 0.5f,
+                cy + def.offset.y - def.size.y * 0.5f,
+                def.size.x, def.size.y
+            };
+            continue;
+        }
+
+        const float rL = rel.left, rR = rel.left + rel.width;
+        float wL, wR;
+        if (facing >= 0) {
+            wL = cx + rL * scale;
+            wR = cx + rR * scale;
+        } else {
+            wL = cx - rR * scale;
+            wR = cx - rL * scale;
+        }
+
+        s.worldBox = {
+            wL,
+            cy + rel.top * scale,
+            wR - wL,
+            rel.height * scale
+        };
+    }
 }
 
 } // namespace support

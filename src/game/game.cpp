@@ -10,6 +10,7 @@
 #include "world/Generation.h"
 #include "world/Stratum.h"
 #include "assets/PlayerSprite.h"
+#include "assets/SpriteFrameRegistry.h"
 #include "../window/window.h"
 #include "entities/Player/Player.h"
 
@@ -294,16 +295,8 @@ void Game::render()
 
 void Game::drawPlayerSprite() {
     Player *p = player.get();
-    const sf::Texture *tex;
-    if (run_.isDead()) {
-        tex = &sprites_.playerDeath;
-    } else {
-        tex = game::pickPlayerFrame(p->jumping, p->getVx(),
-                                    p->hurtIframes.running(),
-                                    p->meleeAnimT > 0.f, p->meleeTex,
-                                    p->throwAnimT > 0.f,
-                                    sprites_, p->walkFrame);
-    }
+    const sf::Texture *tex =
+        game::textureForFrame(p->currentFrameId, sprites_, p->meleeTex);
     // Escala p/ altura da entidade (50px), aspecto preservado.
     const float s = p->getH() / static_cast<float>(sprites::kPlayerH);
     sf::Sprite spr;
@@ -373,37 +366,17 @@ void Game::drawPlayerWeapon() {
 
 void Game::drawEnemiesSprites() {
     enemies_->forEach([&](support::Enemy &s) {
-        const sf::Texture *tex = &sprites_.slimeIdle;
-        float sw = static_cast<float>(sprites::kSlimeW);
-        float sh = static_cast<float>(sprites::kSlimeH);
-        if (auto *d = dynamic_cast<support::DwarfAI *>(s.ai.get())) {
-            sw = static_cast<float>(sprites::kDwarfW);
-            sh = static_cast<float>(sprites::kDwarfH);
-            switch (d->state()) {
-                case support::DwarfState::ThrowWindup:
-                case support::DwarfState::ThrowRelease:
-                    tex = &sprites_.dwarfThrow; // dinamite visível = telegraph
-                    break;
-                case support::DwarfState::Melee:
-                    tex = &sprites_.dwarfMelee; // picareta em riste
-                    break;
-                default:
-                    if (std::fabs(s.body.getVx()) > 0.5f) {
-                        tex = ((tickCount_ / 10) % 2 == 0) ? &sprites_.dwarfWalkA
-                                                           : &sprites_.dwarfWalkB;
-                    } else {
-                        tex = &sprites_.dwarfIdle;
-                    }
-                    break;
-            }
-        } else {
-            // Squash perseguindo (|vx| alto), idle patrulhando.
-            if (std::fabs(s.body.getVx()) > 4.5f) tex = &sprites_.slimeSquash;
-        }
-        const float sc = s.body.getH() / sh;
+        // Frame já decidido no tick (currentFrameId); aqui só desenha.
+        // Dimensões vêm do registry para não hardcodar por tipo.
+        // None (inimigo sem frame) = fallback slime 14x12.
+        const auto f = assets::frameData(s.currentFrameId);
+        const float fw = f.rows ? static_cast<float>(f.w) : 14.f;
+        const float fh = f.rows ? static_cast<float>(f.h) : 12.f;
+        const sf::Texture *tex = game::textureForFrame(s.currentFrameId, sprites_);
+        const float sc = s.body.getH() / fh;
         sf::Sprite spr;
         spr.setTexture(*tex);
-        spr.setOrigin(sw * 0.5f, sh);
+        spr.setOrigin(fw * 0.5f, fh);
         spr.setPosition(s.body.getCenterX(), s.body.getY() + s.body.getH());
         spr.setScale(static_cast<float>(s.body.facing) * sc, sc);
         window->draw(spr);
@@ -481,6 +454,42 @@ void Game::tick() {
     });
     support::GameContext ctx{getWorld(), p, &input_, enemies_,
                              throws_, explodes_, drops_, &targets};
+
+    // Sprite atual primeiro: BodySystem (scheduler) deriva hitboxes dele.
+    p->currentFrameId = run_.isDead()
+        ? support::SpriteFrameId::PlayerDeath
+        : game::resolvePlayerSprite(p->jumping, p->getVx(),
+                                    p->hurtIframes.running(),
+                                    p->meleeAnimT > 0.f,
+                                    p->throwAnimT > 0.f,
+                                    p->walkFrame);
+    enemies_->forEach([&](support::Enemy &s) {
+        if (auto *d = dynamic_cast<support::DwarfAI *>(s.ai.get())) {
+            switch (d->state()) {
+                case support::DwarfState::ThrowWindup:
+                case support::DwarfState::ThrowRelease:
+                    s.currentFrameId = support::SpriteFrameId::DwarfThrow;
+                    break;
+                case support::DwarfState::Melee:
+                    s.currentFrameId = support::SpriteFrameId::DwarfMelee;
+                    break;
+                default:
+                    if (std::fabs(s.body.getVx()) > 0.5f) {
+                        s.currentFrameId = ((tickCount_ / 10) % 2 == 0)
+                            ? support::SpriteFrameId::DwarfWalkA
+                            : support::SpriteFrameId::DwarfWalkB;
+                    } else {
+                        s.currentFrameId = support::SpriteFrameId::DwarfIdle;
+                    }
+                    break;
+            }
+        } else {
+            s.currentFrameId = (std::fabs(s.body.getVx()) > 4.5f)
+                ? support::SpriteFrameId::SlimeSquash
+                : support::SpriteFrameId::SlimeIdle;
+        }
+    });
+
     run_.tick(1.0f / 30.0f, ctx);
     if (!run_.isPaused() && !run_.isDead()) scheduler_.tick(1.0f / 30.0f, ctx);
 }

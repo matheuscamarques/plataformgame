@@ -4,13 +4,17 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <cstddef>
 
+#include "core/BodyPart.h"
+
 namespace core {
 
 // Um caractere = um pixel. Linhas devem ter exatamente `w` chars;
 // (teste cobre widths — textura exige contexto GL, sem teste headless).
+// `part` liga pixel a hitbox (rebuildFromSprite); None = só visual.
 struct PaletteEntry {
     char ch;
     sf::Color color;
+    BodyPartId part = BodyPartId::None;
 };
 
 inline sf::Texture makeSprite(const char *const *rows, int w, int h,

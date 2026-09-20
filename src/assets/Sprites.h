@@ -13,15 +13,15 @@ inline constexpr int kPlayerW = 12;
 inline constexpr int kPlayerH = 20;
 
 inline const core::PaletteEntry kPlayerPal[] = {
-    {'.', {0, 0, 0, 0}},
-    {'K', {30, 20, 20}},
-    {'S', {230, 180, 140}},
-    {'E', {20, 15, 15}},
-    {'C', {60, 90, 160}},
-    {'B', {50, 35, 30}},
-    {'W', {190, 190, 200}},
-    {'T', {220, 60, 50}},
-    {'t', {90, 30, 25}},
+    {'.', {0, 0, 0, 0}, core::BodyPartId::None},
+    {'K', {30, 20, 20}, core::BodyPartId::None},
+    {'S', {230, 180, 140}, core::BodyPartId::ArmR},
+    {'E', {20, 15, 15}, core::BodyPartId::Head},
+    {'C', {60, 90, 160}, core::BodyPartId::Torso},
+    {'B', {50, 35, 30}, core::BodyPartId::LegR},
+    {'W', {190, 190, 200}, core::BodyPartId::Weapon},
+    {'T', {220, 60, 50}, core::BodyPartId::Weapon},
+    {'t', {90, 30, 25}, core::BodyPartId::Weapon},
 };
 inline constexpr std::size_t kPlayerPalCount = 9;
 
@@ -212,11 +212,11 @@ inline constexpr int kSlimeW = 14;
 inline constexpr int kSlimeH = 12;
 
 inline const core::PaletteEntry kSlimePal[] = {
-    {'.', {0, 0, 0, 0}},
-    {'O', {30, 70, 40}},
-    {'G', {80, 180, 90}},
-    {'L', {150, 230, 140}},
-    {'E', {20, 25, 20}},
+    {'.', {0, 0, 0, 0}, core::BodyPartId::None},
+    {'O', {30, 70, 40}, core::BodyPartId::Torso},
+    {'G', {80, 180, 90}, core::BodyPartId::Torso},
+    {'L', {150, 230, 140}, core::BodyPartId::Head},
+    {'E', {20, 25, 20}, core::BodyPartId::Head},
 };
 inline constexpr std::size_t kSlimePalCount = 5;
 
@@ -253,16 +253,16 @@ inline constexpr int kDwarfW = 14;
 inline constexpr int kDwarfH = 18;
 
 inline const core::PaletteEntry kDwarfPal[] = {
-    {'.', {0, 0, 0, 0}},
-    {'K', {20, 15, 10}},
-    {'S', {230, 180, 140}},
-    {'E', {20, 20, 20}},
-    {'H', {140, 90, 60}},
-    {'C', {120, 130, 150}},
-    {'T', {90, 60, 40}},
-    {'B', {50, 35, 30}},
-    {'W', {180, 180, 190}},
-    {'D', {220, 60, 50}},
+    {'.', {0, 0, 0, 0}, core::BodyPartId::None},
+    {'K', {20, 15, 10}, core::BodyPartId::None},
+    {'S', {230, 180, 140}, core::BodyPartId::ArmR},
+    {'E', {20, 20, 20}, core::BodyPartId::Head},
+    {'H', {140, 90, 60}, core::BodyPartId::Head},
+    {'C', {120, 130, 150}, core::BodyPartId::Head},
+    {'T', {90, 60, 40}, core::BodyPartId::Torso},
+    {'B', {50, 35, 30}, core::BodyPartId::LegR},
+    {'W', {180, 180, 190}, core::BodyPartId::Weapon},
+    {'D', {220, 60, 50}, core::BodyPartId::Weapon},
 };
 inline constexpr std::size_t kDwarfPalCount = 10;
 

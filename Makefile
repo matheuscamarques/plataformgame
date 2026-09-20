@@ -61,16 +61,20 @@ $(TEST_BUILD)/%: $(TEST_DIR)/%.cpp $(GAME_OBJS)
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) $< $(GAME_OBJS) -o $@ $(LDFLAGS) $(LDLIBS)
 
+# Camadas: core/ nunca depende de support/ (BodyPartId mora em core).
+test-layers:
+	@! grep -rn '#include.*support/' src/core/ && echo "OK: core nao depende de support"
+
 # P1 cavernas: visualizador de noise standalone (fora de src/, sem Entity).
 NOISE_VIEW := $(BIN_DIR)/tools/noise_view
 NOISE_DIR := $(BIN_DIR)/noise
 
 noise-view: $(NOISE_VIEW)
 
-$(NOISE_VIEW): tools/noise_view/noise_view.cpp src/support/World/Generation.cpp
+$(NOISE_VIEW): tools/noise_view/noise_view.cpp src/world/Generation.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -Isrc $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
-.PHONY: all clean clear run start watch test noise-view
+.PHONY: all clean clear run start watch test test-layers noise-view
 
 -include $(DEPS)

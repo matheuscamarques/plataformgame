@@ -3,6 +3,7 @@
 #include <SFML/Graphics/Rect.hpp>
 #include "entities/Entity.hpp"
 #include "support/Combat/Body.h"
+#include "support/Combat/SpriteFrame.h"
 #include "core/Cooldown.h"
 #include "core/Material.h"
 
@@ -39,6 +40,10 @@ class Player : public Entity
         static constexpr float kThrowAnimDur = 0.40f;
 
         support::Body body; // hitboxes por parte (rebuild via BodySystem)
+
+        // Frame atual (id leve). Game::tick preenche via resolve;
+        // BodySystem deriva hitboxes; render mapeia p/ textura.
+        support::SpriteFrameId currentFrameId = support::SpriteFrameId::PlayerIdle;
 
         // S6: verbo de arremesso. Cooldown tickado no Game::tick (1/30 fixo);
         // lógica aqui para ser testável sem Game/janela.
