@@ -307,30 +307,75 @@ void Game::drawPlayerSprite() {
     window->draw(spr);
 }
 
+namespace {
+
+struct PieceDraw {
+    const sf::Texture *tex = nullptr;
+    sf::Vector2f originPx;              // pivô dentro do sprite
+    support::BodyPartId anchor = support::BodyPartId::None;
+    sf::Vector2f worldOffset;           // ajuste fino em world px
+};
+
+// Peça ancorada numa parte do Body (segue walk/jump/attack).
+// Sem a parte (Body vazio), não desenha.
+void drawPiece(const PieceDraw &pd,
+               const support::Body &body,
+               int facing, float worldScale,
+               sf::RenderTarget &target) {
+    if (!pd.tex) return;
+    const support::PartState *part = body.find(pd.anchor);
+    if (!part) return;
+    const float ax = part->worldBox.left + part->worldBox.width * 0.5f;
+    const float ay = part->worldBox.top + part->worldBox.height * 0.5f;
+    sf::Sprite spr;
+    spr.setTexture(*pd.tex);
+    spr.setOrigin(pd.originPx.x, pd.originPx.y);
+    spr.setPosition(ax + pd.worldOffset.x * static_cast<float>(facing),
+                    ay + pd.worldOffset.y);
+    spr.setScale(worldScale * static_cast<float>(facing), worldScale);
+    target.draw(spr);
+}
+
+} // namespace
+
 void Game::drawPlayerEquipment() {
     Player *p = player.get();
     if (run_.isDead() || !p->loadout.equipped) return;
     const float s = p->getH() / static_cast<float>(sprites::kPlayerH);
-    const float px = p->getCenterX();
-    const float py = p->getY() + p->getH();
-    const float f = static_cast<float>(p->facing);
-    auto drawOverlay = [&](const sf::Texture &tex, int tw, int th, float offY) {
-        sf::Sprite spr;
-        spr.setTexture(tex);
-        spr.setOrigin(tw * 0.5f, static_cast<float>(th));
-        spr.setPosition(px, py - offY * s);
-        spr.setScale(s * f, s);
-        window->draw(spr);
-    };
-    const int mLegs = static_cast<int>(p->loadout.legs);
-    const int mChest = static_cast<int>(p->loadout.chest);
+    const auto &body = p->body;
+    const int f = p->facing;
     const int mHelm = static_cast<int>(p->loadout.helm);
-    drawOverlay(sprites_.legs[mLegs], sprites::kLegsW,
-                sprites::kLegsH, sprites::kLegsH);
-    drawOverlay(sprites_.chest[mChest], sprites::kChestW,
-                sprites::kChestH, 14.f);
-    drawOverlay(sprites_.helm[mHelm], sprites::kHelmW,
-                sprites::kHelmH, 20.f);
+    const int mChest = static_cast<int>(p->loadout.chest);
+    const int mLegs = static_cast<int>(p->loadout.legs);
+
+    using support::BodyPartId;
+
+    drawPiece({&sprites_.helm[mHelm],
+               {sprites::kHelmW * 0.5f, static_cast<float>(sprites::kHelmH)},
+               BodyPartId::Head, {0.f, 5.5f}},
+              body, f, s, *window);
+    drawPiece({&sprites_.chest[mChest],
+               {sprites::kChestW * 0.5f, 0.f},
+               BodyPartId::Torso, {0.f, -7.5f}},
+              body, f, s, *window);
+    // Perneiras e botas no centro (Torso): simétricas, 1 draw cada.
+    drawPiece({&sprites_.legs[mLegs],
+               {sprites::kLegsW * 0.5f, 0.f},
+               BodyPartId::Torso, {0.f, 10.f}},
+              body, f, s, *window);
+    drawPiece({&sprites_.boots[mLegs],
+               {sprites::kBootsW * 0.5f, 0.f},
+               BodyPartId::Torso, {0.f, 20.f}},
+              body, f, s, *window);
+    const int mGlove = mHelm; // mesmo material do elmo (sem slot próprio)
+    drawPiece({&sprites_.gloves[mGlove],
+               {sprites::kGloveW * 0.5f, 0.f},
+               BodyPartId::ArmL, {0.f, -1.f}},
+              body, f, s, *window);
+    drawPiece({&sprites_.gloves[mGlove],
+               {sprites::kGloveW * 0.5f, 0.f},
+               BodyPartId::ArmR, {0.f, -1.f}},
+              body, f, s, *window);
 }
 
 void Game::drawPlayerWeapon() {

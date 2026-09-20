@@ -353,6 +353,24 @@ inline constexpr int kChestH = 8;
 inline constexpr int kLegsW = 12;
 inline constexpr int kLegsH = 6;
 
+inline constexpr int kBootsW = 12;
+inline constexpr int kBootsH = 3;
+
+inline const char *const kIronBootsIdle[] = {
+    "..wwww.wwww.",
+    "..wGGw.wGGw.",
+    "..wwww.wwww.",
+};
+
+inline constexpr int kGloveW = 4;
+inline constexpr int kGloveH = 3;
+
+inline const char *const kIronGlovesIdle[] = {
+    ".WW.",
+    "WWWw",
+    ".wW.",
+};
+
 inline const char *const kIronSwordIdle[] = {
     "....WWWW",
     "....WwwW",
@@ -463,6 +481,8 @@ struct SpriteSet {
     sf::Texture helm[kMats];
     sf::Texture chest[kMats];
     sf::Texture legs[kMats];
+    sf::Texture boots[kMats];
+    sf::Texture gloves[kMats];
 };
 
 // Roda 1x no boot (precisa de contexto GL — nunca em teste headless).
@@ -511,6 +531,8 @@ inline SpriteSet build() {
         s.helm[m] = core::makeSprite(kIronHelmIdle, kHelmW, kHelmH, pal, 5);
         s.chest[m] = core::makeSprite(kIronChestIdle, kChestW, kChestH, pal, 5);
         s.legs[m] = core::makeSprite(kIronLegsIdle, kLegsW, kLegsH, pal, 5);
+        s.boots[m] = core::makeSprite(kIronBootsIdle, kBootsW, kBootsH, pal, 5);
+        s.gloves[m] = core::makeSprite(kIronGlovesIdle, kGloveW, kGloveH, pal, 5);
     }
     return s;
 }
