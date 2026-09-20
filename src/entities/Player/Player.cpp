@@ -248,6 +248,15 @@ MeleePhase Player::updateMelee(float dt) {
 
 sf::FloatRect Player::meleeHitbox() {
     if (meleePhase != MeleePhase::Active) return sf::FloatRect{};
+
+    // A: arma equipada manda (bbox real do Body, mesma do desenho).
+    if (loadout.equipped) {
+        if (const auto *w = body.find(support::BodyPartId::Weapon)) {
+            if (w->worldBox.width > 1.f) return w->worldBox;
+        }
+    }
+
+    // Fallback: sem arma válida, usa o schema estático (kLight, soco).
     const MeleeDef &d = kLight[meleeCombo];
     const float cx = getCenterX() + static_cast<float>(facing) * (getW() * 0.5f + d.hx * 0.5f);
     const float cy = getCenterY();

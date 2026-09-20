@@ -338,7 +338,11 @@ void Game::drawPlayerWeapon() {
     if (run_.isDead() || !p->loadout.equipped) return;
     const int m = static_cast<int>(p->loadout.weapon);
     const float s = p->getH() / static_cast<float>(sprites::kPlayerH);
-    const float f = static_cast<float>(p->facing);
+    // Mão = centro do ArmR (espelho de computeWeaponBbox em BodySystem).
+    const auto *arm = p->body.find(support::BodyPartId::ArmR);
+    if (!arm) return;
+    const float handX = arm->worldBox.left + arm->worldBox.width * 0.5f;
+    const float handY = arm->worldBox.top + arm->worldBox.height * 0.5f;
     const sf::Texture *tex = &sprites_.swordIdle[m];
     float originX = 4.f, originY = 20.f;
     switch (p->meleePhase) {
@@ -354,13 +358,12 @@ void Game::drawPlayerWeapon() {
         default:
             break;
     }
-    const float handX = p->getCenterX() + 4.f * f * s;
-    const float handY = p->getY() + p->getH() * 0.5f;
     sf::Sprite spr;
     spr.setTexture(*tex);
     spr.setOrigin(originX, originY);
-    spr.setPosition(handX, handY);
-    spr.setScale(s * f, s);
+    spr.setPosition(handX + 4.f * static_cast<float>(p->facing) * s,
+                    handY + 8.f);
+    spr.setScale(s * static_cast<float>(p->facing), s);
     window->draw(spr);
 }
 

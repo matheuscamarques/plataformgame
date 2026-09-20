@@ -24,6 +24,10 @@ BodySchema BodySchema::humanoid(float height, float width) {
         // Legs
         { BodyPartId::LegL,  {-hw * 0.5f, height * 0.28f}, {width * 0.4f, height * 0.30f}, 0.7f, 0.8f, true },
         { BodyPartId::LegR,  { hw * 0.5f, height * 0.28f}, {width * 0.4f, height * 0.30f}, 0.7f, 0.8f, true },
+        // Weapon — slot zerado; BodySystem preenche por frame quando há
+        // arma (computeWeaponBbox no Game). Mult 1.0 para não mudar dano
+        // de explosão em quem usa humanoid (slime).
+        { BodyPartId::Weapon, {0.f, 0.f}, {0.1f, 0.1f}, 1.0f, 1.0f, false },
     };
     return s;
 }

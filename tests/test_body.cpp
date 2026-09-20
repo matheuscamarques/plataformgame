@@ -6,9 +6,9 @@
 int main() {
     using namespace support;
 
-    { // HumanoidHasSixParts
+    { // HumanoidHasSixPartsPlusWeaponSlot
         auto s = BodySchema::humanoid();
-        assert(s.parts.size() == 6u);
+        assert(s.parts.size() == 7u); // 6 + Weapon zerado (computeWeaponBbox)
     }
     { // DwarfHasWeaponPart
         auto s = BodySchema::dwarf();
