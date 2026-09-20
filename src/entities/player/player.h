@@ -17,6 +17,8 @@ class Player : public Entity
         bool moveDown = false, moveUp = false, moveLeft = false, moveRight = false,runFast = false;
         bool jumping = false;
         float jumpingRecharge = 0.0f;
+        int walkFrame = 0; // 0..3 (sprite walk); 0 parado
+        float walkTimer = 0.f;
 
         support::Body body; // hitboxes por parte (rebuild via BodySystem)
 

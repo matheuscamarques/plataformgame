@@ -21,6 +21,7 @@
 #include "../support/StratumManager.h"
 #include "../support/ParticleSystem.h"
 #include "../support/ThrowSystem.h"
+#include "Sprites.h"
 
 class Game
 {
@@ -52,9 +53,14 @@ private:
     support::RunManager run_; // valor: gate do tick (morte/pause)
     support::DropSystem *drops_ = nullptr; // observa; dono é o scheduler
     support::ParticleSystem *particles_ = nullptr; // observa; dono é o scheduler
+    sprites::SpriteSet sprites_; // dono: build 1x no run (precisa de GL)
+    bool spritesBuilt_ = false;
+    int tickCount_ = 0; // p/ animação walk do anão
     bool running = false;
     void render();
     void tick();
+    void drawPlayerSprite();
+    void drawEnemiesSprites();
 
     // Tamanho da viewport. Futuro: AssetManager é dono de font;
     // Game só pede por chave. Não criar AssetManager no B5.

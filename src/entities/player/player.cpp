@@ -115,6 +115,19 @@ void Player::tick() {
         setVx(0.0f);
     }
 
+    // Walk anim (10fps, só no chão): parado volta ao frame 0.
+    // jumping=true = no chão (pode pular); false = no ar.
+    if ((moveLeft || moveRight) && jumping) {
+        walkTimer += 1.0f / 30.0f;
+        if (walkTimer >= 0.10f) {
+            walkTimer = 0.f;
+            walkFrame = (walkFrame + 1) % 4;
+        }
+    } else {
+        walkFrame = 0;
+        walkTimer = 0.f;
+    }
+
     // gravity
     setVy(9.8f);
     Entity::tick();

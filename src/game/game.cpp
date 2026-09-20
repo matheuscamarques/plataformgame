@@ -6,6 +6,7 @@
 #include "../core/Log.h"
 #include "../core/Time.h"
 #include "../support/BodySystem.h"
+#include "../support/DwarfAI.h"
 #include "../support/World/Generation.h"
 #include "../support/World/Stratum.h"
 #include "../window/window.h"
@@ -90,6 +91,11 @@ void Game::run()
 {
     // Preserva os 30 TPS do loop original (Time default é 1/60).
     core::Time::setFixedStep(1.0f / 30.0f);
+    // Sprites 1x: janela aberta = contexto GL vivo (nunca em teste).
+    if (!spritesBuilt_) {
+        sprites_ = sprites::build();
+        spritesBuilt_ = true;
+    }
     float lastStat = 0.0f;
     int frames = 0;
     int updates = 0;
@@ -165,9 +171,8 @@ void Game::render()
         entity->draw(window);
     });
 
-    player.get()->draw(window);
-
-    enemies_->forEach([&](support::Enemy &s) { s.body.draw(window); });
+    drawPlayerSprite();
+    drawEnemiesSprites();
 
     // Barks com fade 1.5s acima da cabeça (texto; áudio futuro).
     enemies_->forEach([&](support::Enemy &s) {
@@ -282,7 +287,65 @@ void Game::render()
     window->display();
 }
 
+void Game::drawPlayerSprite() {
+    Player *p = player.get();
+    const sf::Texture *tex = &sprites_.playerIdle;
+    if (!p->jumping) {
+        tex = &sprites_.playerJump; // no ar
+    } else if (p->moveLeft || p->moveRight) {
+        tex = &sprites_.playerWalk[p->walkFrame % 4];
+    }
+    // Escala p/ altura da entidade (50px), aspecto preservado.
+    const float s = p->getH() / static_cast<float>(sprites::kPlayerH);
+    sf::Sprite spr;
+    spr.setTexture(*tex);
+    spr.setOrigin(sprites::kPlayerW * 0.5f, static_cast<float>(sprites::kPlayerH));
+    spr.setPosition(p->getCenterX(), p->getY() + p->getH());
+    spr.setScale(static_cast<float>(p->facing) * s, s);
+    window->draw(spr);
+}
+
+void Game::drawEnemiesSprites() {
+    enemies_->forEach([&](support::Enemy &s) {
+        const sf::Texture *tex = &sprites_.slimeIdle;
+        float sw = static_cast<float>(sprites::kSlimeW);
+        float sh = static_cast<float>(sprites::kSlimeH);
+        if (auto *d = dynamic_cast<support::DwarfAI *>(s.ai.get())) {
+            sw = static_cast<float>(sprites::kDwarfW);
+            sh = static_cast<float>(sprites::kDwarfH);
+            switch (d->state()) {
+                case support::DwarfState::ThrowWindup:
+                case support::DwarfState::ThrowRelease:
+                    tex = &sprites_.dwarfThrow; // dinamite visível = telegraph
+                    break;
+                case support::DwarfState::Melee:
+                    tex = &sprites_.dwarfMelee; // picareta em riste
+                    break;
+                default:
+                    if (std::fabs(s.body.getVx()) > 0.5f) {
+                        tex = ((tickCount_ / 10) % 2 == 0) ? &sprites_.dwarfWalkA
+                                                           : &sprites_.dwarfWalkB;
+                    } else {
+                        tex = &sprites_.dwarfIdle;
+                    }
+                    break;
+            }
+        } else {
+            // Squash perseguindo (|vx| alto), idle patrulhando.
+            if (std::fabs(s.body.getVx()) > 4.5f) tex = &sprites_.slimeSquash;
+        }
+        const float sc = s.body.getH() / sh;
+        sf::Sprite spr;
+        spr.setTexture(*tex);
+        spr.setOrigin(sw * 0.5f, sh);
+        spr.setPosition(s.body.getCenterX(), s.body.getY() + s.body.getH());
+        spr.setScale(static_cast<float>(s.body.facing) * sc, sc);
+        window->draw(spr);
+    });
+}
+
 void Game::tick() {
+    tickCount_++;
     Player *p = player.get();
     p->moveRight = input_.held(support::Action::Right);
     p->moveUp    = input_.held(support::Action::Up);
