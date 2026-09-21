@@ -68,6 +68,16 @@ int main() {
         assert(resolveFor(p) == SpriteFrameId::PlayerPunchUp);
     }
 
+    { // AimSurvivesJumpConsumption (↑ segurado no ar mantém N)
+        Player p;
+        p.moveUp = true;
+        p.jumping = true;
+        p.jumpingRecharge = 999.f; // estoura o limiar: pulo consome moveUp
+        p.tick();
+        assert(!p.moveUp); // subida limitada preservada
+        assert(p.aimDir == support::AimDir::N); // mira viu o input físico
+    }
+
     std::puts("player sprite sync test OK");
     return 0;
 }

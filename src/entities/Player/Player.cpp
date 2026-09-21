@@ -97,6 +97,12 @@ void Player::collide(Component bloco)
 }
 
 void Player::tick() {
+    // Snapshot do input p/ mira: o pulo consome moveUp abaixo; sem a
+    // cópia, segurar ↑ no ar perde o N após ~5 ticks de subida.
+    const bool aimUp = moveUp;
+    const bool aimDown = moveDown;
+    const bool aimLeft = moveLeft;
+    const bool aimRight = moveRight;
 
 
     if (moveUp && jumping) {
@@ -135,7 +141,7 @@ void Player::tick() {
     }
 
     // Mira segue o input todo tick; o swing congela a sua (snapshot).
-    aimDir = support::resolveAim(moveUp, moveDown, moveLeft, moveRight, facing);
+    aimDir = support::resolveAim(aimUp, aimDown, aimLeft, aimRight, facing);
 
     // Walk anim (10fps, só no chão): parado volta ao frame 0.
     // jumping=true = no chão (pode pular); false = no ar.
