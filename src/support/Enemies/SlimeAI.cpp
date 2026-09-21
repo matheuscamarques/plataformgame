@@ -31,6 +31,7 @@ void SlimeAI::onTick(Enemy &e, float dt, GameContext &ctx) {
         dy = p->getCenterY() - e.body.getCenterY();
         chase = std::fabs(dx) < AGGRO_X && std::fabs(dy) < AGGRO_Y;
     }
+    chasing_ = chase;
 
     // Skill ranged: cospe entre 40 e 220px (cooldown+stamina no tryUse).
     if (p) {

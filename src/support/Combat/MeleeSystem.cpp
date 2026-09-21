@@ -6,12 +6,33 @@
 
 #include "entities/Player/Player.h"
 #include "support/Combat/Body.h"
+#include "support/Debug/DebugFeed.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
 #include "support/Input/InputMap.h"
 #include "support/Effects/ParticleSystem.h"
 
 namespace support {
+
+namespace {
+// Nome curto p/ log de debug (feed F4). Espelha kind(), sem string.
+const char *enemyKindName(const Enemy &s) {
+    if (!s.ai) return "?";
+    return s.ai->kind() == core::EntityKind::Dwarf ? "dwarf" : "slime";
+}
+const char *partName(BodyPartId id) {
+    switch (id) {
+        case BodyPartId::Head: return "head";
+        case BodyPartId::Torso: return "torso";
+        case BodyPartId::ArmL:
+        case BodyPartId::ArmR: return "arm";
+        case BodyPartId::LegL:
+        case BodyPartId::LegR: return "leg";
+        case BodyPartId::Weapon: return "weapon";
+        default: return "?";
+    }
+}
+} // namespace
 
 void MeleeSystem::tick(float dt, GameContext &ctx) {
     Player *p = ctx.player;
@@ -91,6 +112,15 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
             particles_->spawnHitSpark(
                 {bestBox.left + bestBox.width * 0.5f,
                  bestBox.top + bestBox.height * 0.5f});
+        }
+        // Feed de debug (F2 números, F4 log). Sem ctx.debug, sem custo.
+        if (ctx.debug && applied > 0) {
+            const sf::Vector2f at{bestBox.left + bestBox.width * 0.5f,
+                                  bestBox.top + bestBox.height * 0.5f};
+            ctx.debug->pushNumber("-" + std::to_string(applied), at);
+            ctx.debug->pushLog(std::string("melee ") + enemyKindName(s) +
+                               " " + (best ? partName(best->id) : "body") +
+                               " -" + std::to_string(applied));
         }
     });
 }

@@ -13,6 +13,7 @@ enum class Action : uint8_t {
     Light, Heavy,
     Pause, ToggleDebug, Restart, CycleMaterial, ToggleCharView,
     ScreenshotNow, ToggleAutoMelee, ToggleAutoHurt, // F12, F11, F10
+    ToggleHitboxes, ToggleAi, ToggleEvents, ToggleWorld, // F2,F5,F4,F6
     COUNT
 };
 

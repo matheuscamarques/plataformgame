@@ -45,6 +45,8 @@ public:
 
     // Observabilidade de teste (não API de gameplay).
     DwarfState state() const { return state_; }
+    // Raio de aggro p/ overlay de debug (círculo F5). Só leitura.
+    float aggroRange() const { return cfg_.aggroRange; }
 
 private:
     Config cfg_;

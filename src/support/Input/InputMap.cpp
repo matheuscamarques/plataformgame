@@ -22,6 +22,10 @@ InputMap::InputMap() {
     bind(Action::ScreenshotNow, sf::Keyboard::F12);
     bind(Action::ToggleAutoMelee, sf::Keyboard::F11);
     bind(Action::ToggleAutoHurt, sf::Keyboard::F10);
+    bind(Action::ToggleHitboxes, sf::Keyboard::F2);
+    bind(Action::ToggleAi, sf::Keyboard::F5);
+    bind(Action::ToggleEvents, sf::Keyboard::F4);
+    bind(Action::ToggleWorld, sf::Keyboard::F6);
 
     addBind(Action::Left,  sf::Keyboard::A);
     addBind(Action::Right, sf::Keyboard::D);

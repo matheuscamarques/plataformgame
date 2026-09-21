@@ -16,8 +16,11 @@ public:
     void setGrounded(bool g) override { grounded = g; }
 
     bool grounded = false;
+    // Observabilidade p/ label de debug (F5). Sem lógica de gameplay.
+    bool chasing() const { return chasing_; }
 
 private:
+    bool chasing_ = false;
     float dir_ = 1.0f;
     int flipTimer_ = 0;
     int hopCooldown_ = 0;

@@ -32,4 +32,11 @@ void Game::pollEvents() {
         screenshots_.setAutoMelee(!screenshots_.autoMelee());
     if (input_.pressed(support::Action::ToggleAutoHurt))
         screenshots_.setAutoHurt(!screenshots_.autoHurt());
+    if (input_.pressed(support::Action::ToggleHitboxes))
+        overlay_.toggleHitboxes();
+    if (input_.pressed(support::Action::ToggleAi)) overlay_.toggleAi();
+    if (input_.pressed(support::Action::ToggleEvents))
+        overlay_.toggleEvents();
+    if (input_.pressed(support::Action::ToggleWorld))
+        overlay_.toggleWorld();
 }

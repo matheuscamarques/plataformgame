@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include <string>
+#include <utility>
 
 #include "core/Config.h"
 #include "core/Material.h"
@@ -19,12 +20,29 @@
 #include "support/Debug/BodyDump.h"
 #include "support/Effects/ParticleSystem.h"
 #include "support/Effects/ThrowSystem.h"
+#include "support/Enemies/DwarfAI.h"
 #include "support/Enemies/EnemySystem.h"
+#include "support/Enemies/SlimeAI.h"
 #include "support/Progression/DropSystem.h"
 
 // Renderer: tudo que desenha (render + draws + helpers de char-view).
 
 namespace {
+// Cor por estado do anão p/ label de debug (F5). Cinza = calmo.
+std::pair<const char *, sf::Color> dwarfLabel(support::DwarfState st) {
+    using support::DwarfState;
+    switch (st) {
+        case DwarfState::Patrol: return {"PATROL", {160, 160, 160}};
+        case DwarfState::Alert: return {"ALERT", {255, 255, 0}};
+        case DwarfState::ThrowWindup: return {"THROW", {255, 140, 0}};
+        case DwarfState::ThrowRelease: return {"THROW", {255, 140, 0}};
+        case DwarfState::Recover: return {"RECOVER", {100, 160, 255}};
+        case DwarfState::Melee: return {"MELEE", {255, 60, 60}};
+        case DwarfState::Retreat: return {"RETREAT", {200, 100, 255}};
+        default: return {"?", {255, 255, 255}};
+    }
+}
+
 // Cor determinística por char (hash → RGB). '.' = transparente.
 sf::Color colorForChar(char c) {
     if (c == '.') return {0, 0, 0, 0};
@@ -112,6 +130,56 @@ void Game::render()
         window->draw(t);
     });
 
+    // Labels de IA + aggro (canal F5): estado do anão, chase do slime,
+    // retângulo de aggro do slime (condição real: |dx|,|dy| < 400),
+    // círculo do anão (radial, cfg do tipo).
+    if (overlay_.visible() && overlay_.ai()) {
+        enemies_->forEach([&](support::Enemy &s) {
+            const float cx = s.body.getCenterX();
+            const float cy = s.body.getCenterY();
+            if (const auto *d =
+                    dynamic_cast<const support::DwarfAI *>(s.ai.get())) {
+                const auto [label, color] = dwarfLabel(d->state());
+                sf::Text t;
+                t.setFont(font);
+                t.setString(label);
+                t.setCharacterSize(12);
+                t.setFillColor(color);
+                t.setOutlineColor(sf::Color::Black);
+                t.setOutlineThickness(1);
+                t.setPosition(s.body.getX() - 20.f, s.body.getY() - 40.f);
+                window->draw(t);
+                const float r = d->aggroRange();
+                sf::CircleShape c(r);
+                c.setOrigin(r, r);
+                c.setPosition(cx, cy);
+                c.setFillColor(sf::Color::Transparent);
+                c.setOutlineColor(sf::Color(100, 255, 100, 160));
+                c.setOutlineThickness(1.f);
+                window->draw(c);
+            } else if (const auto *sl =
+                           dynamic_cast<const support::SlimeAI *>(
+                               s.ai.get())) {
+                sf::Text t;
+                t.setFont(font);
+                t.setString(sl->chasing() ? "CHASE" : "PATROL");
+                t.setFillColor(sl->chasing() ? sf::Color(255, 80, 80)
+                                             : sf::Color(160, 160, 160));
+                t.setCharacterSize(12);
+                t.setOutlineColor(sf::Color::Black);
+                t.setOutlineThickness(1);
+                t.setPosition(s.body.getX() - 20.f, s.body.getY() - 40.f);
+                window->draw(t);
+                sf::RectangleShape r(sf::Vector2f(800.f, 800.f));
+                r.setPosition(cx - 400.f, cy - 400.f);
+                r.setFillColor(sf::Color::Transparent);
+                r.setOutlineColor(sf::Color(255, 100, 100, 160));
+                r.setOutlineThickness(1.f);
+                window->draw(r);
+            }
+        });
+    }
+
     // Throwables visíveis: círculo com cor pelo fuse (verde→vermelho).
     throws_->forEachActive([&](const support::Throwable &t) {
         sf::CircleShape c(3.f);
@@ -131,8 +199,9 @@ void Game::render()
 
     particles_->render(*window);
 
-    // Flash do swing: outline da hitbox só na janela Active.
-    if (player.get()->meleePhase == MeleePhase::Active) {
+    // Flash do swing: outline da hitbox só na janela Active (canal F2).
+    if (player.get()->meleePhase == MeleePhase::Active &&
+        overlay_.visible() && overlay_.hitboxes()) {
         const sf::FloatRect box = player.get()->meleeHitbox();
         sf::RectangleShape r(sf::Vector2f(box.width, box.height));
         r.setPosition(box.left, box.top);
@@ -144,8 +213,8 @@ void Game::render()
 
     drops_->render(*window);
 
-    // Debug draw das hitboxes por parte (só com overlay ligado).
-    if (overlay_.visible()) {
+    // Debug draw das hitboxes por parte (canal F2; F1 master).
+    if (overlay_.visible() && overlay_.hitboxes()) {
         Player *p = player.get();
         auto drawParts = [&](const support::Body &b) {
             b.forEach([&](const support::PartState &st,
@@ -233,6 +302,44 @@ void Game::render()
             window->draw(line, 2, sf::Lines);
         }
 
+        // ── 4. Números de dano flutuantes (feed): sobem e somem em
+        // 0.5s. Valida per-part no olho (-16 = head, -5 = arm).
+        for (const auto &n : debugFeed_.numbers) {
+            const float risen =
+                (support::DebugFeed::kNumberTtl - n.ttl) * 80.f;
+            const sf::Uint8 a = static_cast<sf::Uint8>(
+                255.f * std::max(0.f, std::min(1.f, n.ttl /
+                                                         support::DebugFeed::kNumberTtl)));
+            sf::Text t;
+            t.setFont(font);
+            t.setString(n.text);
+            t.setCharacterSize(14);
+            t.setFillColor(sf::Color(255, 240, 200, a));
+            t.setOutlineColor(sf::Color(0, 0, 0, a));
+            t.setOutlineThickness(1);
+            t.setPosition(n.pos.x - 10.f, n.pos.y - risen);
+            window->draw(t);
+        }
+
+        // ── 5. Linha Body↔sprite do player: tripwire de offset. Por
+        // construção é ~zero (mesma fórmula dos 2 lados); se abrir
+        // >2px, alguma conta de desenho divergiu. Vermelho = divergiu.
+        {
+            Player *pl = player.get();
+            const float s =
+                pl->getH() / static_cast<float>(sprites::kPlayerH);
+            const sf::Vector2f a{pl->getCenterX(), pl->getCenterY()};
+            const sf::Vector2f b{pl->getCenterX(),
+                                 pl->getY() + pl->getH() - 10.f * s};
+            const float dx = a.x - b.x, dy = a.y - b.y;
+            const bool diverged =
+                (dx * dx + dy * dy) > 4.f; // 2px ao quadrado
+            const sf::Color c =
+                diverged ? sf::Color::Red : sf::Color::Green;
+            sf::Vertex line[] = {sf::Vertex(a, c), sf::Vertex(b, c)};
+            window->draw(line, 2, sf::Lines);
+        }
+
         // Dump textual a cada 30 frames (não spamma stderr por frame).
         static int dumpCounter = 0;
         if (++dumpCounter % 30 == 0) {
@@ -260,6 +367,22 @@ void Game::render()
     // Tosco de propósito; HUD bonito é polimento.
     {
         window->setView(window->getDefaultView());
+        // Log de eventos (canal F4): últimas linhas do feed, topo-right.
+        if (overlay_.visible() && overlay_.events()) {
+            int row = 0;
+            for (const auto &line : debugFeed_.log) {
+                sf::Text t;
+                t.setFont(font);
+                t.setString(line);
+                t.setCharacterSize(14);
+                t.setFillColor(sf::Color(200, 255, 200));
+                t.setOutlineColor(sf::Color::Black);
+                t.setOutlineThickness(1);
+                t.setPosition(viewW_ - 380.f, 16.f + row * 20.f);
+                window->draw(t);
+                ++row;
+            }
+        }
         Player *p = player.get();
         const float ratio = static_cast<float>(p->hp) / static_cast<float>(p->hpMax);
 

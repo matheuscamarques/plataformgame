@@ -5,6 +5,7 @@
 
 #include "defines.h"
 #include "entities/Entity.hpp"
+#include "support/Debug/DebugFeed.h"
 #include "support/Enemies/EnemyResources.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
@@ -40,6 +41,9 @@ int ExplosionSystem::explode(sf::Vector2f center, const ExplosionDef &def, GameC
             if (applyToTarget(t, center, def)) ++hit;
         }
     }
+    if (ctx.debug)
+        ctx.debug->pushLog("explode " + std::to_string(def.damage) +
+                           " hit" + std::to_string(hit));
     return hit;
 }
 

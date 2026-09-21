@@ -145,7 +145,7 @@ void Game::tick() {
     });
     support::GameContext ctx{getWorld(), p, &input_, enemies_,
                              throws_, explodes_, drops_, &targets,
-                             &screenshots_};
+                             &screenshots_, &debugFeed_};
 
     // Sprite atual primeiro: BodySystem (scheduler) deriva hitboxes dele.
     p->currentFrameId = run_.isDead()
@@ -184,5 +184,6 @@ void Game::tick() {
     });
 
     run_.tick(1.0f / 30.0f, ctx);
+    debugFeed_.tick(1.0f / 30.0f); // números de dano expiram
     if (!run_.isPaused() && !run_.isDead()) scheduler_.tick(1.0f / 30.0f, ctx);
 }

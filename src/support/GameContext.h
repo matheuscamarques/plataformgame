@@ -14,6 +14,7 @@ class ExplosionSystem;
 class DropSystem;
 struct ExplosionTarget;
 class ScreenshotSystem;
+struct DebugFeed;
 
 // Visões (sem ownership) que os sistemas recebem por tick.
 // Dono continua sendo o Game.
@@ -32,6 +33,9 @@ struct GameContext {
 
     // Debug visual (screenshots auto). Nulo em testes headless.
     ScreenshotSystem *screenshots = nullptr;
+
+    // Feed de debug (números + log). Nulo em testes headless.
+    DebugFeed *debug = nullptr;
 };
 
 } // namespace support

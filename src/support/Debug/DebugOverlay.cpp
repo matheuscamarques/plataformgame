@@ -10,7 +10,8 @@ namespace support {
 void DebugOverlay::render(sf::RenderWindow &window, const sf::Font &font,
                           World &world, ::Player &player,
                           std::size_t totalPlatforms) {
-    if (!visible_) return;
+    // Todo o corpo é canal world (F6): query, grid, hash, plataformas.
+    if (!visible_ || !world_) return;
 
     float qx = player.getX() - core::kBlockSize;
     float qy = player.getY() - core::kBlockSize;

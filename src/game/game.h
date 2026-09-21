@@ -7,6 +7,7 @@
 #include "core/System.h"
 #include "../support/Camera/Camera.h"
 #include "../support/Debug/DebugOverlay.h"
+#include "../support/Debug/DebugFeed.h"
 #include "../support/Debug/ScreenshotSystem.h"
 #include "../support/Input/InputMap.h"
 #include "support/Progression/RunManager.h"
@@ -58,6 +59,7 @@ private:
     support::MeleeSystem *melee_ = nullptr; // observa; dono é o scheduler
     support::StratumManager *stratum_ = nullptr; // observa; dono é o scheduler
     support::RunManager run_; // valor: gate do tick (morte/pause)
+    support::DebugFeed debugFeed_; // valor: números + log (F2/F4)
     support::ScreenshotSystem screenshots_; // valor: PNGs de debug (F10-12)
     support::DropSystem *drops_ = nullptr; // observa; dono é o scheduler
     support::ParticleSystem *particles_ = nullptr; // observa; dono é o scheduler

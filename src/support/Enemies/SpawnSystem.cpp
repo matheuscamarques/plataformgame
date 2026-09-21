@@ -10,6 +10,7 @@
 #include "entities/Player/Player.h"
 #include "EnemySystem.h"
 #include "EnemyArchetype.h"
+#include "support/Debug/DebugFeed.h"
 #include "support/GameContext.h"
 #include "world/Stratum.h"
 #include "world/World.h"
@@ -105,6 +106,9 @@ void SpawnSystem::tick(float dt, GameContext &ctx) {
         sy = static_cast<float>(tyy) * core::kBlockSize;
     }
     ctx.enemies->spawn(kind, sx, sy, &ctx);
+    if (ctx.debug)
+        ctx.debug->pushLog("spawn " + kind + " S" +
+                           std::to_string(stratum));
 }
 
 } // namespace support
