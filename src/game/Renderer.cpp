@@ -146,8 +146,10 @@ void Game::render()
 
     // Debug draw das hitboxes por parte (só com overlay ligado).
     if (overlay_.visible()) {
+        Player *p = player.get();
         auto drawParts = [&](const support::Body &b) {
-            b.forEach([&](const support::PartState &st, const support::PartDef &) {
+            b.forEach([&](const support::PartState &st,
+                          const support::PartDef &) {
                 sf::RectangleShape r(sf::Vector2f(st.worldBox.width, st.worldBox.height));
                 r.setPosition(st.worldBox.left, st.worldBox.top);
                 r.setFillColor(sf::Color::Transparent);
@@ -156,8 +158,80 @@ void Game::render()
                 window->draw(r);
             });
         };
-        drawParts(player.get()->body);
+        drawParts(p->body);
         enemies_->forEach([&](support::Enemy &s) { drawParts(s.bodyParts); });
+
+        // ── 1. Weapon bbox sempre (ciano): onde a arma está agora,
+        // mesmo fora do Active (só existe com arma visível).
+        if (p->loadout.equipped) {
+            if (const auto *w = p->body.find(support::BodyPartId::Weapon)) {
+                if (w->worldBox.width > 0.5f) {
+                    sf::RectangleShape r(
+                        {w->worldBox.width, w->worldBox.height});
+                    r.setPosition(w->worldBox.left, w->worldBox.top);
+                    r.setFillColor(sf::Color::Transparent);
+                    r.setOutlineColor(sf::Color::Cyan);
+                    r.setOutlineThickness(1.f);
+                    window->draw(r);
+                }
+            }
+        }
+
+        // ── 2. Preview da hitbox 8-dir (laranja, sólida: SFML não
+        // tem tracejado): onde a hitbox cairia se apertasse K agora.
+        // Mesma fórmula de Player::meleeHitbox(), mas com a mira
+        // atual (fora do swing) ou o snapshot (no swing), sem exigir
+        // Active. Tabela duplicada só p/ debug; quem manda em prod é
+        // Player::meleeHitbox(). Escala da arma replicada (machado).
+        {
+            const auto aim = p->inMeleeSwing() ? p->swingAim : p->aimDir;
+            struct HB {
+                float cx, cy, w, h;
+            };
+            static const HB kPrev[8] = {
+                {20.f, 0.f, 20.f, 14.f}, // E
+                {14.f, -14.f, 18.f, 14.f}, // NE
+                {0.f, -20.f, 14.f, 20.f}, // N
+                {-14.f, -14.f, 18.f, 14.f}, // NW
+                {-20.f, 0.f, 20.f, 14.f}, // W
+                {-14.f, 14.f, 18.f, 14.f}, // SW
+                {0.f, 20.f, 14.f, 20.f}, // S
+                {14.f, 14.f, 18.f, 14.f}, // SE
+            };
+            const auto &hb = kPrev[static_cast<int>(aim)];
+            float ws = 1.f, hs = 1.f;
+            if (p->loadout.equipped) {
+                if (const auto *wd =
+                        support::WeaponRegistry::instance().find(
+                            p->loadout.weaponId)) {
+                    ws = wd->spriteW / 16.f;
+                    hs = wd->spriteH / 8.f;
+                }
+            }
+            const float w = hb.w * ws, h = hb.h * hs;
+            const float cx = p->getCenterX() + hb.cx;
+            const float cy = p->getCenterY() + hb.cy;
+            sf::RectangleShape r({w, h});
+            r.setPosition(cx - w * 0.5f, cy - h * 0.5f);
+            r.setFillColor(sf::Color::Transparent);
+            r.setOutlineColor(sf::Color(255, 140, 0)); // laranja
+            r.setOutlineThickness(1.f);
+            window->draw(r);
+        }
+
+        // ── 3. Indicador de mira (linha amarela): centro do player
+        // na direção de aimDir.
+        {
+            const auto v = support::aimVector(p->aimDir);
+            const float cx = p->getCenterX();
+            const float cy = p->getCenterY();
+            sf::Vertex line[] = {
+                sf::Vertex({cx, cy}, sf::Color::Yellow),
+                sf::Vertex({cx + v.x * 40.f, cy + v.y * 40.f},
+                           sf::Color::Yellow),
+            };
+            window->draw(line, 2, sf::Lines);
+        }
 
         // Dump textual a cada 30 frames (não spamma stderr por frame).
         static int dumpCounter = 0;
