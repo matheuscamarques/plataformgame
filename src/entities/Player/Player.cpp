@@ -11,7 +11,7 @@ constexpr float kGravity = 2.0f;
 constexpr float kTerminalVelocity = 25.0f;
 }
  Player::Player() :
-Entity(PLAYER,0,0,30,50) // AABB derivado do sprite 12x20 a 2.5x
+Entity(core::kIdPlayer,0,0,30,50) // AABB derivado do sprite 12x20 a 2.5x
 {
     setFillColor(sf::Color::Red);
     static auto schema = support::BodySchema::humanoid(30.f, 50.f);
@@ -22,25 +22,25 @@ Entity(PLAYER,0,0,30,50) // AABB derivado do sprite 12x20 a 2.5x
 void Player::collide(Entity bloco)
 {
     if(
-        bloco.getName() == WATER
+        bloco.getName() == core::kIdWater
     ){
         jumping = true;
         return;
     }
     // Lava e deco não colidem como parede (dano vem na Fase C).
     if(
-        bloco.getName() == LAVA
+        bloco.getName() == core::kIdLava
     ){
         return;
     }
     // Enemy não empurra o player (dano de contato vem na Fase C).
     if(
-        bloco.getName() == SLIME
+        bloco.getName() == core::kIdSlime
     ){
         return;
     }
     if(
-        bloco.getName() == TREE_TRUNK || bloco.getName() == TREE_LEAF
+        bloco.getName() == core::kIdTreeTrunk || bloco.getName() == core::kIdTreeLeaf
     ){
         return;
     }
@@ -100,11 +100,10 @@ void Player::tick() {
 
 
     if (moveUp && jumping) {
-        // 50 is block tile tam
-			setY(getY() - 50 * 1.0f / 2);
+			setY(getY() - core::kBlockSize * 1.0f / 2);
 
-			jumpingRecharge += 50 * 1.0/ 2 ;
-			if (jumpingRecharge > 50 * 5) {
+			jumpingRecharge += core::kBlockSize * 1.0/ 2 ;
+			if (jumpingRecharge > core::kBlockSize * 5) {
 				jumping = false;
 				jumpingRecharge = 0.0f;
 				moveUp = false;

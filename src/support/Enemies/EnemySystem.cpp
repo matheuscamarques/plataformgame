@@ -71,7 +71,7 @@ void EnemySystem::physics(Enemy &s, GameContext &ctx) {
     ctx.world->query(e.getX() - 2.0f, e.getY() - 2.0f,
                      e.getW() + 4.0f, e.getH() + 4.0f, around);
     for (Entity *c : around) {
-        if (c->getName() != COLIDE) continue;
+        if (c->getName() != core::kIdColide) continue;
         if (e.getBoundsBottom().intersects(*c)) {
             e.setY(c->getY() - e.getH());
             e.setVy(0.0f);

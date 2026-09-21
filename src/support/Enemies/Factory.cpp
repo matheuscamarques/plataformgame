@@ -25,7 +25,7 @@ std::unique_ptr<Enemy> Factory::spawnEnemy(const std::string &kind,
     auto ai = BehaviorRegistry::instance().create(a->behaviorKind);
     if (!ai) return nullptr;
 
-    Entity body(SLIME, x, y, a->hitboxSize.x, a->hitboxSize.y);
+    Entity body(core::kIdSlime, x, y, a->hitboxSize.x, a->hitboxSize.y);
     body.setFillColor(a->color);
 
     auto e = std::make_unique<Enemy>(std::move(body), std::move(ai));
@@ -52,7 +52,7 @@ std::unique_ptr<Enemy> Factory::spawnEnemy(const std::string &kind,
 
     // Variante por profundidade (dano/hp/skills extras). Slime não tem
     // variantes: forDepth retorna null e nada muda.
-    const int stratum = stratumAt(static_cast<int>(std::floor(y / BLOCK_SIZE)));
+    const int stratum = stratumAt(static_cast<int>(std::floor(y / core::kBlockSize)));
     if (const VariantDef *v = VariantRegistry::instance().forDepth(kind, stratum)) {
         e->variantLevel = v->level;
         e->damageMult = v->damageMult;

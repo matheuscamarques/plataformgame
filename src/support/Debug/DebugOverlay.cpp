@@ -12,10 +12,10 @@ void DebugOverlay::render(sf::RenderWindow &window, const sf::Font &font,
                           std::size_t totalPlatforms) {
     if (!visible_) return;
 
-    float qx = player.getX() - BLOCK_SIZE;
-    float qy = player.getY() - BLOCK_SIZE;
-    float qw = player.getW() + BLOCK_SIZE * 2;
-    float qh = player.getH() + BLOCK_SIZE * 2;
+    float qx = player.getX() - core::kBlockSize;
+    float qy = player.getY() - core::kBlockSize;
+    float qw = player.getW() + core::kBlockSize * 2;
+    float qh = player.getH() + core::kBlockSize * 2;
 
     sf::RectangleShape queryRect(sf::Vector2f(qw, qh));
     queryRect.setPosition(qx, qy);

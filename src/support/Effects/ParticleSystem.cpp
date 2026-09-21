@@ -35,8 +35,8 @@ void ParticleSystem::tick(float dt, GameContext &ctx) {
         p.pos += p.vel * dt;
 
         if (p.collides && ctx.world) {
-            int tx = static_cast<int>(p.pos.x / BLOCK_SIZE);
-            int ty = static_cast<int>(p.pos.y / BLOCK_SIZE);
+            int tx = static_cast<int>(p.pos.x / core::kBlockSize);
+            int ty = static_cast<int>(p.pos.y / core::kBlockSize);
             if (ctx.world->isSolid(tx, ty)) {
                 p.vel = {0.f, 0.f};
                 p.gravity = 0.f;

@@ -5,6 +5,7 @@
 
 #include <SFML/System/Vector2.hpp>
 
+#include "core/Config.h"
 #include "entities/Player/Player.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
@@ -18,7 +19,7 @@ REGISTER_ENEMY_ARCHETYPE("slime", [] {
     a.color = {0, 200, 0};
     a.hitboxSize = {40.f, 30.f};
     a.behaviorKind = "slime";
-    a.behaviorName = "SlimeAI";
+    a.kind = core::EntityKind::Slime;
     a.bodySchema = "humanoid";
     a.isTrash = true;
     a.hp = 30;
@@ -37,7 +38,7 @@ REGISTER_ENEMY_ARCHETYPE("dwarf", [] {
     a.color = {139, 90, 43};
     a.hitboxSize = {36.f, 44.f};
     a.behaviorKind = "dwarf";
-    a.behaviorName = "DwarfAI";
+    a.kind = core::EntityKind::Dwarf;
     a.bodySchema = "dwarf";
     a.isTrash = false;
     a.hp = 60;
@@ -209,15 +210,15 @@ REGISTER_SKILL("dwarf_dig", [] {
                               : 1.f;
         const float nx = self.body.getCenterX() + dir * 128.f;
         const float ny = self.body.getCenterY();
-        const int ntx = static_cast<int>(nx / 50.f);
-        const int nty = static_cast<int>(ny / 50.f);
+        const int ntx = static_cast<int>(nx / core::kBlockSize);
+        const int nty = static_cast<int>(ny / core::kBlockSize);
         auto break3x3 = [&](int cx, int cy) {
             for (int dy = -1; dy <= 1; ++dy)
                 for (int dx = -1; dx <= 1; ++dx)
                     ctx.world->breakTile(cx + dx, cy + dy);
         };
-        break3x3(static_cast<int>(self.body.getCenterX() / 50.f),
-                 static_cast<int>(self.body.getCenterY() / 50.f));
+        break3x3(static_cast<int>(self.body.getCenterX() / core::kBlockSize),
+                 static_cast<int>(self.body.getCenterY() / core::kBlockSize));
         if (!ctx.world->isSolid(ntx, nty)) {
             self.body.setX(nx - self.body.getW() * 0.5f);
             break3x3(ntx, nty);
@@ -246,9 +247,10 @@ REGISTER_SKILL("dwarf_collapse", [] {
                               ? -1.f
                               : 1.f;
         const float cx = self.body.getCenterX();
-        const int ty = static_cast<int>(self.body.getCenterY() / 50.f);
+        const int ty = static_cast<int>(self.body.getCenterY() / core::kBlockSize);
         for (int i = 1; i <= 6; ++i) {
-            const int tx = static_cast<int>((cx + dir * i * 50.f) / 50.f);
+            const int tx = static_cast<int>(
+                (cx + dir * i * core::kBlockSize) / core::kBlockSize);
             for (int dy = -2; dy <= 2; ++dy) ctx.world->breakTile(tx, ty + dy);
         }
         ctx.player->hurt(static_cast<int>(40.f * self.damageMult));

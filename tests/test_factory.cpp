@@ -10,7 +10,7 @@ int main() {
 
     auto s = Factory::spawnEnemy("slime", 100.0f, 0.0f);
     assert(s != nullptr);
-    assert(s->body.getName() == SLIME);
+    assert(s->body.getName() == core::kIdSlime);
     assert(std::fabs(s->body.getW() - 40.0f) < 0.001f);
     assert(std::fabs(s->body.getH() - 30.0f) < 0.001f);
     assert(std::fabs(s->body.getX() - 100.0f) < 0.001f);

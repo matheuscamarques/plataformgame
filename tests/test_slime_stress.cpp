@@ -26,8 +26,8 @@ int main() {
     for (int t = 0; t < 600; t++) {
         // mundo segue cada slime (como o Game segue o player)
         enemies.forEach([&](Enemy &s) {
-            world.update(static_cast<int>(std::floor(s.body.getX() / BLOCK_SIZE)),
-                         static_cast<int>(std::floor(s.body.getY() / BLOCK_SIZE)));
+            world.update(static_cast<int>(std::floor(s.body.getX() / core::kBlockSize)),
+                         static_cast<int>(std::floor(s.body.getY() / core::kBlockSize)));
         });
         enemies.tick(1.0f / 30.0f, ctx);
     }

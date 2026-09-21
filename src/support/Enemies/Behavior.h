@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/EntityKind.h"
+
 class Entity;
 
 namespace support {
@@ -16,6 +18,8 @@ class Behavior {
 public:
     virtual ~Behavior() = default;
     virtual const char *name() const = 0;
+    // Identidade tipada (troca os switches em name() por enum).
+    virtual core::EntityKind kind() const = 0;
     virtual void onTick(Enemy &e, float dt, GameContext &ctx) = 0;
     // Física avisa; default ignora (nem todo Behavior pula).
     virtual void setGrounded(bool) {}

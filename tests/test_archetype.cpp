@@ -13,7 +13,7 @@ int main() {
     { // SlimeRegisteredWithTrashDefaults
         const EnemyArchetype *a = ArchetypeRegistry::instance().find("slime");
         assert(a != nullptr);
-        assert(a->behaviorKind == "slime" && a->behaviorName == "SlimeAI");
+        assert(a->behaviorKind == "slime" && a->kind == core::EntityKind::Slime);
         assert(a->bodySchema == "humanoid");
         assert(a->isTrash && a->hp == 30);
         assert(a->minStratum == 0 && a->maxAlive == 100);
@@ -21,7 +21,7 @@ int main() {
     { // DwarfRegisteredAsElite
         const EnemyArchetype *a = ArchetypeRegistry::instance().find("dwarf");
         assert(a != nullptr);
-        assert(a->behaviorKind == "dwarf" && a->behaviorName == "DwarfAI");
+        assert(a->behaviorKind == "dwarf" && a->kind == core::EntityKind::Dwarf);
         assert(a->bodySchema == "dwarf");
         assert(!a->isTrash && a->hp == 60);
         assert(a->minStratum == 3 && a->maxStratum == 99);

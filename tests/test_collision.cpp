@@ -17,12 +17,12 @@ int main() {
     int landedTick = -1;
     for (int t = 0; t < 600; t++) {
         p.tick(); // gravidade (teclado headless = tudo solto)
-        int ptx = static_cast<int>(std::floor(p.getX() / BLOCK_SIZE));
-        int pty = static_cast<int>(std::floor(p.getY() / BLOCK_SIZE));
+        int ptx = static_cast<int>(std::floor(p.getX() / core::kBlockSize));
+        int pty = static_cast<int>(std::floor(p.getY() / core::kBlockSize));
         world.update(ptx, pty);
         std::vector<Entity*> candidatos;
-        world.query(p.getX() - BLOCK_SIZE, p.getY() - BLOCK_SIZE,
-                    p.getW() + BLOCK_SIZE * 2, p.getH() + BLOCK_SIZE * 2,
+        world.query(p.getX() - core::kBlockSize, p.getY() - core::kBlockSize,
+                    p.getW() + core::kBlockSize * 2, p.getH() + core::kBlockSize * 2,
                     candidatos);
         if (t == 590) std::printf("candidatos@t590=%zu y=%.1f\n", candidatos.size(), p.getY());
         for (Entity *e : candidatos) {

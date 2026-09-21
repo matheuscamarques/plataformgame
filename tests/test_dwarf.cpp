@@ -152,7 +152,7 @@ int main() {
         auto dwarfs = [&]() {
             int n = 0;
             enemies.forEach([&](Enemy &e) {
-                if (e.ai && std::string(e.ai->name()) == "DwarfAI" &&
+                if (e.ai && e.ai->kind() == core::EntityKind::Dwarf &&
                     !e.resources.isDead())
                     ++n;
             });

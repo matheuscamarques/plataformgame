@@ -10,10 +10,12 @@
 int main() {
     std::vector<std::unique_ptr<Entity>> floor;
     for (int j = 0; j < 30; j++)
-        floor.push_back(std::make_unique<Entity>(COLIDE, j * 50, 100, 50, 50));
+        floor.push_back(std::make_unique<Entity>(core::kIdColide, j * core::kBlockSize,
+                                                 2 * core::kBlockSize,
+                                                 core::kBlockSize, core::kBlockSize));
     Player p;
     p.setX(0.0f);
-    p.setY(50.0f); // em pe
+    p.setY(static_cast<float>(core::kBlockSize)); // em pe
 
     float maxX = 0.0f;
     for (int t = 0; t < 120; t++) {

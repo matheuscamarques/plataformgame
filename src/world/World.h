@@ -54,8 +54,8 @@ public:
     // não encarecem o frame. Chunks ausentes são pulados (sem load).
     template <typename F>
     void forEachEntityInRect(float x0, float y0, float x1, float y1, F &&fn) {
-        const float cw = static_cast<float>(Chunk::W) * BLOCK_SIZE;
-        const float ch = static_cast<float>(Chunk::H) * BLOCK_SIZE;
+        const float cw = static_cast<float>(Chunk::W) * core::kBlockSize;
+        const float ch = static_cast<float>(Chunk::H) * core::kBlockSize;
         const int cx0 = static_cast<int>(std::floor(x0 / cw));
         const int cx1 = static_cast<int>(std::floor(x1 / cw));
         const int cy0 = static_cast<int>(std::floor(y0 / ch));

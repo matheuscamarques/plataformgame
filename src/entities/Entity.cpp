@@ -18,12 +18,12 @@ Entity::Entity(int name,float x, float y, float w, float h) : Component(name,sf:
     this->gravity = 0.0;
     this->bounds = std::map<std::string, Component>();
 
-    this->bounds["bottom"] = Component(BOUND,x + (w / 3) - ((w / 3) / 2), y + (h / 2), w / 3, h / 2);
+    this->bounds["bottom"] = Component(core::kIdBound,x + (w / 3) - ((w / 3) / 2), y + (h / 2), w / 3, h / 2);
     this->bounds["bottom"].setFillColor(sf::Color::Transparent);
     this->bounds["bottom"].setOutlineColor(sf::Color::Green);
     this->bounds["bottom"].setOutlineThickness(1);
 
-    this->bounds["top"] = Component(BOUND,x + (w / 2) - ((w / 2) / 2), y, w / 3, h / 2);
+    this->bounds["top"] = Component(core::kIdBound,x + (w / 2) - ((w / 2) / 2), y, w / 3, h / 2);
     this->bounds["top"].setFillColor(sf::Color::Transparent);
     this->bounds["top"].setOutlineColor(sf::Color::Green);
     this->bounds["top"].setOutlineThickness(1);
@@ -31,12 +31,12 @@ Entity::Entity(int name,float x, float y, float w, float h) : Component(name,sf:
     // Sensores laterais cobrem só a banda média [0.3h, 0.7h]: andar sobre
     // o chão afunda o player ~vy por tick, e sensor alto demais encostava
     // no tile vizinho do mesmo nível (parede invisível nas emendas).
-    this->bounds["left"] = Component(BOUND,x,y+h*0.3f,w*0.2f,h*0.4f);
+    this->bounds["left"] = Component(core::kIdBound,x,y+h*0.3f,w*0.2f,h*0.4f);
     this->bounds["left"].setFillColor(sf::Color::Transparent);
     this->bounds["left"].setOutlineColor(sf::Color::Green);
     this->bounds["left"].setOutlineThickness(1);
 
-    this->bounds["right"] = Component(BOUND,x,y+h*0.3f,w*0.20f,h*0.4f);
+    this->bounds["right"] = Component(core::kIdBound,x,y+h*0.3f,w*0.20f,h*0.4f);
     this->bounds["right"].setFillColor(sf::Color::Transparent);
     this->bounds["right"].setOutlineColor(sf::Color::Green);
     this->bounds["right"].setOutlineThickness(1);

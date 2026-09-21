@@ -7,10 +7,14 @@
 int main() {
     std::vector<std::unique_ptr<Entity>> world;
     for (int j = 0; j < 30; j++)
-        world.push_back(std::make_unique<Entity>(COLIDE, j * 50, 100, 50, 50));
-    world.push_back(std::make_unique<Entity>(COLIDE, 500, 50, 50, 50)); // parede real a frente
+        world.push_back(std::make_unique<Entity>(core::kIdColide, j * core::kBlockSize,
+                                                 2 * core::kBlockSize,
+                                                 core::kBlockSize, core::kBlockSize));
+    world.push_back(std::make_unique<Entity>(core::kIdColide, 10 * core::kBlockSize,
+                                             core::kBlockSize,
+                                             core::kBlockSize, core::kBlockSize)); // parede real a frente
     Player p;
-    p.setX(0.0f); p.setY(50.0f);
+    p.setX(0.0f); p.setY(static_cast<float>(core::kBlockSize));
     float maxX = 0.0f;
     for (int t = 0; t < 120; t++) {
         p.setVx(9.8f); p.setVy(9.8f); p.Entity::tick();

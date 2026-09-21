@@ -23,8 +23,8 @@ int main() {
         int btx = 0, bty = 0;
         bool found = false;
         for (Entity *e : world.getPlatforms()) {
-            const int tx = static_cast<int>(e->getX() / BLOCK_SIZE);
-            const int ty = static_cast<int>(e->getY() / BLOCK_SIZE);
+            const int tx = static_cast<int>(e->getX() / core::kBlockSize);
+            const int ty = static_cast<int>(e->getY() / core::kBlockSize);
             const Tile t = world.tileAt(tx, ty);
             if (t == Tile::Air || t == Tile::Bedrock || isLiquid(t)) continue;
             btx = tx;
@@ -36,12 +36,12 @@ int main() {
 
         // Conjunto R: endereços das entidades exatamente neste tile.
         std::vector<Entity *> area;
-        world.query(btx * BLOCK_SIZE - 1.f, bty * BLOCK_SIZE - 1.f,
-                    BLOCK_SIZE + 2.f, BLOCK_SIZE + 2.f, area);
+        world.query(btx * core::kBlockSize - 1.f, bty * core::kBlockSize - 1.f,
+                    core::kBlockSize + 2.f, core::kBlockSize + 2.f, area);
         std::vector<Entity *> removed;
         for (Entity *e : area) {
-            const int ex = static_cast<int>(e->getX() / BLOCK_SIZE);
-            const int ey = static_cast<int>(e->getY() / BLOCK_SIZE);
+            const int ex = static_cast<int>(e->getX() / core::kBlockSize);
+            const int ey = static_cast<int>(e->getY() / core::kBlockSize);
             if (ex == btx && ey == bty) removed.push_back(e);
         }
         assert(!removed.empty());

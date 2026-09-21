@@ -25,8 +25,8 @@ int main() {
     for (int t = 0; t < 300; t++) {
         float px = 0.0f, py = 0.0f;
         enemies.forEach([&](Enemy &s) { px = s.body.getX(); py = s.body.getY(); });
-        world.update(static_cast<int>(std::floor(px / BLOCK_SIZE)),
-                     static_cast<int>(std::floor(py / BLOCK_SIZE)));
+        world.update(static_cast<int>(std::floor(px / core::kBlockSize)),
+                     static_cast<int>(std::floor(py / core::kBlockSize)));
         enemies.tick(1.0f / 30.0f, ctx);
         enemies.forEach([&](Enemy &s) {
             traveled += std::fabs(s.body.getX() - prevX);

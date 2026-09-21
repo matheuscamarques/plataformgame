@@ -23,8 +23,8 @@ static void stampTree(uint32_t seed, Chunk &c, int cx, int tx, int sy, const Tre
         if (lx < 0 || lx >= Chunk::W) return; // vizinho estampa a parte dele
         if (tileType(wx, wy, seed) != Tile::Air) return; // nunca enterra
         auto e = std::make_unique<Entity>(
-            tile == Tile::TreeTrunk ? TREE_TRUNK : TREE_LEAF,
-            wx * BLOCK_SIZE, wy * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+            tile == Tile::TreeTrunk ? core::kIdTreeTrunk : core::kIdTreeLeaf,
+            wx * core::kBlockSize, wy * core::kBlockSize, core::kBlockSize, core::kBlockSize);
         e->setFillColor(blockDef(tile).color);
         c.index(e.get());
         c.entities.push_back(std::move(e));
@@ -69,12 +69,12 @@ void ChunkManager::generate(int cx, int cy) {
 
             // Liquid (água, lava) e Deco (futuro: tronco/folha) não colidem.
             // Lava distingue pelo ID (dano vai na Fase C).
-            int entityKind = (def.kind == support::BlockKind::Solid) ? COLIDE
-                           : (t == support::Tile::Lava) ? LAVA
-                           : (def.kind == support::BlockKind::Liquid) ? WATER : 0;
+            int entityKind = (def.kind == support::BlockKind::Solid) ? core::kIdColide
+                           : (t == support::Tile::Lava) ? core::kIdLava
+                           : (def.kind == support::BlockKind::Liquid) ? core::kIdWater : 0;
             auto e = std::make_unique<Entity>(
-                entityKind, tx * BLOCK_SIZE, ty * BLOCK_SIZE,
-                BLOCK_SIZE, BLOCK_SIZE);
+                entityKind, tx * core::kBlockSize, ty * core::kBlockSize,
+                core::kBlockSize, core::kBlockSize);
             e->setFillColor(def.color);
             c->index(e.get());
             c->entities.push_back(std::move(e));

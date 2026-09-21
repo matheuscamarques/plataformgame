@@ -103,8 +103,8 @@ bool ExplosionSystem::applyToTarget(const ExplosionTarget &t,
 void ExplosionSystem::breakTilesInCircle(sf::Vector2f center, int tilesRadius, GameContext &ctx) {
     if (!ctx.world) return;
 
-    const int cx = static_cast<int>(std::floor(center.x / BLOCK_SIZE));
-    const int cy = static_cast<int>(std::floor(center.y / BLOCK_SIZE));
+    const int cx = static_cast<int>(std::floor(center.x / core::kBlockSize));
+    const int cy = static_cast<int>(std::floor(center.y / core::kBlockSize));
     const float r2 = static_cast<float>(tilesRadius * tilesRadius);
 
     // Paciência: 1 call por explosão (não por tile — senão 1 blast =
@@ -120,8 +120,8 @@ void ExplosionSystem::breakTilesInCircle(sf::Vector2f center, int tilesRadius, G
             Tile broken = Tile::Air;
             if (ctx.world->breakTile(tx, ty, &broken) && particles_) {
                 const sf::Vector2f tileCenter{
-                    (tx + 0.5f) * BLOCK_SIZE,
-                    (ty + 0.5f) * BLOCK_SIZE
+                    (tx + 0.5f) * core::kBlockSize,
+                    (ty + 0.5f) * core::kBlockSize
                 };
                 // Cor do tile quebrado (primário = tipo real).
                 particles_->spawnTileBreak(tileCenter, static_cast<int>(broken), 0, 0);
@@ -136,7 +136,7 @@ void ExplosionSystem::breakTilesInCircle(sf::Vector2f center, int tilesRadius, G
     // por aqui: usam World::breakTile direto.
     if (brokeAny && ctx.enemies) {
         ctx.enemies->forEach([&](Enemy &s) {
-            if (!s.ai || std::string(s.ai->name()) != "DwarfAI") return;
+            if (!s.ai || s.ai->kind() != core::EntityKind::Dwarf) return;
             const float dx = center.x - s.body.getCenterX();
             const float dy = center.y - s.body.getCenterY();
             patienceOnMine(s.patience, brokeOre, std::sqrt(dx * dx + dy * dy));

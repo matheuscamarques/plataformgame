@@ -102,12 +102,12 @@ int main() {
         int trunks = 0;
         std::vector<int> trunkXs;
         for (Entity *e : world.getPlatforms()) {
-            if (e->getName() != TREE_TRUNK && e->getName() != TREE_LEAF) continue;
-            int tx = static_cast<int>(e->getX()) / BLOCK_SIZE;
-            int ty = static_cast<int>(e->getY()) / BLOCK_SIZE;
+            if (e->getName() != core::kIdTreeTrunk && e->getName() != core::kIdTreeLeaf) continue;
+            int tx = static_cast<int>(e->getX()) / core::kBlockSize;
+            int ty = static_cast<int>(e->getY()) / core::kBlockSize;
             // entidade de árvore sempre sobre tile de ar (nunca enterra)
             assert(world.tileAt(tx, ty) == Tile::Air);
-            if (e->getName() == TREE_TRUNK) {
+            if (e->getName() == core::kIdTreeTrunk) {
                 trunks++;
                 trunkXs.push_back(tx);
                 // base tem chão sólido embaixo (ou boca, aceito)

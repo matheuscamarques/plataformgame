@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <string>
 #include <vector>
+#include "core/EntityKind.h"
 #include "entities/Player/Player.h"
 #include "support/Enemies/Barks.h"
 #include "support/Enemies/EnemySystem.h"
@@ -125,14 +126,14 @@ int main() {
         def.tilesRadius = 3; // 29 tiles: algum sólido quebra (não-água)
         float dx = 0.f, dy = 0.f;
         enemies.forEach([&](Enemy &e) {
-            if (std::string(e.ai->name()) == "DwarfAI") {
+            if (e.ai->kind() == core::EntityKind::Dwarf) {
                 dx = e.body.getCenterX();
                 dy = e.body.getCenterY();
             }
         });
         ex.explode({dx, dy}, def, ctx);
         enemies.forEach([&](Enemy &e) {
-            if (std::string(e.ai->name()) == "DwarfAI") {
+            if (e.ai->kind() == core::EntityKind::Dwarf) {
                 assert(e.patience.value == 92.f); // pedra perto: -8
             } else {
                 assert(e.patience.value == 100.f); // slime não liga

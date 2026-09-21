@@ -39,6 +39,7 @@ public:
     explicit DwarfAI(Config cfg) : cfg_(cfg) {}
 
     const char *name() const override { return "DwarfAI"; }
+    core::EntityKind kind() const override { return core::EntityKind::Dwarf; }
     void onTick(Enemy &e, float dt, GameContext &ctx) override;
     void onTakeHit(Enemy &e, int applied, GameContext &ctx) override;
 

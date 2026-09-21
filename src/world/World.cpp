@@ -23,8 +23,8 @@ void World::update(int playerTileX, int playerTileY) {
             Entity *e = slot.get();
             activePlatforms_.push_back(e);
             // Água, lava e deco não colidem como parede (Fase C dá dano).
-            if (e->getName() != WATER && e->getName() != LAVA &&
-                e->getName() != TREE_TRUNK && e->getName() != TREE_LEAF)
+            if (e->getName() != core::kIdWater && e->getName() != core::kIdLava &&
+                e->getName() != core::kIdTreeTrunk && e->getName() != core::kIdTreeLeaf)
                 activeColides_.push_back(e);
         }
     }

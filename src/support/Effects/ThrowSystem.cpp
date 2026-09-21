@@ -84,7 +84,7 @@ void ThrowSystem::tick(float dt, GameContext &ctx) {
         // Player ainda não joga pepita — mecanismo pronto, item pendente.
         if (t.kind == ThrowKind::GoldNugget && t.resting && ctx.enemies) {
             ctx.enemies->forEach([&](Enemy &s) {
-                if (!s.ai || std::string(s.ai->name()) != "DwarfAI") return;
+                if (!s.ai || s.ai->kind() != core::EntityKind::Dwarf) return;
                 const float dx = t.pos.x - s.body.getCenterX();
                 const float dy = t.pos.y - s.body.getCenterY();
                 if (dx * dx + dy * dy < 150.f * 150.f)
@@ -97,8 +97,8 @@ void ThrowSystem::tick(float dt, GameContext &ctx) {
 void ThrowSystem::handleTileCollision(Throwable &t, GameContext &ctx) {
     if (!ctx.world) return;
 
-    const int tx = static_cast<int>(std::floor(t.pos.x / BLOCK_SIZE));
-    const int ty = static_cast<int>(std::floor(t.pos.y / BLOCK_SIZE));
+    const int tx = static_cast<int>(std::floor(t.pos.x / core::kBlockSize));
+    const int ty = static_cast<int>(std::floor(t.pos.y / core::kBlockSize));
     if (!ctx.world->isSolid(tx, ty)) return;
 
     // Reverte ~1 frame e zera vertical, atrito na horizontal.

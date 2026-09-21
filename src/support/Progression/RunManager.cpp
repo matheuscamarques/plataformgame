@@ -30,14 +30,14 @@ void RunManager::restart(GameContext &ctx) {
     float x = p->getX();
     float y = stratum_ ? stratum_->respawnPoint(x).y : 0.f;
     if (ctx.world) {
-        int tx = static_cast<int>(std::floor(p->getCenterX() / BLOCK_SIZE));
-        int ty = static_cast<int>(std::floor(y / BLOCK_SIZE));
+        int tx = static_cast<int>(std::floor(p->getCenterX() / core::kBlockSize));
+        int ty = static_cast<int>(std::floor(y / core::kBlockSize));
         int guard = 0;
         // 2 tiles livres (corpo 50px): cabeça e pés fora da rocha.
         while (guard++ < 400 &&
                (ctx.world->isSolid(tx, ty) || ctx.world->isSolid(tx, ty - 1)))
             ty--;
-        y = static_cast<float>(ty) * BLOCK_SIZE;
+        y = static_cast<float>(ty) * core::kBlockSize;
     }
     p->respawn(x, y);
 

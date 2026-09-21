@@ -22,7 +22,7 @@ struct Chunk {
     static const int W = 16;
     static const int H = 16;
     // Uma entidade de 50px ocupa 1 célula; célula = 2 tiles.
-    static constexpr float HASH_CELL = BLOCK_SIZE * 2.0f;
+    static constexpr float HASH_CELL = core::kBlockSize * 2.0f;
 
     int cx = 0;
     int cy = 0;
@@ -67,8 +67,8 @@ struct Chunk {
         int n = 0;
         for (auto it = entities.begin(); it != entities.end();) {
             Entity *e = it->get();
-            const int ex = static_cast<int>(e->getX() / BLOCK_SIZE);
-            const int ey = static_cast<int>(e->getY() / BLOCK_SIZE);
+            const int ex = static_cast<int>(e->getX() / core::kBlockSize);
+            const int ey = static_cast<int>(e->getY() / core::kBlockSize);
             if (ex != worldTileX || ey != worldTileY) {
                 ++it;
                 continue;

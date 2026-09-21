@@ -3,6 +3,7 @@
 #include <chrono>
 #include <cmath>
 #include "./game.h"
+#include "core/Config.h"
 #include "core/Log.h"
 #include "core/Time.h"
 #include "support/Combat/BodySystem.h"
@@ -18,8 +19,6 @@
 #include "entities/Player/Player.h"
 
 namespace {
-constexpr uint32_t WORLD_SEED = 1337u;
-
 // Cor determinística por char (hash → RGB). '.' = transparente.
 sf::Color colorForChar(char c) {
     if (c == '.') return {0, 0, 0, 0};
@@ -65,19 +64,19 @@ void Game::main()
 {
     auto game = std::make_unique<Game>();
     //game->view = new sf::View(sf::FloatRect(0.f, 0.f, 1000.f, 600.f));
-    auto world = std::make_unique<support::World>(WORLD_SEED);
+    auto world = std::make_unique<support::World>(core::kWorldSeed);
     game->player = std::make_unique<Player>();
     // Spawn no flanco de montanha mais próximo (terra garantida):
     // cair do céu no meio do nada não mostra o jogo.
-    int spawnTx = support::findSpawnTileX(0, WORLD_SEED);
-    game->player->setX(spawnTx * BLOCK_SIZE);
+    int spawnTx = support::findSpawnTileX(0, core::kWorldSeed);
+    game->player->setX(spawnTx * core::kBlockSize);
     game->setWorld(std::move(world));
 
     if (!game->font.loadFromFile("./arial.ttf"))
     {
         throw std::runtime_error("Could not load font");
     }
-    LOG_INFO("Game", "boot ok, seed=" << WORLD_SEED << " spawnTx=" << spawnTx);
+    LOG_INFO("Game", "boot ok, seed=" << core::kWorldSeed << " spawnTx=" << spawnTx);
 
     // Sistemas via scheduler; 2 slimes perto do spawn (determinístico).
     game->stratum_ = &game->scheduler_.add<support::StratumManager>();
@@ -98,8 +97,8 @@ void Game::main()
     game->deaths_->setDropSystem(game->drops_);
     game->deaths_->setParticleSystem(game->particles_);
     game->melee_->setParticleSystem(game->particles_);
-    game->enemies_->spawn("slime", (spawnTx - 6) * BLOCK_SIZE, 0.0f);
-    game->enemies_->spawn("slime", (spawnTx + 6) * BLOCK_SIZE, 0.0f);
+    game->enemies_->spawn("slime", (spawnTx - 6) * core::kBlockSize, 0.0f);
+    game->enemies_->spawn("slime", (spawnTx + 6) * core::kBlockSize, 0.0f);
 
     // add border font
 
@@ -199,7 +198,7 @@ void Game::render()
     // Fundo chapado do estrato do player (1 draw; pop na fronteira
     // marca a transição de propósito).
     {
-        const int pty = static_cast<int>(std::floor(player.get()->getY() / BLOCK_SIZE));
+        const int pty = static_cast<int>(std::floor(player.get()->getY() / core::kBlockSize));
         const support::StratumBg bg =
             support::stratumBg(support::stratumAt(pty));
         sf::RectangleShape bgRect(sf::Vector2f(vx1 - vx0, vy1 - vy0));
@@ -332,7 +331,7 @@ void Game::render()
         text("HP " + std::to_string(p->hp) + "/" + std::to_string(p->hpMax), 16.f, 38.f);
         text("TNT:" + std::to_string(p->dynamiteCount) + " J  K melee", 16.f, 62.f);
         text(std::string("Mat: ") + core::materialName(p->loadout.weapon), 16.f, 110.f);
-        const int pty = static_cast<int>(std::floor(p->getY() / BLOCK_SIZE));
+        const int pty = static_cast<int>(std::floor(p->getY() / core::kBlockSize));
         text(std::string(support::stratumName(support::stratumAt(pty)))
              + "  y" + std::to_string(pty), 16.f, 86.f);
 
@@ -505,18 +504,18 @@ void Game::tick() {
         }
 
         // Mundo infinito: carrega/descarrega chunks em torno do tile do player.
-        int playerTileX = static_cast<int>(std::floor(p->getX() / BLOCK_SIZE));
-        int playerTileY = static_cast<int>(std::floor(p->getY() / BLOCK_SIZE));
+        int playerTileX = static_cast<int>(std::floor(p->getX() / core::kBlockSize));
+        int playerTileY = static_cast<int>(std::floor(p->getY() / core::kBlockSize));
         getWorld()->update(playerTileX, playerTileY);
 
         // Consulta o hash ao redor do player (1 tile de margem).
         // Inclui água de propósito: Player::collide usa WATER para natação.
         std::vector<Entity*> candidatos;
         getWorld()->query(
-            p->getX() - BLOCK_SIZE,
-            p->getY() - BLOCK_SIZE,
-            p->getW() + BLOCK_SIZE * 2,
-            p->getH() + BLOCK_SIZE * 2,
+            p->getX() - core::kBlockSize,
+            p->getY() - core::kBlockSize,
+            p->getW() + core::kBlockSize * 2,
+            p->getH() + core::kBlockSize * 2,
             candidatos);
 
         for (Entity *e : candidatos) {

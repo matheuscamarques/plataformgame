@@ -5,6 +5,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "core/EntityKind.h"
+
 namespace support {
 
 // Tudo que varia entre inimigos e não é comportamento. Adicionar
@@ -15,7 +17,7 @@ struct EnemyArchetype {
     sf::Vector2f hitboxSize{36.f, 44.f};
 
     std::string behaviorKind = "slime"; // chave no BehaviorRegistry
-    std::string behaviorName = "SlimeAI"; // Behavior::name(), p/ contagem
+    core::EntityKind kind = core::EntityKind::Slime; // p/ contagem (cap)
     std::string bodySchema = "humanoid"; // chave no BodySchemaRegistry
 
     bool isTrash = true;
