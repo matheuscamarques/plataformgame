@@ -1,6 +1,6 @@
 #include "SpriteFrameRegistry.h"
 
-#include "assets/Sprites.h"
+#include "assets/Sprites/SpriteSet.h"
 
 namespace assets {
 

@@ -3,7 +3,7 @@
 #include <cstdio>
 
 #include "assets/SpriteFrameRegistry.h"
-#include "assets/Sprites.h"
+#include "assets/Sprites/PlayerSprites.h"
 #include "core/sprite_from_ascii.h"
 #include "support/Combat/Body.h"
 

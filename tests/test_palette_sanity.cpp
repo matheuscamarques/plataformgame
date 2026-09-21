@@ -3,7 +3,8 @@
 #include <cstring>
 #include <set>
 
-#include "assets/Sprites.h"
+#include "assets/Sprites/PlayerSprites.h"
+#include "assets/Sprites/EnemySprites.h"
 
 // Sanity de palette: 1 char = 1 parte (S ambíguo morreu aqui).
 // Mão (H) e rosto (F) nunca se intersectam no mesmo frame.

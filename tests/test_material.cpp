@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include "assets/Sprites.h"
+#include "assets/Sprites/EquipSprites.h"
 #include "core/Material.h"
 
 // Material: 4 cores distintas; ASCII de equipamento com widths exatas.

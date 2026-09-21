@@ -21,7 +21,7 @@
 #include "support/Progression/StratumManager.h"
 #include "support/Effects/ParticleSystem.h"
 #include "support/Effects/ThrowSystem.h"
-#include "assets/Sprites.h"
+#include "assets/Sprites/SpriteSet.h"
 
 class Game
 {

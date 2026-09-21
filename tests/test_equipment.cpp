@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <cstring>
 
-#include "assets/Sprites.h"
+#include "assets/Sprites/EquipSprites.h"
 #include "support/Combat/Body.h"
 
 using namespace support;
