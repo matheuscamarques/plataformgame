@@ -38,6 +38,10 @@ public:
     Tile tileAt(int worldTileX, int worldTileY) const;
     bool isSolid(int worldTileX, int worldTileY) const;
 
+    // Altura da superfície (world px) na coordenada X — p/ céu/luz.
+    // Vem da geração (não dos chunks): vale mesmo descarregado.
+    float surfaceYAt(float worldX) const;
+
     // Quebra um tile: vira Air, marca modified (persiste via LRU),
     // remove a entidade e devolve o tipo anterior em `broken`
     // (para partícula com a cor certa). Bedrock nunca quebra.

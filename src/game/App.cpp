@@ -93,6 +93,15 @@ void Game::run()
         game::buildSoundBank(audio_);
         sfxBuilt_ = true;
     }
+    // Luz 1x: ciclo 10 min + lightmap do tamanho da view (precisa de GL).
+    dayNight_.setCycleDuration(600.f); // 10 min = 1 dia
+    lighting_.init(static_cast<unsigned>(viewW_), static_cast<unsigned>(viewH_));
+    lighting_.setSurfaceSampler([this](float worldX) {
+        return getWorld()->surfaceYAt(worldX);
+    });
+    lighting_.setDayNight(&dayNight_);
+    lighting_.setSunFadeDepth(300.f);
+    lighting_.setPlayerRadius(90.f);
     float lastStat = 0.0f;
     int frames = 0;
     int updates = 0;
@@ -257,6 +266,7 @@ void Game::tick() {
     } else {
         music_.resume();
         music_.tick(1.0f / 30.0f);
+        dayNight_.tick(1.0f / 30.0f); // relógio anda com o jogo (pausa congela)
         if (stratum_) {
             const int s = stratum_->current();
             if (s != lastMusicStratum_) {

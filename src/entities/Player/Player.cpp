@@ -1,4 +1,5 @@
 #include "Player.h"
+#include <algorithm>
 #include <iostream>
 #include "defines.h"
 #include "support/Combat/WeaponRegistry.h"
@@ -47,14 +48,28 @@ void Player::collide(Entity bloco)
     ){
         return;
     }
+    // Correções lidas no rect do BLOCO (top/left/width/height frescos em
+    // estáticos). Nunca dims do jogador no lugar do bloco: +getW() na
+    // esquerda grudava o player 20px dentro da parede 50px (o "pior na
+    // esquerda"). No teto, +getH() coincide em 50px mas é lixo no
+    // overload Component (privados nunca setados) — usa bloco.height.
+    // Topo dispara quando a base do bloco está no meio do corpo ou acima:
+    // janela 0.5h cobre o teleporte do pulo (25px/tick) inteiro — gate
+    // 0.25h perdia metade e o player subia pelo teto. Bloco na altura do
+    // peito (base abaixo do meio) cai na lateral. Quando o topo dispara,
+    // os lados pulam este bloco (evita fling horizontal no bonk fundo).
+    bool topHit = false;
     if (getBoundsTop().intersects(bloco)
-    ) {
-        setY(bloco.getY() + getH());
+        && bloco.top + bloco.height <= getY() + getH() * 0.5f) {
+        // Teto de verdade (acima do meio): bonk. Bloco na altura do
+        // peito cai na correção lateral — sem teleporte p/ baixo.
+        setY(bloco.top + bloco.height);
         if (getVy() < 0.f) setVy(0.f); // bonk: teto zera subida (senão gruda)
+        topHit = true;
     }
 
     if (getBoundsBottom().intersects(bloco)) {
-        setY(bloco.getY() - getH());
+        setY(bloco.top - getH());
         moveDown = false;
         jumping = true;
         setVy(0.f); // pouso mata a queda (gravidade reacumula se sair)
@@ -62,26 +77,43 @@ void Player::collide(Entity bloco)
          moveDown = true;
     }
 
-    if (getBoundsRight().intersects(bloco)) {
-        setX(bloco.getX() - getW());
+    // Lateral só com penetração >= 6px: roçar lintel/teto com 2px não
+    // empurra (passa por baixo); parede de verdade tem penetração funda.
+    if (!topHit) {
+        const Component sr = getBoundsRight();
+        if (sr.intersects(bloco)) {
+            const float pen = std::min(sr.top + sr.height, bloco.top + bloco.height)
+                            - std::max(sr.top, bloco.top);
+            if (pen >= 6.f) setX(bloco.left - getW());
+        }
     }
 
-    if (getBoundsLeft().intersects(bloco)) {
-        setX(bloco.getX() + getW());
+    if (!topHit) {
+        const Component sl = getBoundsLeft();
+        if (sl.intersects(bloco)) {
+            const float pen = std::min(sl.top + sl.height, bloco.top + bloco.height)
+                            - std::max(sl.top, bloco.top);
+            if (pen >= 6.f) setX(bloco.left + bloco.width);
+        }
     }
 
 }
 
 void Player::collide(Component bloco)
 {
+    // Mesma doutrina do overload Entity: rect do bloco (FloatRect, sempre
+    // válido — getX()/getW() do Component são lixo p/ cópias fatiadas).
+    // Gate no meio (0.5h) + skip lateral se o topo disparar (idem acima).
+    bool topHit = false;
     if (getBoundsTop().intersects(bloco)
-            ) {
-        setY(bloco.getY() + getH());
+        && bloco.top + bloco.height <= getY() + getH() * 0.5f) {
+        setY(bloco.top + bloco.height);
         if (getVy() < 0.f) setVy(0.f); // bonk: teto zera subida (senão gruda)
+        topHit = true;
     }
 
     if (getBoundsBottom().intersects(bloco)) {
-        setY(bloco.getY() - getH());
+        setY(bloco.top - getH());
         moveDown = false;
         jumping = true;
         setVy(0.f); // pouso mata a queda (gravidade reacumula se sair)
@@ -89,12 +121,22 @@ void Player::collide(Component bloco)
          moveDown = true;
     }
 
-    if (getBoundsRight().intersects(bloco)) {
-        setX(bloco.getX() - getW());
+    if (!topHit) {
+        const Component sr = getBoundsRight();
+        if (sr.intersects(bloco)) {
+            const float pen = std::min(sr.top + sr.height, bloco.top + bloco.height)
+                            - std::max(sr.top, bloco.top);
+            if (pen >= 6.f) setX(bloco.left - getW());
+        }
     }
 
-    if (getBoundsLeft().intersects(bloco)) {
-        setX(bloco.getX() + getW());
+    if (!topHit) {
+        const Component sl = getBoundsLeft();
+        if (sl.intersects(bloco)) {
+            const float pen = std::min(sl.top + sl.height, bloco.top + bloco.height)
+                            - std::max(sl.top, bloco.top);
+            if (pen >= 6.f) setX(bloco.left + bloco.width);
+        }
     }
 
 }

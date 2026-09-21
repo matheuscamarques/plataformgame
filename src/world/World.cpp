@@ -6,6 +6,7 @@
 #include "defines.h"
 #include "entities/Entity.hpp"
 #include "Block.h"
+#include "Generation.h"
 
 namespace support {
 
@@ -39,6 +40,12 @@ Tile World::tileAt(int worldTileX, int worldTileY) const {
 
 bool World::isSolid(int worldTileX, int worldTileY) const {
     return support::isSolid(tileAt(worldTileX, worldTileY));
+}
+
+float World::surfaceYAt(float worldX) const {
+    const int tx = static_cast<int>(std::floor(worldX / core::kBlockSize));
+    return static_cast<float>(support::surfaceHeight(tx, getSeed()))
+         * core::kBlockSize;
 }
 
 bool World::breakTile(int worldTileX, int worldTileY, Tile *broken) {

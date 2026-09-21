@@ -28,15 +28,18 @@ Entity::Entity(int name,float x, float y, float w, float h) : Component(name,sf:
     this->bounds["top"].setOutlineColor(sf::Color::Green);
     this->bounds["top"].setOutlineThickness(1);
 
-    // Sensores laterais cobrem só a banda média [0.3h, 0.7h]: andar sobre
-    // o chão afunda o player ~vy por tick, e sensor alto demais encostava
-    // no tile vizinho do mesmo nível (parede invisível nas emendas).
-    this->bounds["left"] = Component(core::kIdBound,x,y+h*0.3f,w*0.2f,h*0.4f);
+    // Sensores laterais cobrem [0, 0.7h]: a cabeça precisa enxergar
+    // cantos (teto baixo, lintel) — a banda antiga [0.3h, 0.7h] deixava
+    // a cabeça atravessar quina. O fundo fica em 0.7h: tile vizinho no
+    // mesmo nível só encosta com vy > 15 (pouso duro), nunca andando.
+    // Tile de piso não vira parede porque collide() só corrige lado
+    // com penetração >= 6px (roçar lintel com 2px não empurra).
+    this->bounds["left"] = Component(core::kIdBound,x,y,w*0.2f,h*0.7f);
     this->bounds["left"].setFillColor(sf::Color::Transparent);
     this->bounds["left"].setOutlineColor(sf::Color::Green);
     this->bounds["left"].setOutlineThickness(1);
 
-    this->bounds["right"] = Component(core::kIdBound,x,y+h*0.3f,w*0.20f,h*0.4f);
+    this->bounds["right"] = Component(core::kIdBound,x+w-w*0.20f,y,w*0.20f,h*0.7f);
     this->bounds["right"].setFillColor(sf::Color::Transparent);
     this->bounds["right"].setOutlineColor(sf::Color::Green);
     this->bounds["right"].setOutlineThickness(1);
@@ -132,16 +135,16 @@ Component Entity::getBoundsTop()
 
 Component Entity::getBoundsLeft()
 {
-    this->bounds["left"].setPosition(x,y+h*0.3f);
-    this->bounds["left"].top = this->y + h*0.3f;
+    this->bounds["left"].setPosition(x,y);
+    this->bounds["left"].top = this->y;
     this->bounds["left"].left = this->x;
     return this->bounds["left"];
 }
 
 Component Entity::getBoundsRight()
 {
-    this->bounds["right"].setPosition(x+w-w*0.2f,y+h*0.3f);
-    this->bounds["right"].top = y+h*0.3f;
+    this->bounds["right"].setPosition(x+w-w*0.2f,y);
+    this->bounds["right"].top = y;
     this->bounds["right"].left = x+w-w*0.2f;
     return this->bounds["right"];
 }

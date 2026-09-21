@@ -13,7 +13,9 @@
 #include "support/Progression/RunManager.h"
 #include "assets/Sprites/SpriteSet.h"
 #include "core/AudioSystem.h"
+#include "core/DayNightCycle.h"
 #include "core/MusicSystem.h"
+#include "support/Lighting/LightingSystem.h"
 
 // Só ponteiros no header: definição completa mora no .cpp de cada
 // sistema (game.cpp inclui). Valor continua incluído (precisa do tipo).
@@ -72,6 +74,8 @@ private:
     int lastMusicStratum_ = -1;
     core::AudioSystem audio_; // dono: 26 SFX sintetizados 1x no run (RAM)
     bool sfxBuilt_ = false;
+    core::DayNightCycle dayNight_; // dono: relógio dia/noite (10 min)
+    support::LightingSystem lighting_; // dono: lightmap por frame (GL)
     bool charView_ = false; // F3: ASCII por char, sem textura
     int tickCount_ = 0; // p/ animação walk do anão
     bool running = false;

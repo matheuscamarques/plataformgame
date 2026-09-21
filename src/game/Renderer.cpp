@@ -98,16 +98,13 @@ void Game::render()
     // lista global (chunks modified pinned não encarecem o frame).
     float vx0 = camPos.x - 60.0f, vy0 = camPos.y - 60.0f;
     float vx1 = camPos.x + viewW_ + 60.0f, vy1 = camPos.y + viewH_ + 60.0f;
-    // Fundo chapado do estrato do player (1 draw; pop na fronteira
-    // marca a transição de propósito).
+    // Céu dinâmico do ciclo dia/noite (superfície) ou preto de caverna.
+    // O estrato continua no HUD; o fundo agora é o céu, não o chapado.
     {
-        const int pty = static_cast<int>(std::floor(player.get()->getY() / core::kBlockSize));
-        const support::StratumBg bg =
-            support::stratumBg(support::stratumAt(pty));
-        sf::RectangleShape bgRect(sf::Vector2f(vx1 - vx0, vy1 - vy0));
-        bgRect.setPosition(vx0, vy0);
-        bgRect.setFillColor(sf::Color(bg.r, bg.g, bg.b));
-        window->draw(bgRect);
+        const float playerY  = player.get()->getY();
+        const float playerCX = player.get()->getCenterX();
+        const float surfY    = getWorld()->surfaceYAt(playerCX);
+        window->clear(lighting_.ambientSky(playerY, surfY));
     }
     getWorld()->forEachEntityInRect(vx0, vy0, vx1, vy1, [&](Entity *entity) {
         entity->draw(window);
@@ -402,6 +399,14 @@ void Game::render()
         }
     }
 
+    // ─── Iluminação (lightmap por cima do mundo, antes do HUD) ───
+    lighting_.beginFrame();
+    lighting_.addSunGradient(camPos.x, camPos.y, viewW_, viewH_);
+    lighting_.addPlayerLight(player.get()->getCenterX(), player.get()->getCenterY(),
+                             camPos.x, camPos.y);
+    lighting_.endFrame();
+    lighting_.composite(*window);
+
     overlay_.render(*window, font, *getWorld(), *player.get(), objects.size());
 
     // HUD em espaço de tela (view default): HP, TNT, estrato, morte/pause.
@@ -456,6 +461,14 @@ void Game::render()
         const int pty = static_cast<int>(std::floor(p->getY() / core::kBlockSize));
         text(std::string(support::stratumName(support::stratumAt(pty)))
              + "  y" + std::to_string(pty), 16.f, 86.f);
+        {
+            const float h = dayNight_.hour();
+            const int hh = static_cast<int>(h);
+            const int mm = static_cast<int>((h - hh) * 60);
+            text(std::string("Hora ") + std::to_string(hh) + ":"
+                     + (mm < 10 ? "0" : "") + std::to_string(mm),
+                 16.f, 134.f);
+        }
 
         if (run_.isDead()) {
             sf::RectangleShape dim(sf::Vector2f(viewW_, viewH_));
