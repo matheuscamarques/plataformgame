@@ -11,10 +11,10 @@ constexpr float kGravity = 2.0f;
 constexpr float kTerminalVelocity = 25.0f;
 }
  Player::Player() :
-Entity(PLAYER,0,0,50,50)
+Entity(PLAYER,0,0,30,50) // AABB derivado do sprite 12x20 a 2.5x
 {
     setFillColor(sf::Color::Red);
-    static auto schema = support::BodySchema::humanoid(50.f, 50.f);
+    static auto schema = support::BodySchema::humanoid(30.f, 50.f);
     body.attach(&schema);
     //this->setGravity(9.8f);
 }

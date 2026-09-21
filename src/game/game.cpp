@@ -11,12 +11,47 @@
 #include "world/Generation.h"
 #include "world/Stratum.h"
 #include "assets/PlayerSprite.h"
+#include "assets/EquipmentLayout.h"
 #include "assets/SpriteFrameRegistry.h"
+#include "support/Debug/BodyDump.h"
 #include "../window/window.h"
 #include "entities/Player/Player.h"
 
 namespace {
 constexpr uint32_t WORLD_SEED = 1337u;
+
+// Cor determinística por char (hash → RGB). '.' = transparente.
+sf::Color colorForChar(char c) {
+    if (c == '.') return {0, 0, 0, 0};
+    const uint32_t h = static_cast<uint32_t>(c) * 2654435761u;
+    return sf::Color{
+        static_cast<sf::Uint8>(80 + (h & 0x7F)),
+        static_cast<sf::Uint8>(80 + ((h >> 7) & 0x7F)),
+        static_cast<sf::Uint8>(80 + ((h >> 14) & 0x7F))};
+}
+
+// Posição final da peça: game::pieceDrawPos (fonte única, testável).
+
+// Renderiza o ASCII do frame com uma cor por char (F3).
+// Ignora texturas: mostra a segmentação semântica direto do dado.
+void renderCharView(sf::RenderTarget &target,
+                    float px, float py, // canto superior esquerdo no mundo
+                    int facing, float scale,
+                    const char *const *rows, int w, int h) {
+    sf::RectangleShape pixel({scale, scale});
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
+            const char c = rows[y][x];
+            if (c == '.') continue;
+            pixel.setFillColor(colorForChar(c));
+            const float sx = (facing >= 0)
+                                 ? px + x * scale
+                                 : px + (w - 1 - x) * scale;
+            pixel.setPosition(sx, py + y * scale);
+            target.draw(pixel);
+        }
+    }
+}
 }
 
 
@@ -124,6 +159,7 @@ void Game::run()
             input_.handleEvent(event);
         }
         if (input_.pressed(support::Action::ToggleDebug)) overlay_.toggle();
+        if (input_.pressed(support::Action::ToggleCharView)) charView_ = !charView_;
         core::Time::beginFrame();
         int ticks = core::Time::consumeTicks();
         for (int i = 0; i < ticks; i++)
@@ -242,6 +278,26 @@ void Game::render()
         };
         drawParts(player.get()->body);
         enemies_->forEach([&](support::Enemy &s) { drawParts(s.bodyParts); });
+
+        // Dump textual a cada 30 frames (não spamma stderr por frame).
+        static int dumpCounter = 0;
+        if (++dumpCounter % 30 == 0) {
+            const auto f = assets::frameData(player.get()->currentFrameId);
+            support::dumpBody(std::cerr, player.get()->body,
+                              f.rows, f.w, f.h, f.pal, f.palCount);
+        }
+    }
+
+    // F3: char-view do player (1 char = 1 cor), sem textura.
+    if (charView_) {
+        const auto f = assets::frameData(player.get()->currentFrameId);
+        if (f.rows) {
+            const float s = player.get()->getH() / static_cast<float>(f.h);
+            const float px = player.get()->getCenterX() - f.w * 0.5f * s;
+            const float py = player.get()->getY() + player.get()->getH() - f.h * s;
+            renderCharView(*window, px, py, player.get()->facing, s,
+                           f.rows, f.w, f.h);
+        }
     }
 
     overlay_.render(*window, font, *getWorld(), *player.get(), objects.size());
@@ -310,29 +366,20 @@ void Game::drawPlayerSprite() {
 
 namespace {
 
-struct PieceDraw {
-    const sf::Texture *tex = nullptr;
-    sf::Vector2f originPx;              // pivô dentro do sprite
-    support::BodyPartId anchor = support::BodyPartId::None;
-    sf::Vector2f worldOffset;           // ajuste fino em world px
-};
-
 // Peça ancorada numa parte do Body (segue walk/jump/attack).
-// Sem a parte (Body vazio), não desenha.
-void drawPiece(const PieceDraw &pd,
+// Sem a parte (Body vazio), não desenha. Posição via
+// game::pieceDrawPos (fonte única, testável sem GL).
+void drawPiece(const game::PieceDraw &pd,
                const support::Body &body,
                int facing, float worldScale,
                sf::RenderTarget &target) {
     if (!pd.tex) return;
-    const support::PartState *part = body.find(pd.anchor);
-    if (!part) return;
-    const float ax = part->worldBox.left + part->worldBox.width * 0.5f;
-    const float ay = part->worldBox.top + part->worldBox.height * 0.5f;
+    if (!body.find(pd.anchor)) return;
+    const sf::Vector2f at = game::pieceDrawPos(pd, body, facing, worldScale);
     sf::Sprite spr;
     spr.setTexture(*pd.tex);
     spr.setOrigin(pd.originPx.x, pd.originPx.y);
-    spr.setPosition(ax + pd.worldOffset.x * static_cast<float>(facing),
-                    ay + pd.worldOffset.y);
+    spr.setPosition(at);
     spr.setScale(worldScale * static_cast<float>(facing), worldScale);
     target.draw(spr);
 }
@@ -351,31 +398,31 @@ void Game::drawPlayerEquipment() {
 
     using support::BodyPartId;
 
-    drawPiece({&sprites_.helm[mHelm],
+    drawPiece(game::PieceDraw{&sprites_.helm[mHelm],
                {sprites::kHelmW * 0.5f, static_cast<float>(sprites::kHelmH)},
-               BodyPartId::Head, {0.f, 5.5f}},
+               BodyPartId::Head, {0.f, 2.2f}},
               body, f, s, *window);
-    drawPiece({&sprites_.chest[mChest],
+    drawPiece(game::PieceDraw{&sprites_.chest[mChest],
                {sprites::kChestW * 0.5f, 0.f},
-               BodyPartId::Torso, {0.f, -7.5f}},
+               BodyPartId::Torso, {0.f, -3.0f}},
               body, f, s, *window);
     // Perneiras e botas no centro (Torso): simétricas, 1 draw cada.
-    drawPiece({&sprites_.legs[mLegs],
+    drawPiece(game::PieceDraw{&sprites_.legs[mLegs],
                {sprites::kLegsW * 0.5f, 0.f},
-               BodyPartId::Torso, {0.f, 10.f}},
+               BodyPartId::Torso, {0.f, 4.0f}},
               body, f, s, *window);
-    drawPiece({&sprites_.boots[mLegs],
+    drawPiece(game::PieceDraw{&sprites_.boots[mLegs],
                {sprites::kBootsW * 0.5f, 0.f},
-               BodyPartId::Torso, {0.f, 20.f}},
+               BodyPartId::Torso, {0.f, 8.0f}},
               body, f, s, *window);
     const int mGlove = mHelm; // mesmo material do elmo (sem slot próprio)
-    drawPiece({&sprites_.gloves[mGlove],
+    drawPiece(game::PieceDraw{&sprites_.gloves[mGlove],
                {sprites::kGloveW * 0.5f, 0.f},
-               BodyPartId::ArmL, {0.f, -1.f}},
+               BodyPartId::ArmL, {0.f, -0.4f}},
               body, f, s, *window);
-    drawPiece({&sprites_.gloves[mGlove],
+    drawPiece(game::PieceDraw{&sprites_.gloves[mGlove],
                {sprites::kGloveW * 0.5f, 0.f},
-               BodyPartId::ArmR, {0.f, -1.f}},
+               BodyPartId::ArmR, {0.f, -0.4f}},
               body, f, s, *window);
 }
 

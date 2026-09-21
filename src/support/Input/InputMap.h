@@ -11,7 +11,7 @@ enum class Action : uint8_t {
     Left, Right, Up, Down,
     Jump, Roll, RunFast,
     Light, Heavy,
-    Pause, ToggleDebug, Restart, CycleMaterial,
+    Pause, ToggleDebug, Restart, CycleMaterial, ToggleCharView,
     COUNT
 };
 

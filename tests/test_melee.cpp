@@ -10,9 +10,9 @@ int main() {
     using namespace support;
 
     { // HitsSlimeInFrontOnce (30 → 22, sem duplo hit no swing)
-        Player p; // (0,0) 50x50 facing 1 → hitbox combo0 x=[50,66]
+        Player p; // (0,0) 30x50 facing 1 → hitbox combo0 x=[30,46]
         EnemySystem enemies;
-        enemies.spawn("slime", 52.f, 10.f); // 40x30 sobre a hitbox
+        enemies.spawn("slime", 32.f, 10.f); // 40x30 sobre a hitbox [30,46]
 
         MeleeSystem ms;
         GameContext ctx{};
@@ -44,7 +44,7 @@ int main() {
     { // ChainsComboInRecovery (combo 0 → 1, dano 10)
         Player p;
         EnemySystem enemies;
-        enemies.spawn("slime", 52.f, 10.f);
+        enemies.spawn("slime", 32.f, 10.f);
 
         MeleeSystem ms;
         GameContext ctx{};

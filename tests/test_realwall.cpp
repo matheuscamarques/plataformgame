@@ -18,8 +18,8 @@ int main() {
             if (p.isColide(*world[k])) p.collide(*world[k]);
         if (p.getX() > maxX) maxX = p.getX();
     }
-    std::printf("maxX=%.1f (parede em x=500, player deve parar em ~450)\n", maxX);
-    if (maxX > 451.0f) { std::printf("FALHOU: atravessou parede real\n"); return 1; }
+    std::printf("maxX=%.1f (parede em x=500, player 30 de largura para em ~470)\n", maxX);
+    if (maxX > 471.0f) { std::printf("FALHOU: atravessou parede real\n"); return 1; }
     std::printf("OK: parede real bloqueia\n");
     return 0;
 }

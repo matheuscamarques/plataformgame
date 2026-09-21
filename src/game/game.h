@@ -55,6 +55,7 @@ private:
     support::ParticleSystem *particles_ = nullptr; // observa; dono é o scheduler
     sprites::SpriteSet sprites_; // dono: build 1x no run (precisa de GL)
     bool spritesBuilt_ = false;
+    bool charView_ = false; // F3: ASCII por char, sem textura
     int tickCount_ = 0; // p/ animação walk do anão
     bool running = false;
     void render();
