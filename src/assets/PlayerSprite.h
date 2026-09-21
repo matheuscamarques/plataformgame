@@ -4,6 +4,7 @@
 #include <SFML/Graphics/Texture.hpp>
 
 #include "assets/Sprites/SpriteSet.h"
+#include "support/Combat/AimDir.h"
 #include "support/Combat/SpriteFrame.h"
 
 class Player;
@@ -15,13 +16,27 @@ class Player;
 namespace game {
 
 inline support::SpriteFrameId resolvePlayerSprite(bool onGround, float vx,
-                                                  bool hurt,
-                                                  bool attackingMelee,
-                                                  bool attackingThrow,
-                                                  int walkFrame) {
+                                                   bool hurt,
+                                                   bool attackingMelee,
+                                                   support::AimDir aimDir,
+                                                   bool attackingThrow,
+                                                   int walkFrame) {
     using support::SpriteFrameId;
+    using support::AimDir;
     if (hurt) return SpriteFrameId::PlayerHurt;
-    if (attackingMelee) return SpriteFrameId::PlayerPunch;
+    // Corpo reflete o input atual (aimDir), mesmo em Recovery: se o
+    // jogador virar pra cima no meio do golpe, o braço ergue.
+    if (attackingMelee) {
+        switch (aimDir) {
+            case AimDir::N:
+            case AimDir::NE:
+            case AimDir::NW: return SpriteFrameId::PlayerPunchUp;
+            case AimDir::S:
+            case AimDir::SE:
+            case AimDir::SW: return SpriteFrameId::PlayerPunchDown;
+            default: return SpriteFrameId::PlayerPunch;
+        }
+    }
     if (attackingThrow) return SpriteFrameId::PlayerThrow;
     if (!onGround) return SpriteFrameId::PlayerJump;
     if (std::fabs(vx) > 5.f) {
@@ -43,6 +58,8 @@ inline const sf::Texture *textureForFrame(support::SpriteFrameId id,
         case SpriteFrameId::PlayerThrow: return &sp.playerThrow;
         case SpriteFrameId::PlayerPunch:
             return meleeTex ? meleeTex : &sp.playerPunch;
+        case SpriteFrameId::PlayerPunchUp: return &sp.playerPunchUp;
+        case SpriteFrameId::PlayerPunchDown: return &sp.playerPunchDown;
         case SpriteFrameId::PlayerHurt: return &sp.playerHurt;
         case SpriteFrameId::PlayerDeath: return &sp.playerDeath;
         case SpriteFrameId::SlimeIdle: return &sp.slimeIdle;

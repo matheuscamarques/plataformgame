@@ -60,7 +60,8 @@ int main() {
     { // AllPlayerFramesHandFaceSeparated
         const char *const *frames[] = {
             kPlayerIdle, kPlayerWalkA, kPlayerWalkB, kPlayerJump,
-            kPlayerThrow, kPlayerPunch, kPlayerHurt, kPlayerDeath,
+            kPlayerThrow, kPlayerPunch, kPlayerPunchUp, kPlayerPunchDown,
+            kPlayerHurt, kPlayerDeath,
         };
         for (auto *f : frames) {
             auto hand = bboxForChar(f, kPlayerH, 'H');

@@ -25,6 +25,12 @@ SpriteFrameData frameData(support::SpriteFrameId id) {
         case SpriteFrameId::PlayerPunch:
             return {sprites::kPlayerPunch, sprites::kPlayerW, sprites::kPlayerH,
                     sprites::kPlayerPal, sprites::kPlayerPalCount};
+        case SpriteFrameId::PlayerPunchUp:
+            return {sprites::kPlayerPunchUp, sprites::kPlayerW, sprites::kPlayerH,
+                    sprites::kPlayerPal, sprites::kPlayerPalCount};
+        case SpriteFrameId::PlayerPunchDown:
+            return {sprites::kPlayerPunchDown, sprites::kPlayerW, sprites::kPlayerH,
+                    sprites::kPlayerPal, sprites::kPlayerPalCount};
         case SpriteFrameId::PlayerHurt:
             return {sprites::kPlayerHurt, sprites::kPlayerW, sprites::kPlayerH,
                     sprites::kPlayerPal, sprites::kPlayerPalCount};

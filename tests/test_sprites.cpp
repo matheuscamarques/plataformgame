@@ -14,10 +14,11 @@ int main() {
         return false;
     };
 
-    { // PlayerWidths (12x20, 8 frames)
+    { // PlayerWidths (12x20, 10 frames)
         const char *const *frames[] = {
             kPlayerIdle, kPlayerWalkA, kPlayerWalkB,
             kPlayerJump, kPlayerThrow, kPlayerPunch,
+            kPlayerPunchUp, kPlayerPunchDown,
             kPlayerHurt, kPlayerDeath
         };
         for (auto f : frames) {
@@ -108,20 +109,65 @@ int main() {
     }
     { // ResolvePriority (hurt > melee > throw > jump > walk > idle)
         using support::SpriteFrameId;
-        assert(game::resolvePlayerSprite(true, 0.f, true, true, true, 0)
-               == SpriteFrameId::PlayerHurt);
-        assert(game::resolvePlayerSprite(false, 0.f, false, true, true, 0)
-               == SpriteFrameId::PlayerPunch);
-        assert(game::resolvePlayerSprite(true, 0.f, false, false, true, 0)
-               == SpriteFrameId::PlayerThrow);
-        assert(game::resolvePlayerSprite(false, 0.f, false, false, false, 0)
-               == SpriteFrameId::PlayerJump);
-        assert(game::resolvePlayerSprite(true, 100.f, false, false, false, 0)
-               == SpriteFrameId::PlayerWalkA);
-        assert(game::resolvePlayerSprite(true, 100.f, false, false, false, 1)
-               == SpriteFrameId::PlayerWalkB);
-        assert(game::resolvePlayerSprite(true, 0.f, false, false, false, 0)
-               == SpriteFrameId::PlayerIdle);
+        using support::AimDir;
+        assert(game::resolvePlayerSprite(true, 0.f, true, true, AimDir::E,
+                                         true, 0) == SpriteFrameId::PlayerHurt);
+        assert(game::resolvePlayerSprite(false, 0.f, false, true, AimDir::E,
+                                         true, 0) == SpriteFrameId::PlayerPunch);
+        assert(game::resolvePlayerSprite(true, 0.f, false, false, AimDir::E,
+                                         true, 0) == SpriteFrameId::PlayerThrow);
+        assert(game::resolvePlayerSprite(false, 0.f, false, false, AimDir::E,
+                                         false, 0) == SpriteFrameId::PlayerJump);
+        assert(game::resolvePlayerSprite(true, 100.f, false, false, AimDir::E,
+                                         false, 0) == SpriteFrameId::PlayerWalkA);
+        assert(game::resolvePlayerSprite(true, 100.f, false, false, AimDir::E,
+                                         false, 1) == SpriteFrameId::PlayerWalkB);
+        assert(game::resolvePlayerSprite(true, 0.f, false, false, AimDir::E,
+                                         false, 0) == SpriteFrameId::PlayerIdle);
+    }
+    { // ResolveUsesAimDir (corpo segue input: N/NE/NW up, S/SE/SW down)
+        using support::SpriteFrameId;
+        using support::AimDir;
+        auto R = [](AimDir a) {
+            return game::resolvePlayerSprite(true, 0.f, false, true, a,
+                                             false, 0);
+        };
+        assert(R(AimDir::E) == SpriteFrameId::PlayerPunch);
+        assert(R(AimDir::W) == SpriteFrameId::PlayerPunch);
+        assert(R(AimDir::N) == SpriteFrameId::PlayerPunchUp);
+        assert(R(AimDir::NE) == SpriteFrameId::PlayerPunchUp);
+        assert(R(AimDir::NW) == SpriteFrameId::PlayerPunchUp);
+        assert(R(AimDir::S) == SpriteFrameId::PlayerPunchDown);
+        assert(R(AimDir::SE) == SpriteFrameId::PlayerPunchDown);
+        assert(R(AimDir::SW) == SpriteFrameId::PlayerPunchDown);
+    }
+    { // PunchUpAlignsLegs (pernas ancoradas; cabeça/torso +2 rows)
+        auto firstRowWith = [](const char *const *f, char c) {
+            for (int y = 0; y < kPlayerH; ++y) {
+                if (std::strchr(f[y], c)) return y;
+            }
+            return -1;
+        };
+        assert(firstRowWith(kPlayerPunchUp, 'B')
+               == firstRowWith(kPlayerIdle, 'B'));
+        assert(firstRowWith(kPlayerPunchUp, 'K')
+               == firstRowWith(kPlayerIdle, 'K') + 2);
+        assert(firstRowWith(kPlayerPunchUp, 'C')
+               == firstRowWith(kPlayerIdle, 'C') + 2);
+    }
+    { // PunchDownFullyAligned (cabeça/torso/botas nas rows do idle)
+        auto firstRowWith = [](const char *const *f, char c) {
+            for (int y = 0; y < kPlayerH; ++y) {
+                if (std::strchr(f[y], c)) return y;
+            }
+            return -1;
+        };
+        assert(firstRowWith(kPlayerPunchDown, 'K')
+               == firstRowWith(kPlayerIdle, 'K'));
+        assert(firstRowWith(kPlayerPunchDown, 'C')
+               == firstRowWith(kPlayerIdle, 'C'));
+        assert(firstRowWith(kPlayerPunchDown, 'B')
+               == firstRowWith(kPlayerIdle, 'B'));
     }
     { // TextureForFrameMapsEveryId (todo id resolve p/ textura existente)
         SpriteSet sp{};
@@ -137,6 +183,10 @@ int main() {
                == fake); // seam de arma preservado
         assert(game::textureForFrame(support::SpriteFrameId::PlayerPunch, sp)
                == &sp.playerPunch); // fallback soco
+        assert(game::textureForFrame(support::SpriteFrameId::PlayerPunchUp,
+                                     sp) == &sp.playerPunchUp);
+        assert(game::textureForFrame(support::SpriteFrameId::PlayerPunchDown,
+                                     sp) == &sp.playerPunchDown);
         assert(game::textureForFrame(support::SpriteFrameId::None, sp)
                == &sp.playerIdle);
     }

@@ -16,6 +16,8 @@ struct SpriteSet {
     sf::Texture playerJump;
     sf::Texture playerThrow;
     sf::Texture playerPunch;
+    sf::Texture playerPunchUp;
+    sf::Texture playerPunchDown;
     sf::Texture playerHurt;
     sf::Texture playerDeath;
     sf::Texture slimeIdle;
@@ -52,6 +54,8 @@ inline SpriteSet build() {
     s.playerJump = P(kPlayerJump);
     s.playerThrow = P(kPlayerThrow);
     s.playerPunch = P(kPlayerPunch);
+    s.playerPunchUp = P(kPlayerPunchUp);
+    s.playerPunchDown = P(kPlayerPunchDown);
     s.playerHurt = P(kPlayerHurt);
     s.playerDeath = P(kPlayerDeath);
     s.slimeIdle = core::makeSprite(kSlimeIdle, kSlimeW, kSlimeH,

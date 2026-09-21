@@ -161,6 +161,52 @@ inline const char *const kPlayerPunch[] = {
     "............",
 };
 
+inline const char *const kPlayerPunchUp[] = {
+    "...HH..HH...",     // 0  mãos no topo
+    "...HH..HH...",     // 1
+    "....KKKK....",     // 2  cabeça começa +2
+    "..KKKKKKKK..",     // 3
+    "..KFFFFFFK..",     // 4
+    "..KFEFFEFK..",     // 5
+    "..KFFFFFFK..",     // 6
+    "...FFFFFF...",     // 7
+    "..CCCCCCCC..",     // 8  torso +2
+    "..CCCCCCCC..",     // 9
+    "..CCCCCCCC..",     // 10
+    "..CCCCCCCC..",     // 11
+    "..CCCCCCCC..",     // 12
+    "...CCCCCC...",     // 13
+    "...CC..CC...",     // 14 pernas em mesma row
+    "...CC..CC...",     // 15
+    "...BB..BB...",     // 16 botas em mesma row
+    "...BB..BB...",     // 17
+    "...BB..BB...",     // 18
+    "............",     // 19
+};
+
+inline const char *const kPlayerPunchDown[] = {
+    "....KKKK....",     // 0  cabeça em mesma row (idle)
+    "..KKKKKKKK..",     // 1
+    "..KFFFFFFK..",     // 2
+    "..KFEFFEFK..",     // 3
+    "..KFFFFFFK..",     // 4
+    "...FFFFFF...",     // 5
+    "..CCCCCCCC..",     // 6  torso em mesma row (idle)
+    ".HCCCCCCCCH.",     // 7  braços descem
+    "..CCCCCCCC..",     // 8
+    "..CCCCCCCC..",     // 9
+    "..CCCCCCCC..",     // 10
+    "..CCCCCCCC..",     // 11
+    "..CCCCCCCC..",     // 12
+    "..CCCCCCCC..",     // 13
+    "..HH....HH..",     // 14 mãos no quadril
+    "..CC....CC..",     // 15
+    "..BB....BB..",     // 16 botas em mesma row (idle)
+    "..BB....BB..",     // 17
+    "..BB....BB..",     // 18
+    "............",     // 19
+};
+
 inline const char *const kPlayerHurt[] = {
     ".H........H.",
     ".H.KKKKKK.H.",

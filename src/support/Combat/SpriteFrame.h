@@ -16,6 +16,8 @@ enum class SpriteFrameId : uint8_t {
     PlayerJump,
     PlayerThrow,
     PlayerPunch,
+    PlayerPunchUp,
+    PlayerPunchDown,
     PlayerHurt,
     PlayerDeath,
 

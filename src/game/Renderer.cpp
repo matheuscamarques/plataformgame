@@ -271,11 +271,16 @@ void Game::drawPlayerEquipment() {
     };
 
     // Posições em coords do sprite 12x20 (mesmas do ASCII do player).
+    // PunchUp desloca cabeça/torso +2 rows (mãos no topo): elmo e
+    // peitoral acompanham. Pernas/botas alinhadas por design.
+    const float headOffsetRows =
+        (p->currentFrameId == support::SpriteFrameId::PlayerPunchUp) ? 2.f
+                                                                     : 0.f;
     // Elmo: cobre rows 0-4 do player, cols 0-11.
-    drawSprite(sprites_.helm[mHelm], 0.f, 0.f);
+    drawSprite(sprites_.helm[mHelm], 0.f, 0.f + headOffsetRows);
 
     // Peitoral: cobre rows 6-13 (túnica + cinto), cols 0-11.
-    drawSprite(sprites_.chest[mChest], 0.f, 6.f);
+    drawSprite(sprites_.chest[mChest], 0.f, 6.f + headOffsetRows);
 
     // Perneiras: cobre rows 14-16 (parte superior das pernas).
     drawSprite(sprites_.legs[mLegs], 0.f, 14.f);
@@ -322,12 +327,27 @@ void Game::drawPlayerWeapon() {
                 break;
         }
     }
+    // Direção pela rotação (snapshot do golpe), não pelo flip: flip +
+    // rotação espelharia errado em NW/SW. 0 = lâmina pra direita.
+    float angle = 0.f;
+    using support::AimDir;
+    switch (p->swingAim) {
+        case AimDir::E: angle = 0.f; break;
+        case AimDir::NE: angle = -45.f; break;
+        case AimDir::N: angle = -90.f; break;
+        case AimDir::NW: angle = -135.f; break;
+        case AimDir::W: angle = 180.f; break;
+        case AimDir::SW: angle = 135.f; break;
+        case AimDir::S: angle = 90.f; break;
+        case AimDir::SE: angle = 45.f; break;
+        default: break;
+    }
     sf::Sprite spr;
     spr.setTexture(*tex);
     spr.setOrigin(originX, originY);
-    spr.setPosition(handX + 4.f * static_cast<float>(p->facing) * s,
-                    handY + 8.f);
-    spr.setScale(s * static_cast<float>(p->facing), s);
+    spr.setPosition(handX, handY);
+    spr.setScale(s, s);
+    spr.setRotation(angle);
     window->draw(spr);
 }
 
