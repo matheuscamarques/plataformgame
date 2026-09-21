@@ -77,6 +77,13 @@ class Player : public Entity
             return meleePhase != MeleePhase::Idle;
         }
 
+        // Mira efetiva da arma: fora do swing segue o input (aimDir);
+        // no swing congela no snapshot (swingAim). Sem isto, idle após
+        // um golpe-W desenharia a arma rotacionada 180° para sempre.
+        support::AimDir effectiveAim() const {
+            return inMeleeSwing() ? swingAim : aimDir;
+        }
+
         // Seam para parry (sem chamador ainda — CombatSystem consome
         // quando rebate existir). Janela = início do Active.
         bool parryWindowActive() const {

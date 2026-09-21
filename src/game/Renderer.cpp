@@ -533,11 +533,17 @@ void Game::drawPlayerWeapon() {
                 break;
         }
     }
-    // Direção pela rotação (snapshot do golpe), não pelo flip: flip +
-    // rotação espelharia errado em NW/SW. 0 = lâmina pra direita.
+    // Direção pela rotação, não pelo flip: flip + rotação espelharia
+    // errado em NW/SW. Fora do swing segue o input (aimDir); no swing,
+    // o snapshot — swingAim idle congela no último golpe (lâmina
+    // invertida para sempre). Tabela calibrada p/ sprite horizontal
+    // (swing, lâmina p/ direita); sprite vertical (idle/windup, lâmina
+    // em cima) ganha +90°. Windup é aproximado (lâmina na diagonal).
+    const bool verticalSprite = (p->meleePhase == MeleePhase::Idle ||
+                                 p->meleePhase == MeleePhase::Windup);
     float angle = 0.f;
     using support::AimDir;
-    switch (p->swingAim) {
+    switch (p->effectiveAim()) {
         case AimDir::E: angle = 0.f; break;
         case AimDir::NE: angle = -45.f; break;
         case AimDir::N: angle = -90.f; break;
@@ -548,6 +554,7 @@ void Game::drawPlayerWeapon() {
         case AimDir::SE: angle = 45.f; break;
         default: break;
     }
+    if (verticalSprite) angle += 90.f;
     sf::Sprite spr;
     spr.setTexture(*tex);
     spr.setOrigin(originX, originY);
