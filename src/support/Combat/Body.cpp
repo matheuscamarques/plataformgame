@@ -85,6 +85,11 @@ void Body::rebuildFromSprite(
     if (!schema || !rows || sw <= 0 || sh <= 0) return;
     facing = facing_;
 
+    // NOTA: entrada não-proporcional é legal (slime 40x30 com sprite
+    // 14x12). A derivação usa escala uniforme por `sh`; caixas só saem
+    // mais estreitas que o AABB — hitbox = pixels, por design. Um assert
+    // de proporcionalidade aqui quebrava o boot (slime), então não há.
+
     const bool same = (rows == cachedRows)
                    && (sw == cachedW) && (sh == cachedH)
                    && (facing_ == cachedFacing);
