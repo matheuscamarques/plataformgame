@@ -139,7 +139,7 @@ int main() {
         Player p;
         int s0 = support::surfaceHeight(0, 1337u);
         p.setX(0.f);
-        p.setY(static_cast<float>(s0 - 1) * 50.f);
+        p.setY(static_cast<float>(s0 - 1) * core::kBlockSize);
         EnemySystem enemies;
         SpawnSystem ss;
         World world(1337u);

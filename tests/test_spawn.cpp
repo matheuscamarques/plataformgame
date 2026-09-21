@@ -1,5 +1,6 @@
 #include <cassert>
 #include <cstdio>
+#include "core/Config.h"
 #include "entities/Player/Player.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
@@ -10,8 +11,8 @@
 // Player assentado no solo (pés no topo do chão).
 static void settle(Player &p, support::World &w, int tx) {
     int s = support::surfaceHeight(tx, 1337u);
-    p.setX(static_cast<float>(tx) * 50.f);
-    p.setY(static_cast<float>(s - 1) * 50.f);
+    p.setX(static_cast<float>(tx) * core::kBlockSize);
+    p.setY(static_cast<float>(s - 1) * core::kBlockSize);
     w.update(tx, s);
 }
 
@@ -62,8 +63,8 @@ int main() {
             ss.tick(1.f / 30.f, ctx); // até 20 janelas: alguma acerta chão
         assert(enemies.count() > 0u);
         enemies.forEach([&](Enemy &s) {
-            const int tx = static_cast<int>(s.body.getX() / 50.f);
-            const int ty = static_cast<int>(s.body.getY() / 50.f);
+            const int tx = static_cast<int>(s.body.getX() / core::kBlockSize);
+            const int ty = static_cast<int>(s.body.getY() / core::kBlockSize);
             // Tile do slime livre (pés caem na física depois, sem enterrar).
             assert(!world.isSolid(tx, ty));
         });
