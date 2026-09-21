@@ -378,11 +378,13 @@ void Game::drawPlayerEquipment() {
     const float spriteTop = p->getY() + p->getH() - sprites::kPlayerH * s;
 
     // Helper que desenha um overlay na grade 12x20 do player.
-    auto drawSprite = [&](const sf::Texture &tex, int texW, int texH,
+    // Origin sempre (0,0): com facing<0 o setScale(-s,s) espelha a
+    // partir do canto, e equipSpritePos já ancora o canto direito.
+    auto drawSprite = [&](const sf::Texture &tex,
                           float spriteX, float spriteY) {
         sf::Sprite spr(tex);
         const sf::Vector2f at = game::equipSpritePos(
-            spriteLeft, spriteTop, s, f, spriteX, spriteY, texW);
+            spriteLeft, spriteTop, s, f, spriteX, spriteY);
         spr.setPosition(at);
         spr.setScale(s * f, s);
         window->draw(spr);
@@ -390,21 +392,21 @@ void Game::drawPlayerEquipment() {
 
     // Posições em coords do sprite 12x20 (mesmas do ASCII do player).
     // Elmo: cobre rows 0-4 do player, cols 0-11.
-    drawSprite(sprites_.helm[mHelm], sprites::kHelmW, sprites::kHelmH, 0.f, 0.f);
+    drawSprite(sprites_.helm[mHelm], 0.f, 0.f);
 
     // Peitoral: cobre rows 6-13 (túnica + cinto), cols 0-11.
-    drawSprite(sprites_.chest[mChest], sprites::kChestW, sprites::kChestH, 0.f, 6.f);
+    drawSprite(sprites_.chest[mChest], 0.f, 6.f);
 
     // Perneiras: cobre rows 14-16 (parte superior das pernas).
-    drawSprite(sprites_.legs[mLegs], sprites::kLegsW, sprites::kLegsH, 0.f, 14.f);
+    drawSprite(sprites_.legs[mLegs], 0.f, 14.f);
 
     // Botas: cobre rows 17-19.
-    drawSprite(sprites_.boots[mLegs], sprites::kBootsW, sprites::kBootsH, 0.f, 17.f);
+    drawSprite(sprites_.boots[mLegs], 0.f, 17.f);
 
     // Luvas: 2 draws, uma em cada mão (cols ~1 e ~10).
     const int mGlove = mHelm; // mesmo material do elmo (sem slot próprio)
-    drawSprite(sprites_.gloves[mGlove], sprites::kGloveW, sprites::kGloveH, 0.f, 7.f);
-    drawSprite(sprites_.gloves[mGlove], sprites::kGloveW, sprites::kGloveH, 8.f, 7.f);
+    drawSprite(sprites_.gloves[mGlove], 0.f, 7.f);
+    drawSprite(sprites_.gloves[mGlove], 8.f, 7.f);
 }
 
 void Game::drawPlayerWeapon() {
