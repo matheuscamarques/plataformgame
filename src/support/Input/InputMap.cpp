@@ -19,6 +19,9 @@ InputMap::InputMap() {
     bind(Action::CycleMaterial, sf::Keyboard::M);
     bind(Action::ToggleDebug, sf::Keyboard::F1);
     bind(Action::ToggleCharView, sf::Keyboard::F3);
+    bind(Action::ScreenshotNow, sf::Keyboard::F12);
+    bind(Action::ToggleAutoMelee, sf::Keyboard::F11);
+    bind(Action::ToggleAutoHurt, sf::Keyboard::F10);
 
     addBind(Action::Left,  sf::Keyboard::A);
     addBind(Action::Right, sf::Keyboard::D);

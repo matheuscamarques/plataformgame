@@ -12,6 +12,7 @@ void Game::setWindow(sf::RenderWindow *window)
 
     //window->setView(*this->view);
     this->window = window;
+    screenshots_.setWindow(window);
 }
 
 

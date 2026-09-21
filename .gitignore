@@ -13,3 +13,10 @@ compiled/
 *.swp
 *~
 .DS_Store
+
+# Screenshots de debug (F10-12, nunca commitar PNG)
+/screenshots/
+
+# Doxygen gerado (rode local, nunca commitar milhares de arquivos)
+docs/doxygen/html/
+docs/doxygen/latex/

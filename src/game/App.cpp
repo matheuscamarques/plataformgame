@@ -144,7 +144,8 @@ void Game::tick() {
                            &s.body, &s.knockbackLock});
     });
     support::GameContext ctx{getWorld(), p, &input_, enemies_,
-                             throws_, explodes_, drops_, &targets};
+                             throws_, explodes_, drops_, &targets,
+                             &screenshots_};
 
     // Sprite atual primeiro: BodySystem (scheduler) deriva hitboxes dele.
     p->currentFrameId = run_.isDead()
@@ -155,6 +156,9 @@ void Game::tick() {
                                     p->swingAim,
                                     p->throwAnimT > 0.f,
                                     p->walkFrame);
+    // Screenshot auto: 1 por swing em Active (F11 liga).
+    if (p->meleePhase == MeleePhase::Active)
+        screenshots_.maybeCaptureMelee(p->meleeSwingId);
     enemies_->forEach([&](support::Enemy &s) {
         if (auto *d = dynamic_cast<support::DwarfAI *>(s.ai.get())) {
             switch (d->state()) {

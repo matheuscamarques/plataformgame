@@ -21,4 +21,10 @@ void Game::pollEvents() {
     }
     if (input_.pressed(support::Action::ToggleDebug)) overlay_.toggle();
     if (input_.pressed(support::Action::ToggleCharView)) charView_ = !charView_;
+    if (input_.pressed(support::Action::ScreenshotNow))
+        screenshots_.capture("manual");
+    if (input_.pressed(support::Action::ToggleAutoMelee))
+        screenshots_.setAutoMelee(!screenshots_.autoMelee());
+    if (input_.pressed(support::Action::ToggleAutoHurt))
+        screenshots_.setAutoHurt(!screenshots_.autoHurt());
 }

@@ -13,6 +13,7 @@ class ThrowSystem;
 class ExplosionSystem;
 class DropSystem;
 struct ExplosionTarget;
+class ScreenshotSystem;
 
 // Visões (sem ownership) que os sistemas recebem por tick.
 // Dono continua sendo o Game.
@@ -28,6 +29,9 @@ struct GameContext {
     // Preenchido pelo Game antes de explosões (Player + Slimes).
     // Dono: Game (vive no stack do tick).
     std::vector<ExplosionTarget> *explosionTargets = nullptr;
+
+    // Debug visual (screenshots auto). Nulo em testes headless.
+    ScreenshotSystem *screenshots = nullptr;
 };
 
 } // namespace support
