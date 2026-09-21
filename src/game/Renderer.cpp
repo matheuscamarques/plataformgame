@@ -301,6 +301,15 @@ void Game::render()
         }
     }
 
+    // Screenshot auto (F11): aqui, após todos os draws e antes do
+    // display — o framebuffer contém exatamente este frame. No tick,
+    // a captura sairia 1 frame atrasada (sem a yellow box do Active).
+    if (player.get()->meleePhase == MeleePhase::Active) {
+        screenshots_.setFocus({player.get()->getCenterX(),
+                               player.get()->getCenterY()});
+        screenshots_.maybeCaptureMelee(player.get()->meleeSwingId);
+    }
+
     window->display();
 }
 

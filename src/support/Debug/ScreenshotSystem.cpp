@@ -1,5 +1,6 @@
 #include "ScreenshotSystem.h"
 
+#include <algorithm>
 #include <chrono>
 #include <filesystem>
 #include <iomanip>
@@ -31,6 +32,37 @@ std::string timestamp() {
 
 } // namespace
 
+// Recorte size×size centrado em focus (clampado no framebuffer),
+// ampliado zoom× com nearest-neighbor (pixel-art sem blur).
+sf::Image ScreenshotSystem::cropZoom(const sf::Image &src,
+                                     sf::Vector2f focusPx) {
+    const sf::Vector2u size = src.getSize();
+    if (size.x == 0 || size.y == 0) return src;
+    constexpr unsigned S = ScreenshotSystem::kFocusSize;
+    constexpr unsigned Z = ScreenshotSystem::kFocusZoom;
+    const int half = static_cast<int>(S) / 2;
+    int x0 = static_cast<int>(focusPx.x) - half;
+    int y0 = static_cast<int>(focusPx.y) - half;
+    const int maxX0 = static_cast<int>(size.x) - static_cast<int>(S);
+    const int maxY0 = static_cast<int>(size.y) - static_cast<int>(S);
+    x0 = std::max(0, std::min(x0, std::max(0, maxX0)));
+    y0 = std::max(0, std::min(y0, std::max(0, maxY0)));
+
+    sf::Image out;
+    out.create(S * Z, S * Z);
+    for (unsigned y = 0; y < S * Z; ++y) {
+        for (unsigned x = 0; x < S * Z; ++x) {
+            // Clamp individual: framebuffer menor que o recorte.
+            const unsigned sx =
+                std::min(static_cast<unsigned>(x0) + x / Z, size.x - 1u);
+            const unsigned sy =
+                std::min(static_cast<unsigned>(y0) + y / Z, size.y - 1u);
+            out.setPixel(x, y, src.getPixel(sx, sy));
+        }
+    }
+    return out;
+}
+
 bool ScreenshotSystem::capture(const std::string &tag) {
     if (!window_) return false;
 
@@ -50,7 +82,10 @@ bool ScreenshotSystem::capture(const std::string &tag) {
     tex.create(size.x, size.y);
     tex.update(*window_); // copia o framebuffer atual
 
-    const sf::Image img = tex.copyToImage();
+    sf::Image img = tex.copyToImage();
+    // Foco no personagem: mundo→pixel na view atual, recorte + zoom.
+    if (hasFocus_)
+        img = cropZoom(img, sf::Vector2f(window_->mapCoordsToPixel(focus_)));
 
     std::ostringstream name;
     name << "./screenshots/" << std::setw(4) << std::setfill('0')
@@ -68,8 +103,9 @@ void ScreenshotSystem::maybeCaptureMelee(int swingId) {
     capture("melee_" + std::to_string(swingId));
 }
 
-void ScreenshotSystem::notifyHurt() {
+void ScreenshotSystem::notifyHurt(sf::Vector2f worldCenter) {
     if (!autoHurt_) return;
+    setFocus(worldCenter);
     capture("hurt_" + std::to_string(counter_));
 }
 

@@ -37,11 +37,37 @@ int main() {
     }
     { // NotifyHurtRespectsFlag (desligado = no-op)
         ScreenshotSystem ss;
-        ss.notifyHurt();
+        ss.notifyHurt({100.f, 200.f});
         assert(ss.count() == 0);
         ss.setAutoHurt(true);
-        ss.notifyHurt(); // sem janela: falha limpo
+        ss.notifyHurt({100.f, 200.f}); // sem janela: falha limpo
         assert(ss.count() == 0);
+    }
+    { // CropZoomCentersAndScales (CPU puro, sem GL)
+        sf::Image src;
+        src.create(800, 800, sf::Color::Black);
+        src.setPixel(400, 300, sf::Color::Red);
+        const sf::Image out =
+            ScreenshotSystem::cropZoom(src, {400.f, 300.f});
+        assert(out.getSize().x == ScreenshotSystem::kFocusSize *
+                                     ScreenshotSystem::kFocusZoom);
+        assert(out.getSize().y == ScreenshotSystem::kFocusSize *
+                                     ScreenshotSystem::kFocusZoom);
+        // Foco no centro do recorte ampliado.
+        const unsigned c = ScreenshotSystem::kFocusSize *
+                           ScreenshotSystem::kFocusZoom / 2;
+        assert(out.getPixel(c, c) == sf::Color::Red);
+        // Canto superior esquerdo = origem do recorte (400-120, 300-120).
+        assert(out.getPixel(0, 0) == sf::Color::Black);
+    }
+    { // CropZoomClampsAtEdges (foco no canto não lê fora)
+        sf::Image src;
+        src.create(800, 800, sf::Color::Green);
+        const sf::Image out =
+            ScreenshotSystem::cropZoom(src, {0.f, 0.f});
+        assert(out.getSize().x == 720u);
+        assert(out.getPixel(0, 0) == sf::Color::Green);
+        assert(out.getPixel(719, 719) == sf::Color::Green);
     }
 
     std::puts("screenshot test OK");
