@@ -65,6 +65,7 @@ private:
     int tickCount_ = 0; // p/ animação walk do anão
     bool running = false;
     void render();
+    void pollEvents(); // loop SFML + edges por frame (run() chama 1x)
     void tick();
     void drawPlayerSprite();
     void drawPlayerEquipment();
