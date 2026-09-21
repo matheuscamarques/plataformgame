@@ -17,6 +17,9 @@ compiled/
 # Screenshots de debug (F10-12, nunca commitar PNG)
 /screenshots/
 
+# Log de debug em arquivo (F9, 1 run = 1 arquivo, nunca commitar)
+/logs/
+
 # Doxygen gerado (rode local, nunca commitar milhares de arquivos)
 docs/doxygen/html/
 docs/doxygen/latex/

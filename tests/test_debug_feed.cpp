@@ -1,5 +1,8 @@
 #include <cassert>
 #include <cstdio>
+#include <filesystem>
+#include <fstream>
+#include <string>
 
 #include "support/Debug/DebugFeed.h"
 
@@ -29,6 +32,41 @@ int main() {
         assert(f.log.size() == DebugFeed::kLogCap);
         assert(f.log.front() == "e2");
         assert(f.log.back() == "e6");
+    }
+
+    { // FileDisabledCreatesNothing (sem enable: zero arquivo)
+        const std::string tmp = "/tmp/test_debug_feed_off.log";
+        std::remove(tmp.c_str());
+        DebugFeed f;
+        f.setLogPath(tmp);
+        f.pushLog("ghost");
+        assert(!std::filesystem::exists(tmp));
+    }
+    { // FileRoundTrip (linhas com stamp de tick, flush imediato)
+        const std::string tmp = "/tmp/test_debug_feed.log";
+        std::remove(tmp.c_str());
+        {
+            DebugFeed f;
+            assert(!f.fileEnabled());
+            f.setLogPath(tmp);
+            f.setFileEnabled(true);
+            f.pushLog("melee slime head -16"); // t=0
+            assert(f.tickCount() == 0);
+            f.tick(1.f / 30.f); // t=1
+            f.pushLog("spawn dwarf S3"); // t=1
+            assert(f.tickCount() == 1);
+            f.setFileEnabled(false); // fecha (flush já foi imediato)
+        }
+        std::ifstream in(tmp);
+        assert(in.is_open());
+        std::string l1, l2, extra;
+        std::getline(in, l1);
+        std::getline(in, l2);
+        assert(l1 == "[t=0] melee slime head -16");
+        assert(l2 == "[t=1] spawn dwarf S3");
+        assert(!std::getline(in, extra));
+        in.close();
+        std::remove(tmp.c_str());
     }
 
     std::puts("debug feed test OK");

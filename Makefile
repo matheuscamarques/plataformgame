@@ -50,7 +50,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(OBJ_DIR) $(BIN_DIR) *.o plataformer
+	rm -rf $(OBJ_DIR) $(BIN_DIR) *.o plataformer logs
 
 # mantido por compatibilidade: limpa e recria as pastas
 clear: clean

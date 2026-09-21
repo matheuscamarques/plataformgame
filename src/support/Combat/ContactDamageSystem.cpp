@@ -4,6 +4,7 @@
 #include <SFML/Graphics/Rect.hpp>
 
 #include "entities/Player/Player.h"
+#include "support/Debug/DebugFeed.h"
 #include "support/Debug/ScreenshotSystem.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
@@ -61,6 +62,9 @@ void ContactDamageSystem::tick(float dt, GameContext &ctx) {
         if (!p->hurt(kContactDamage)) return; // i-frame segurou, tenta de novo
         if (ctx.screenshots)
             ctx.screenshots->notifyHurt({p->getCenterX(), p->getCenterY()});
+        if (ctx.debug)
+            ctx.debug->pushLog("hurt player -" +
+                               std::to_string(kContactDamage));
         // Empurrão posicional: vel do Player legado é sobrescrita
         // todo frame pelos flags de movimento, impulso não persistiria.
         const float away = (p->getCenterX() < s.body.getCenterX()) ? -1.f : 1.f;

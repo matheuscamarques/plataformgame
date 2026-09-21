@@ -39,4 +39,9 @@ void Game::pollEvents() {
         overlay_.toggleEvents();
     if (input_.pressed(support::Action::ToggleWorld))
         overlay_.toggleWorld();
+    if (input_.pressed(support::Action::ToggleFileLog)) {
+        debugFeed_.setFileEnabled(!debugFeed_.fileEnabled());
+        debugFeed_.pushLog(debugFeed_.fileEnabled() ? "filelog on"
+                                                    : "filelog off");
+    }
 }
