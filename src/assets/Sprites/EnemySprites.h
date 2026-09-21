@@ -114,24 +114,24 @@ inline const char *const kDwarfThrow[] = {
     "..BBB....BBB..",
 };
 inline const char *const kDwarfMelee[] = {
-    ".........WWWW.",
-    "..........W...",
-    "....CCCCCCW...",
-    "...CCCCCCCC...",
-    "...CFFFFFFC...",
-    "...FEFFFFEF...",
-    "....FFFFFF....",
-    "...RRRRRRRR...",
-    "..RRRRRRRRRR..",
-    "..RRRRRRRRRR..",
-    ".HRRRRRRRRRRH.",
-    ".TTTRRRRRRTTT.",
-    ".TTTTTTTTTTTT.",
-    ".TTTTTTTTTTTT.",
-    "..TTTTTTTTTT..",
-    "..TTT....TTT..",
-    "..BBB....BBB..",
-    "..BBB....BBB..",
+    ".........WWWW.",     // 0  pickaxe blade
+    "....CCCCCCW...",     // 1  capacete topo + cabo
+    "...CCCCCCCC...",     // 2  capacete
+    "...CFFFFFFC...",     // 3  rosto
+    "...FEFFFFEF...",     // 4  olhos
+    "....FFFFFF....",     // 5  queixo
+    "...RRRRRRRR...",     // 6  barba topo (comprimida)
+    "..RRRRRRRRRR..",     // 7  barba
+    ".HRRRRRRRRRRH.",     // 8  braços (mesma row do idle)
+    ".TTTRRRRRRTTT.",     // 9  torso topo + barba
+    ".TTTTTTTTTTTT.",     // 10 torso
+    ".TTTTTTTTTTTT.",     // 11
+    ".TTTTTTTTTTTT.",     // 12
+    "..TTTTTTTTTT..",     // 13
+    "..TTT....TTT..",     // 14 pernas (mesma row do idle)
+    "..BBB....BBB..",     // 15 botas
+    "..BBB....BBB..",     // 16
+    "..BBB....BBB..",     // 17
 };
 
 } // namespace sprites

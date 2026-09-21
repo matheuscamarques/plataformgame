@@ -57,16 +57,28 @@ int main() {
         assert(hand.valid && face.valid);
         assert(separated(hand, face));
     }
-    { // AllPlayerFramesHandFaceSeparated
+    { // AllPlayerFramesHandFaceSeparatedX (H nunca dentro do span-X de F)
+        // Refinado p/ PunchUp: braços laterais compartilham rows com o
+        // rosto (H rows 0-6, F 4-6) mas nunca as colunas (H 1/10, F 3-8).
+        // Faixa-Y rejeitaria; disjunção-X por row pega o bug real
+        // (mão-sobre-rosto = H dentro de [fMin,fMax]).
         const char *const *frames[] = {
             kPlayerIdle, kPlayerWalkA, kPlayerWalkB, kPlayerJump,
             kPlayerThrow, kPlayerPunch, kPlayerPunchUp, kPlayerPunchDown,
             kPlayerHurt, kPlayerDeath,
         };
         for (auto *f : frames) {
-            auto hand = bboxForChar(f, kPlayerH, 'H');
-            auto face = bboxForChar(f, kPlayerH, 'F');
-            assert(separated(hand, face));
+            for (int y = 0; y < kPlayerH; ++y) {
+                int fMin = kPlayerW, fMax = -1;
+                for (int x = 0; x < kPlayerW; ++x)
+                    if (f[y][x] == 'F') {
+                        if (x < fMin) fMin = x;
+                        if (x > fMax) fMax = x;
+                    }
+                if (fMax < 0) continue; // sem F na row
+                for (int x = 0; x < kPlayerW; ++x)
+                    assert(!(f[y][x] == 'H' && x >= fMin && x <= fMax));
+            }
         }
     }
     { // DwarfHandFaceBarba (H mão, F rosto, R barba presentes)
