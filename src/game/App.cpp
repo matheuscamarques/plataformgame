@@ -184,6 +184,7 @@ void Game::tick() {
     });
 
     run_.tick(1.0f / 30.0f, ctx);
-    debugFeed_.tick(1.0f / 30.0f); // números de dano expiram
+    // Números de dano congelam no pause (nada flutua/expira parado).
+    if (!run_.isPaused()) debugFeed_.tick(1.0f / 30.0f);
     if (!run_.isPaused() && !run_.isDead()) scheduler_.tick(1.0f / 30.0f, ctx);
 }
