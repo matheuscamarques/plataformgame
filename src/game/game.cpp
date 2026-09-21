@@ -364,66 +364,47 @@ void Game::drawPlayerSprite() {
     window->draw(spr);
 }
 
-namespace {
-
-// Peça ancorada numa parte do Body (segue walk/jump/attack).
-// Sem a parte (Body vazio), não desenha. Posição via
-// game::pieceDrawPos (fonte única, testável sem GL).
-void drawPiece(const game::PieceDraw &pd,
-               const support::Body &body,
-               int facing, float worldScale,
-               sf::RenderTarget &target) {
-    if (!pd.tex) return;
-    if (!body.find(pd.anchor)) return;
-    const sf::Vector2f at = game::pieceDrawPos(pd, body, facing, worldScale);
-    sf::Sprite spr;
-    spr.setTexture(*pd.tex);
-    spr.setOrigin(pd.originPx.x, pd.originPx.y);
-    spr.setPosition(at);
-    spr.setScale(worldScale * static_cast<float>(facing), worldScale);
-    target.draw(spr);
-}
-
-} // namespace
-
 void Game::drawPlayerEquipment() {
     Player *p = player.get();
     if (run_.isDead() || !p->loadout.equipped) return;
     const float s = p->getH() / static_cast<float>(sprites::kPlayerH);
-    const auto &body = p->body;
     const int f = p->facing;
     const int mHelm = static_cast<int>(p->loadout.helm);
     const int mChest = static_cast<int>(p->loadout.chest);
     const int mLegs = static_cast<int>(p->loadout.legs);
 
-    using support::BodyPartId;
+    // Canto superior esquerdo do sprite no mundo (grade 12x20 do player).
+    const float spriteLeft = p->getCenterX() - (sprites::kPlayerW * 0.5f) * s;
+    const float spriteTop = p->getY() + p->getH() - sprites::kPlayerH * s;
 
-    drawPiece(game::PieceDraw{&sprites_.helm[mHelm],
-               {sprites::kHelmW * 0.5f, static_cast<float>(sprites::kHelmH)},
-               BodyPartId::Head, {0.f, 2.2f}},
-              body, f, s, *window);
-    drawPiece(game::PieceDraw{&sprites_.chest[mChest],
-               {sprites::kChestW * 0.5f, 0.f},
-               BodyPartId::Torso, {0.f, -3.0f}},
-              body, f, s, *window);
-    // Perneiras e botas no centro (Torso): simétricas, 1 draw cada.
-    drawPiece(game::PieceDraw{&sprites_.legs[mLegs],
-               {sprites::kLegsW * 0.5f, 0.f},
-               BodyPartId::Torso, {0.f, 4.0f}},
-              body, f, s, *window);
-    drawPiece(game::PieceDraw{&sprites_.boots[mLegs],
-               {sprites::kBootsW * 0.5f, 0.f},
-               BodyPartId::Torso, {0.f, 8.0f}},
-              body, f, s, *window);
+    // Helper que desenha um overlay na grade 12x20 do player.
+    auto drawSprite = [&](const sf::Texture &tex, int texW, int texH,
+                          float spriteX, float spriteY) {
+        sf::Sprite spr(tex);
+        const sf::Vector2f at = game::equipSpritePos(
+            spriteLeft, spriteTop, s, f, spriteX, spriteY, texW);
+        spr.setPosition(at);
+        spr.setScale(s * f, s);
+        window->draw(spr);
+    };
+
+    // Posições em coords do sprite 12x20 (mesmas do ASCII do player).
+    // Elmo: cobre rows 0-4 do player, cols 0-11.
+    drawSprite(sprites_.helm[mHelm], sprites::kHelmW, sprites::kHelmH, 0.f, 0.f);
+
+    // Peitoral: cobre rows 6-13 (túnica + cinto), cols 0-11.
+    drawSprite(sprites_.chest[mChest], sprites::kChestW, sprites::kChestH, 0.f, 6.f);
+
+    // Perneiras: cobre rows 14-16 (parte superior das pernas).
+    drawSprite(sprites_.legs[mLegs], sprites::kLegsW, sprites::kLegsH, 0.f, 14.f);
+
+    // Botas: cobre rows 17-19.
+    drawSprite(sprites_.boots[mLegs], sprites::kBootsW, sprites::kBootsH, 0.f, 17.f);
+
+    // Luvas: 2 draws, uma em cada mão (cols ~1 e ~10).
     const int mGlove = mHelm; // mesmo material do elmo (sem slot próprio)
-    drawPiece(game::PieceDraw{&sprites_.gloves[mGlove],
-               {sprites::kGloveW * 0.5f, 0.f},
-               BodyPartId::ArmL, {0.f, -0.4f}},
-              body, f, s, *window);
-    drawPiece(game::PieceDraw{&sprites_.gloves[mGlove],
-               {sprites::kGloveW * 0.5f, 0.f},
-               BodyPartId::ArmR, {0.f, -0.4f}},
-              body, f, s, *window);
+    drawSprite(sprites_.gloves[mGlove], sprites::kGloveW, sprites::kGloveH, 0.f, 7.f);
+    drawSprite(sprites_.gloves[mGlove], sprites::kGloveW, sprites::kGloveH, 8.f, 7.f);
 }
 
 void Game::drawPlayerWeapon() {

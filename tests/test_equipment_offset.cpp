@@ -3,52 +3,32 @@
 #include <cstdio>
 
 #include "assets/EquipmentLayout.h"
-#include "support/Combat/Body.h"
 
 namespace {
 bool near(float a, float b) { return std::fabs(a - b) < 0.01f; }
-
-support::Body makeBody() {
-    support::Body b;
-    support::BodySchema s = support::BodySchema::humanoid(50.f, 50.f);
-    b.attach(&s);
-    b.rebuild({100.f, 100.f}, 1);
-    return b;
-}
 } // namespace
 
+// Posição de overlay na grade do sprite (sem Body, sem GL).
 int main() {
-    using namespace support;
-
-    { // OffsetScalesWithWorldScale (mesmo spriteOffset, s=2.5 vs 5.0: dobra)
-        Body b = makeBody();
-        const PartState *torso = b.find(BodyPartId::Torso);
-        assert(torso != nullptr);
-        const float ax = torso->worldBox.left + torso->worldBox.width * 0.5f;
-        const float ay = torso->worldBox.top + torso->worldBox.height * 0.5f;
-
-        game::PieceDraw pd{nullptr, {0.f, 0.f}, BodyPartId::Torso, {0.f, 4.0f}};
-        sf::Vector2f p25 = game::pieceDrawPos(pd, b, 1, 2.5f);
-        sf::Vector2f p50 = game::pieceDrawPos(pd, b, 1, 5.0f);
-        assert(near(p25.x, ax) && near(p50.x, ax)); // X sem offset: igual
-        assert(near(p25.y, ay + 10.f));             // 4.0 * 2.5
-        assert(near(p50.y, ay + 20.f));             // 4.0 * 5.0: dobrou
+    { // ScaleApplies (sprite 12x20 em (100,200), s=2.5)
+        // Elmo em (0,0): canto superior esquerdo do sprite.
+        sf::Vector2f p = game::equipSpritePos(100.f, 200.f, 2.5f, 1, 0.f, 0.f, 12);
+        assert(near(p.x, 100.f) && near(p.y, 200.f));
+        // Peitoral em (0,6): 6 rows * 2.5 = 15px abaixo.
+        sf::Vector2f c = game::equipSpritePos(100.f, 200.f, 2.5f, 1, 0.f, 6.f, 12);
+        assert(near(c.x, 100.f) && near(c.y, 215.f));
     }
-    { // FacingMirrorsOffsetX (facing -1 espelha o X do offset)
-        Body b = makeBody();
-        game::PieceDraw pd{nullptr, {0.f, 0.f}, BodyPartId::Torso, {2.f, 0.f}};
-        sf::Vector2f pr = game::pieceDrawPos(pd, b, 1, 2.5f);
-        sf::Vector2f pl = game::pieceDrawPos(pd, b, -1, 2.5f);
-        const float ax = b.find(BodyPartId::Torso)->worldBox.left +
-                         b.find(BodyPartId::Torso)->worldBox.width * 0.5f;
-        assert(near(pr.x, ax + 5.f) && near(pl.x, ax - 5.f));
+    { // FacingMirrorsX (facing -1: x -> 12 - x - texW)
+        // Luva direita em x=8 (w=4): normal 8, espelhado 12-8-4 = 0.
+        sf::Vector2f pr = game::equipSpritePos(100.f, 200.f, 2.5f, 1, 8.f, 7.f, 4);
+        sf::Vector2f pl = game::equipSpritePos(100.f, 200.f, 2.5f, -1, 8.f, 7.f, 4);
+        assert(near(pr.x, 120.f) && near(pl.x, 100.f));
         assert(near(pr.y, pl.y)); // Y não espelha
     }
-    { // MissingPartDrawsAtOffsetOrigin (sem a parte: só offset, sem crash)
-        Body b; // sem schema: find retorna null
-        game::PieceDraw pd{nullptr, {0.f, 0.f}, BodyPartId::Head, {1.f, 2.f}};
-        sf::Vector2f p = game::pieceDrawPos(pd, b, 1, 2.5f);
-        assert(near(p.x, 2.5f) && near(p.y, 5.f));
+    { // ScaleDoublesOffset (s=2.5 vs 5.0: mesma grade, dobra mundo)
+        sf::Vector2f a = game::equipSpritePos(0.f, 0.f, 2.5f, 1, 0.f, 8.f, 4);
+        sf::Vector2f b = game::equipSpritePos(0.f, 0.f, 5.0f, 1, 0.f, 8.f, 4);
+        assert(near(a.y, 20.f) && near(b.y, 40.f));
     }
 
     std::printf("equipment offset test OK\n");
