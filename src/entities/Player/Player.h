@@ -37,12 +37,10 @@ class Player : public Entity
         float jumpingRecharge = 0.0f;
         int walkFrame = 0; // 0..3 (sprite walk); 0 parado
         float walkTimer = 0.f;
-        float meleeAnimT = 0.f; // >0 = frame melee (0.3s)
         float throwAnimT = 0.f; // >0 = frame throw (0.4s)
         // Frame do melee atual (arma equipada). nullptr = soco.
         // Arma futura = 1 linha ao equipar; pick/render não mudam.
         const sf::Texture *meleeTex = nullptr;
-        static constexpr float kMeleeAnimDur = 0.30f;
         static constexpr float kThrowAnimDur = 0.40f;
 
         support::Body body; // hitboxes por parte (rebuild via BodySystem)
@@ -72,6 +70,12 @@ class Player : public Entity
         // o input no meio do golpe).
         support::AimDir aimDir = support::AimDir::E;
         support::AimDir swingAim = support::AimDir::E;
+
+        // Fonte única do estado de swing. O resolve do sprite, a
+        // hitbox e o debug yellow box leem TODOS isto — nunca timer.
+        bool inMeleeSwing() const {
+            return meleePhase != MeleePhase::Idle;
+        }
 
         // Seam para parry (sem chamador ainda — CombatSystem consome
         // quando rebate existir). Janela = início do Active.

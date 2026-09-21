@@ -150,8 +150,7 @@ void Player::tick() {
         walkTimer = 0.f;
     }
 
-    // Timers de ataque (frames telegraph).
-    if (meleeAnimT > 0.f) meleeAnimT -= 1.0f / 30.0f;
+    // Timer de ataque (frame telegraph).
     if (throwAnimT > 0.f) throwAnimT -= 1.0f / 30.0f;
 
     // Cooldowns do Player, tickados pelo Player (1 só lugar).
@@ -245,7 +244,6 @@ bool Player::startSwing() {
     meleePhase = MeleePhase::Windup;
     meleeTimer = kLight[meleeCombo].windup;
     meleeSwingId++;
-    meleeAnimT = kMeleeAnimDur;
     swingAim = aimDir; // congela direção do próximo golpe
     return true;
 }

@@ -1,0 +1,73 @@
+#include <cassert>
+#include <cstdio>
+
+#include "assets/PlayerSprite.h"
+#include "entities/Player/Player.h"
+
+// Sincronia sprite ↔ hitbox: fonte única meleePhase (via inMeleeSwing)
+// + snapshot swingAim. Sem timer duplicado, sem input vivo.
+namespace {
+
+support::SpriteFrameId resolveFor(const Player &p) {
+    return game::resolvePlayerSprite(true, 0.f, false, p.inMeleeSwing(),
+                                     p.swingAim, false, 0);
+}
+
+} // namespace
+
+int main() {
+    using support::AimDir;
+    using support::SpriteFrameId;
+
+    { // SpriteMatchesPhaseThroughoutSwing (Idle→W→A→R, sempre soco em E)
+        Player p;
+        assert(!p.inMeleeSwing());
+        assert(resolveFor(p) == SpriteFrameId::PlayerIdle);
+        assert(p.startSwing());
+        assert(p.inMeleeSwing());
+        assert(resolveFor(p) == SpriteFrameId::PlayerPunch);
+        p.updateMelee(0.10f); // Windup → Active
+        assert(p.meleePhase == MeleePhase::Active);
+        assert(resolveFor(p) == SpriteFrameId::PlayerPunch);
+        p.updateMelee(0.10f); // Active → Recovery
+        assert(p.meleePhase == MeleePhase::Recovery);
+        assert(resolveFor(p) == SpriteFrameId::PlayerPunch);
+    }
+    { // Combo3SpriteHoldsThroughRecovery (hit3 Recovery 0.22s segura)
+        Player p;
+        assert(p.startSwing()); // hit1 W0
+        p.updateMelee(0.10f); // → A0
+        p.updateMelee(0.10f); // → R0
+        assert(p.startSwing()); // hit2 W1
+        p.updateMelee(0.10f); // → A1
+        p.updateMelee(0.10f); // → R1 (0.12 > 0.10, fica)
+        assert(p.meleePhase == MeleePhase::Recovery);
+        assert(p.startSwing() && p.meleeCombo == 2); // hit3 W2
+        p.updateMelee(0.10f); // → A2
+        p.updateMelee(0.10f); // → R2
+        assert(p.meleePhase == MeleePhase::Recovery);
+        assert(p.inMeleeSwing());
+        assert(resolveFor(p) == SpriteFrameId::PlayerPunch);
+    }
+    { // SpriteUsesSwingAimNotLiveAim (N congelado, E vivo → Up)
+        Player p;
+        p.aimDir = AimDir::N;
+        assert(p.startSwing());
+        assert(p.swingAim == AimDir::N);
+        p.aimDir = AimDir::E; // jogador soltou o ↑
+        assert(resolveFor(p) == SpriteFrameId::PlayerPunchUp);
+    }
+    { // HitboxAndSpriteReadSameAim (money test: N divergente de E)
+        Player p; // equipped=true, sword: hitbox direcional por swingAim
+        p.meleePhase = MeleePhase::Active;
+        p.swingAim = AimDir::N;
+        p.aimDir = AimDir::E; // divergente de propósito
+        assert(p.inMeleeSwing());
+        const sf::FloatRect box = p.meleeHitbox();
+        assert(box.top < p.getY()); // N → acima
+        assert(resolveFor(p) == SpriteFrameId::PlayerPunchUp);
+    }
+
+    std::puts("player sprite sync test OK");
+    return 0;
+}

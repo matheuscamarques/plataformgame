@@ -18,16 +18,16 @@ namespace game {
 inline support::SpriteFrameId resolvePlayerSprite(bool onGround, float vx,
                                                    bool hurt,
                                                    bool attackingMelee,
-                                                   support::AimDir aimDir,
+                                                   support::AimDir attackAim,
                                                    bool attackingThrow,
                                                    int walkFrame) {
     using support::SpriteFrameId;
     using support::AimDir;
     if (hurt) return SpriteFrameId::PlayerHurt;
-    // Corpo reflete o input atual (aimDir), mesmo em Recovery: se o
-    // jogador virar pra cima no meio do golpe, o braço ergue.
+    // Corpo reflete a direção congelada do golpe (attackAim), não o
+    // input vivo: sprite e hitbox leem o mesmo snapshot.
     if (attackingMelee) {
-        switch (aimDir) {
+        switch (attackAim) {
             case AimDir::N:
             case AimDir::NE:
             case AimDir::NW: return SpriteFrameId::PlayerPunchUp;

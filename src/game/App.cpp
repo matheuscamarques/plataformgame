@@ -151,8 +151,8 @@ void Game::tick() {
         ? support::SpriteFrameId::PlayerDeath
         : game::resolvePlayerSprite(p->jumping, p->getVx(),
                                     p->hurtIframes.running(),
-                                    p->meleeAnimT > 0.f,
-                                    p->aimDir,
+                                    p->inMeleeSwing(),
+                                    p->swingAim,
                                     p->throwAnimT > 0.f,
                                     p->walkFrame);
     enemies_->forEach([&](support::Enemy &s) {
