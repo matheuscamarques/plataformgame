@@ -412,7 +412,10 @@ void Game::render()
         };
         text("HP " + std::to_string(p->hp) + "/" + std::to_string(p->hpMax), 16.f, 38.f);
         text("TNT:" + std::to_string(p->dynamiteCount) + " J  K melee", 16.f, 62.f);
-        text(std::string("Mat: ") + core::materialName(p->loadout.weapon), 16.f, 110.f);
+        text(std::string("Mat: ") + (p->loadout.equipped
+                                          ? core::materialName(p->loadout.weapon)
+                                          : "--"),
+             16.f, 110.f);
         const int pty = static_cast<int>(std::floor(p->getY() / core::kBlockSize));
         text(std::string(support::stratumName(support::stratumAt(pty)))
              + "  y" + std::to_string(pty), 16.f, 86.f);

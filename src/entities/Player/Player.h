@@ -95,6 +95,11 @@ class Player : public Entity
         Player();
         void collide(Entity entity);
         void collide(Component bloco);
+
+        // M (debug visual): Iron→Leather→Gold→Diamond→pelado→Iron.
+        // Pelado zera equipped (sem arma/armadura p/ teste do sprite
+        // base); o próximo ciclo reequipa no Iron. Testável sem Game.
+        void cycleMaterial();
         void tick();
 
         // Tenta arremessar na direção do facing com arco fixo.

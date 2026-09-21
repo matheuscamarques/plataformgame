@@ -181,6 +181,24 @@ bool Player::tryThrow(support::ThrowSystem &throws) {
     return true;
 }
 
+void Player::cycleMaterial() {
+    if (!loadout.equipped) {
+        // Pelado → reequipa no Iron (fecha o ciclo de 5 estados).
+        loadout.equipped = true;
+        loadout.weapon = loadout.helm = loadout.chest = loadout.legs =
+            core::MaterialId::Iron;
+        return;
+    }
+    const int next =
+        static_cast<int>(loadout.weapon) + 1;
+    if (next >= static_cast<int>(core::MaterialId::COUNT)) {
+        loadout.equipped = false; // 5º estado: sem nada, p/ teste
+        return;
+    }
+    loadout.weapon = loadout.helm = loadout.chest = loadout.legs =
+        static_cast<core::MaterialId>(next);
+}
+
 bool Player::hurt(int dmg) {
     if (dmg <= 0 || hp <= 0 || !hurtIframes.ready()) return false;
     hp -= dmg;
