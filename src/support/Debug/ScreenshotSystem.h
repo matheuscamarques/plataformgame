@@ -27,14 +27,21 @@ public:
     bool autoHurt() const { return autoHurt_; }
     int count() const { return counter_; }
 
-    // Centro do recorte, em coords de MUNDO. A conversão p/ pixel
-    // acontece na captura (view mais atual). CPU-side: testável
+    // Centro do recorte, em coords de MUNDO. A conversão p/ pixel usa
+    // a worldView armazenada (a view ativa na captura é a default do
+    // HUD — converter nela descentra o recorte). CPU-side: testável
     // headless via cropZoom.
     void setFocus(sf::Vector2f worldCenter) {
         focus_ = worldCenter;
         hasFocus_ = true;
     }
     void clearFocus() { hasFocus_ = false; }
+    // View do mundo p/ conversão (Renderer atualiza todo frame antes
+    // do HUD trocar p/ default).
+    void setWorldView(const sf::View &v) {
+        worldView_ = v;
+        hasWorldView_ = true;
+    }
 
     // Recorte size×size centrado no foco + zoom nearest-neighbor.
     // Estático p/ teste headless (sf::Image é CPU, sem GL).
@@ -60,6 +67,8 @@ private:
 
     sf::Vector2f focus_{0.f, 0.f};
     bool hasFocus_ = false;
+    sf::View worldView_;
+    bool hasWorldView_ = false;
 };
 
 } // namespace support

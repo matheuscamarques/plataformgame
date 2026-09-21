@@ -83,9 +83,15 @@ bool ScreenshotSystem::capture(const std::string &tag) {
     tex.update(*window_); // copia o framebuffer atual
 
     sf::Image img = tex.copyToImage();
-    // Foco no personagem: mundo→pixel na view atual, recorte + zoom.
-    if (hasFocus_)
-        img = cropZoom(img, sf::Vector2f(window_->mapCoordsToPixel(focus_)));
+    // Foco no personagem: mundo→pixel na worldView armazenada (a view
+    // ativa aqui é a default do HUD). Sem worldView, usa a atual.
+    if (hasFocus_) {
+        const sf::Vector2i px = hasWorldView_
+                                    ? window_->mapCoordsToPixel(focus_,
+                                                                worldView_)
+                                    : window_->mapCoordsToPixel(focus_);
+        img = cropZoom(img, sf::Vector2f(px));
+    }
 
     std::ostringstream name;
     name << "./screenshots/" << std::setw(4) << std::setfill('0')

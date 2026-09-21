@@ -88,6 +88,10 @@ void Game::render()
     auto view = window->getDefaultView();
     view.move(camPos.x, camPos.y);
     window->setView(view);
+    // View do mundo salva: o HUD troca p/ default depois, e o foco do
+    // screenshot precisa converter mundo→pixel nesta view (não na default).
+    const sf::View worldView = window->getView();
+    screenshots_.setWorldView(worldView);
     auto &objects = getWorld()->getPlatforms();
 
     // Desenha só o visível (+margem), por range de chunks — não pela
@@ -427,6 +431,7 @@ void Game::render()
     // Screenshot auto (F11): aqui, após todos os draws e antes do
     // display — o framebuffer contém exatamente este frame. No tick,
     // a captura sairia 1 frame atrasada (sem a yellow box do Active).
+    // A conversão mundo→pixel usa a worldView armazenada.
     if (player.get()->meleePhase == MeleePhase::Active) {
         screenshots_.setFocus({player.get()->getCenterX(),
                                player.get()->getCenterY()});
