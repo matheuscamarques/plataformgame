@@ -1,7 +1,12 @@
 #include "game.h"
 
 #include <cmath>
+#include <cstdlib>
+#include <iostream>
 #include <vector>
+
+#include <SFML/Audio/Sound.hpp>
+#include <SFML/System/Sleep.hpp>
 
 #include "core/Config.h"
 #include "core/Material.h"
@@ -10,11 +15,15 @@
 #include "entities/Player/Player.h"
 #include "world/World.h"
 #include "assets/PlayerSprite.h"
+#include "game/MusicBank.h"
+#include "game/SoundBank.h"
 #include "support/Combat/ExplosionSystem.h"
 #include "support/Combat/SpriteFrame.h"
 #include "support/Enemies/DwarfAI.h"
 #include "support/Enemies/EnemySystem.h"
+#include "support/Effects/ThrowSystem.h"
 #include "support/GameContext.h"
+#include "support/Progression/StratumManager.h"
 
 // App: ciclo de vida (ctor/start/run/tick). Render em Renderer.cpp,
 // eventos em Input.cpp, boot em Bootstrapper.cpp.
@@ -36,6 +45,30 @@ void Game::start()
 
 void Game::run()
 {
+    // Preview de audição: PREVIEW_MUSIC=1 toca as 6 tracks em sequência
+    // e sai (ferramenta de debug, não faz parte do jogo).
+    if (std::getenv("PREVIEW_MUSIC")) {
+        const std::vector<std::pair<const char*, core::MusicTrack>> tracks = {
+            {"surface",      game::surfaceTheme()},
+            {"shallowCaves", game::shallowCavesTheme()},
+            {"fungalWoods",  game::fungalWoodsTheme()},
+            {"oldMines",     game::oldMinesTheme()},
+            {"moltenHalls",  game::moltenHallsTheme()},
+            {"core",         game::coreTheme()},
+        };
+        for (const auto& [name, t] : tracks) {
+            sf::SoundBuffer buf;
+            core::synthesizeTrack(t, buf);
+            sf::Sound s;
+            s.setBuffer(buf);
+            s.play();
+            std::cout << "Playing " << name << " ("
+                      << buf.getDuration().asSeconds() << "s)...\n";
+            while (s.getStatus() == sf::Sound::Playing)
+                sf::sleep(sf::milliseconds(50));
+        }
+        return;
+    }
     // Preserva os 30 TPS do loop original (Time default é 1/60).
     core::Time::setFixedStep(1.0f / 30.0f);
     // Sprites 1x: janela aberta = contexto GL vivo (nunca em teste).
@@ -43,6 +76,22 @@ void Game::run()
         sprites_ = sprites::build();
         spritesBuilt_ = true;
         player->meleeTex = &sprites_.playerPunch; // default = soco
+    }
+    // Música 1x: síntese em RAM (~250ms, ~5MB p/ 6 tracks). Zero arquivo.
+    if (!musicBuilt_) {
+        music_.registerTrack(0, game::surfaceTheme());
+        music_.registerTrack(1, game::shallowCavesTheme());
+        music_.registerTrack(2, game::fungalWoodsTheme());
+        music_.registerTrack(4, game::oldMinesTheme());
+        music_.registerTrack(6, game::moltenHallsTheme());
+        music_.registerTrack(9, game::coreTheme());
+        // Estratos 3,5,7,8,10: sem track ainda → mantém a atual.
+        musicBuilt_ = true;
+    }
+    // SFX 1x: 26 sons sintetizados (~350KB). Zero arquivo.
+    if (!sfxBuilt_) {
+        game::buildSoundBank(audio_);
+        sfxBuilt_ = true;
     }
     float lastStat = 0.0f;
     int frames = 0;
@@ -87,15 +136,28 @@ void Game::tick() {
 
     // Run gate: morto/pausado congela movimento, mundo e scheduler.
     // RunManager roda sempre (precisa ver o R).
+    // Snapshots p/ SFX de transição (sistemas não veem antes/depois).
+    const bool wasGrounded = p->jumping;
+    const int hpBefore = p->hp;
+    const int phaseBefore = static_cast<int>(p->meleePhase);
     const bool frozen = run_.isPaused() || run_.isDead();
     if (!frozen) {
+        // SFX pulo: Up com pé no chão (antes do tick consumir o estado).
+        // Na água, silêncio: collide() mantém jumping=true e o som
+        // dispararia a 30×/s (metralhadora). Nado com som é fase futura.
+        if (p->moveUp && p->jumping && !p->inWater)
+            audio_.play(game::keyOf(game::Sfx::PlayerJump));
         p->tick();
 
         // S6: J (Action::Light) arremessa dinamite.
         // Cooldown cobre o edge por frame: pressed fica alto em todos os
         // ticks do frame, o 2º tick já encontra cooldown rodando.
         // (throwCooldown é tickado no Player::tick, junto dos outros.)
-        if (input_.pressed(support::Action::Light)) p->tryThrow(*throws_);
+        if (input_.pressed(support::Action::Light) && p->tryThrow(*throws_)) {
+            // SFX arremesso + pavio (tryThrow true = saiu da mão).
+            audio_.play(game::keyOf(game::Sfx::ThrowDyn));
+            audio_.play(game::keyOf(game::Sfx::DynFuse));
+        }
 
         // M: cicla material do set inteiro (debug visual).
         if (input_.pressed(support::Action::CycleMaterial)) {
@@ -140,7 +202,7 @@ void Game::tick() {
     });
     support::GameContext ctx{getWorld(), p, &input_, enemies_,
                              throws_, explodes_, drops_, &targets,
-                             &screenshots_, &debugFeed_};
+                             &screenshots_, &debugFeed_, &audio_};
 
     // Sprite atual primeiro: BodySystem (scheduler) deriva hitboxes dele.
     p->currentFrameId = run_.isDead()
@@ -182,4 +244,40 @@ void Game::tick() {
     // Números de dano congelam no pause (nada flutua/expira parado).
     if (!run_.isPaused()) debugFeed_.tick(1.0f / 30.0f);
     if (!run_.isPaused() && !run_.isDead()) scheduler_.tick(1.0f / 30.0f, ctx);
+    // Blast do boom: tick fora do scheduler (visual puro, sem gameplay).
+    if (throws_ && !run_.isPaused()) throws_->tickBlasts(1.0f / 30.0f);
+
+    // SFX: libera canais terminados (mesmo pausado: sons <1s terminam).
+    audio_.tick();
+
+    // Música: crossfade + troca por estrato (posição real, sobe e desce).
+    // Congelado (pause/morte) = música pausada (retoma onde parou).
+    if (run_.isPaused() || run_.isDead()) {
+        music_.pause();
+    } else {
+        music_.resume();
+        music_.tick(1.0f / 30.0f);
+        if (stratum_) {
+            const int s = stratum_->current();
+            if (s != lastMusicStratum_) {
+                music_.playStratum(s);
+                lastMusicStratum_ = s;
+            }
+        }
+    }
+
+    // SFX de transição do player (poll fim-do-tick; cobre TODAS as fontes
+    // de dano/movimento num lugar só, sem ctx nos métodos do Player).
+    if (!frozen) {
+        if (!wasGrounded && p->jumping)
+            audio_.play(game::keyOf(game::Sfx::PlayerLand));
+        if (phaseBefore == 0 && static_cast<int>(p->meleePhase) == 1)
+            audio_.play(game::keyOf(game::Sfx::MeleeSwing));
+        if (p->hp < hpBefore) {
+            if (p->hp <= 0)
+                audio_.play(game::keyOf(game::Sfx::PlayerDeath));
+            else
+                audio_.play(game::keyOf(game::Sfx::PlayerHurt));
+        }
+    }
 }

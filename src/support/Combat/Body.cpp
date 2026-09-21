@@ -57,6 +57,7 @@ void Body::rebuild(sf::Vector2f topLeftPos, int facing_) {
         const PartDef& d = schema->parts[i];
         PartState&     s = parts[i];
         s.id = d.id;
+        s.fromSchema = false; // rebuild(): schema É a fonte — não é "ausente"
 
         const float ox = d.offset.x * static_cast<float>(facing);
         const float oy = d.offset.y;
@@ -151,8 +152,10 @@ void Body::rebuildFromSprite(
                 cy + def.offset.y - def.size.y * 0.5f,
                 def.size.x, def.size.y
             };
+            s.fromSchema = true;
             continue;
         }
+        s.fromSchema = false;
 
         const float rL = rel.left, rR = rel.left + rel.width;
         float wL, wR;

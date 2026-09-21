@@ -46,7 +46,7 @@ int main() {
         }
     }
     { // PalettesNonEmpty (toda sprite tem pixel visível, não é vazio)
-        assert(kPlayerPalCount == 10u && kSlimePalCount == 5u && kDwarfPalCount == 11u);
+        assert(kPlayerPalCount == 12u && kSlimePalCount == 5u && kDwarfPalCount == 11u);
         assert(has(kPlayerIdle, kPlayerH, 'F'));
         assert(has(kPlayerJump, kPlayerH, 'H'));
         assert(has(kPlayerThrow, kPlayerH, 'T'));
@@ -65,7 +65,7 @@ int main() {
         assert(!has(kPlayerPunch, kPlayerH, 'W'));
     }
     { // WalkFramesDifferInArms (braços em lados opostos)
-        assert(kPlayerWalkA[8][1] == 'H');
+        assert(kPlayerWalkA[8][1] == 'G');
         assert(kPlayerWalkA[8][10] == '.');
         assert(kPlayerWalkB[8][1] == '.');
         assert(kPlayerWalkB[8][10] == 'H');

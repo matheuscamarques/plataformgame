@@ -57,11 +57,11 @@ int main() {
         assert(hand.valid && face.valid);
         assert(separated(hand, face));
     }
-    { // AllPlayerFramesHandFaceSeparatedX (H nunca dentro do span-X de F)
+    { // AllPlayerFramesHandFaceSeparatedX (H/G nunca dentro do span-X de F)
         // Refinado p/ PunchUp: braços laterais compartilham rows com o
-        // rosto (H rows 0-6, F 4-6) mas nunca as colunas (H 1/10, F 3-8).
+        // rosto (H/G rows 0-6, F 4-6) mas nunca as colunas (H/G 1/10, F 3-8).
         // Faixa-Y rejeitaria; disjunção-X por row pega o bug real
-        // (mão-sobre-rosto = H dentro de [fMin,fMax]).
+        // (mão-sobre-rosto = H/G dentro de [fMin,fMax]).
         const char *const *frames[] = {
             kPlayerIdle, kPlayerWalkA, kPlayerWalkB, kPlayerJump,
             kPlayerThrow, kPlayerPunch, kPlayerPunchUp, kPlayerPunchDown,
@@ -76,10 +76,35 @@ int main() {
                         if (x > fMax) fMax = x;
                     }
                 if (fMax < 0) continue; // sem F na row
-                for (int x = 0; x < kPlayerW; ++x)
-                    assert(!(f[y][x] == 'H' && x >= fMin && x <= fMax));
+                for (int x = 0; x < kPlayerW; ++x) {
+                    char c = f[y][x];
+                    bool isHand = (c == 'H' || c == 'G');
+                    assert(!(isHand && x >= fMin && x <= fMax));
+                }
             }
         }
+    }
+    { // LeftAndRightHandsHaveDistinctChars
+        bool hasH = false, hasG = false;
+        for (int y = 0; y < kPlayerH; ++y) {
+            for (int x = 0; x < kPlayerW; ++x) {
+                if (kPlayerIdle[y][x] == 'H') hasH = true;
+                if (kPlayerIdle[y][x] == 'G') hasG = true;
+            }
+        }
+        assert(hasH);
+        assert(hasG);
+    }
+    { // LegLeftRightHaveDistinctChars
+        bool hasB = false, hasL = false;
+        for (int y = 0; y < kPlayerH; ++y) {
+            for (int x = 0; x < kPlayerW; ++x) {
+                if (kPlayerIdle[y][x] == 'B') hasB = true;
+                if (kPlayerIdle[y][x] == 'L') hasL = true;
+            }
+        }
+        assert(hasB);
+        assert(hasL);
     }
     { // DwarfHandFaceBarba (H mão, F rosto, R barba presentes)
         const char *const *frames[] = {

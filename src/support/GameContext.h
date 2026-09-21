@@ -4,6 +4,10 @@
 
 class Player;
 
+namespace core {
+class AudioSystem;
+}
+
 namespace support {
 
 class World;
@@ -36,6 +40,10 @@ struct GameContext {
 
     // Feed de debug (números + log). Nulo em testes headless.
     DebugFeed *debug = nullptr;
+
+    // SFX procedural. Nulo em testes headless (call sites checam).
+    // Dono: Game (vive como membro, buffers no boot).
+    core::AudioSystem *audio = nullptr;
 };
 
 } // namespace support

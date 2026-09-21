@@ -26,6 +26,7 @@ void Player::collide(Entity bloco)
     if(
         bloco.getName() == core::kIdWater
     ){
+        inWater = true; // nada: silêncio (splash/bolha é fase futura)
         jumping = true;
         return;
     }
@@ -99,6 +100,7 @@ void Player::collide(Component bloco)
 }
 
 void Player::tick() {
+    inWater = false; // reset; collide() seta de novo se houver água
     // Snapshot do input p/ mira: o pulo consome moveUp abaixo; sem a
     // cópia, segurar ↑ no ar perde o N após ~5 ticks de subida.
     const bool aimUp = moveUp;
@@ -221,6 +223,7 @@ void Player::respawn(float x, float y) {
     meleeTimer = 0.f;
     facing = 1;
     jumping = false;
+    inWater = false;
     jumpingRecharge = 0.f;
     moveDown = moveUp = moveLeft = moveRight = runFast = false;
 }

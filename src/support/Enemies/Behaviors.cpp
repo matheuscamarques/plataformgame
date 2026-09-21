@@ -7,6 +7,7 @@
 
 #include "core/Config.h"
 #include "entities/Player/Player.h"
+#include "game/SoundBank.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
 #include "support/Effects/ThrowSystem.h"
@@ -219,6 +220,8 @@ REGISTER_SKILL("dwarf_dig", [] {
         };
         break3x3(static_cast<int>(self.body.getCenterX() / core::kBlockSize),
                  static_cast<int>(self.body.getCenterY() / core::kBlockSize));
+        // SFX escavação do anão (1 por evento, não por tile).
+        if (ctx.audio) ctx.audio->play(game::keyOf(game::Sfx::TileBreak), 0.7f);
         if (!ctx.world->isSolid(ntx, nty)) {
             self.body.setX(nx - self.body.getW() * 0.5f);
             break3x3(ntx, nty);
@@ -253,6 +256,8 @@ REGISTER_SKILL("dwarf_collapse", [] {
                 (cx + dir * i * core::kBlockSize) / core::kBlockSize);
             for (int dy = -2; dy <= 2; ++dy) ctx.world->breakTile(tx, ty + dy);
         }
+        // SFX colapso (1 por evento, não por tile).
+        if (ctx.audio) ctx.audio->play(game::keyOf(game::Sfx::TileBreak), 0.7f);
         ctx.player->hurt(static_cast<int>(40.f * self.damageMult));
     };
     return s;

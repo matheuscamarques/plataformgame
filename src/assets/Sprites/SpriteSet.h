@@ -7,6 +7,7 @@
 #include "assets/Sprites/PlayerSprites.h"
 #include "assets/Sprites/EnemySprites.h"
 #include "assets/Sprites/EquipSprites.h"
+#include "assets/Sprites/ThrowableSprites.h"
 
 namespace sprites {
 struct SpriteSet {
@@ -39,6 +40,9 @@ struct SpriteSet {
     sf::Texture legs[kMats];
     sf::Texture boots[kMats];
     sf::Texture gloves[kMats];
+
+    // Throwables — 1 textura por frame (fresh/burning/critical), sem material.
+    sf::Texture tnt[3];
 };
 
 // Roda 1x no boot (precisa de contexto GL — nunca em teste headless).
@@ -93,6 +97,9 @@ inline SpriteSet build() {
         s.boots[m] = core::makeSprite(kIronBootsIdle, kBootsW, kBootsH, pal, 5);
         s.gloves[m] = core::makeSprite(kIronGlovesIdle, kGloveW, kGloveH, pal, 5);
     }
+    s.tnt[0] = core::makeSprite(kTntFresh, kTntW, kTntH, kTntPal, kTntPalCount);
+    s.tnt[1] = core::makeSprite(kTntBurning, kTntW, kTntH, kTntPal, kTntPalCount);
+    s.tnt[2] = core::makeSprite(kTntCritical, kTntW, kTntH, kTntPal, kTntPalCount);
     return s;
 }
 

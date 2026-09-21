@@ -34,6 +34,7 @@ class Player : public Entity
 
         bool moveDown = false, moveUp = false, moveLeft = false, moveRight = false,runFast = false;
         bool jumping = false;
+        bool inWater = false; // collide() seta; tick() reseta (p/ gate de SFX)
         float jumpingRecharge = 0.0f;
         int walkFrame = 0; // 0..3 (sprite walk); 0 parado
         float walkTimer = 0.f;

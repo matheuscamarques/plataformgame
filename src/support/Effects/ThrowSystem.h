@@ -2,14 +2,27 @@
 #include "core/System.h"
 #include "core/Pool.h"
 #include "Throwable.h"
+#include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cstddef>
+#include <vector>
 
 namespace support {
 
 struct GameContext;
 class ExplosionSystem;
 class ParticleSystem;
+
+// Anel de explosão: nasce no boom, expande até radius em maxTtl.
+// Lógica pura (testável headless); desenho em renderBlasts (precisa GL).
+struct BlastVisual {
+    sf::Vector2f center;
+    float        radius;      // alvo (o raio real do dano)
+    float        ttl;         // restante
+    float        maxTtl = 0.35f;
+    bool         active = false;
+};
 
 class ThrowSystem : public core::System {
 public:
@@ -29,7 +42,14 @@ public:
     std::size_t activeCount() const { return pool_.activeCount(); }
 
     // Limpa todos (restart da run).
-    void clear() { pool_.releaseAll(); }
+    void clear() { pool_.releaseAll(); blasts_.clear(); }
+
+    // Blast do boom: registrado por ExplosionSystem::explode().
+    void spawnBlast(sf::Vector2f center, float radius);
+    void tickBlasts(float dt);
+    void renderBlasts(sf::RenderTarget& target);
+    void clearBlasts();
+    std::size_t activeBlastCount() const;
 
     // Render/debug: itera os ativos sem expor o pool.
     // (Pool::forEachActive é não-const; render também é.)
@@ -38,6 +58,7 @@ public:
 
 private:
     core::Pool<Throwable> pool_{64};
+    std::vector<BlastVisual> blasts_;
     ExplosionSystem *explosions_ = nullptr;
     ParticleSystem  *particles_  = nullptr;
 

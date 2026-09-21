@@ -12,6 +12,8 @@
 #include "../support/Input/InputMap.h"
 #include "support/Progression/RunManager.h"
 #include "assets/Sprites/SpriteSet.h"
+#include "core/AudioSystem.h"
+#include "core/MusicSystem.h"
 
 // Só ponteiros no header: definição completa mora no .cpp de cada
 // sistema (game.cpp inclui). Valor continua incluído (precisa do tipo).
@@ -65,6 +67,11 @@ private:
     support::ParticleSystem *particles_ = nullptr; // observa; dono é o scheduler
     sprites::SpriteSet sprites_; // dono: build 1x no run (precisa de GL)
     bool spritesBuilt_ = false;
+    core::MusicSystem music_; // dono: tracks sintetizadas 1x no run (RAM)
+    bool musicBuilt_ = false;
+    int lastMusicStratum_ = -1;
+    core::AudioSystem audio_; // dono: 26 SFX sintetizados 1x no run (RAM)
+    bool sfxBuilt_ = false;
     bool charView_ = false; // F3: ASCII por char, sem textura
     int tickCount_ = 0; // p/ animação walk do anão
     bool running = false;

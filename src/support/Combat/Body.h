@@ -40,6 +40,16 @@ struct BodySchema {
 struct PartState {
     BodyPartId    id = BodyPartId::Torso;
     sf::FloatRect worldBox;
+    // fromSchema = true significa: corpo sprite-driven (rebuildFromSprite)
+    // mas a parte NÃO tem pixels no sprite deste frame.
+    // Semântica: parte inexistente neste frame. Consumidores DEVEM pular:
+    //   - Renderer (drawParts, drawPlayerEquipment): não desenhar
+    //   - MeleeSystem, ExplosionSystem: não considerar alvo
+    // Body::rebuild() (sem sprite: testes, corpos estáticos) sempre deixa
+    // false — ali o schema É a fonte válida, não "ausência".
+    // NOTA: worldBox NÃO é zerado no fallback (mantém o valor do schema:
+    // computeWeaponBbox/drawPlayerWeapon leem ArmR incondicionalmente).
+    bool fromSchema = false;
 };
 
 struct Body {

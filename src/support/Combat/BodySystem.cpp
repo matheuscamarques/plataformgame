@@ -17,7 +17,7 @@ sf::FloatRect computeWeaponBbox(Player &p) {
     if (!arm) return {0.f, 0.f, 0.f, 0.f};
     const float s = p.getH() / 20.f; // kPlayerH
     const float handX = arm->worldBox.left + arm->worldBox.width * 0.5f;
-    const float handY = arm->worldBox.top + arm->worldBox.height * 0.5f;
+    const float handY = arm->worldBox.top + arm->worldBox.height;
     // Offsets por arma via registry (mesma matemática de antes).
     float handOX = 4.f, handOY = 8.f;
     if (const auto *wd0 = WeaponRegistry::instance().find(p.loadout.weaponId)) {
@@ -25,7 +25,7 @@ sf::FloatRect computeWeaponBbox(Player &p) {
         handOY = wd0->handOffsetY;
     }
     const float baseX = handX + handOX * static_cast<float>(p.facing) * s;
-    const float baseY = handY + handOY;
+    const float baseY = handY + handOY * s;
     // Só Active/Recovery estendem; resto, arma recolhida (nulo).
     if (p.meleePhase != MeleePhase::Active &&
         p.meleePhase != MeleePhase::Recovery)

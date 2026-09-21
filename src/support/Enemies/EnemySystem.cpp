@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "defines.h"
+#include "game/SoundBank.h"
 #include "support/Skills/SkillSystem.h"
 #include "world/World.h"
 
@@ -23,6 +24,11 @@ void EnemySystem::removeDead(const std::function<void(sf::Vector2f)> &onDeath,
     for (auto it = slimes_.begin(); it != slimes_.end(); ) {
         if (!(*it)->resources.isDead()) { ++it; continue; }
         if (ctx && (*it)->ai) (*it)->ai->onDeath(**it, *ctx);
+        // SFX morte por kind (sem ctx.audio em teste = mudo).
+        if (ctx && ctx->audio && (*it)->ai)
+            ctx->audio->play(game::keyOf(
+                (*it)->ai->kind() == core::EntityKind::Dwarf
+                    ? game::Sfx::DwarfDeath : game::Sfx::SlimeDeath));
         sf::Vector2f pos{(*it)->body.getCenterX(), (*it)->body.getCenterY()};
         it = slimes_.erase(it);
         onDeath(pos);

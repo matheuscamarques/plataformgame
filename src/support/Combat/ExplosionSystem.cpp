@@ -5,11 +5,13 @@
 
 #include "defines.h"
 #include "entities/Entity.hpp"
+#include "game/SoundBank.h"
 #include "support/Debug/DebugFeed.h"
 #include "support/Enemies/EnemyResources.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
 #include "support/Effects/ParticleSystem.h"
+#include "support/Effects/ThrowSystem.h"
 #include "support/Progression/PatienceSystem.h"
 #include "world/World.h"
 
@@ -41,6 +43,9 @@ int ExplosionSystem::explode(sf::Vector2f center, const ExplosionDef &def, GameC
             if (applyToTarget(t, center, def)) ++hit;
         }
     }
+    // Visual: anel até o raio real (ThrowSystem desenha; sem ctx = sem custo).
+    if (ctx.throws) ctx.throws->spawnBlast(center, def.radius);
+
     if (ctx.debug)
         ctx.debug->pushLog("explode " + std::to_string(def.damage) +
                            " hit" + std::to_string(hit));
@@ -60,6 +65,7 @@ bool ExplosionSystem::applyToTarget(const ExplosionTarget &t,
     bool  inRange  = false;
 
     t.body->forEach([&](const PartState &st, const PartDef &pd) {
+        if (st.fromSchema) return; // parte oculta: não sofre dano de área
         const sf::Vector2f pc{
             st.worldBox.left + st.worldBox.width  * 0.5f,
             st.worldBox.top  + st.worldBox.height * 0.5f
@@ -143,7 +149,18 @@ void ExplosionSystem::breakTilesInCircle(sf::Vector2f center, int tilesRadius, G
             if (!s.ai || s.ai->kind() != core::EntityKind::Dwarf) return;
             const float dx = center.x - s.body.getCenterX();
             const float dy = center.y - s.body.getCenterY();
+            const int w0 = s.patience.warningLevel;
+            const bool b0 = s.patience.betrayed;
             patienceOnMine(s.patience, brokeOre, std::sqrt(dx * dx + dy * dy));
+            // SFX warnings/traição (transição; sem ctx.audio em teste = mudo).
+            if (ctx.audio) {
+                if (!b0 && s.patience.betrayed)
+                    ctx.audio->play(game::keyOf(game::Sfx::DwarfBetray));
+                else if (s.patience.warningLevel > w0)
+                    ctx.audio->play(game::keyOf(static_cast<game::Sfx>(
+                        static_cast<int>(game::Sfx::DwarfWarn1)
+                        + s.patience.warningLevel - 1)));
+            }
         });
     }
 }

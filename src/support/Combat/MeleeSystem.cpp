@@ -5,6 +5,7 @@
 #include <algorithm>
 
 #include "entities/Player/Player.h"
+#include "game/SoundBank.h"
 #include "support/Combat/Body.h"
 #include "support/Debug/DebugFeed.h"
 #include "support/Enemies/EnemySystem.h"
@@ -86,6 +87,7 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
         sf::FloatRect bestBox = sb;
         float bestDmgMult = 0.f;
         s.bodyParts.forEach([&](const PartState &st, const PartDef &def) {
+            if (st.fromSchema) return; // parte oculta: não é alvo
             if (!box.intersects(st.worldBox)) return;
             if (def.damageMult > bestDmgMult) {
                 bestDmgMult = def.damageMult;
@@ -103,6 +105,14 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
         }
         const int dmg = static_cast<int>(dmgBase * dmgMult);
         const int applied = s.resources.takeDamage(dmg);
+        // SFX hit (só com dano; sem ctx.audio em teste = sem custo).
+        if (applied > 0 && ctx.audio) {
+            ctx.audio->play(game::keyOf(game::Sfx::MeleeHit), 0.8f);
+            if (s.ai && s.ai->kind() == core::EntityKind::Dwarf)
+                ctx.audio->play(game::keyOf(game::Sfx::DwarfHurt));
+            else
+                ctx.audio->play(game::keyOf(game::Sfx::SlimeHurt));
+        }
         s.resources.damagePosture(postureBase * postureMult);
         if (applied > 0 && s.ai) s.ai->onTakeHit(s, applied, ctx);
         s.lastHitSwing = p->meleeSwingId;

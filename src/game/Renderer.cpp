@@ -184,22 +184,58 @@ void Game::render()
         });
     }
 
-    // Throwables visíveis: círculo com cor pelo fuse (verde→vermelho).
+    // Throwables visíveis: TNT animada por fuse + telegraph do raio.
+    // Outros kinds continuam no círculo dourado.
     throws_->forEachActive([&](const support::Throwable &t) {
-        sf::CircleShape c(3.f);
-        c.setOrigin(3.f, 3.f);
-        c.setPosition(t.pos);
-        if (t.kind == support::ThrowKind::Dynamite) {
-            float r = std::clamp(t.fuse / 1.0f, 0.f, 1.f); // 1 cheio → 0 explodindo
-            c.setFillColor(sf::Color(
-                static_cast<sf::Uint8>(255 - 155 * r),
-                static_cast<sf::Uint8>(80 + 120 * r),
-                60));
-        } else {
+        if (t.kind != support::ThrowKind::Dynamite) {
+            sf::CircleShape c(3.f);
+            c.setOrigin(3.f, 3.f);
+            c.setPosition(t.pos);
             c.setFillColor(sf::Color(200, 180, 60));
+            window->draw(c);
+            return;
         }
-        window->draw(c);
+
+        // ── 1. Telegraph: aura pulsante até o raio real do dano ──
+        if (t.fuse > 0.f) {
+            const float fuseRatio = std::clamp(t.fuse / 0.8f, 0.f, 1.f);
+            const float pulse     = 0.5f + 0.5f * std::sin(t.fuse * 30.f);
+            const float alpha     = 40.f + 80.f * (1.f - fuseRatio);
+            const float radius    = t.radius * (0.5f + 0.5f * pulse * (1.f - fuseRatio));
+
+            sf::CircleShape ring(radius);
+            ring.setOrigin(radius, radius);
+            ring.setPosition(t.pos);
+            ring.setFillColor(sf::Color(255, 100, 40,
+                                        static_cast<sf::Uint8>(alpha)));
+            ring.setOutlineColor(sf::Color(255, 200, 80,
+                                           static_cast<sf::Uint8>(alpha * 2)));
+            ring.setOutlineThickness(1.f);
+            window->draw(ring);
+        }
+
+        // ── 2. Sprite da TNT, frame por fuse ──
+        int frame = 0;
+        if      (t.fuse < 0.33f) frame = 2; // crítico — pavio consumido
+        else if (t.fuse < 0.66f) frame = 1; // queimando
+        // else: frame 0 (fresco)
+
+        const float scale = 2.5f; // mesmo do player
+        sf::Sprite spr(sprites_.tnt[frame]);
+        spr.setOrigin(3.f, 4.f); // centro do sprite 6x8
+        spr.setPosition(t.pos);
+        spr.setScale(scale, scale);
+
+        // Flash branco no último 15% (o "vai explodir agora").
+        if (t.fuse < 0.15f) {
+            const float flash = 0.5f + 0.5f * std::sin(t.fuse * 60.f);
+            spr.setColor(sf::Color(255, 255,
+                static_cast<sf::Uint8>(180 + 75 * flash)));
+        }
+        window->draw(spr);
     });
+    // Blast por cima: acabou de explodir, é o que o jogador precisa ver.
+    throws_->renderBlasts(*window);
 
     particles_->render(*window);
 
@@ -223,6 +259,7 @@ void Game::render()
         auto drawParts = [&](const support::Body &b) {
             b.forEach([&](const support::PartState &st,
                           const support::PartDef &) {
+                if (st.fromSchema) return; // parte inexistente neste frame
                 sf::RectangleShape r(sf::Vector2f(st.worldBox.width, st.worldBox.height));
                 r.setPosition(st.worldBox.left, st.worldBox.top);
                 r.setFillColor(sf::Color::Transparent);
@@ -466,46 +503,58 @@ void Game::drawPlayerEquipment() {
     const int mHelm = static_cast<int>(p->loadout.helm);
     const int mChest = static_cast<int>(p->loadout.chest);
     const int mLegs = static_cast<int>(p->loadout.legs);
+    const int mGlove = mHelm; // mesmo material do elmo (sem slot próprio)
 
-    // Canto superior esquerdo do sprite no mundo (grade 12x20 do player).
-    const float spriteLeft = p->getCenterX() - (sprites::kPlayerW * 0.5f) * s;
-    const float spriteTop = p->getY() + p->getH() - sprites::kPlayerH * s;
-
-    // Helper que desenha um overlay na grade 12x20 do player.
-    // Origin sempre (0,0): com facing<0 o setScale(-s,s) espelha a
-    // partir do canto, e equipSpritePos já ancora o canto direito.
-    auto drawSprite = [&](const sf::Texture &tex,
-                          float spriteX, float spriteY) {
+    // Peça full-width (12px) centralizada no centro-x da parte âncora.
+    // Offsets em rows do sprite (nunca world): a âncora segue o Body,
+    // que o BodySystem recalcula por frame via rebuildFromSprite —
+    // o headOffsetRows morreu aqui (valia só p/ PunchUp).
+    // Origin (0,0) + facing<0 desenha p/ esquerda: x ancora o canto
+    // direito (mesma regra de equipSpritePos).
+    auto drawFullWidth = [&](const sf::Texture &tex, int texW,
+                             support::BodyPartId anchor, float fracY,
+                             float offRows) {
+        const auto *part = p->body.find(anchor);
+        if (!part || part->fromSchema) return; // âncora ausente: não desenhar
+        const float cx = part->worldBox.left + part->worldBox.width * 0.5f;
+        const float y =
+            part->worldBox.top + part->worldBox.height * fracY + offRows * s;
         sf::Sprite spr(tex);
-        const sf::Vector2f at = game::equipSpritePos(
-            spriteLeft, spriteTop, s, f, spriteX, spriteY);
-        spr.setPosition(at);
-        spr.setScale(s * f, s);
+        spr.setPosition(cx - static_cast<float>(f * texW) * 0.5f * s, y);
+        spr.setScale(s * static_cast<float>(f), s);
         window->draw(spr);
     };
 
-    // Posições em coords do sprite 12x20 (mesmas do ASCII do player).
-    // PunchUp desloca cabeça/torso +2 rows (mãos no topo): elmo e
-    // peitoral acompanham. Pernas/botas alinhadas por design.
-    const float headOffsetRows =
-        (p->currentFrameId == support::SpriteFrameId::PlayerPunchUp) ? 2.f
-                                                                     : 0.f;
-    // Elmo: cobre rows 0-4 do player, cols 0-11.
-    drawSprite(sprites_.helm[mHelm], 0.f, 0.f + headOffsetRows);
+    // Luva centrada na mão; some se o braço está oculto no frame
+    // (fromSchema: walkA/walkB/throw/punch mostram 1 braço só).
+    auto drawGlove = [&](support::BodyPartId arm) {
+        const auto *part = p->body.find(arm);
+        if (!part || part->fromSchema) return;
+        sf::Sprite spr(sprites_.gloves[mGlove]);
+        spr.setOrigin(sprites::kGloveW * 0.5f,
+                      static_cast<float>(sprites::kGloveH) * 0.5f);
+        spr.setPosition(part->worldBox.left + part->worldBox.width * 0.5f,
+                        part->worldBox.top + part->worldBox.height * 0.5f);
+        spr.setScale(s * static_cast<float>(f), s);
+        window->draw(spr);
+    };
 
-    // Peitoral: cobre rows 6-13 (túnica + cinto), cols 0-11.
-    drawSprite(sprites_.chest[mChest], 0.f, 6.f + headOffsetRows);
+    // Elmo 12x5: topo 2 rows acima do topo da cabeça (idle: rows 0-4).
+    drawFullWidth(sprites_.helm[mHelm], sprites::kHelmW,
+                  support::BodyPartId::Head, 0.f, -2.f);
+    // Peitoral 12x8: topo no topo do torso (idle: rows 6-13).
+    drawFullWidth(sprites_.chest[mChest], sprites::kChestW,
+                  support::BodyPartId::Torso, 0.f, 0.f);
+    // Perneiras 12x6: topo 2 rows acima da base do torso (idle: rows
+    // 14-19, sobrepõe a coxa sob a túnica, como no layout antigo).
+    drawFullWidth(sprites_.legs[mLegs], sprites::kLegsW,
+                  support::BodyPartId::Torso, 1.f, -2.f);
+    // Botas 12x3: topo 1 row abaixo da base do torso (idle: rows 17-19).
+    drawFullWidth(sprites_.boots[mLegs], sprites::kBootsW,
+                  support::BodyPartId::Torso, 1.f, 1.f);
 
-    // Perneiras: cobre rows 14-16 (parte superior das pernas).
-    drawSprite(sprites_.legs[mLegs], 0.f, 14.f);
-
-    // Botas: cobre rows 17-19.
-    drawSprite(sprites_.boots[mLegs], 0.f, 17.f);
-
-    // Luvas: 2 draws, uma em cada mão (cols ~1 e ~10).
-    const int mGlove = mHelm; // mesmo material do elmo (sem slot próprio)
-    drawSprite(sprites_.gloves[mGlove], 0.f, 7.f);
-    drawSprite(sprites_.gloves[mGlove], 8.f, 7.f);
+    drawGlove(support::BodyPartId::ArmL);
+    drawGlove(support::BodyPartId::ArmR);
 }
 
 void Game::drawPlayerWeapon() {
@@ -513,11 +562,13 @@ void Game::drawPlayerWeapon() {
     if (run_.isDead() || !p->loadout.equipped) return;
     const int m = static_cast<int>(p->loadout.weapon);
     const float s = p->getH() / static_cast<float>(sprites::kPlayerH);
-    // Mão = centro do ArmR (espelho de computeWeaponBbox em BodySystem).
+    // Mão = base do ArmR (onde o pixel de pele termina, row 9 no idle).
+    // Espelho de computeWeaponBbox em BodySystem — mudar um sem o outro
+    // desalinha desenho e hitbox.
     const auto *arm = p->body.find(support::BodyPartId::ArmR);
     if (!arm) return;
     const float handX = arm->worldBox.left + arm->worldBox.width * 0.5f;
-    const float handY = arm->worldBox.top + arm->worldBox.height * 0.5f;
+    const float handY = arm->worldBox.top + arm->worldBox.height;
     const sf::Texture *tex = &sprites_.swordIdle[m];
     float originX = 4.f, originY = 20.f;
     // Machado só tem idle: mesma textura em toda fase (dado no registry).

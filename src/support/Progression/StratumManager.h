@@ -19,6 +19,9 @@ public:
     void tick(float /*dt*/, GameContext &ctx) override;
 
     int deepest() const { return deepest_; }
+    // Estrato onde o player ESTÁ (sobe e desce; p/ música/ HUD).
+    // deepest() é o máximo alcançado (checkpoint); current() é posição.
+    int current() const { return current_; }
     uint32_t unlockedMask() const { return unlocked_; }
     bool unlocked(int s) const { return (unlocked_ >> s) & 1u; }
 
@@ -29,6 +32,7 @@ public:
 private:
     uint32_t unlocked_ = 1u; // estrato 0 nasce desbloqueado
     int deepest_ = 0;
+    int current_ = 0;
 };
 
 } // namespace support

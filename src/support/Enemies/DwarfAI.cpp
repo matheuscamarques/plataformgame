@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "entities/Player/Player.h"
+#include "game/SoundBank.h"
 #include "BehaviorRegistry.h"
 #include "Barks.h"
 #include "support/Enemies/EnemySystem.h"
@@ -81,6 +82,7 @@ void DwarfAI::onTick(Enemy &e, float dt, GameContext &ctx) {
         if (ctx.player && dp < cfg_.aggroRange) {
             changeState(DwarfState::Alert, kAlertTime);
             emitBark(e, BarkId::Alert);
+            if (ctx.audio) ctx.audio->play(game::keyOf(game::Sfx::DwarfAlert));
         } else if (state_ == DwarfState::Patrol) {
             tickPatrol(e, dt, ctx);
         } else {
@@ -152,8 +154,11 @@ void DwarfAI::tickCombat(Enemy &e, float /*dt*/, GameContext &ctx) {
         case DwarfState::ThrowWindup: {
             e.body.setVx(0.f);
             if (stateTimer_.ready()) {
-                if (SkillSystem::tryUse(e, ctx, pendingSkill_))
+                if (SkillSystem::tryUse(e, ctx, pendingSkill_)) {
                     emitBark(e, BarkId::Attack);
+                    if (ctx.audio)
+                        ctx.audio->play(game::keyOf(game::Sfx::DwarfThrow));
+                }
                 changeState(DwarfState::ThrowRelease, kThrowRelease);
             }
             break;
@@ -168,7 +173,8 @@ void DwarfAI::tickCombat(Enemy &e, float /*dt*/, GameContext &ctx) {
         case DwarfState::Melee: {
             e.body.setVx(0.f);
             if (!stateTimer_.ready()) return;
-            SkillSystem::tryUse(e, ctx, pendingSkill_);
+            if (SkillSystem::tryUse(e, ctx, pendingSkill_) && ctx.audio)
+                ctx.audio->play(game::keyOf(game::Sfx::DwarfMelee));
             changeState(DwarfState::Recover, kMeleeRecover);
             break;
         }

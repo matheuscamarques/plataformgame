@@ -15,14 +15,16 @@ inline const core::PaletteEntry kPlayerPal[] = {
     {'K', {30, 20, 20}, core::BodyPartId::None},
     {'F', {230, 180, 140}, core::BodyPartId::Head},
     {'H', {230, 180, 140}, core::BodyPartId::ArmR},
+    {'G', {230, 180, 140}, core::BodyPartId::ArmL},
     {'E', {20, 15, 15}, core::BodyPartId::Head},
     {'C', {60, 90, 160}, core::BodyPartId::Torso},
     {'B', {50, 35, 30}, core::BodyPartId::LegR},
+    {'L', {50, 35, 30}, core::BodyPartId::LegL},
     {'W', {190, 190, 200}, core::BodyPartId::Weapon},
     {'T', {220, 60, 50}, core::BodyPartId::Weapon},
     {'t', {90, 30, 25}, core::BodyPartId::Weapon},
 };
-inline constexpr std::size_t kPlayerPalCount = 10;
+inline constexpr std::size_t kPlayerPalCount = 12;
 
 inline const char *const kPlayerIdle[] = {
     "....KKKK....",
@@ -32,18 +34,18 @@ inline const char *const kPlayerIdle[] = {
     "..KFFFFFFK..",
     "...FFFFFF...",
     "..CCCCCCCC..",
-    ".HCCCCCCCCH.",
-    ".HCCCCCCCCH.",
-    ".HCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "...CCCCCC...",
     "...CC..CC...",
     "...CC..CC...",
-    "...BB..BB...",
-    "...BB..BB...",
-    "...BB..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
     "............",
 };
 
@@ -55,18 +57,18 @@ inline const char *const kPlayerWalkA[] = {
     "..KFFFFFFK..",
     "...FFFFFF...",
     "..CCCCCCCC..",
-    ".HCCCCCCCC..",
-    ".HCCCCCCCC..",
-    ".HCCCCCCCC..",
+    ".GCCCCCCCC..",
+    ".GCCCCCCCC..",
+    ".GCCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "...CCCCCC...",
     "...CC..CC...",
     "...CC..CC...",
-    "...BB..BB...",
-    "...BB..BB...",
-    "...BB..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
     "............",
 };
 
@@ -87,15 +89,15 @@ inline const char *const kPlayerWalkB[] = {
     "...CCCCCC...",
     "..CC....CC..",
     "..CC....CC..",
-    ".BB......BB.",
-    ".BB......BB.",
-    ".BB......BB.",
+    ".LL......BB.",
+    ".LL......BB.",
+    ".LL......BB.",
     "............",
 };
 inline const char *const kPlayerJump[] = {
-    ".H........H.",
-    ".H.KKKKKK.H.",
-    ".HKKKKKKKKH.",
+    ".G........H.",
+    ".G.KKKKKK.H.",
+    ".GKKKKKKKKH.",
     "..KFFFFFFK..",
     "..KFEFFEFK..",
     "..KFFFFFFK..",
@@ -108,7 +110,7 @@ inline const char *const kPlayerJump[] = {
     "..CCCCCCCC..",
     "...CCCCCC...",
     "...CC..CC...",
-    "..BB....BB..",
+    "..LL....BB..",
     "............",
     "............",
     "............",
@@ -123,16 +125,16 @@ inline const char *const kPlayerThrow[] = {
     "..KFFFFFFK..",
     "...FFFFFF...",
     "..CCCCCCCC..",
-    ".HCCCCCCCC..",
-    ".HCCCCCCCC..",
+    ".GCCCCCCCC..",
+    ".GCCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "...CCCCCC...",
     "...CC..CC...",
     "...CC..CC...",
-    "...BB..BB...",
-    "...BB..BB...",
-    "...BB..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
     "............",
     "............",
     "............",
@@ -155,20 +157,20 @@ inline const char *const kPlayerPunch[] = {
     "...CCCCCC...",
     "...CC..CC...",
     "...CC..CC...",
-    "...BB..BB...",
-    "...BB..BB...",
-    "...BB..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
     "............",
 };
 
 inline const char *const kPlayerPunchUp[] = {
-    ".HH......HH.",     // 0  mãos nas laterais
-    ".HH......HH.",     // 1
-    ".H..KKKK..H.",     // 2  cabeça + braços nas laterais
-    ".HKKKKKKKKH.",     // 3
-    ".HKFFFFFFKH.",     // 4
-    ".HKFEFFEFKH.",     // 5
-    ".HKFFFFFFKH.",     // 6
+    ".GG......HH.",     // 0  mãos nas laterais
+    ".GG......HH.",     // 1
+    ".G..KKKK..H.",     // 2  cabeça + braços nas laterais
+    ".GKKKKKKKKH.",     // 3
+    ".GKFFFFFFKH.",     // 4
+    ".GKFEFFEFKH.",     // 5
+    ".GKFFFFFFKH.",     // 6
     "...FFFFFF...",     // 7  queixo (braços terminam em 6)
     "..CCCCCCCC..",     // 8  torso (+2 vs idle)
     "..CCCCCCCC..",     // 9
@@ -178,9 +180,9 @@ inline const char *const kPlayerPunchUp[] = {
     "...CCCCCC...",     // 13
     "...CC..CC...",     // 14 pernas (mesma row)
     "...CC..CC...",     // 15
-    "...BB..BB...",     // 16 botas (mesma row)
-    "...BB..BB...",     // 17
-    "...BB..BB...",     // 18
+    "...LL..BB...",     // 16 botas (mesma row)
+    "...LL..BB...",     // 17
+    "...LL..BB...",     // 18
     "............",     // 19
 };
 
@@ -192,25 +194,25 @@ inline const char *const kPlayerPunchDown[] = {
     "..KFFFFFFK..",     // 4
     "...FFFFFF...",     // 5
     "..CCCCCCCC..",     // 6  ombros (igual idle)
-    ".HCCCCCCCCH.",     // 7  braços descem
-    ".HCCCCCCCCH.",     // 8
-    ".HCCCCCCCCH.",     // 9
-    ".HCCCCCCCCH.",     // 10
-    "..HCCCCCCH..",     // 11 estreitando
-    "..HCCCCCCH..",     // 12
+    ".GCCCCCCCCH.",     // 7  braços descem
+    ".GCCCCCCCCH.",     // 8
+    ".GCCCCCCCCH.",     // 9
+    ".GCCCCCCCCH.",     // 10
+    "..GCCCCCCH..",     // 11 estreitando
+    "..GCCCCCCH..",     // 12
     "...CCCCCC...",     // 13 cintura (igual idle)
     "...CC..CC...",     // 14 PERNAS (igual idle)
     "...CC..CC...",     // 15
-    "...BB..BB...",     // 16
-    "...BB..BB...",     // 17
-    "...BB..BB...",     // 18
+    "...LL..BB...",     // 16
+    "...LL..BB...",     // 17
+    "...LL..BB...",     // 18
     "............",     // 19
 };
 
 inline const char *const kPlayerHurt[] = {
-    ".H........H.",
-    ".H.KKKKKK.H.",
-    ".HKKKKKKKKH.",
+    ".G........H.",
+    ".G.KKKKKK.H.",
+    ".GKKKKKKKKH.",
     "..KFFFFFFK..",
     "..KFEFFEFK..",
     "..KFFFFFFK..",
@@ -224,7 +226,7 @@ inline const char *const kPlayerHurt[] = {
     "...CCCCCC...",
     "...CC..CC...",
     "..CC....CC..",
-    "..BB....BB..",
+    "..LL....BB..",
     "............",
     "............",
     "............",
@@ -243,13 +245,13 @@ inline const char *const kPlayerDeath[] = {
     "..KFFFFFFK..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
-    ".HCCCCCCCCH.",
+    ".GCCCCCCCCH.",
     "..CCCCCCCC..",
     "...CCCCCC...",
     "..CC....CC..",
     "..CC....CC..",
-    ".BB......BB.",
-    "BB........BB",
+    ".LL......BB.",
+    "LL........BB",
     "............",
 };
 

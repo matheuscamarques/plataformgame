@@ -4,6 +4,7 @@
 #include <SFML/Graphics/Rect.hpp>
 
 #include "entities/Player/Player.h"
+#include "game/SoundBank.h"
 #include "support/Debug/DebugFeed.h"
 #include "support/Debug/ScreenshotSystem.h"
 #include "support/Enemies/EnemySystem.h"
@@ -60,6 +61,8 @@ void ContactDamageSystem::tick(float dt, GameContext &ctx) {
         if (s.biteWindup > 0.f) return;
         s.biteWindup = kBiteWindup;
         if (!p->hurt(kContactDamage)) return; // i-frame segurou, tenta de novo
+        // SFX mordida (dano aplicado; sem ctx.audio em teste = mudo).
+        if (ctx.audio) ctx.audio->play(game::keyOf(game::Sfx::SlimeBite));
         if (ctx.screenshots)
             ctx.screenshots->notifyHurt({p->getCenterX(), p->getCenterY()});
         if (ctx.debug)
