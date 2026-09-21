@@ -14,7 +14,9 @@ constexpr float kTerminalVelocity = 25.0f;
 Entity(core::kIdPlayer,0,0,30,50) // AABB derivado do sprite 12x20 a 2.5x
 {
     setFillColor(sf::Color::Red);
-    static auto schema = support::BodySchema::humanoid(30.f, 50.f);
+    // humanoid(ALTURA, LARGURA): AABB 30x50. Já foi (30, 50) invertido —
+    // hw=25 punha o ArmL 12px fora do AABB (caixa magenta flutuante).
+    static auto schema = support::BodySchema::humanoid(50.f, 30.f);
     body.attach(&schema);
     //this->setGravity(9.8f);
 }
