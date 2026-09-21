@@ -273,9 +273,9 @@ sf::FloatRect Player::meleeHitbox() {
     if (meleePhase != MeleePhase::Active) return sf::FloatRect{};
 
     // Com arma: 8 rects por swingAim (snapshot; input não move o golpe).
-    // E espelha X por facing (à frente); demais, direção da tela.
-    // Tamanho escala pelo sprite da arma (espada 16x8, machado 8x20):
-    // arma diferente, alcance diferente — sem lógica nova.
+    // swingAim já é screen-space (tecla esquerda = W = esquerda da tela),
+    // então NÃO espelha por facing — o * facing aqui duplicava o espelho
+    // e jogava o W para a direita (melee só acertava à direita).
     if (loadout.equipped) {
         const auto &hb = kAimHitbox[static_cast<int>(swingAim)];
         float ws = 1.f, hs = 1.f;
@@ -285,7 +285,7 @@ sf::FloatRect Player::meleeHitbox() {
             hs = wd->spriteH / 8.f;
         }
         const float w = hb.w * ws, h = hb.h * hs;
-        const float cx = getCenterX() + hb.cx * static_cast<float>(facing);
+        const float cx = getCenterX() + hb.cx;
         const float cy = getCenterY() + hb.cy;
         return sf::FloatRect{cx - w * 0.5f, cy - h * 0.5f, w, h};
     }

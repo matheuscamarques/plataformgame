@@ -25,6 +25,26 @@ int main() {
         enemies.forEach([&](Enemy &s) { hp = s.resources.hp; });
         assert(hp == 22);
     }
+    { // HitsSlimeBehindWhenFacingLeft (regressão: W ia p/ direita)
+        Player p; // (100,0) 30x50, centro (115,25)
+        p.setX(100.f);
+        p.facing = -1;
+        p.aimDir = support::AimDir::W; // tecla esquerda = esquerda da tela
+        EnemySystem enemies;
+        enemies.spawn("slime", 60.f, 10.f); // [60,100] sobre a hitbox [85,105]
+
+        MeleeSystem ms;
+        GameContext ctx{};
+        ctx.player = &p;
+        ctx.enemies = &enemies;
+
+        assert(p.startSwing());
+        assert(p.swingAim == support::AimDir::W);
+        for (int i = 0; i < 6; ++i) ms.tick(1.f / 30.f, ctx);
+        int hp = -1;
+        enemies.forEach([&](Enemy &s) { hp = s.resources.hp; });
+        assert(hp == 22);
+    }
     { // WhiffsWhenFar
         Player p;
         EnemySystem enemies;

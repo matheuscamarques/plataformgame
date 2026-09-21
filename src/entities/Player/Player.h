@@ -105,7 +105,7 @@ class Player : public Entity
         // Avança timers; retorna a fase atual.
         MeleePhase updateMelee(float dt);
 
-        // Hitbox do swing atual (à frente, lado do facing). Só válida
+        // Hitbox do swing atual (screen-space via swingAim). Só válida
         // em Active; em outras fases retorna rect vazio.
         // Não-const: getters legados do Entity não são const.
         sf::FloatRect meleeHitbox();
