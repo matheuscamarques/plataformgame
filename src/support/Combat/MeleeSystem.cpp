@@ -2,7 +2,10 @@
 
 #include <SFML/Graphics/Rect.hpp>
 
+#include <algorithm>
+
 #include "entities/Player/Player.h"
+#include "support/Combat/Body.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
 #include "support/Input/InputMap.h"
@@ -23,21 +26,71 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
     const sf::FloatRect box = p->meleeHitbox();
     if (box.width <= 0.f) return;
 
-    const int dmg = p->meleeDamage();
-    const float post = p->meleePosture();
+    const int dmgBase = p->meleeDamage();
+    const float postureBase = p->meleePosture();
     ctx.enemies->forEach([&](Enemy &s) {
         if (s.resources.isDead()) return;
         if (s.lastHitSwing == p->meleeSwingId) return; // 1 hit por swing
+        // Broadphase: união das partes posicionadas. Braços protuem
+        // para fora do AABB do corpo (ArmL x∈[−4,0) relativo); AABB
+        // puro os tornaria inalvejáveis — o jogador veria o braço e
+        // o golpe passaria batido. Sem partes: AABB (legado/teste).
         const sf::FloatRect sb{s.body.getX(), s.body.getY(),
                                s.body.getW(), s.body.getH()};
-        if (!box.intersects(sb)) return;
+        sf::FloatRect broad = sb;
+        if (s.bodyParts.schema) {
+            bool first = true;
+            s.bodyParts.forEach([&](const PartState &st, const PartDef &) {
+                if (st.worldBox.width <= 0.f || st.worldBox.height <= 0.f)
+                    return;
+                if (first) {
+                    broad = st.worldBox;
+                    first = false;
+                    return;
+                }
+                const float l = std::min(broad.left, st.worldBox.left);
+                const float t = std::min(broad.top, st.worldBox.top);
+                const float r = std::max(broad.left + broad.width,
+                                         st.worldBox.left + st.worldBox.width);
+                const float b = std::max(broad.top + broad.height,
+                                         st.worldBox.top + st.worldBox.height);
+                broad = {l, t, r - l, b - t};
+            });
+        }
+        if (!box.intersects(broad)) return;
+        // Narrowphase: maior damageMult entre as partes tocadas
+        // (mesma regra da explosão). Sem parte tocada:
+        // com schema = whiff; sem schema = AABB 1x (legado).
+        const PartDef *best = nullptr;
+        sf::FloatRect bestBox = sb;
+        float bestDmgMult = 0.f;
+        s.bodyParts.forEach([&](const PartState &st, const PartDef &def) {
+            if (!box.intersects(st.worldBox)) return;
+            if (def.damageMult > bestDmgMult) {
+                bestDmgMult = def.damageMult;
+                best = &def;
+                bestBox = st.worldBox;
+            }
+        });
+        float dmgMult = 1.0f;
+        float postureMult = 1.0f;
+        if (best) {
+            dmgMult = best->damageMult;
+            postureMult = best->postureMult;
+        } else if (s.bodyParts.schema) {
+            return; // whiff: dentro do AABB, fora das partes
+        }
+        const int dmg = static_cast<int>(dmgBase * dmgMult);
         const int applied = s.resources.takeDamage(dmg);
-        s.resources.damagePosture(post);
+        s.resources.damagePosture(postureBase * postureMult);
         if (applied > 0 && s.ai) s.ai->onTakeHit(s, applied, ctx);
         s.lastHitSwing = p->meleeSwingId;
         if (particles_) {
+            // Faísca no centro da parte (feedback anatômico);
+            // sem parte, no centro do corpo.
             particles_->spawnHitSpark(
-                {sb.left + sb.width * 0.5f, sb.top + sb.height * 0.5f});
+                {bestBox.left + bestBox.width * 0.5f,
+                 bestBox.top + bestBox.height * 0.5f});
         }
     });
 }

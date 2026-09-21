@@ -1,11 +1,24 @@
 # Plano — alinhar melee com per-part narrowphase
 
-## Contexto
-Hoje coexistem dois modelos de colisão para o mesmo inimigo:
-- `MeleeSystem` → AABB cru do `Enemy::body`
-- `ExplosionSystem` → narrowphase por `bodyParts` com `bestMult`
+## Contexto do produto
 
-O refactor do `Body` per-part não é usado no ataque principal.
+O jogo investiu nas Fases S1-S4 em um sistema de corpo por partes `BodySchema`/`BodyPartId` para derivar hitboxes direto do sprite ASCII. O objetivo de produto é: **o jogador sente a diferença ao mirar cabeça vs torso vs braço**, e o dano reflete a anatomia do inimigo.
+
+Hoje isso funciona para explosões, mas não para o ataque principal do jogador.
+
+**Situação atual:**
+- `ExplosionSystem` usa narrowphase por parte com `damageMult` e `postureMult`. Cabeça explode com 2x dano, braço com 0.6x. O jogador percebe punição/recompensa por posicionamento.
+- `MeleeSystem` usa apenas o AABB cru do `Enemy::body`. O schema per-part é construído, o debug magenta é desenhado, mas o cálculo de dano ignora completamente `PartDef`.
+- Resultado: o refactor de `Body` pagou custo de engenharia, mas o loop de gameplay mais usado — melee — continua flat. O jogador recebe feedback visual de partes mas não feedback de dano.
+
+**Para onde queremos ir:**
+Alinhar melee com o mesmo modelo de colisão da explosão, mantendo compatibilidade com testes antigos e performance. Queremos que:
+- Acertar a cabeça de um inimigo dê dano aumentado e derrube postura mais rápido
+- Acertar um braço dê dano reduzido
+- Errar as partes, mesmo dentro do AABB do corpo, resulte em whiff
+- O sistema continue funcional para inimigos sem schema
+
+Isso entrega consistência de arquitetura, valor de gameplay e retorno do investimento já feito no `Body` per-part.
 
 ## Decisões a travar antes do patch
 

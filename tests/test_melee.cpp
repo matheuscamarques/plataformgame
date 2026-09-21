@@ -9,10 +9,16 @@
 int main() {
     using namespace support;
 
-    { // HitsSlimeInFrontOnce (30 → 22, sem duplo hit no swing)
-        Player p; // (0,0) 30x50 facing 1 → hitbox combo0 x=[30,46]
+    { // HitsSlimeInFrontOnce (head 2x: 30 → 14, sem duplo hit)
+        Player p; // (0,0) 30x50 facing 1 → soco combo0 x=[30,46] y=[15,35]
+        p.loadout.equipped = false; // trava hitbox do soco (default é espada)
         EnemySystem enemies;
-        enemies.spawn("slime", 32.f, 10.f); // 40x30 sobre a hitbox [30,46]
+        enemies.spawn("slime", 32.f, 10.f); // 40x30 sobre a hitbox
+        // Body posicionado (como BodySystem 250 faz em jogo): hitbox
+        // toca Head+Torso+ArmL → best=head → 8 * 2.0 = 16.
+        enemies.forEach([](Enemy &s) {
+            s.bodyParts.rebuild({s.body.getX(), s.body.getY()}, 1);
+        });
 
         MeleeSystem ms;
         GameContext ctx{};
@@ -23,10 +29,11 @@ int main() {
         for (int i = 0; i < 6; ++i) ms.tick(1.f / 30.f, ctx);
         int hp = -1;
         enemies.forEach([&](Enemy &s) { hp = s.resources.hp; });
-        assert(hp == 22);
+        assert(hp == 14);
     }
     { // HitsSlimeBehindWhenFacingLeft (regressão: W ia p/ direita)
         Player p; // (100,0) 30x50, centro (115,25)
+        p.loadout.equipped = false; // trava hitbox do soco (default é espada)
         p.setX(100.f);
         p.facing = -1;
         p.aimDir = support::AimDir::W; // tecla esquerda = esquerda da tela
@@ -40,10 +47,14 @@ int main() {
 
         assert(p.startSwing());
         assert(p.swingAim == support::AimDir::W);
+        // Hitbox [84,100]x[15,35] toca Head+Torso+ArmR+LegR → best=head.
+        enemies.forEach([](Enemy &s) {
+            s.bodyParts.rebuild({s.body.getX(), s.body.getY()}, 1);
+        });
         for (int i = 0; i < 6; ++i) ms.tick(1.f / 30.f, ctx);
         int hp = -1;
         enemies.forEach([&](Enemy &s) { hp = s.resources.hp; });
-        assert(hp == 22);
+        assert(hp == 14);
     }
     { // WhiffsWhenFar
         Player p;
@@ -61,10 +72,14 @@ int main() {
         enemies.forEach([&](Enemy &s) { hp = s.resources.hp; });
         assert(hp == 30);
     }
-    { // ChainsComboInRecovery (combo 0 → 1, dano 10)
+    { // ChainsComboInRecovery (combo 0 → 1; combo1 head overkilla)
         Player p;
+        p.loadout.equipped = false; // trava hitbox do soco (default é espada)
         EnemySystem enemies;
         enemies.spawn("slime", 32.f, 10.f);
+        enemies.forEach([](Enemy &s) {
+            s.bodyParts.rebuild({s.body.getX(), s.body.getY()}, 1);
+        });
 
         MeleeSystem ms;
         GameContext ctx{};
@@ -76,12 +91,19 @@ int main() {
         for (int i = 0; i < 20 && p.meleePhase != MeleePhase::Recovery; ++i)
             ms.tick(1.f / 30.f, ctx);
         assert(p.meleePhase == MeleePhase::Recovery);
+        int hp0 = -1;
+        enemies.forEach([&](Enemy &s) { hp0 = s.resources.hp; });
+        assert(hp0 == 14); // combo0 head: 8 * 2.0 = 16
         assert(p.startSwing() && p.meleeCombo == 1);
-        // Deixa o combo 1 acertar (slime ainda vivo com 22).
+        // Combo1 head (10 * 2.0 = 20) overkilla os 14 restantes.
         for (int i = 0; i < 10; ++i) ms.tick(1.f / 30.f, ctx);
         int hp = -1;
-        enemies.forEach([&](Enemy &s) { hp = s.resources.hp; });
-        assert(hp == 12); // 22 - 10
+        bool dead = false;
+        enemies.forEach([&](Enemy &s) {
+            hp = s.resources.hp;
+            dead = s.resources.isDead();
+        });
+        assert(hp == 0 && dead);
     }
     { // MidSwingIgnoresNewPress
         Player p;
