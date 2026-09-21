@@ -14,9 +14,21 @@
 #include "assets/PlayerSprite.h"
 #include "assets/EquipmentLayout.h"
 #include "assets/SpriteFrameRegistry.h"
+// Completos (game.h só declara): sistemas instanciados no scheduler.
+#include "entities/Player/Player.h"
+#include "world/World.h"
+#include "support/Combat/ContactDamageSystem.h"
+#include "support/Combat/DeathSystem.h"
+#include "support/Combat/ExplosionSystem.h"
+#include "support/Combat/MeleeSystem.h"
+#include "support/Effects/ParticleSystem.h"
+#include "support/Effects/ThrowSystem.h"
+#include "support/Enemies/EnemySystem.h"
+#include "support/Enemies/SpawnSystem.h"
+#include "support/Progression/DropSystem.h"
+#include "support/Progression/StratumManager.h"
 #include "support/Debug/BodyDump.h"
 #include "../window/window.h"
-#include "entities/Player/Player.h"
 
 namespace {
 // Cor determinística por char (hash → RGB). '.' = transparente.

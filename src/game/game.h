@@ -5,23 +5,29 @@
 #include <memory>
 #include "vector"
 #include "core/System.h"
-#include "world/World.h"
-#include "entities/Player/Player.h"
 #include "../support/Camera/Camera.h"
-#include "support/Combat/ContactDamageSystem.h"
 #include "../support/Debug/DebugOverlay.h"
-#include "support/Combat/DeathSystem.h"
-#include "support/Progression/DropSystem.h"
-#include "support/Enemies/EnemySystem.h"
-#include "support/Combat/ExplosionSystem.h"
 #include "../support/Input/InputMap.h"
-#include "support/Combat/MeleeSystem.h"
 #include "support/Progression/RunManager.h"
-#include "support/Enemies/SpawnSystem.h"
-#include "support/Progression/StratumManager.h"
-#include "support/Effects/ParticleSystem.h"
-#include "support/Effects/ThrowSystem.h"
 #include "assets/Sprites/SpriteSet.h"
+
+// Só ponteiros no header: definição completa mora no .cpp de cada
+// sistema (game.cpp inclui). Valor continua incluído (precisa do tipo).
+class Player;
+
+namespace support {
+class ContactDamageSystem;
+class DeathSystem;
+class DropSystem;
+class EnemySystem;
+class ExplosionSystem;
+class MeleeSystem;
+class SpawnSystem;
+class StratumManager;
+class ParticleSystem;
+class ThrowSystem;
+class World;
+} // namespace support
 
 class Game
 {
