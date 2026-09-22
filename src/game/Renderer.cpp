@@ -8,8 +8,11 @@
 
 #include "core/Config.h"
 #include "core/Material.h"
+#include "core/Time.h"
 #include "entities/Entity.hpp"
 #include "entities/Player/Player.h"
+#include "world/ChunkKey.h"
+#include "world/LightPropagator.h"
 #include "world/Stratum.h"
 #include "world/World.h"
 #include "assets/EquipmentLayout.h"
@@ -81,10 +84,14 @@ void renderCharView(sf::RenderTarget &target,
 void Game::render()
 {
 
-    window->clear(sf::Color(135, 206, 235));
     camera.setViewport(viewW_, viewH_);
     camera.follow(player.get()->getX(), player.get()->getY());
     sf::Vector2f camPos = camera.position();
+    // Snap do canto superior-esquerdo (não do centro): vale p/ janela
+    // par e ímpar — view/2 fracionário não reintroduz a fresta de 1px
+    // entre tiles (céu aparecendo na grade) nem no lightmap bilinear.
+    camPos.x = std::round(camPos.x - viewW_ * 0.5f) + viewW_ * 0.5f;
+    camPos.y = std::round(camPos.y - viewH_ * 0.5f) + viewH_ * 0.5f;
     auto view = window->getDefaultView();
     view.move(camPos.x, camPos.y);
     window->setView(view);
@@ -231,8 +238,6 @@ void Game::render()
         }
         window->draw(spr);
     });
-    // Blast por cima: acabou de explodir, é o que o jogador precisa ver.
-    throws_->renderBlasts(*window);
 
     particles_->render(*window);
 
@@ -267,6 +272,31 @@ void Game::render()
         };
         drawParts(p->body);
         enemies_->forEach([&](support::Enemy &s) { drawParts(s.bodyParts); });
+
+        // Máscara do raycast (canal F7): amarelo = raio alcançou.
+        // Parede cortando o amarelo ao meio = oclusão funcionando.
+        if (overlay_.lightMask()) {
+            const int ptx = static_cast<int>(p->getX() / core::kBlockSize);
+            const int pty = static_cast<int>(p->getY() / core::kBlockSize);
+            const support::ChunkCoord cc = support::chunkCoordFromWorld(
+                ptx, pty, support::Chunk::W);
+            if (const support::Chunk *c = getWorld()->findChunk(cc.x, cc.y)) {
+                const float cs = static_cast<float>(core::kBlockSize);
+                const float ox = c->cx * support::Chunk::W * cs;
+                const float oy = c->cy * support::Chunk::H * cs;
+                for (int y = 0; y < support::Chunk::H; ++y) {
+                    for (int x = 0; x < support::Chunk::W; ++x) {
+                        if (!c->isVisible(x, y)) continue;
+                        sf::RectangleShape r({cs, cs});
+                        r.setPosition(ox + x * cs, oy + y * cs);
+                        r.setFillColor(sf::Color(255, 255, 0, 25));
+                        r.setOutlineColor(sf::Color(255, 255, 0, 80));
+                        r.setOutlineThickness(1.f);
+                        window->draw(r);
+                    }
+                }
+            }
+        }
 
         // ── 1. Weapon bbox sempre (ciano): onde a arma está agora,
         // mesmo fora do Active (só existe com arma visível).
@@ -399,13 +429,60 @@ void Game::render()
         }
     }
 
-    // ─── Iluminação (lightmap por cima do mundo, antes do HUD) ───
-    lighting_.beginFrame();
-    lighting_.addSunGradient(camPos.x, camPos.y, viewW_, viewH_);
-    lighting_.addPlayerLight(player.get()->getCenterX(), player.get()->getCenterY(),
-                             camPos.x, camPos.y);
-    lighting_.endFrame();
-    lighting_.composite(*window);
+    // ─── Iluminação por tile (grids × tint do ciclo, antes do HUD) ───
+    // Sprites W×H do lightmap com Multiply; tint quente/frio carrega o
+    // dia/noite sem relight (grids são topologia baked cheia).
+    {
+        const sf::Color tint = lighting_.lightTint();
+        const float cs = static_cast<float>(core::kBlockSize);
+        const float cw = support::Chunk::W * cs;
+        const float ch = support::Chunk::H * cs;
+        getWorld()->forEachChunkInRect(vx0, vy0, vx1, vy1, [&](support::Chunk *c) {
+            if (c->lightDirty)
+                support::LightPropagator::updateTexture(
+                    *c, getWorld()->findChunk(c->cx - 1, c->cy),
+                    getWorld()->findChunk(c->cx + 1, c->cy),
+                    getWorld()->findChunk(c->cx, c->cy - 1),
+                    getWorld()->findChunk(c->cx, c->cy + 1),
+                    getWorld()->findChunk(c->cx - 1, c->cy - 1),
+                    getWorld()->findChunk(c->cx + 1, c->cy - 1),
+                    getWorld()->findChunk(c->cx - 1, c->cy + 1),
+                    getWorld()->findChunk(c->cx + 1, c->cy + 1));
+            if (!c->lightmap.getSize().x) return;
+            sf::Sprite spr(c->lightmap);
+            spr.setPosition(c->cx * cw, c->cy * ch);
+            // 2 texels por tile (32×32): mesma pegada 800×800, sem overlap.
+            // Overlap com Multiply escureceria a faixa (não-idempotente).
+            const float ls = cs / support::LightPropagator::kLightmapScale;
+            spr.setScale(ls, ls);
+            spr.setColor(tint);
+            sf::RenderStates rs;
+            rs.blendMode = sf::BlendMultiply;
+            window->draw(spr, rs);
+        });
+    }
+
+    // ─── Emissivos (ADD, após multiply: não são escurecidos) ───
+    // Grid-only p/ o player (Terraria puro): a luz vem do blockLight
+    // (App re-registra level 13); sem overlay ADD — o "ovo" morreu aqui.
+    // drawPlayerLight mantido na classe p/ reversão em 1 linha, mas sem
+    // chamada. TNT/blast mantêm glows próprios (alphas independentes).
+    throws_->forEachActive([&](const support::Throwable &t) {
+        if (t.kind != support::ThrowKind::Dynamite) return;
+        if (t.fuse <= 0.f) return;
+        const auto gp =
+            support::tntGlowParams(t.fuse, core::Time::elapsed());
+        lighting_.drawRadial(*window, t.pos, gp.radius,
+                             sf::Color(
+                                 static_cast<sf::Uint8>(gp.r),
+                                 static_cast<sf::Uint8>(gp.g),
+                                 static_cast<sf::Uint8>(gp.b),
+                                 static_cast<sf::Uint8>(gp.a)));
+    });
+    throws_->renderBlasts(*window,
+        [&](sf::Vector2f p, float r, sf::Color c) {
+            lighting_.drawRadial(*window, p, r, c);
+        });
 
     overlay_.render(*window, font, *getWorld(), *player.get(), objects.size());
 

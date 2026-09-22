@@ -14,6 +14,9 @@
 #include "entities/Entity.hpp"
 #include "entities/Player/Player.h"
 #include "world/World.h"
+#include "world/Chunk.h"
+#include "world/ChunkKey.h"
+#include "world/LightPropagator.h"
 #include "assets/PlayerSprite.h"
 #include "game/MusicBank.h"
 #include "game/SoundBank.h"
@@ -93,15 +96,14 @@ void Game::run()
         game::buildSoundBank(audio_);
         sfxBuilt_ = true;
     }
-    // Luz 1x: ciclo 10 min + lightmap do tamanho da view (precisa de GL).
+    // Luz 1x: ciclo 10 min + radial do player (GL). Sol por tile vem
+    // de LightPropagator (grids no generate/break, textura no render).
     dayNight_.setCycleDuration(600.f); // 10 min = 1 dia
-    lighting_.init(static_cast<unsigned>(viewW_), static_cast<unsigned>(viewH_));
-    lighting_.setSurfaceSampler([this](float worldX) {
-        return getWorld()->surfaceYAt(worldX);
-    });
+    lighting_.init();
     lighting_.setDayNight(&dayNight_);
-    lighting_.setSunFadeDepth(300.f);
-    lighting_.setPlayerRadius(90.f);
+    // Raio VISUAL (centro à borda): 180 renderiza 360px de largura.
+    // Aura difusa que ilumina o caminho (~3.6 tiles por lado).
+    lighting_.setPlayerRadius(180.f);
     float lastStat = 0.0f;
     int frames = 0;
     int updates = 0;
@@ -273,6 +275,29 @@ void Game::tick() {
                 music_.playStratum(s);
                 lastMusicStratum_ = s;
             }
+        }
+    }
+
+    // Luz do player: fonte com raycast ao trocar de tile (~3-4x/s) OU
+    // quando o chunk foi relightado (explosão zera o grid; parado, a
+    // fonte precisa voltar — senão o subsolo apaga de vez). Render
+    // consome o dirty depois do tick: sem loop (re-add → dirty →
+    // textura → limpo → pula até mover/relightar de novo).
+    if (!frozen) {
+        const int ptx = static_cast<int>(player->getX() / core::kBlockSize);
+        const int pty = static_cast<int>(player->getY() / core::kBlockSize);
+        const support::ChunkCoord cc = support::chunkCoordFromWorld(
+            ptx, pty, support::Chunk::W);
+        support::Chunk *pc = getWorld()->findChunk(cc.x, cc.y);
+        if (pc && (ptx != lastPlayerLightTileX_ ||
+                   pty != lastPlayerLightTileY_ || pc->lightDirty)) {
+            lastPlayerLightTileX_ = ptx;
+            lastPlayerLightTileY_ = pty;
+            // Cross-chunk: cast único + push outward (costura sem corte).
+            // Nível 13: ~13 tiles com decaimento 1/tile.
+            support::LightPropagator::addBlockSourceAt(
+                [this](int cx, int cy) { return getWorld()->findChunk(cx, cy); },
+                player->getX(), player->getY(), 13);
         }
     }
 

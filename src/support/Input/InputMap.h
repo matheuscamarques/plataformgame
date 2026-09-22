@@ -15,6 +15,7 @@ enum class Action : uint8_t {
     ScreenshotNow, ToggleAutoMelee, ToggleAutoHurt, // F12, F11, F10
     ToggleHitboxes, ToggleAi, ToggleEvents, ToggleWorld, // F2,F5,F4,F6
     ToggleFileLog, // F9: log de eventos em logs/debug.log
+    ToggleLightMask, // F7: máscara do raycast de luz
     COUNT
 };
 

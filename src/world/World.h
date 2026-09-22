@@ -79,6 +79,23 @@ public:
         }
     }
 
+    // Busca chunk carregado por coords de chunk (nullptr se ausente).
+    Chunk *findChunk(int cx, int cy) { return chunks_.find(cx, cy); }
+
+    // Itera chunks carregados que tocam o rect (p/ sprites do lightmap).
+    template <typename F>
+    void forEachChunkInRect(float x0, float y0, float x1, float y1, F &&fn) {
+        const float cw = static_cast<float>(Chunk::W) * core::kBlockSize;
+        const float ch = static_cast<float>(Chunk::H) * core::kBlockSize;
+        for (Chunk *c : chunks_.loaded()) {
+            const float cx0 = c->cx * cw;
+            const float cy0 = c->cy * ch;
+            if (cx0 + cw < x0 || cx0 > x1 || cy0 + ch < y0 || cy0 > y1)
+                continue;
+            fn(c);
+        }
+    }
+
     // Debug visual do SpatialHash (grade em coords de mundo).
     void debugCells(float x, float y, float w, float h,
                     std::vector<std::pair<int,int>> &out);

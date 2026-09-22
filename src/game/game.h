@@ -74,6 +74,8 @@ private:
     int lastMusicStratum_ = -1;
     core::AudioSystem audio_; // dono: 26 SFX sintetizados 1x no run (RAM)
     bool sfxBuilt_ = false;
+    int lastPlayerLightTileX_ = -1; // cache: raycast só ao trocar de tile
+    int lastPlayerLightTileY_ = -1;
     core::DayNightCycle dayNight_; // dono: relógio dia/noite (10 min)
     support::LightingSystem lighting_; // dono: lightmap por frame (GL)
     bool charView_ = false; // F3: ASCII por char, sem textura

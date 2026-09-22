@@ -90,6 +90,13 @@ $(NOISE_VIEW): tools/noise_view/noise_view.cpp src/world/Generation.cpp
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -Isrc $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
-.PHONY: all clean clear run start watch test test-all test-layers noise-view
+LIGHT_VIEW := $(BIN_DIR)/tools/light_view
+light-view: $(LIGHT_VIEW)
+
+$(LIGHT_VIEW): tools/light_view/light_view.cpp src/world/LightPropagator.cpp src/world/RaycastLight.cpp src/support/Spatial/spatialhash.cpp src/entities/Entity.cpp src/component/component.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -Isrc $^ -o $@ $(LDFLAGS) $(LDLIBS)
+
+.PHONY: all clean clear run start watch test test-all test-layers noise-view light-view
 
 -include $(DEPS)

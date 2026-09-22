@@ -27,6 +27,7 @@ InputMap::InputMap() {
     bind(Action::ToggleEvents, sf::Keyboard::F4);
     bind(Action::ToggleWorld, sf::Keyboard::F6);
     bind(Action::ToggleFileLog, sf::Keyboard::F9);
+    bind(Action::ToggleLightMask, sf::Keyboard::F7);
 
     addBind(Action::Left,  sf::Keyboard::A);
     addBind(Action::Right, sf::Keyboard::D);

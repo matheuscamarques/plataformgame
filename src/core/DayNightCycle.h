@@ -6,7 +6,7 @@
 namespace core {
 
 // Ciclo dia/noite. `hours` vai de 0 a 24 e wrapa.
-// Interpola entre 11 fases-âncora (midnight ... midnight).
+// Interpola entre 12 fases-âncora (midnight ... midnight).
 // Lógica pura, zero SFML (testável headless).
 //
 // Regras de design:
@@ -25,6 +25,13 @@ public:
     // Duração real de um ciclo completo (segundos).
     // 600s = 10 min. Ajustável.
     void setCycleDuration(float seconds) { cycleDuration_ = seconds; }
+
+    // Hora inicial (p/ teste e boot diurno). Clamp em [0,24).
+    void setHour(float h) {
+        if (h < 0.f) h = 0.f;
+        if (h >= 24.f) h = 0.f;
+        t_ = (h / 24.f) * cycleDuration_;
+    }
 
     // Avança o relógio. Chamado por frame.
     void tick(float dt) {
@@ -47,7 +54,7 @@ public:
     static DayNightSample sampleAt(float hour);
 
 private:
-    float t_             = 0.f;   // tempo acumulado no ciclo
+    float t_             = (9.f / 24.f) * 600.f; // boot 9h (manhã, não breu)
     float cycleDuration_ = 600.f; // 10 min = 1 dia
 };
 
@@ -63,13 +70,14 @@ struct Anchor {
     uint8_t  tintR, tintG, tintB;
 };
 
-// 11 âncoras. Ordem cronológica. Não precisa ser simétrico.
+// 12 âncoras. Ordem cronológica. Não precisa ser simétrico.
 inline constexpr Anchor kAnchors[] = {
     // hour  sun   moon   sky (R,G,B)         tint (R,G,B)
     {  0.0f, 0.00f, 0.30f, 5, 10, 24,    150,180,220},  // midnight
     {  4.0f, 0.00f, 0.25f, 15, 20, 45,    150,180,220},  // pre-dawn
     {  5.5f, 0.20f, 0.10f, 60, 50, 80,    220,150,180},  // first light
     {  6.5f, 0.55f, 0.00f, 200,100, 60,    255,180,140},  // dawn
+    {  7.0f, 0.75f, 0.00f, 130,140,180,    255,220,190},  // mid-morning (quebra o marrom dawn→morning)
     {  8.0f, 0.90f, 0.00f, 120,170,220,    255,230,200},  // morning
     { 12.0f, 1.00f, 0.00f, 135,195,235,    255,250,240},  // noon
     { 16.0f, 0.95f, 0.00f, 130,180,220,    255,235,210},  // afternoon

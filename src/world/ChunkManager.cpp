@@ -7,6 +7,7 @@
 #include "defines.h"
 #include "Block.h"
 #include "Generation.h"
+#include "LightPropagator.h"
 
 namespace support {
 
@@ -99,6 +100,19 @@ void ChunkManager::generate(int cx, int cy) {
             lastTreeX = tx;
             if (tx < x0 || tx >= x1) continue; // tronco fora: vizinho estampa
             stampTree(seed_, *c, cx, tx, sy, tp);
+        }
+    }
+    // Luz: grids + dirty (sem GL — textura só no render). Vizinhos
+    // existentes relightam junto (bordas que dependiam da nossa ausência).
+    {
+        auto nb = [&](int nx, int ny) -> Chunk* { return find(nx, ny); };
+        LightPropagator::relightChunk(*c, nb(cx, cy - 1), nb(cx - 1, cy),
+                                      nb(cx + 1, cy), nb(cx, cy + 1));
+        Chunk* nbs[] = {nb(cx, cy - 1), nb(cx, cy + 1), nb(cx - 1, cy), nb(cx + 1, cy)};
+        for (Chunk* n : nbs) {
+            if (!n) continue;
+            LightPropagator::relightChunk(*n, nb(n->cx, n->cy - 1), nb(n->cx - 1, n->cy),
+                                          nb(n->cx + 1, n->cy), nb(n->cx, n->cy + 1));
         }
     }
     c->touch();

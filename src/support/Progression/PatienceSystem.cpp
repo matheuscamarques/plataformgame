@@ -1,11 +1,12 @@
 #include "PatienceSystem.h"
+#include "core/Config.h"
 
 #include <algorithm>
 
 namespace support {
 
 namespace {
-constexpr float kMineRadius = 128.f; // 4 tiles de 32px (unidade do design)
+constexpr float kMineRadius = core::kBlockSize * 4.f; // 4 tiles (200px com bloco 50)
 }
 
 int patienceOnMine(PatienceState &p, bool isOre, float distance) {

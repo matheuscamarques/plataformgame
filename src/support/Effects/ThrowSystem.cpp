@@ -117,7 +117,14 @@ void ThrowSystem::handleTileCollision(Throwable &t, GameContext &ctx) {
 }
 
 void ThrowSystem::spawnBlast(sf::Vector2f center, float radius) {
-    blasts_.push_back({center, radius, 0.35f, 0.35f, true});
+    BlastVisual b;
+    b.center = center;
+    b.radius = radius;
+    b.ttl = b.maxTtl;
+    b.lightRadius = radius * 1.5f; // visual: 3× o dano de largura, como antes
+    b.lightPeak = 1.0f;
+    b.active = true;
+    blasts_.push_back(b);
 }
 
 void ThrowSystem::tickBlasts(float dt) {
@@ -132,9 +139,18 @@ void ThrowSystem::tickBlasts(float dt) {
         blasts_.end());
 }
 
-void ThrowSystem::renderBlasts(sf::RenderTarget& target) {
+void ThrowSystem::renderBlasts(sf::RenderTarget& target,
+                                BlastGlowFn glow) {
     for (const auto& b : blasts_) {
         const float u = 1.f - (b.ttl / b.maxTtl);   // 0 → 1
+        // Flash laranja via drawRadial injetado (origem/escala central).
+        // Fade quadrático: forte no boom, some rápido.
+        if (glow) {
+            const float fade = (1.f - u) * (1.f - u);
+            const auto a = static_cast<sf::Uint8>(255.f * fade * b.lightPeak);
+            if (a >= 4)
+                glow(b.center, b.lightRadius, sf::Color(255, 160, 60, a));
+        }
         // Anel cresce de 20% a 100% do raio em 0.35s.
         const float r = b.radius * (0.2f + 0.8f * u);
         // Alpha cai conforme expande.

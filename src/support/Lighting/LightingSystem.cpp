@@ -5,102 +5,44 @@
 
 namespace support {
 
-void LightingSystem::init(unsigned w, unsigned h) {
-    buffer_.create(w, h);
-    buffer_.setSmooth(true);
-    playerTex_.loadFromImage(core::makeRadialImage(128, 2.0f));
+void LightingSystem::init() {
+    playerTex_.loadFromImage(core::makeRadialImage(128, 1.6f));
+    playerTex_.setSmooth(true);
     ready_ = true;
 }
 
-void LightingSystem::beginFrame() {
+void LightingSystem::drawRadial(sf::RenderTarget& target,
+                                 sf::Vector2f worldPos,
+                                 float radius,
+                                 sf::Color color) {
     if (!ready_) return;
-    buffer_.setView(buffer_.getDefaultView());
-    buffer_.clear(sf::Color::Black);
-}
-
-void LightingSystem::addSunGradient(float camX, float camY,
-                                    float viewW, float viewH) {
-    if (!ready_ || !surfaceAt_) return;
-
-    const core::DayNightSample dn = cycle_
-        ? cycle_->sample()
-        : core::DayNightSample{1.f, 0.f, 135,195,235, 255,250,240};
-
-    // Intensidade efetiva acima do solo: sol + um pouco de lua.
-    const float ambient = dn.sunIntensity + dn.moonIntensity;
-
-    // Tint combinado (sol = quente, lua = frio) pelo peso de cada fonte.
-    const float totalLight = std::max(0.01f, dn.sunIntensity + dn.moonIntensity);
-    const float wSun = dn.sunIntensity / totalLight;
-    const float wMoon = dn.moonIntensity / totalLight;
-    const auto tintR = static_cast<sf::Uint8>(dn.tintR * wSun + 150 * wMoon);
-    const auto tintG = static_cast<sf::Uint8>(dn.tintG * wSun + 180 * wMoon);
-    const auto tintB = static_cast<sf::Uint8>(dn.tintB * wSun + 220 * wMoon);
-
-    constexpr float kStep = 8.f;
-    const int cols = static_cast<int>(viewW / kStep) + 2;
-
-    sf::VertexArray va(sf::TriangleStrip, cols * 2);
-
-    for (int i = 0; i < cols; ++i) {
-        const float screenX = i * kStep;
-        const float worldX  = camX + screenX;
-        const float surfaceY = surfaceAt_(worldX);
-
-        const float lTop = lightAt(camY,         surfaceY, ambient, fadeDepth_) * master_;
-        const float lBot = lightAt(camY + viewH, surfaceY, ambient, fadeDepth_) * master_;
-
-        auto shade = [&](float v) {
-            const float u = std::clamp(v, 0.f, 1.f);
-            return sf::Color(
-                static_cast<sf::Uint8>(tintR * u),
-                static_cast<sf::Uint8>(tintG * u),
-                static_cast<sf::Uint8>(tintB * u),
-                255);
-        };
-
-        va[i * 2 + 0] = sf::Vertex({screenX, 0.f},   shade(lTop));
-        va[i * 2 + 1] = sf::Vertex({screenX, viewH}, shade(lBot));
-    }
-
-    buffer_.draw(va);
-}
-
-void LightingSystem::addPlayerLight(float worldX, float worldY,
-                                    float camX, float camY) {
-    if (!ready_) return;
+    const float w = static_cast<float>(playerTex_.getSize().x);
+    const RadialTransform t = radialTransform(w, radius);
     sf::Sprite spr(playerTex_);
-    spr.setOrigin(playerTex_.getSize().x * 0.5f,
-                  playerTex_.getSize().y * 0.5f);
-    spr.setPosition(worldX - camX, worldY - camY);
-    const float scale = playerRadius_ / 128.f;
-    spr.setScale(scale, scale);
+    spr.setOrigin(t.origin, t.origin);
+    spr.setPosition(worldPos); // coords de mundo (view de mundo ativa)
+    spr.setScale(t.scale, t.scale);
+    spr.setColor(color);
 
     sf::RenderStates rs;
     rs.blendMode = sf::BlendAdd;
-    buffer_.draw(spr, rs);
+    target.draw(spr, rs);
 }
 
-void LightingSystem::endFrame() {
+void LightingSystem::drawPlayerLight(sf::RenderTarget& target,
+                                     float worldX, float worldY) {
     if (!ready_) return;
-    buffer_.display();
-}
-
-void LightingSystem::composite(sf::RenderTarget& target) {
-    if (!ready_) return;
-    sf::Sprite light(buffer_.getTexture());
-    light.setPosition(0.f, 0.f);
-    sf::RenderStates rs;
-    rs.blendMode = sf::BlendMultiply;
-    target.draw(light, rs);
-}
-
-float LightingSystem::lightAt(float worldY, float surfaceY,
-                                float ambient, float fadeDepth) {
-    const float depth = worldY - surfaceY;
-    if (depth < 0.f) return ambient;             // acima: luz plena do ciclo
-    if (depth > fadeDepth) return 0.f;           // fundo: escuro
-    return ambient * (1.f - depth / fadeDepth);
+    // Alpha inverso ao sol: forte à noite (player carrega a visão),
+    // quase invisível de dia (sol já ilumina). Antes era 140 fixo.
+    float darkness = 1.f;
+    if (cycle_) {
+        const auto s = cycle_->sample();
+        darkness = darknessOf(s.sunIntensity, s.moonIntensity);
+    }
+    const auto a = static_cast<sf::Uint8>(
+        255.f * glowAlphaScale(darkness) * std::clamp(master_, 0.f, 1.f));
+    drawRadial(target, {worldX, worldY}, playerRadius_,
+               sf::Color(255, 240, 200, a));
 }
 
 sf::Color LightingSystem::skyColor() const {
@@ -109,11 +51,31 @@ sf::Color LightingSystem::skyColor() const {
     return sf::Color(s.skyR, s.skyG, s.skyB);
 }
 
-sf::Color LightingSystem::ambientSky(float playerY, float surfaceY) const {
-    // Se o player está ACIMA do solo, céu dinâmico.
-    if (playerY < surfaceY + 20.f) return skyColor();
-    // Abaixo: preto (vai ser sobrescrito pelo lightmap).
-    return sf::Color(10, 10, 15);
+sf::Color LightingSystem::ambientSky(float /*playerY*/, float /*surfaceY*/) const {
+    // Sem checagem de superfície: céu do ciclo sempre. Caverna selada
+    // fica preta via lightmap (skyLight 0 × tint = 0), não via clear.
+    return skyColor();
+}
+
+sf::Color LightingSystem::lightTint() const {
+    if (!cycle_) return sf::Color::White;
+    const auto s = cycle_->sample();
+    // Piso 0.55: âncoras dão o MATIZ, o multiplicador dá a HORA.
+    // Sem piso a noite ia a 0.21 (breu); sem multiplicador o ciclo
+    // some (meia-noite 0.72 ≈ dia). Contraste dia/noite: 1.0 → 0.39.
+    // Subsolo selado continua preto (grid 0 × qualquer tint = 0).
+    const float b = std::clamp(s.sunIntensity + s.moonIntensity, 0.55f, 1.f);
+    return sf::Color(static_cast<sf::Uint8>(s.tintR * b),
+                     static_cast<sf::Uint8>(s.tintG * b),
+                     static_cast<sf::Uint8>(s.tintB * b));
+}
+
+float LightingSystem::lightAt(float worldY, float surfaceY,
+                              float ambient, float fadeDepth) {
+    const float depth = worldY - surfaceY;
+    if (depth < 0.f) return ambient;             // acima: luz plena do ciclo
+    if (depth > fadeDepth) return 0.f;           // fundo: escuro
+    return ambient * (1.f - depth / fadeDepth);
 }
 
 } // namespace support

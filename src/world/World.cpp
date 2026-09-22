@@ -7,6 +7,7 @@
 #include "entities/Entity.hpp"
 #include "Block.h"
 #include "Generation.h"
+#include "LightPropagator.h"
 
 namespace support {
 
@@ -77,6 +78,23 @@ bool World::breakTile(int worldTileX, int worldTileY, Tile *broken) {
         };
         expunge(activePlatforms_);
         expunge(activeColides_);
+    }
+    // Luz: relight do chunk (só grids + dirty, sem GL — headless-safe).
+    // Borda do chunk: vizinhos também (luz vaza entre chunks).
+    LightPropagator::relightChunk(
+        *chunk, chunks_.find(c.x, c.y - 1), chunks_.find(c.x - 1, c.y),
+        chunks_.find(c.x + 1, c.y), chunks_.find(c.x, c.y + 1));
+    if (lx == 0 || lx == Chunk::W - 1 || ly == 0 || ly == Chunk::H - 1) {
+        auto relightNb = [&](int nx, int ny) {
+            if (Chunk *nb = chunks_.find(nx, ny))
+                LightPropagator::relightChunk(
+                    *nb, chunks_.find(nx, ny - 1), chunks_.find(nx - 1, ny),
+                    chunks_.find(nx + 1, ny), chunks_.find(nx, ny + 1));
+        };
+        relightNb(c.x - 1, c.y);
+        relightNb(c.x + 1, c.y);
+        relightNb(c.x, c.y - 1);
+        relightNb(c.x, c.y + 1);
     }
     return true;
 }

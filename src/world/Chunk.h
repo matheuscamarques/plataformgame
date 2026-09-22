@@ -1,10 +1,13 @@
 #pragma once
 
+#include <algorithm>
 #include <cassert>
 #include <chrono>
 #include <cstdint>
 #include <memory>
 #include <vector>
+
+#include <SFML/Graphics/Texture.hpp>
 
 #include "defines.h"
 #include "entities/Entity.hpp"
@@ -29,6 +32,17 @@ struct Chunk {
     // Tipos por tile local [0,W) x [0,H). uint8_t: 256B por chunk
     // em vez de 1KB (32KB em vez de 128KB com 128 chunks).
     std::vector<Tile> tiles = std::vector<Tile>(W * H, Tile::Air);
+    // Luz 0..15 por tile (propagação real; LightPropagator preenche).
+    // Sky = sol/lua por cima; Block = fontes (tochas futuras).
+    // lightAt = max das duas. Textura só no render (GL); geração e
+    // testes tocam só nos grids (headless-safe).
+    std::vector<uint8_t> skyLight = std::vector<uint8_t>(W * H, 0);
+    std::vector<uint8_t> blockLight = std::vector<uint8_t>(W * H, 0);
+    bool lightDirty = true;
+    sf::Texture lightmap; // W×H, bilinear; criada sob demanda no render
+    // Máscara de visibilidade do último raycast (1 = raio alcançou).
+    // Por fonte (raycast sobrescreve); hoje só o player usa.
+    std::vector<uint8_t> visibleMask = std::vector<uint8_t>(W * H, 0);
     // Entidades deste chunk (dono).
     std::vector<std::unique_ptr<Entity>> entities;
     // Índice espacial das entidades (views, sem ownership).
@@ -37,6 +51,31 @@ struct Chunk {
     Tile tile(int lx, int ly) const {
         assert(lx >= 0 && lx < W && ly >= 0 && ly < H);
         return tiles[ly * W + lx];
+    }
+
+    inline bool inBounds(int lx, int ly) const {
+        return lx >= 0 && ly >= 0 && lx < W && ly < H;
+    }
+
+    // Luz combinada 0..15 (max das duas fontes). Fora = 0.
+    inline uint8_t lightAt(int lx, int ly) const {
+        if (!inBounds(lx, ly)) return 0;
+        const int i = ly * W + lx;
+        return std::max(skyLight[i], blockLight[i]);
+    }
+
+    // Byte 0..255 p/ textura (×17).
+    inline uint8_t lightByte(int lx, int ly) const {
+        return static_cast<uint8_t>(lightAt(lx, ly) * 17);
+    }
+
+    inline bool isVisible(int lx, int ly) const {
+        if (!inBounds(lx, ly)) return false;
+        return visibleMask[ly * W + lx] != 0;
+    }
+
+    inline void clearVisibility() {
+        std::fill(visibleMask.begin(), visibleMask.end(), 0);
     }
 
     // Escrita pós-geração: marca modified (chunk precisa persistir).
