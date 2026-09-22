@@ -110,33 +110,46 @@ int main() {
 
     { // EdgeSeedSkipsSolid (parede na borda não vira conduto)
         // Vizinho esquerdo todo claro (borda 15); parede total na col 0.
-        // A parede recebe a face iluminada (15-2=13) mas NÃO entra na fila:
-        // sem o no-push, (0,6) sólida ganhava 14 e vazava 13 p/ (1,6).
+        // A parede (Stone, att 2) recebe a face 15-2=13 mas NÃO entra na
+        // fila: sem o no-push, conduzia p/ o ar atrás da parede.
         Chunk left;
         LightPropagator::computeSkyLight(left, nullptr, nullptr, nullptr, nullptr, 15);
         Chunk c;
         for (int y = 0; y < Chunk::H; ++y)
             c.tiles[y * Chunk::W + 0] = Tile::Stone;
         LightPropagator::computeSkyLight(c, nullptr, &left, nullptr, nullptr, 15);
-        assert(c.skyLight[6 * Chunk::W + 0] == 13); // face iluminada, sem conduzir
+        assert(c.skyLight[6 * Chunk::W + 0] == 13); // face de pedra, sem conduzir
         assert(c.skyLight[6 * Chunk::W + 1] == 15); // ar ao lado: fill vertical
     }
+    { // AttenuationByMaterial (pedra 2, terra 2, resto 3)
+        using support::LightPropagator;
+        assert(LightPropagator::attenuationFor(Tile::Stone) == 2);
+        assert(LightPropagator::attenuationFor(Tile::Granite) == 4);
+        assert(LightPropagator::attenuationFor(Tile::Bedrock) == 4);
+        assert(LightPropagator::attenuationFor(Tile::Dirt) == 2);
+        assert(LightPropagator::attenuationFor(Tile::Grass) == 2);
+        assert(LightPropagator::attenuationFor(Tile::Sand) == 2);
+        assert(LightPropagator::attenuationFor(Tile::OreIron) == 3);
+        assert(LightPropagator::attenuationFor(Tile::TreeTrunk) == 3);
+    }
     { // EdgeSeedTransmitsZero (parede do vizinho não vaza p/ ar coberto)
-        // Vizinho com parede na col 15 (face 13, sol acima); chunk atual
-        // com teto total (só a col 0 interessa, coberta). Sem o transmit,
-        // a borda semeava 13-1=12 no ar atrás da parede (conduto).
+        // Vizinho com parede cheia na col 15 (só o topo recebe: 11, o
+        // resto apaga em gradiente); chunk atual com teto total.
+        // Sem o transmit-zero, a face 11 semeava 10 no ar atrás da parede.
         Chunk left;
         for (int y = 0; y < Chunk::H; ++y)
             left.tiles[y * Chunk::W + 15] = Tile::Stone;
         LightPropagator::computeSkyLight(left, nullptr, nullptr, nullptr, nullptr, 15);
-        assert(left.skyLight[6 * Chunk::W + 15] == 13); // face transmissora
+        assert(left.skyLight[0 * Chunk::W + 15] == 13); // face superior acesa
+        assert(left.skyLight[6 * Chunk::W + 15] == 13); // face lateral acesa (transmissor)
         Chunk c;
         for (int x = 0; x < Chunk::W; ++x)
             c.tiles[0 * Chunk::W + x] = Tile::Stone; // teto total
         LightPropagator::computeSkyLight(c, nullptr, &left, nullptr, nullptr, 15);
-        assert(c.skyLight[0 * Chunk::W + 0] == 13); // face do próprio teto
+        assert(c.skyLight[0 * Chunk::W + 0] == 13); // face do próprio teto (pedra)
         assert(c.skyLight[6 * Chunk::W + 0] == 0);  // ar coberto: nada vaza
     }
+
 
     { // SeamSmoothAcrossBoundary (borda enxerga o vizinho, imagem 32×32)
         // Esquerda escura na col 15, direita clara na col 0.

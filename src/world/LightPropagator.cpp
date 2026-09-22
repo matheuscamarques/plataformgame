@@ -12,6 +12,49 @@
 
 namespace support {
 
+uint8_t LightPropagator::attenuationFor(Tile t) {
+    switch (t) {
+        case Tile::Stone:
+            return 2; // pedra comum: gradiente noturno legível (8 tiles)
+        // Rocha dura: segura mais luz.
+        case Tile::Granite:
+        case Tile::Basalt:
+        case Tile::Marble:
+        case Tile::Obsidian:
+        case Tile::Bedrock:
+        case Tile::Cobblestone:
+        case Tile::Schist:
+        case Tile::PebbledStone:
+        case Tile::CrackedStone:
+        case Tile::CharredStone:
+        case Tile::TwistedStone:
+        case Tile::NullStone:
+            return 4;
+        // Terra fofa: deixa passar mais.
+        case Tile::Dirt:
+        case Tile::Grass:
+        case Tile::Sand:
+        case Tile::Mud:
+        case Tile::Clay:
+        case Tile::Gravel:
+        case Tile::Snow:
+        case Tile::TundraTop:
+        case Tile::TaigaTop:
+        case Tile::FallbackTop:
+        case Tile::SavannaTop:
+        case Tile::Sandstone:
+        case Tile::Permafrost:
+        case Tile::RootedDirt:
+        case Tile::MossStone:
+        case Tile::Mycelium:
+        case Tile::CoalDust:
+        case Tile::ScorchedEarth:
+            return 2;
+        default:
+            return 3; // minérios, cristais, madeiras, resto
+    }
+}
+
 namespace {
 
 struct Cell { int x, y; };
@@ -51,8 +94,9 @@ void bfs(std::vector<uint8_t>& grid,
         const int i = y * Chunk::W + x;
         const Tile t = c.tiles[i];
         if (t != Tile::Air && t != Tile::Water) {
-            if (v > grid[i] + 2)
-                grid[i] = static_cast<uint8_t>(v - 2);
+            const uint8_t att = LightPropagator::attenuationFor(t);
+            if (v > grid[i] + att)
+                grid[i] = static_cast<uint8_t>(v - att);
             return;
         }
         if (v > grid[i] + 1) {
@@ -88,11 +132,12 @@ void bfs(std::vector<uint8_t>& grid,
             const int ny = cell.y + dy[d];
             if (nx < 0 || nx >= Chunk::W || ny < 0 || ny >= Chunk::H) continue;
             const int ni = ny * Chunk::W + nx;
-            // Sólido: pinta a face com -2, mas não empurra p/ fila
-            // (absorve, não conduz). Ar/água: -1 com fila, como antes.
+            // Sólido: pinta a face com -att (material), mas não empurra
+            // p/ fila (absorve, não conduz). Ar/água: -1 com fila, como antes.
             if (c.tiles[ni] != Tile::Air && c.tiles[ni] != Tile::Water) {
-                if (cur > grid[ni] + 2)
-                    grid[ni] = static_cast<uint8_t>(cur - 2);
+                const uint8_t att = LightPropagator::attenuationFor(c.tiles[ni]);
+                if (cur > grid[ni] + att)
+                    grid[ni] = static_cast<uint8_t>(cur - att);
                 continue;
             }
             const uint8_t next = static_cast<uint8_t>(cur - 1);
@@ -140,10 +185,9 @@ void LightPropagator::computeSkyLight(Chunk& c,
                 level = (level > 3) ? static_cast<uint8_t>(level - 3) : 0;
                 c.skyLight[i] = level;
             } else {
-                // Sólido: recebe luz na face superior (ex.: terra ao sol),
-                // mas não propaga (bloqueia a coluna). Atenuação 2 simula
-                // a perda na superfície.
-                c.skyLight[i] = (level > 2) ? static_cast<uint8_t>(level - 2) : 0;
+                // Sólido: face com -att (material), sem propagar (bloqueia).
+                const uint8_t att = LightPropagator::attenuationFor(t);
+                c.skyLight[i] = (level > att) ? static_cast<uint8_t>(level - att) : 0;
                 break;
             }
         }
@@ -206,10 +250,11 @@ bool seedBorderFromNeighbors(std::vector<uint8_t>& grid, const Chunk& dst,
         const int i = y * Chunk::W + x;
         const Tile t = dst.tiles[i];
         if (t != Tile::Air && t != Tile::Water) {
-            // Sólido de borda: face iluminada (-2), sem fila (não conduz).
+            // Sólido de borda: face iluminada (-att material), sem fila.
             if (mask[i] == 0) return; // sem raycast aqui: sombra, não costura
-            if (v > grid[i] + 2) {
-                grid[i] = static_cast<uint8_t>(v - 2);
+            const uint8_t att = LightPropagator::attenuationFor(t);
+            if (v > grid[i] + att) {
+                grid[i] = static_cast<uint8_t>(v - att);
                 changed = true;
             }
             return;
@@ -483,8 +528,9 @@ void LightPropagator::floodMasked(std::vector<uint8_t>& grid,
             // (Espalhar A PARTIR de sólido visível continua permitido via
             // fila inicial: a máscara já limitou a região — o raio viu.)
             if (c.tiles[ni] != Tile::Air && c.tiles[ni] != Tile::Water) {
-                if (cur > grid[ni] + 2)
-                    grid[ni] = static_cast<uint8_t>(cur - 2);
+                const uint8_t att = LightPropagator::attenuationFor(c.tiles[ni]);
+                if (cur > grid[ni] + att)
+                    grid[ni] = static_cast<uint8_t>(cur - att);
                 continue;
             }
             const uint8_t next = static_cast<uint8_t>(cur - 1);

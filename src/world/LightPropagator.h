@@ -21,6 +21,11 @@ struct Chunk;
 // vizinhos existentes (converge no streaming).
 class LightPropagator {
 public:
+public:
+    // Atenuação que um sólido impõe à luz que o atinge (item 19):
+    // pedra dura 4, terra fofa 2, resto 3. Ar/água não usam (regras
+    // próprias). Pura e testável; aplicada nos 5 pontos de pintura.
+    static uint8_t attenuationFor(Tile t);
     // Texels por tile no lightmap + kernel do blur (sempre ímpar).
     // Perfis testáveis (muda os dois, rebuild, compara PNGs em build/light/):
     //   A) scale=1, kernel=7   (16×16, spread ~3 tiles — bem suave)

@@ -7,6 +7,7 @@
 #include <utility>
 
 #include "core/Config.h"
+#include "core/Celestial.h"
 #include "core/Material.h"
 #include "core/Time.h"
 #include "entities/Entity.hpp"
@@ -471,6 +472,107 @@ void Game::render()
             rs.blendMode = sf::BlendMultiply;
             window->draw(spr, rs);
         });
+    }
+
+    // ─── Astros PÓS-multiply (item 18, fix lua escura) ───
+    // Pré-multiply o tint noturno os apagava (lua cinza). Aqui brilham,
+    // mas SÓ onde o céu chega: gate por skyLight (sem lua em caverna).
+    // View de mundo ainda ativa; tiles já desenhados não importam mais.
+    {
+        const float h = dayNight_.hour();
+        const auto s = dayNight_.sample();
+        const float darkness = 1.f - std::clamp(s.sunIntensity + s.moonIntensity,
+                                                0.f, 1.f);
+        const float bs = static_cast<float>(core::kBlockSize);
+        constexpr int W = support::Chunk::W;
+        auto skyOpen = [&](float wx, float wy) -> float {            const int tx = static_cast<int>(std::floor(wx / bs));
+            const int ty = static_cast<int>(std::floor(wy / bs));
+            const int cx = tx >= 0 ? tx / W : -((-tx + W - 1) / W);
+            const int cy = ty >= 0 ? ty / W : -((-ty + W - 1) / W);
+            const support::Chunk* c = getWorld()->findChunk(cx, cy);
+            if (!c) return 0.f;
+            const int lx = tx - cx * W, ly = ty - cy * W;
+            if (lx < 0 || lx >= W || ly < 0 || ly >= W) return 0.f;
+            return c->skyLight[ly * W + lx] / 15.f;
+        };
+        // Gate por ÁREA (não pixel): o disco tem raio e o centro em céu
+        // aberto não basta — bordas invadiriam a rocha e desenhavam por
+        // cima (visível descendo/bombando). Mínimo em 9 pontos no raio.
+        auto skyOpenArea = [&](float wx, float wy, float r) -> float {
+            float g = skyOpen(wx, wy);
+            const float o[8][2] = {{r, 0},   {-r, 0},  {0, r},   {0, -r},
+                                   {r, -r},  {-r, -r}, {r, r},   {-r, r}};
+            for (const auto& d : o) {
+                const float v = skyOpen(wx + d[0], wy + d[1]);
+                if (v < g) g = v;
+                if (g <= 0.01f) break;
+            }
+            return g;
+        };
+        auto arcPos = [&](float ang) {
+            const float t = ang / 180.f;
+            return sf::Vector2f(camPos.x + t * viewW_,
+                                camPos.y + viewH_ * (0.08f + 0.30f * (1.f - (2.f * t - 1.f) * (2.f * t - 1.f))));
+        };
+        // Sol (disco + halo).
+        const float sv = core::arcVisibility(core::sunAngle(h));
+        if (sv > 0.01f) {
+            const sf::Vector2f sp = arcPos(core::sunAngle(h));
+            const float g = skyOpenArea(sp.x, sp.y, 30.f);
+            if (g > 0.01f) {
+                for (int i = 3; i >= 1; --i) {
+                    const float r = 30.f * (1.f + i * 0.6f);
+                    sf::CircleShape glow(r);
+                    glow.setOrigin(r, r);
+                    glow.setPosition(sp);
+                    glow.setFillColor(sf::Color(255, 240, 180,
+                        static_cast<sf::Uint8>(30.f * sv * g / i)));
+                    window->draw(glow);
+                }
+                sf::CircleShape disc(30.f);
+                disc.setOrigin(30.f, 30.f);
+                disc.setPosition(sp);
+                disc.setFillColor(sf::Color(255, 230, 140,
+                    static_cast<sf::Uint8>(255.f * sv * g)));
+                window->draw(disc);
+            }
+        }
+        // Lua (disco + cratera fixa).
+        const float mv = core::arcVisibility(core::moonAngle(h));
+        if (mv > 0.01f) {
+            const sf::Vector2f mp = arcPos(core::moonAngle(h));
+            const float g = skyOpenArea(mp.x, mp.y, 22.f);
+            if (g > 0.01f) {
+                const sf::Uint8 a = static_cast<sf::Uint8>(255.f * mv * g);
+                sf::CircleShape disc(22.f);
+                disc.setOrigin(22.f, 22.f);
+                disc.setPosition(mp);
+                disc.setFillColor(sf::Color(220, 225, 240, a));
+                window->draw(disc);
+                sf::CircleShape crater(22.f * 0.22f);
+                crater.setOrigin(22.f * 0.22f, 22.f * 0.22f);
+                crater.setPosition(mp.x - 22.f * 0.25f, mp.y + 22.f * 0.15f);
+                crater.setFillColor(sf::Color(180, 185, 200, a));
+                window->draw(crater);
+            }
+        }
+        // Estrelas (80 pts, só no escuro, twinkle; gate por estrela: as
+        // atrás de rocha somem sozinhas, as do poço aberto ficam).
+        if (darkness > 0.4f) {
+            const float starAlpha = (darkness - 0.4f) / 0.6f * 200.f;
+            sf::VertexArray stars(sf::Points, 80);
+            for (int i = 0; i < 80; ++i) {
+                const float sx = camPos.x + core::starOffsetX(i) * viewW_;
+                const float sy = camPos.y + core::starOffsetY(i) * viewH_;
+                const float tw = 0.7f + 0.3f * std::sin(
+                    static_cast<float>(i) + core::Time::elapsed() * 0.8f);
+                const float g = skyOpen(sx, sy);
+                stars[i] = sf::Vertex({sx, sy},
+                    sf::Color(255, 255, 240,
+                              static_cast<sf::Uint8>(starAlpha * tw * g)));
+            }
+            window->draw(stars);
+        }
     }
 
     // ─── Emissivos (ADD, após multiply: não são escurecidos) ───
