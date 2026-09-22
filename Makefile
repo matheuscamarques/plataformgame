@@ -15,7 +15,7 @@ endif
 # O -rpath-link só vale em tempo de link, não altera o binário final,
 # e é inofensivo quando já se usa o `ld` do sistema.
 LDFLAGS := -Wl,-rpath-link,/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu
-LDLIBS := -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+LDLIBS := -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -pthread
 
 SRC_DIR := src
 OBJ_DIR := compiled

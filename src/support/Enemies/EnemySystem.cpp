@@ -22,7 +22,10 @@ void EnemySystem::forEach(const std::function<void(Enemy &)> &fn) {
 void EnemySystem::removeDead(const std::function<void(sf::Vector2f)> &onDeath,
                              GameContext *ctx) {
     for (auto it = slimes_.begin(); it != slimes_.end(); ) {
-        if (!(*it)->resources.isDead()) { ++it; continue; }
+        if (!(*it)->resources.isDead() && !(*it)->destroyPending) {
+            ++it;
+            continue;
+        }
         if (ctx && (*it)->ai) (*it)->ai->onDeath(**it, *ctx);
         // SFX morte por kind (sem ctx.audio em teste = mudo).
         if (ctx && ctx->audio && (*it)->ai)

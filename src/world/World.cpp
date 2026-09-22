@@ -6,6 +6,7 @@
 #include "defines.h"
 #include "entities/Entity.hpp"
 #include "Block.h"
+#include "ChunkLoader.h"
 #include "Generation.h"
 #include "LightPropagator.h"
 
@@ -17,7 +18,10 @@ World::World(uint32_t seed)
 }
 
 void World::update(int playerTileX, int playerTileY) {
-    chunks_.update(playerTileX, playerTileY);
+    if (loader_ && loader_->running())
+        chunks_.updateAsync(playerTileX, playerTileY, *loader_, 2);
+    else
+        chunks_.update(playerTileX, playerTileY);
     activePlatforms_.clear();
     activeColides_.clear();
     for (Chunk *c : chunks_.loaded()) {
@@ -30,6 +34,10 @@ void World::update(int playerTileX, int playerTileY) {
                 activeColides_.push_back(e);
         }
     }
+}
+
+std::unique_ptr<Chunk> World::buildBareChunk(int cx, int cy) {
+    return chunks_.buildBare(cx, cy);
 }
 
 Tile World::tileAt(int worldTileX, int worldTileY) const {

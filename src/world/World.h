@@ -11,6 +11,8 @@
 
 namespace support {
 
+class ChunkLoader;
+
 // Fachada pública do mundo. Features NUNCA acessam Chunk ou ChunkManager
 // diretamente — só a World.
 //
@@ -32,6 +34,13 @@ public:
     // Streaming: carrega/descarrega chunks em torno do tile do player e
     // reconstrói as listas ativas. Chamar uma vez por tick.
     void update(int playerTileX, int playerTileY);
+
+    // Camada 6 (opt-in, default off): com loader, update() pede faltantes
+    // ao worker e adota até 2 prontos/frame; sem loader, 100% síncrono.
+    void setChunkLoader(ChunkLoader* loader) { loader_ = loader; }
+
+    // Construção nua p/ o worker (repasse ao ChunkManager; thread-safe).
+    std::unique_ptr<Chunk> buildBareChunk(int cx, int cy);
 
     // Acesso por coordenada de tile de mundo (pode ser negativa).
     // Não carrega chunk ausente — retorna Air.
@@ -113,6 +122,7 @@ public:
 
 private:
     ChunkManager chunks_;
+    ChunkLoader* loader_ = nullptr; // opt-in camada 6; não é dono
     std::vector<Entity*> activePlatforms_;
     std::vector<Entity*> activeColides_;
 };

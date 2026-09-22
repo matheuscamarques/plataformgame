@@ -14,6 +14,7 @@
 #include "world/ChunkKey.h"
 #include "world/LightPropagator.h"
 #include "world/Stratum.h"
+#include "world/TileRenderer.h"
 #include "world/World.h"
 #include "assets/EquipmentLayout.h"
 #include "assets/PlayerSprite.h"
@@ -113,7 +114,17 @@ void Game::render()
         const float surfY    = getWorld()->surfaceYAt(playerCX);
         window->clear(lighting_.ambientSky(playerY, surfY));
     }
+    // Tiles em batch pré-renderizado (camadas 1+5: 1 sprite/chunk);
+    // entidades-tile puladas abaixo (já estão no batch — sem double-draw).
+    getWorld()->forEachChunkInRect(vx0, vy0, vx1, vy1, [&](support::Chunk *c) {
+        if (c->tileDirty) {
+            support::TileRenderer::rebuild(*c);
+            support::TileRenderer::upload(*c);
+        }
+        support::TileRenderer::drawLayer(*c, *window);
+    });
     getWorld()->forEachEntityInRect(vx0, vy0, vx1, vy1, [&](Entity *entity) {
+        if (support::TileRenderer::isTileKind(entity->getName())) return;
         entity->draw(window);
     });
 

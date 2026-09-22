@@ -6,6 +6,7 @@
 
 #include "defines.h"
 #include "Block.h"
+#include "ChunkLoader.h"
 #include "Generation.h"
 #include "LightPropagator.h"
 
@@ -48,7 +49,7 @@ static void stampTree(uint32_t seed, Chunk &c, int cx, int tx, int sy, const Tre
     }
 }
 
-void ChunkManager::generate(int cx, int cy) {
+std::unique_ptr<Chunk> ChunkManager::buildBare(int cx, int cy) {
     auto c = std::make_unique<Chunk>();
     c->cx = cx;
     c->cy = cy;
@@ -104,22 +105,47 @@ void ChunkManager::generate(int cx, int cy) {
     }
     // Luz: grids + dirty (sem GL — textura só no render). Vizinhos
     // existentes relightam junto (bordas que dependiam da nossa ausência).
-    {
-        auto nb = [&](int nx, int ny) -> Chunk* { return find(nx, ny); };
-        LightPropagator::relightChunk(*c, nb(cx, cy - 1), nb(cx - 1, cy),
-                                      nb(cx + 1, cy), nb(cx, cy + 1));
-        Chunk* nbs[] = {nb(cx, cy - 1), nb(cx, cy + 1), nb(cx - 1, cy), nb(cx + 1, cy)};
-        for (Chunk* n : nbs) {
-            if (!n) continue;
-            LightPropagator::relightChunk(*n, nb(n->cx, n->cy - 1), nb(n->cx - 1, n->cy),
-                                          nb(n->cx + 1, n->cy), nb(n->cx, n->cy + 1));
-        }
-    }
+    // (buildBare termina aqui: sem relight e sem inserir — worker-safe.)
+    return c;
+}
+
+void ChunkManager::adopt(std::unique_ptr<Chunk> c) {
+    const int cx = c->cx;
+    const int cy = c->cy;
     c->touch();
-    int64_t k = chunkKey(ChunkCoord{cx, cy});
+    const int64_t k = chunkKey(ChunkCoord{cx, cy});
     chunks_.emplace(k, std::move(c));
     lru_.push_front(k);
     lruIndex_[k] = lru_.begin();
+}
+
+void ChunkManager::relightAt(int cx, int cy) {
+    auto nb = [&](int nx, int ny) -> Chunk* { return find(nx, ny); };
+    if (Chunk* c = nb(cx, cy))
+        LightPropagator::relightChunk(*c, nb(cx, cy - 1), nb(cx - 1, cy),
+                                      nb(cx + 1, cy), nb(cx, cy + 1));
+    Chunk* nbs[] = {nb(cx, cy - 1), nb(cx, cy + 1), nb(cx - 1, cy), nb(cx + 1, cy)};
+    for (Chunk* n : nbs) {
+        if (!n) continue;
+        LightPropagator::relightChunk(*n, nb(n->cx, n->cy - 1), nb(n->cx - 1, n->cy),
+                                      nb(n->cx + 1, n->cy), nb(n->cx, n->cy + 1));
+    }
+}
+
+void ChunkManager::generate(int cx, int cy) {
+    // Ordem original preservada: relight ANTES do emplace (vizinhos não
+    // enxergam o novo — idêntico ao código anterior, só fatiado).
+    auto c = buildBare(cx, cy);
+    auto nb = [&](int nx, int ny) -> Chunk* { return find(nx, ny); };
+    LightPropagator::relightChunk(*c, nb(cx, cy - 1), nb(cx - 1, cy),
+                                  nb(cx + 1, cy), nb(cx, cy + 1));
+    Chunk* nbs[] = {nb(cx, cy - 1), nb(cx, cy + 1), nb(cx - 1, cy), nb(cx + 1, cy)};
+    for (Chunk* n : nbs) {
+        if (!n) continue;
+        LightPropagator::relightChunk(*n, nb(n->cx, n->cy - 1), nb(n->cx - 1, n->cy),
+                                      nb(n->cx + 1, n->cy), nb(n->cx, n->cy + 1));
+    }
+    adopt(std::move(c));
 }
 
 void ChunkManager::touchKey(int64_t k) {
@@ -156,6 +182,42 @@ void ChunkManager::update(int centerTileX, int centerTileY) {
     // Descarrega fora do raio + 1 (margem contra churn na borda).
     // Modificado nunca descarrega aqui (perderia mudança sem log nem
     // crash); fica até o LRU decidir — que também o poupa.
+    evictAround(center);
+}
+
+void ChunkManager::updateAsync(int centerTileX, int centerTileY,
+                               ChunkLoader& loader, int budget) {
+    ChunkCoord center = chunkCoordFromWorld(centerTileX, centerTileY, Chunk::W);
+    for (int cy = center.y - radius_; cy <= center.y + radius_; cy++) {
+        for (int cx = center.x - radius_; cx <= center.x + radius_; cx++) {
+            int64_t k = chunkKey(ChunkCoord{cx, cy});
+            auto it = chunks_.find(k);
+            if (it == chunks_.end()) {
+                loader.request(cx, cy); // worker gera; adotamos abaixo
+            } else {
+                it->second->touch();
+                touchKey(k);
+            }
+        }
+    }
+    // Consome prontos com orçamento (adopt + relight na main thread).
+    while (budget-- > 0) {
+        auto c = loader.tryTake();
+        if (!c) break;
+        const int cx = c->cx, cy = c->cy;
+        // Saiu da janela enquanto gerava: descarta (regenera se voltar).
+        if (std::abs(cx - center.x) > radius_ + 1 ||
+            std::abs(cy - center.y) > radius_ + 1)
+            continue;
+        // Chegou por outro caminho (sync race): não sobrescreve.
+        if (find(cx, cy)) continue;
+        adopt(std::move(c));
+        relightAt(cx, cy);
+    }
+    evictAround(center);
+}
+
+void ChunkManager::evictAround(ChunkCoord center) {
     for (auto it = chunks_.begin(); it != chunks_.end();) {
         ChunkCoord c = chunkCoordFromKey(it->first);
         if (std::abs(c.x - center.x) > radius_ + 1 ||

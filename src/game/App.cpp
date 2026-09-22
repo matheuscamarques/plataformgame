@@ -16,6 +16,7 @@
 #include "world/World.h"
 #include "world/Chunk.h"
 #include "world/ChunkKey.h"
+#include "world/ChunkLoader.h"
 #include "world/LightPropagator.h"
 #include "assets/PlayerSprite.h"
 #include "game/MusicBank.h"

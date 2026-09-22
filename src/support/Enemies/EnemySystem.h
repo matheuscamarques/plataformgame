@@ -28,6 +28,9 @@ struct Enemy {
     EnemyResources resources;
     Body bodyParts;
     bool grounded = false;
+    // Morte adiada: marcado durante iteração (forEach/tick), varrido no
+    // removeDead. Nunca erase no meio do loop (camada 7).
+    bool destroyPending = false;
     // IA não sobrescreve vel enquanto roda (knockback visível).
     core::Cooldown knockbackLock;
     // Último swing de melee que acertou (1 hit por swing por slime).
@@ -92,8 +95,14 @@ public:
     // Remove mortos; onDeath(pos do centro) por removido para juice
     // (partículas/drops no DeathSystem). Erase mora aqui, no dono.
     // Com ctx, dispara ai->onDeath antes do erase (hook opcional).
+    // Também varre destroyPending (markForDestroy): morte marcada
+    // durante iteração cai aqui no fim do frame, nunca no meio do loop.
     void removeDead(const std::function<void(sf::Vector2f)> &onDeath,
                     GameContext *ctx = nullptr);
+
+    // Marca p/ destruição adiada (seguro dentro de forEach/tick).
+    // O erase acontece no próximo removeDead.
+    void markForDestroy(Enemy& e) { e.destroyPending = true; }
 
     // Despawn por distância (economia do SpawnSystem). Remove além do
     // raio (px) do ponto. Retorna quantos removeu.

@@ -22,6 +22,7 @@
 class Player;
 
 namespace support {
+class ChunkLoader;
 class ContactDamageSystem;
 class DeathSystem;
 class DropSystem;
@@ -39,6 +40,7 @@ class Game
 {
 public:
     Game();
+    ~Game(); // definido em game.cpp (ChunkLoader completo só lá)
     static void main();
     void setWindow(sf::RenderWindow *window);
     void start();
@@ -46,6 +48,9 @@ public:
     support::World* getWorld();
     void setWorld(std::unique_ptr<support::World> world);
     Player* getPlayer();
+    // Camada 6 (opt-in, default off): liga/desliga geração assíncrona de
+    // chunks. Chamar após setWorld. Sem chamar: 100% síncrono (policy).
+    void setAsyncChunks(bool on);
     
 
 private:
@@ -78,6 +83,8 @@ private:
     int lastPlayerLightTileY_ = -1;
     core::DayNightCycle dayNight_; // dono: relógio dia/noite (10 min)
     support::LightingSystem lighting_; // dono: lightmap por frame (GL)
+    // Worker de chunks (camada 6): após `world` (destrói antes dele).
+    std::unique_ptr<support::ChunkLoader> chunkLoader_;
     bool charView_ = false; // F3: ASCII por char, sem textura
     int tickCount_ = 0; // p/ animação walk do anão
     bool running = false;

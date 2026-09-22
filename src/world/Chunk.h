@@ -8,6 +8,8 @@
 #include <vector>
 
 #include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/VertexArray.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
 
 #include "defines.h"
 #include "entities/Entity.hpp"
@@ -40,6 +42,13 @@ struct Chunk {
     std::vector<uint8_t> blockLight = std::vector<uint8_t>(W * H, 0);
     bool lightDirty = true;
     sf::Texture lightmap; // W×H, bilinear; criada sob demanda no render
+    // Batch de tiles estáticos (1 draw/chunk): reconstruído quando
+    // tileDirty (CPU, headless-safe); TileRenderer é o dono da lógica.
+    // Camada 5: tileLayer pré-renderiza o batch 1× (800×800, ~2.5MB);
+    // criada sob demanda no render (GL) — geração/teste nunca tocam.
+    sf::VertexArray tileVerts;
+    sf::RenderTexture tileLayer;
+    bool tileDirty = true;
     // Máscara de visibilidade do último raycast (1 = raio alcançou).
     // Por fonte (raycast sobrescreve); hoje só o player usa.
     std::vector<uint8_t> visibleMask = std::vector<uint8_t>(W * H, 0);
@@ -82,6 +91,7 @@ struct Chunk {
     void setTile(int lx, int ly, Tile v) {
         tiles[ly * W + lx] = v;
         modified_ = true;
+        tileDirty = true; // visual do tile mudou: rebuild no próximo draw
     }
 
     // Escrita da geração: estado inicial, NÃO é modificação.
@@ -117,6 +127,7 @@ struct Chunk {
             it = entities.erase(it);
             ++n;
         }
+        if (n > 0) tileDirty = true; // entidade-tile sumiu: rebuild no draw
         return n;
     }
 
