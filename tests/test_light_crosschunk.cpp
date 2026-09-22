@@ -150,9 +150,11 @@ int main() {
             LightPropagator::buildLightImage(a, nullptr, &b, nullptr, nullptr);
         sf::Image imgB =
             LightPropagator::buildLightImage(b, &a, nullptr, nullptr, nullptr);
-        assert(imgA.getSize().x == 32u);
-        const int bA = imgA.getPixel(31, 16).r;
-        const int bB = imgB.getPixel(0, 16).r;
+        assert(imgA.getSize().x == 16u * LightPropagator::kLightmapScale);
+        const unsigned ex = imgA.getSize().x - 1;
+        const unsigned mid = imgA.getSize().y / 2;
+        const int bA = imgA.getPixel(ex, mid).r;
+        const int bB = imgB.getPixel(0, mid).r;
         assert(bA > 0);                // vê luz do vizinho
         assert(std::abs(bA - bB) < 30); // suave, sem degrau
     }
@@ -168,12 +170,14 @@ int main() {
         // Sem diagonais: o canto afunda (zeros no blur) — regressão travada.
         sf::Image imgNo = LightPropagator::buildLightImage(q, nullptr, &r,
                                                            nullptr, &s);
-        assert(imgNo.getPixel(31, 31).r < 255);
+        const unsigned ex = imgNo.getSize().x - 1;
+        const unsigned ey = imgNo.getSize().y - 1;
+        assert(imgNo.getPixel(ex, ey).r < 255);
         // Com a diagonal (bottomRight=d): canto cheio, sem artefato.
         sf::Image img = LightPropagator::buildLightImage(q, nullptr, &r,
                                                          nullptr, &s, nullptr,
                                                          nullptr, nullptr, &d);
-        assert(img.getPixel(31, 31).r == 255);
+        assert(img.getPixel(ex, ey).r == 255);
     }
 
     std::printf("light crosschunk test OK\n");

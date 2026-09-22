@@ -362,67 +362,56 @@ sf::Image LightPropagator::buildLightImage(const Chunk& c,
                                            const Chunk* bottomLeft,
                                            const Chunk* bottomRight)
 {
-    // Borda fantasma P=2 + blur 5×5 no grid + upscale ×2 bilinear em CPU.
-    // Display é nearest (setSmooth(false)): o clamp de GPU some junto
-    // com a cruz; a suavidade vem daqui (valores + 25px por texel).
-    // Cantos diagonais usam o chunk diagonal (sem ele: 0, 1 texel).
-    constexpr int P = 2;
-    constexpr int BW = Chunk::W + 2 * P;
-    constexpr int BH = Chunk::H + 2 * P;
-    std::vector<uint8_t> buf(BW * BH, 0);
-    auto at = [&](int x, int y) -> uint8_t {
-        if (x >= 0 && x < Chunk::W && y >= 0 && y < Chunk::H)
-            return c.lightByte(x, y);
-        const Chunk* q = nullptr;
-        if (x < 0 && y >= 0 && y < Chunk::H) q = left;
-        else if (x >= Chunk::W && y >= 0 && y < Chunk::H) q = right;
-        else if (y < 0 && x >= 0 && x < Chunk::W) q = top;
-        else if (y >= Chunk::H && x >= 0 && x < Chunk::W) q = bottom;
-        else if (x < 0 && y < 0) q = topLeft;
-        else if (x >= Chunk::W && y < 0) q = topRight;
-        else if (x < 0 && y >= Chunk::H) q = bottomLeft;
-        else q = bottomRight; // x>=W && y>=H
-        if (!q) return 0;
-        // |desloc| <= 2 < W: cai sempre no vizinho imediato.
-        const int lx = (x % Chunk::W + Chunk::W) % Chunk::W;
-        const int ly = (y % Chunk::H + Chunk::H) % Chunk::H;
-        return q->lightByte(lx, ly);
+    // Single-stage: blur K×K direto na resolução de saída (S texels/tile).
+    // Fantasma P=H texels (cobre o kernel exato); cantos usam o chunk
+    // diagonal (sem ele: 0). Display é nearest: sem clamp de GPU.
+    // Perfis (header): A=(1,7) B=(2,5) C=(4,15).
+    constexpr int S = kLightmapScale;
+    constexpr int K = kBlurKernel;
+    static_assert(K % 2 == 1, "kernel do blur precisa ser impar");
+    constexpr int H = K / 2;
+    constexpr int P = H;
+    constexpr int OW = Chunk::W * S;
+    constexpr int OH = Chunk::H * S;
+    constexpr int BW = OW + 2 * P;
+    constexpr int BH = OH + 2 * P;
+    auto floordiv = [](int a, int n) {
+        return a >= 0 ? a / n : -((-a + n - 1) / n);
     };
-    for (int y = -P; y < Chunk::H + P; ++y)
-        for (int x = -P; x < Chunk::W + P; ++x)
-            buf[(y + P) * BW + (x + P)] = at(x, y);
-
-    // Blur 5×5 → campo 16×16 (gradiente espalha por 2 tiles).
-    std::vector<uint8_t> field(Chunk::W * Chunk::H, 0);
-    for (int y = 0; y < Chunk::H; ++y)
-        for (int x = 0; x < Chunk::W; ++x) {
-            int sum = 0;
-            for (int dy = -2; dy <= 2; ++dy)
-                for (int dx = -2; dx <= 2; ++dx)
-                    sum += buf[(y + P + dy) * BW + (x + P + dx)];
-            field[y * Chunk::W + x] = static_cast<uint8_t>(sum / 25);
+    std::vector<uint8_t> buf(BW * BH, 0);
+    for (int by = 0; by < BH; ++by)
+        for (int bx = 0; bx < BW; ++bx) {
+            // Texel -> tile (piso p/ negativos), quadrante -> chunk.
+            // |excursão| <= H < 16: cai sempre no vizinho imediato.
+            const int tx = floordiv(bx - P, S);
+            const int ty = floordiv(by - P, S);
+            const Chunk* q = &c;
+            if (tx < 0 && ty >= 0 && ty < Chunk::H) q = left;
+            else if (tx >= Chunk::W && ty >= 0 && ty < Chunk::H) q = right;
+            else if (ty < 0 && tx >= 0 && tx < Chunk::W) q = top;
+            else if (ty >= Chunk::H && tx >= 0 && tx < Chunk::W) q = bottom;
+            else if (tx < 0 && ty < 0) q = topLeft;
+            else if (tx >= Chunk::W && ty < 0) q = topRight;
+            else if (tx < 0 && ty >= Chunk::H) q = bottomLeft;
+            else if (tx >= Chunk::W && ty >= Chunk::H) q = bottomRight;
+            if (!q) continue; // 0: sem vizinho (borda do mundo/streaming)
+            const int lx = (tx % Chunk::W + Chunk::W) % Chunk::W;
+            const int ly = (ty % Chunk::H + Chunk::H) % Chunk::H;
+            buf[by * BW + bx] = q->lightByte(lx, ly);
         }
 
-    // Upscale ×2 bilinear em CPU → 32×32 (degraus de 25px, não 50px).
-    constexpr int S = kLightmapScale;
+    // Box-blur K×K; saída OW×OH (degrau = 50/S px).
     sf::Image img;
-    img.create(Chunk::W * S, Chunk::H * S);
-    for (int oy = 0; oy < Chunk::H * S; ++oy)
-        for (int ox = 0; ox < Chunk::W * S; ++ox) {
-            const float fx = static_cast<float>(ox) / S;
-            const float fy = static_cast<float>(oy) / S;
-            const int x0 = static_cast<int>(fx);
-            const int y0 = static_cast<int>(fy);
-            const int x1 = (x0 + 1 <= Chunk::W - 1) ? x0 + 1 : Chunk::W - 1;
-            const int y1 = (y0 + 1 <= Chunk::H - 1) ? y0 + 1 : Chunk::H - 1;
-            const float tx = fx - x0, ty = fy - y0;
-            const float v = field[y0 * Chunk::W + x0] * (1 - tx) * (1 - ty)
-                          + field[y0 * Chunk::W + x1] * tx * (1 - ty)
-                          + field[y1 * Chunk::W + x0] * (1 - tx) * ty
-                          + field[y1 * Chunk::W + x1] * tx * ty;
-            const auto b = static_cast<uint8_t>(v);
+    img.create(OW, OH);
+    for (int oy = 0; oy < OH; ++oy)
+        for (int ox = 0; ox < OW; ++ox) {
+            int sum = 0;
+            for (int dy = -H; dy <= H; ++dy)
+                for (int dx = -H; dx <= H; ++dx)
+                    sum += buf[(oy + P + dy) * BW + (ox + P + dx)];
+            const auto v = static_cast<uint8_t>(sum / (K * K));
             img.setPixel(static_cast<unsigned>(ox), static_cast<unsigned>(oy),
-                         sf::Color(b, b, b, 255));
+                         sf::Color(v, v, v, 255));
         }
     return img;
 }

@@ -150,9 +150,11 @@ int main() {
                                                           nullptr, nullptr);
         sf::Image imgR = LightPropagator::buildLightImage(right, &left, nullptr,
                                                           nullptr, nullptr);
-        assert(imgL.getSize().x == 32u && imgL.getSize().y == 32u);
-        const auto pL = imgL.getPixel(31, 16);
-        const auto pR = imgR.getPixel(0, 16);
+        assert(imgL.getSize().x == 16u * LightPropagator::kLightmapScale);
+        const unsigned ex = imgL.getSize().x - 1;
+        const unsigned mid = imgL.getSize().y / 2;
+        const auto pL = imgL.getPixel(ex, mid);
+        const auto pR = imgR.getPixel(0, mid);
         assert(pL.r > 0);   // vê luz do vizinho
         assert(pR.r < 255); // foi suavizado
     }

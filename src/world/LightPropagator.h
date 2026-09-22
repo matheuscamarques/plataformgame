@@ -21,10 +21,16 @@ struct Chunk;
 // vizinhos existentes (converge no streaming).
 class LightPropagator {
 public:
-    // Texels por tile no lightmap (2 = 32×32 p/ chunk 16×16).
+    // Texels por tile no lightmap + kernel do blur (sempre ímpar).
+    // Perfis testáveis (muda os dois, rebuild, compara PNGs em build/light/):
+    //   A) scale=1, kernel=7   (16×16, spread ~3 tiles — bem suave)
+    //   B) scale=2, kernel=5   (32×32, spread ~1 tile — baseline)
+    //   C) scale=4, kernel=15  (64×64, spread ~1.75 tiles — meio)
+    //   D) scale=2, kernel=7   (32×32, spread ~1.5 tiles — meio-termo)
     // Display usa setSmooth(false): sem clamp bilinear, sem cruz;
-    // a suavidade vem do grid (blur 5×5) + resolução (25px por texel).
+    // a suavidade vem do grid (valores) + resolução (px por texel).
     static constexpr int kLightmapScale = 2;
+    static constexpr int kBlurKernel = 7;
     // Sky do chunk. Vizinhos nullable (borda do mundo/streaming).
     // skyLevel = valor no topo do mundo (15 dia; noite usa tint, não relight).
     static void computeSkyLight(Chunk& c,
@@ -57,9 +63,9 @@ public:
                              const Chunk* bottom,
                              uint8_t skyLevel = 15);
 
-    // Imagem 2W×2H do lightmap (pura CPU, testável): combina (max),
-    // lê vizinhos na borda (costura cross-chunk), blur 5×5 no grid e
-    // upscale ×2 bilinear em CPU (display é nearest: sem clamp de GPU).
+    // Imagem S·W×S·H do lightmap (pura CPU, testável): combina (max),
+    // lê vizinhos na borda (costura cross-chunk, diagonais inclusas) e
+    // aplica blur K×K direto na resolução de saída (single-stage).
     // Diagonais: sem elas o blur mistura 0 nos 4 cantos e repete o
     // artefato em toda interseção de chunks (defaults = sem vizinho).
     static sf::Image buildLightImage(const Chunk& c,
