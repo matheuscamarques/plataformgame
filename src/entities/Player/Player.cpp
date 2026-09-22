@@ -19,6 +19,7 @@ Entity(core::kIdPlayer,0,0,30,50) // AABB derivado do sprite 12x20 a 2.5x
     // hw=25 punha o ArmL 12px fora do AABB (caixa magenta flutuante).
     static auto schema = support::BodySchema::humanoid(50.f, 30.f);
     body.attach(&schema);
+    topUpDynamite();
     //this->setGravity(9.8f);
 }
 
@@ -214,12 +215,22 @@ void Player::tick() {
     Entity::tick();
 }
 
-bool Player::tryThrow(support::ThrowSystem &throws) {
-    if (!throwCooldown.ready() || dynamiteCount <= 0) return false;
+void Player::topUpDynamite() {
+    for (int missing = 999 - inventory.count("dynamite"); missing > 0;) {
+        const int put = std::min(missing, 99);
+        const int left = inventory.add(
+            core::Item{"dynamite", static_cast<uint16_t>(put)});
+        missing -= put - left;
+        if (left > 0) break; // cheio: fica com o que coube
+    }
+}
+
+bool Player::tryThrow(support::ThrowSystem &throws) {    if (!throwCooldown.ready() || inventory.count("dynamite") <= 0)
+        return false;
     // Arco fixo na direção do facing; sem mira manual no MVP.
     sf::Vector2f vel{220.f * static_cast<float>(facing), -320.f};
     if (!throws.throwItem({getCenterX(), getCenterY()}, vel)) return false;
-    dynamiteCount--;
+    inventory.remove("dynamite");
     throwCooldown.trigger();
     throwAnimT = kThrowAnimDur;
     return true;
@@ -259,7 +270,7 @@ void Player::respawn(float x, float y) {
     hp = hpMax;
     hurtIframes.reset();
     throwCooldown.reset();
-    dynamiteCount = 999;
+    topUpDynamite();
     meleePhase = MeleePhase::Idle;
     meleeCombo = 0;
     meleeTimer = 0.f;

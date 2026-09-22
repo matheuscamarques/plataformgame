@@ -14,7 +14,9 @@
 #include "support/GameContext.h"
 #include "support/Effects/ParticleSystem.h"
 #include "support/Effects/ThrowSystem.h"
+#include "support/Progression/DropSystem.h"
 #include "support/Progression/PatienceSystem.h"
+#include "world/Block.h"
 #include "world/World.h"
 
 namespace support {
@@ -150,6 +152,14 @@ void ExplosionSystem::breakTilesInCircle(sf::Vector2f center, int tilesRadius, G
             if (broken == Tile::Air) continue; // nada quebrou aqui
             brokeAny = true;
             if (isOreTile(broken)) brokeOre = true;
+            // Drop do bloco (fase 2): dropId vazio = sem drop.
+            if (drops_) {
+                const BlockDef& bd = support::blockDef(broken);
+                if (bd.dropId && bd.dropId[0] != '\0')
+                    drops_->spawnItem(bd.dropId, 1,
+                                      {(tx + 0.5f) * core::kBlockSize,
+                                       (ty + 0.5f) * core::kBlockSize});
+            }
         }
     }
     // mineração → paciência: só anão que já reconheceu liga (sistema

@@ -56,11 +56,12 @@ void Game::main()
     game->throws_->setExplosionSystem(game->explodes_);
     game->throws_->setParticleSystem(game->particles_);
     game->explodes_->setParticleSystem(game->particles_);
+    game->explodes_->setDropSystem(game->drops_); // drops de bloco (fase 2)
     game->deaths_->setDropSystem(game->drops_);
     game->deaths_->setParticleSystem(game->particles_);
     game->melee_->setParticleSystem(game->particles_);
-    game->enemies_->spawn("slime", (spawnTx - 6) * core::kBlockSize, 0.0f);
-    game->enemies_->spawn("slime", (spawnTx + 6) * core::kBlockSize, 0.0f);
+    // game->enemies_->spawn("slime", (spawnTx - 6) * core::kBlockSize, 0.0f);
+    // game->enemies_->spawn("slime", (spawnTx + 6) * core::kBlockSize, 0.0f);
 
     // add border font
 

@@ -31,6 +31,7 @@ REGISTER_ENEMY_ARCHETYPE("slime", [] {
     a.maxStratum = 99;
     a.spawnWeight = 1.0f;
     a.maxAlive = 100;
+    a.drops.entries.push_back({"slime_gel", 0.8f, 1, 2});
     return a;
 }());
 
@@ -56,6 +57,7 @@ REGISTER_ENEMY_ARCHETYPE("dwarf", [] {
     a.maxStratum = 99;
     a.spawnWeight = 0.3f; // unificado S3+ (era 15/30 — tuning junto)
     a.maxAlive = 1;
+    a.drops.entries.push_back({"iron_ore", 0.4f, 1, 1});
     a.skills = {"dwarf_dynamite", "dwarf_melee"};
     return a;
 }());

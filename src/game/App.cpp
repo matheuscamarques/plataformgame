@@ -153,6 +153,8 @@ void Game::tick() {
 
     // Run gate: morto/pausado congela movimento, mundo e scheduler.
     // RunManager roda sempre (precisa ver o R).
+    // Grid aberto NÃO congela (decisão: sem cursor de teclado, sem
+    // freeze — o jogo segue; mouse vem depois).
     // Snapshots p/ SFX de transição (sistemas não veem antes/depois).
     const bool wasGrounded = p->jumping;
     const int hpBefore = p->hp;
@@ -181,6 +183,27 @@ void Game::tick() {
             input_.consume(support::Action::CycleMaterial);
             p->cycleMaterial();
         }
+
+        // 1-5: slot ativo da hotbar (fase 4a; sem consumo — edge por frame).
+        // Fora quando o grid está aberto (navegação é do grid).
+        if (!inventoryUI_.isOpen())
+            activeHotbarSlot_ =
+                hotbar_.handleInput(input_, activeHotbarSlot_);
+
+        // E: abre/fecha o grid (fase 4b). Consome o edge.
+        if (input_.pressed(support::Action::ToggleInventory)) {
+            input_.consume(support::Action::ToggleInventory);
+            inventoryUI_.toggle();
+        }
+        // Esc com grid aberto fecha o grid em vez de pausar por baixo.
+        // Roda antes do run_.tick (abaixo): o RunManager não vê o edge.
+        if (inventoryUI_.isOpen() && input_.pressed(support::Action::Pause)) {
+            input_.consume(support::Action::Pause);
+            inventoryUI_.close();
+        }
+        // Com o grid aberto, a UI dirige a navegação no inventário.
+        if (inventoryUI_.isOpen())
+            inventoryUI_.handleInput(input_, p->inventory);
 
         // Mundo infinito: carrega/descarrega chunks em torno do tile do player.
         int playerTileX = static_cast<int>(std::floor(p->getX() / core::kBlockSize));
@@ -258,6 +281,7 @@ void Game::tick() {
     });
 
     run_.tick(1.0f / 30.0f, ctx);
+
     // Números de dano congelam no pause (nada flutua/expira parado).
     if (!run_.isPaused()) debugFeed_.tick(1.0f / 30.0f);
     if (!run_.isPaused() && !run_.isDead()) scheduler_.tick(1.0f / 30.0f, ctx);

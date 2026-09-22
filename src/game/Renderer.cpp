@@ -674,7 +674,7 @@ void Game::render()
             window->draw(t);
         };
         text("HP " + std::to_string(p->hp) + "/" + std::to_string(p->hpMax), 16.f, 38.f);
-        text("TNT:" + std::to_string(p->dynamiteCount) + " J  K melee", 16.f, 62.f);
+        text("TNT:" + std::to_string(p->inventory.count("dynamite")) + " J  K melee", 16.f, 62.f);
         text(std::string("Mat: ") + (p->loadout.equipped
                                           ? core::materialName(p->loadout.weapon)
                                           : "--"),
@@ -701,6 +701,14 @@ void Game::render()
             text("PAUSADO (ESC)", viewW_ * 0.5f - 110.f, viewH_ * 0.5f - 20.f, 28);
         }
     }
+
+    // Hotbar 4a: após o HUD (view default ativa), antes do screenshot.
+    hotbar_.render(*window, player.get()->inventory, activeHotbarSlot_,
+                   viewW_, viewH_, font);
+
+    // Grid 4b: por cima da hotbar (view default ativa).
+    inventoryUI_.render(*window, player.get()->inventory, font,
+                        viewW_, viewH_);
 
     // Screenshot auto (F11): aqui, após todos os draws e antes do
     // display — o framebuffer contém exatamente este frame. No tick,

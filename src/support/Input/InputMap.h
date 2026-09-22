@@ -16,6 +16,13 @@ enum class Action : uint8_t {
     ToggleHitboxes, ToggleAi, ToggleEvents, ToggleWorld, // F2,F5,F4,F6
     ToggleFileLog, // F9: log de eventos em logs/debug.log
     ToggleLightMask, // F7: máscara do raycast de luz
+    Hotbar1, Hotbar2, Hotbar3, Hotbar4, Hotbar5, // fase 4a: 1-5
+    ToggleInventory, // fase 4b: E abre/fecha grid
+    Interact,        // fase 4b: F pega/solta no grid
+    TabPrev,         // fase 4c: Q, aba anterior
+    TabNext,         // fase 4c: Tab, próxima aba
+    DropItem,        // fase 4e: R descarta selecionado (consome Restart!)
+    ArrangeAll,      // fase 4e: T reordena tudo
     COUNT
 };
 

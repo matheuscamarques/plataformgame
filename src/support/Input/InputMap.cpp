@@ -28,6 +28,17 @@ InputMap::InputMap() {
     bind(Action::ToggleWorld, sf::Keyboard::F6);
     bind(Action::ToggleFileLog, sf::Keyboard::F9);
     bind(Action::ToggleLightMask, sf::Keyboard::F7);
+    bind(Action::Hotbar1, sf::Keyboard::Num1);
+    bind(Action::Hotbar2, sf::Keyboard::Num2);
+    bind(Action::Hotbar3, sf::Keyboard::Num3);
+    bind(Action::Hotbar4, sf::Keyboard::Num4);
+    bind(Action::Hotbar5, sf::Keyboard::Num5);
+    bind(Action::ToggleInventory, sf::Keyboard::E);
+    bind(Action::Interact, sf::Keyboard::F);
+    bind(Action::TabPrev, sf::Keyboard::Q);
+    bind(Action::TabNext, sf::Keyboard::Tab);
+    bind(Action::DropItem, sf::Keyboard::R);
+    bind(Action::ArrangeAll, sf::Keyboard::T);
 
     addBind(Action::Left,  sf::Keyboard::A);
     addBind(Action::Right, sf::Keyboard::D);

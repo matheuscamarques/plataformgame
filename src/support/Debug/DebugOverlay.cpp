@@ -66,7 +66,7 @@ void DebugOverlay::render(sf::RenderWindow &window, const sf::Font &font,
     sf::Text text;
     text.setString("HASH: " + std::to_string(candidatos.size())
         + " HP: " + std::to_string(player.hp)
-        + " TNT: " + std::to_string(player.dynamiteCount) + " (J/K)");
+        + " TNT: " + std::to_string(player.inventory.count("dynamite")) + " (J/K)");
     text.setCharacterSize(20);
     text.setFont(font);
     text.setFillColor(sf::Color::Green);

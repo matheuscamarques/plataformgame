@@ -8,6 +8,7 @@
 #include "support/Combat/Body.h"
 #include "support/Combat/SpriteFrame.h"
 #include "core/Cooldown.h"
+#include "core/Inventory.h"
 #include "core/Material.h"
 
 namespace sf { class Texture; }
@@ -53,13 +54,15 @@ class Player : public Entity
         // S6: verbo de arremesso. Cooldown tickado no Game::tick (1/30 fixo);
         // lógica aqui para ser testável sem Game/janela.
         core::Cooldown throwCooldown{0.5f};
-        int dynamiteCount = 999;
+        // Inventário autoritativo (público, mesmo padrão de hp/loadout).
+        // dynamiteCount morreu aqui: pilha "dynamite" manda no arremesso.
+        core::Inventory inventory;
 
         // Combate: HP + i-frames. Morte/restart ficam para o bloco B.
-        int hp = 100;
-        int hpMax = 100;
+        int hp = 10000;
+        int hpMax = 10000;
         core::Cooldown hurtIframes;
-        Loadout loadout; // público — mesmo padrão de hp, dynamiteCount
+        Loadout loadout; // público — mesmo padrão de hp, inventory
 
         // Melee light 3-hit. Estado avançado pelo MeleeSystem (tem dt).
         MeleePhase meleePhase = MeleePhase::Idle;
@@ -106,6 +109,11 @@ class Player : public Entity
         // Tenta arremessar na direção do facing com arco fixo.
         // Retorna false sem efeito se cooldown/inventário/pool bloquearem.
         bool tryThrow(support::ThrowSystem &throws);
+
+        // Completa a pilha "dynamite" até 999 (legado generoso).
+        // Chamado no ctor e no respawn; coleta soma por cima e o
+        // inventário sobrevive à morte. Nunca esvazia o resto.
+        void topUpDynamite();
 
         // Dano com gate de i-frame (0.6s). Retorna se aplicou.
         // hp trava em 0; morte/restart vêm no bloco B.

@@ -10,6 +10,7 @@ class Entity;
 namespace support {
 
 struct GameContext;
+class DropSystem;
 class EnemyResources;
 class ParticleSystem;
 
@@ -46,8 +47,13 @@ public:
 
     void setParticleSystem(ParticleSystem *p) { particles_ = p; }
 
+    // Drop de blocos quebrados (fase 2): BreakTilesInCircle deposita via
+    // dropId do BlockDef. Nulo = sem drops (testes focados em dano).
+    void setDropSystem(DropSystem *d) { drops_ = d; }
+
 private:
     ParticleSystem *particles_ = nullptr;
+    DropSystem *drops_ = nullptr;
 
     void breakTilesInCircle(sf::Vector2f center, int tilesRadius, GameContext &ctx);
     bool applyToTarget(const ExplosionTarget &t, sf::Vector2f center,

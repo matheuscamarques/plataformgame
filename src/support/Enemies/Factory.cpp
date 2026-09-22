@@ -29,6 +29,7 @@ std::unique_ptr<Enemy> Factory::spawnEnemy(const std::string &kind,
     body.setFillColor(a->color);
 
     auto e = std::make_unique<Enemy>(std::move(body), std::move(ai));
+    e->archetypeId = kind; // p/ drops (DeathSystem rola pela tabela)
     if (const BodySchema *s = BodySchemaRegistry::instance().get(a->bodySchema))
         e->bodyParts.attach(s);
 

@@ -1,9 +1,11 @@
 #pragma once
+#include "core/Inventory.h"
 #include "core/Pool.h"
 #include "core/System.h"
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <cstddef>
+#include <cstdint>
 
 namespace support {
 
@@ -15,6 +17,20 @@ struct XPOrb {
     int          value = 1;
     float        lifetime = 0.f;
     float        maxLifetime = 12.f;
+    bool         active = false;
+    bool         magnetized = false;
+};
+
+// Orbe de item (fase 2): mesma física/magnet do XP, com payload de
+// inventário. pickupDelay impede sugar no frame do spawn; lifetime 60s
+// (chão guarda o que não coube). Render: rect na cor da raridade.
+struct ItemOrb {
+    core::Item   item;
+    sf::Vector2f pos{0.f, 0.f};
+    sf::Vector2f vel{0.f, 0.f};
+    float        lifetime = 0.f;
+    float        maxLifetime = 60.f;
+    float        pickupDelay = 0.5f;
     bool         active = false;
     bool         magnetized = false;
 };
@@ -32,15 +48,21 @@ public:
 
     XPOrb *spawnXP(sf::Vector2f pos, int value = 1);
 
+    // Spawna orbe de item (def precisa existir; senão nullptr, sem custo).
+    // Espalha: vel inicial aleatória p/ cima (visual, randRange de efeitos).
+    ItemOrb *spawnItem(const std::string& defId, int qty, sf::Vector2f pos);
+
     std::size_t activeCount() const { return pool_.activeCount(); }
+    std::size_t activeItemCount() const { return itemPool_.activeCount(); }
     int totalCollected() const { return collected_; }
 
     // Limpa orbes ativas (restart). collected_ é estatística da
     // sessão e sobrevive (generoso, modelo C não especifica).
-    void clear() { pool_.releaseAll(); }
+    void clear() { pool_.releaseAll(); itemPool_.releaseAll(); }
 
 private:
     core::Pool<XPOrb> pool_{128};
+    core::Pool<ItemOrb> itemPool_{128};
     int collected_ = 0;
 
     static constexpr float kMagnetRadius  = 64.f;

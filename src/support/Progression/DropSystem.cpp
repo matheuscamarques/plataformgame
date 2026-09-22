@@ -1,14 +1,31 @@
 #include "DropSystem.h"
 
 #include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 #include <cmath>
 
+#include "core/ItemDef.h"
 #include "core/Random.h"
 #include "entities/Player/Player.h"
 #include "game/SoundBank.h"
 #include "support/GameContext.h"
 
 namespace support {
+
+namespace {
+// Cor do retângulo por raridade (mesmo idioma das partículas: cor = dado).
+sf::Color rarityColor(core::ItemRarity r) {
+    using core::ItemRarity;
+    switch (r) {
+        case ItemRarity::Common:    return {200, 200, 200};
+        case ItemRarity::Uncommon:  return {100, 220, 120};
+        case ItemRarity::Rare:      return {100, 160, 255};
+        case ItemRarity::Epic:      return {190, 110, 255};
+        case ItemRarity::Legendary: return {255, 170, 60};
+    }
+    return {200, 200, 200};
+}
+} // namespace
 
 XPOrb *DropSystem::spawnXP(sf::Vector2f pos, int value) {
     auto *o = pool_.acquire();
@@ -72,6 +89,56 @@ void DropSystem::tick(float dt, GameContext &ctx) {
 
         o.pos += o.vel * dt;
     });
+
+    // Orbes de item: mesmo magnet do XP + pickupDelay (não suga no spawn)
+    // + depósito no inventário do player (sobra fica no chão).
+    itemPool_.forEachActive([&](ItemOrb &o) {
+        if (!o.active) return;
+
+        o.lifetime -= dt;
+        if (o.lifetime <= 0.f) {
+            o.active = false;
+            itemPool_.release(&o);
+            return;
+        }
+        o.pickupDelay -= dt;
+
+        if (hasPlayer && o.pickupDelay <= 0.f) {
+            const float dx = playerPos.x - o.pos.x;
+            const float dy = playerPos.y - o.pos.y;
+            const float d2 = dx * dx + dy * dy;
+
+            if (d2 < kCollectRadius * kCollectRadius) {
+                const int leftover =
+                    ctx.player->inventory.add(o.item);
+                if (leftover <= 0) {
+                    if (ctx.audio)
+                        ctx.audio->play(game::keyOf(game::Sfx::XpCollect), 0.6f);
+                    o.active = false;
+                    itemPool_.release(&o);
+                    return;
+                }
+                // Cheio: para de magnetizar, fica no chão p/ depois.
+                o.item.quantity = static_cast<uint16_t>(leftover);
+                o.magnetized = false;
+            } else {
+                if (d2 < kMagnetRadius * kMagnetRadius) o.magnetized = true;
+                if (o.magnetized) {
+                    const float d = std::sqrt(d2);
+                    if (d > 1.f) {
+                        o.vel.x = (dx / d) * kMagnetSpeed;
+                        o.vel.y = (dy / d) * kMagnetSpeed;
+                    }
+                } else {
+                    o.vel.y += kGravity * dt;
+                }
+                o.pos += o.vel * dt;
+            }
+        } else {
+            o.vel.y += kGravity * dt;
+            o.pos += o.vel * dt;
+        }
+    });
 }
 
 void DropSystem::render(sf::RenderTarget &target) {
@@ -82,6 +149,35 @@ void DropSystem::render(sf::RenderTarget &target) {
         c.setPosition(o.pos);
         target.draw(c);
     });
+    sf::RectangleShape r({7.f, 7.f});
+    itemPool_.forEachActive([&](const ItemOrb &o) {
+        const core::ItemDef* def = o.item.def();
+        const auto col = def ? rarityColor(def->rarity)
+                             : sf::Color(200, 200, 200);
+        r.setFillColor(col);
+        r.setOutlineColor(sf::Color::Black);
+        r.setOutlineThickness(1.f);
+        r.setPosition(o.pos.x - 3.5f, o.pos.y - 3.5f);
+        target.draw(r);
+    });
+}
+
+ItemOrb *DropSystem::spawnItem(const std::string& defId, int qty,
+                               sf::Vector2f pos) {
+    const core::ItemDef* def = core::ItemRegistry::instance().find(defId);
+    if (!def || qty <= 0) return nullptr;
+    auto *o = itemPool_.acquire();
+    if (!o) return nullptr;
+    *o = ItemOrb{};
+    o->item.defId = defId;
+    o->item.quantity = static_cast<uint16_t>(
+        qty > 0xFFFF ? 0xFFFF : qty);
+    o->pos = pos;
+    o->vel = {core::randRange(-70.f, 70.f), core::randRange(-190.f, -110.f)};
+    o->active = true;
+    o->lifetime = o->maxLifetime;
+    o->pickupDelay = 0.5f;
+    return o;
 }
 
 } // namespace support

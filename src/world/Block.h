@@ -18,6 +18,8 @@ struct BlockDef {
     sf::Color   color;
     const char* name;
     BlockKind   kind;
+    // Item dropado ao quebrar ("" = nada). Espelho em ItemRegistry.
+    const char* dropId = "";
 };
 
 // Uma entrada por Tile, NA ORDEM do enum. Índices fora de ordem =
@@ -34,16 +36,16 @@ inline const std::array<BlockDef, TILE_COUNT> BLOCKS = {{
     /* Snow           */ {{235, 235, 245,255}, "snow",            BlockKind::Solid},
     /* Grass          */ {{106, 190,  48,255}, "grass",           BlockKind::Solid},
     /* Dirt           */ {{139,  69,  19,255}, "dirt",            BlockKind::Solid},
-    /* Stone          */ {{128, 128, 128,255}, "stone",           BlockKind::Solid},
-    /* OreCopper      */ {{184, 115,  51,255}, "ore_copper",      BlockKind::Solid},
-    /* OreIron        */ {{120, 120, 130,255}, "ore_iron",        BlockKind::Solid},
-    /* OreGold        */ {{212, 175,  55,255}, "ore_gold",        BlockKind::Solid},
+    /* Stone          */ {{128, 128, 128,255}, "stone",           BlockKind::Solid, "stone"},
+    /* OreCopper      */ {{184, 115,  51,255}, "ore_copper",      BlockKind::Solid, "copper_ore"},
+    /* OreIron        */ {{120, 120, 130,255}, "ore_iron",        BlockKind::Solid, "iron_ore"},
+    /* OreGold        */ {{212, 175,  55,255}, "ore_gold",        BlockKind::Solid, "gold_ore"},
     /* Clay           */ {{150, 110,  90,255}, "clay",            BlockKind::Solid},
     /* Gravel         */ {{140, 140, 140,255}, "gravel",          BlockKind::Solid},
     /* Sandstone      */ {{210, 180, 120,255}, "sandstone",       BlockKind::Solid},
     /* Permafrost     */ {{170, 190, 200,255}, "permafrost",      BlockKind::Solid},
     /* Mud            */ {{ 90,  70,  50,255}, "mud",             BlockKind::Solid},
-    /* TreeTrunk      */ {{101,  67,  33,255}, "tree_trunk",      BlockKind::Deco},
+    /* TreeTrunk      */ {{101,  67,  33,255}, "tree_trunk",      BlockKind::Deco, "wood"},
     /* TreeLeaf       */ {{ 34, 139,  34,255}, "tree_leaf",       BlockKind::Deco},
     /* Water          */ {{  0, 200, 255,255}, "water",           BlockKind::Liquid},
     /* OreCoal        */ {{ 40,  40,  40,255}, "ore_coal",        BlockKind::Solid},
@@ -56,7 +58,7 @@ inline const std::array<BlockDef, TILE_COUNT> BLOCKS = {{
     /* Ice            */ {{180, 220, 255,180}, "ice",             BlockKind::Solid},
     /* Lava           */ {{255, 100,  20,255}, "lava",            BlockKind::Liquid},
     /* Bedrock        */ {{ 20,  20,  20,255}, "bedrock",         BlockKind::Solid},
-    /* PineTrunk      */ {{ 70,  45,  25,255}, "pine_trunk",      BlockKind::Deco},
+    /* PineTrunk      */ {{ 70,  45,  25,255}, "pine_trunk",      BlockKind::Deco, "wood"},
     /* PineLeaf       */ {{ 25,  90,  40,255}, "pine_leaf",       BlockKind::Deco},
     /* CactusTrunk    */ {{ 60, 130,  60,255}, "cactus_trunk",    BlockKind::Solid},
     /* DeadBush       */ {{120, 100,  60,255}, "dead_bush",       BlockKind::Deco},

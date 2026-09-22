@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "core/DropTable.h"
 #include "core/EntityKind.h"
 
 namespace support {
@@ -39,6 +40,9 @@ struct EnemyArchetype {
 
     // Skills disponíveis (IDs no SkillRegistry). Vazio = behavior manual.
     std::vector<std::string> skills;
+
+    // Drops ao morrer (rolados em DeathSystem via rollDrops). Vazio = só XP.
+    core::DropTable drops;
 };
 
 class ArchetypeRegistry {

@@ -28,6 +28,9 @@ struct Enemy {
     EnemyResources resources;
     Body bodyParts;
     bool grounded = false;
+    // Id do archetype que gerou ("slime", "dwarf"...): dirige drops.
+    // Preenchido pela Factory; vazio = sem drops (só XP).
+    std::string archetypeId;
     // Morte adiada: marcado durante iteração (forEach/tick), varrido no
     // removeDead. Nunca erase no meio do loop (camada 7).
     bool destroyPending = false;

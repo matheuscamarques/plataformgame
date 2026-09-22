@@ -17,6 +17,8 @@
 #include "core/DayNightCycle.h"
 #include "core/MusicSystem.h"
 #include "support/Lighting/LightingSystem.h"
+#include "support/UI/HotbarUI.h"
+#include "support/UI/InventoryUI.h"
 
 // Só ponteiros no header: definição completa mora no .cpp de cada
 // sistema (game.cpp inclui). Valor continua incluído (precisa do tipo).
@@ -70,6 +72,9 @@ private:
     support::StratumManager *stratum_ = nullptr; // observa; dono é o scheduler
     support::RunManager run_; // valor: gate do tick (morte/pause)
     support::DebugFeed debugFeed_; // valor: números + log (F2/F4)
+    support::HotbarUI hotbar_; // valor: 5 primeiros slots (fase 4a)
+    support::InventoryUI inventoryUI_; // valor: grid 8x5 (fase 4b)
+    int activeHotbarSlot_ = 0; // 0..4 via teclas 1-5
     support::ScreenshotSystem screenshots_; // valor: PNGs de debug (F10-12)
     support::DropSystem *drops_ = nullptr; // observa; dono é o scheduler
     support::ParticleSystem *particles_ = nullptr; // observa; dono é o scheduler
