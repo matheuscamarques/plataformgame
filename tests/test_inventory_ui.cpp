@@ -308,6 +308,19 @@ int main() {
                                           InventoryUI::SubTab::Weapons));
         assert(InventoryUI::matchesSubTab(helm, InventoryUI::SubTab::Armor));
         assert(!InventoryUI::matchesSubTab(sword, InventoryUI::SubTab::Armor));
+        const core::ItemDef* lhelm =
+            core::ItemRegistry::instance().find("leather_helm");
+        const core::ItemDef* lchest =
+            core::ItemRegistry::instance().find("leather_chest");
+        const core::ItemDef* llegs =
+            core::ItemRegistry::instance().find("leather_legs");
+        assert(lhelm && lhelm->equipSlot == core::EquipSlot::Head);
+        assert(lhelm->material == core::MaterialId::Leather);
+        assert(lhelm->defense == 2);
+        assert(lchest && lchest->equipSlot == core::EquipSlot::Chest);
+        assert(lchest->defense == 4);
+        assert(llegs && llegs->equipSlot == core::EquipSlot::Legs);
+        assert(InventoryUI::matchesSubTab(lhelm, InventoryUI::SubTab::Armor));
     }
     { // EquipMovesToSlot (inventário -> RightHand)
         core::Equipment eq;
@@ -378,6 +391,9 @@ int main() {
         assert(p.inventory.count("iron_helm") == 1);
         assert(p.inventory.count("iron_chest") == 1);
         assert(p.inventory.count("iron_legs") == 1);
+        assert(p.inventory.count("leather_helm") == 1);
+        assert(p.inventory.count("leather_chest") == 1);
+        assert(p.inventory.count("leather_legs") == 1);
     }
     { // EquipViaMenu (F→Equip: grid esvazia, antigo volta)
         InventoryUI ui;

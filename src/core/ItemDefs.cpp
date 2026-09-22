@@ -270,6 +270,31 @@ inline const char* const kItemLegsSprite[] = {
     "........",
 };
 
+// Set de couro: mesmas formas do ferro, paleta marrom (reusa as rows;
+// só a paleta troca). Defesa menor, mesmo padrão de slots.
+inline const core::PaletteEntry kItemLeatherHelmPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {160, 110, 70}},
+    {'s', {100, 70, 45}},
+    {'D', {60, 65, 75}},
+};
+inline constexpr std::size_t kItemLeatherHelmPalCount = 4;
+
+inline const core::PaletteEntry kItemLeatherChestPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {160, 110, 70}},
+    {'s', {100, 70, 45}},
+    {'D', {60, 65, 75}},
+};
+inline constexpr std::size_t kItemLeatherChestPalCount = 4;
+
+inline const core::PaletteEntry kItemLeatherLegsPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {160, 110, 70}},
+    {'s', {100, 70, 45}},
+};
+inline constexpr std::size_t kItemLeatherLegsPalCount = 3;
+
 
 REGISTER_ITEM("dynamite", [] {
     core::ItemDef def;
@@ -504,5 +529,62 @@ REGISTER_ITEM("iron_legs", [] {
     def.defense = 4;
     def.equipSlot = core::EquipSlot::Legs;
     def.material = core::MaterialId::Iron;
+    return def;
+}())
+
+REGISTER_ITEM("leather_helm", [] {
+    core::ItemDef def;
+    def.id = "leather_helm";
+    def.description = "Elmo de couro. Leve e barato.";
+    def.spriteRows = kItemHelmSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemLeatherHelmPal;
+    def.spritePalCount = kItemLeatherHelmPalCount;
+    def.name = "Elmo de Couro";
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Common;
+    def.stackMax = 1;
+    def.defense = 2;
+    def.equipSlot = core::EquipSlot::Head;
+    def.material = core::MaterialId::Leather;
+    return def;
+}())
+
+REGISTER_ITEM("leather_chest", [] {
+    core::ItemDef def;
+    def.id = "leather_chest";
+    def.description = "Peitoral de couro. Flexivel.";
+    def.spriteRows = kItemChestSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemLeatherChestPal;
+    def.spritePalCount = kItemLeatherChestPalCount;
+    def.name = "Peitoral de Couro";
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Common;
+    def.stackMax = 1;
+    def.defense = 4;
+    def.equipSlot = core::EquipSlot::Chest;
+    def.material = core::MaterialId::Leather;
+    return def;
+}())
+
+REGISTER_ITEM("leather_legs", [] {
+    core::ItemDef def;
+    def.id = "leather_legs";
+    def.description = "Perneiras de couro. Silenciosas.";
+    def.spriteRows = kItemLegsSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemLeatherLegsPal;
+    def.spritePalCount = kItemLeatherLegsPalCount;
+    def.name = "Perneiras de Couro";
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Common;
+    def.stackMax = 1;
+    def.defense = 2;
+    def.equipSlot = core::EquipSlot::Legs;
+    def.material = core::MaterialId::Leather;
     return def;
 }())
