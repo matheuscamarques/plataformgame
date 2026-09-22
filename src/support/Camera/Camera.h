@@ -21,17 +21,24 @@ public:
 
     void follow(float targetX, float targetY);
 
-    sf::Vector2f position() const { return pos_; }
+    // Trauma p/ screen shake (item 23): 0 = quieta, 1 = caos.
+    // Soma (clamp 1), decai 1.5/s. Offset quadrático + ruído temporal.
+    void addTrauma(float t);
+    void tickTrauma(float dt);
+    sf::Vector2f shakeOffset() const;
+
+    // Posição inclui o shake (view, screenshots e ranges consistentes).
+    sf::Vector2f position() const;
     sf::FloatRect viewRect() const;
     sf::Vector2f screenToWorld(sf::Vector2f screen) const;
     sf::Vector2f worldToScreen(sf::Vector2f world) const;
 
 private:
-    sf::Vector2f pos_{0.f, 0.f};
-    sf::Vector2f deadzone_{0.f, 0.f};
+    sf::Vector2f pos_{0.f, 0.f};    sf::Vector2f deadzone_{0.f, 0.f};
     float viewW_ = 0.f;
     float viewH_ = 0.f;
     float lerp_ = 1.0f;
+    float trauma_ = 0.f; // screen shake: soma em evento, decai por tick
 };
 
 } // namespace support

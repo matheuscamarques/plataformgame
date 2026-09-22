@@ -6,7 +6,9 @@
 namespace support {
 
 void LightingSystem::init() {
-    playerTex_.loadFromImage(core::makeRadialImage(128, 1.6f));
+    // Power 1.3 (era 1.6): falloff mais aberto, sem "spotlight" de borda
+    // dura — combinado com o halo do fake bloom, virava dupla borda.
+    playerTex_.loadFromImage(core::makeRadialImage(128, 1.3f));
     playerTex_.setSmooth(true);
     ready_ = true;
 }

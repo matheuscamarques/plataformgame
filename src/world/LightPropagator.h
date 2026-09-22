@@ -21,7 +21,6 @@ struct Chunk;
 // vizinhos existentes (converge no streaming).
 class LightPropagator {
 public:
-public:
     // Atenuação que um sólido impõe à luz que o atinge (item 19):
     // pedra dura 4, terra fofa 2, resto 3. Ar/água não usam (regras
     // próprias). Pura e testável; aplicada nos 5 pontos de pintura.
@@ -32,6 +31,8 @@ public:
     //   B) scale=2, kernel=5   (32×32, spread ~1 tile — baseline)
     //   C) scale=4, kernel=15  (64×64, spread ~1.75 tiles — meio)
     //   D) scale=2, kernel=7   (32×32, spread ~1.5 tiles — meio-termo)
+    //   E) scale=4, kernel=7   (64×64 — TESTADO: costura piora (gap 36 vs
+    //      <30 no D); kernel cobre menos tiles em mais resolução. Revertido.)
     // Display usa setSmooth(false): sem clamp bilinear, sem cruz;
     // a suavidade vem do grid (valores) + resolução (px por texel).
     static constexpr int kLightmapScale = 2;

@@ -10,6 +10,7 @@ class AudioSystem;
 
 namespace support {
 
+class Camera;
 class World;
 class InputMap;
 class EnemySystem;
@@ -44,6 +45,10 @@ struct GameContext {
     // SFX procedural. Nulo em testes headless (call sites checam).
     // Dono: Game (vive como membro, buffers no boot).
     core::AudioSystem *audio = nullptr;
+
+    // Câmera p/ screen shake (item 23). Nulo = sem shake. Anexado no fim
+    // p/ não quebrar inits posicionais existentes.
+    Camera *camera = nullptr;
 };
 
 } // namespace support

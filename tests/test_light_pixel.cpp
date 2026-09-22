@@ -26,6 +26,15 @@ int main() {
         assert(std::abs(int(c) - int(c1)) < 30);
         assert(img.getPixel(0, 0).a == 0u);
     }
+    { // VignetteFadesOutward (centro transparente, cantos pretos)
+        auto img = core::makeVignetteImage(64);
+        assert(img.getPixel(32, 32).a == 0u); // centro limpo
+        assert(img.getPixel(0, 0).a > 200u);  // canto escuro
+        assert(img.getPixel(32, 32) == sf::Color(0, 0, 0, 0));
+        // Monotônico do centro à borda na horizontal.
+        assert(img.getPixel(40, 32).a <= img.getPixel(48, 32).a);
+        assert(img.getPixel(48, 32).a <= img.getPixel(60, 32).a);
+    }
     { // NightTintDarkerThanDay (meio-dia > meia-noite; tint cru das âncoras)
         core::DayNightCycle noon, night;
         noon.setCycleDuration(24.f);

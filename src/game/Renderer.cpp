@@ -9,6 +9,7 @@
 #include "core/Config.h"
 #include "core/Celestial.h"
 #include "core/Material.h"
+#include "core/RadialTexture.h"
 #include "core/Time.h"
 #include "entities/Entity.hpp"
 #include "entities/Player/Player.h"
@@ -612,6 +613,22 @@ void Game::render()
         });
 
     overlay_.render(*window, font, *getWorld(), *player.get(), objects.size());
+
+    // Bloom (item 21): captura a cena (sem HUD) e soma o brilho.
+    // Sem shader/GL: no-op, cena intacta. HUD vem depois (não brilha).
+    bloom_.endScene(*window);
+
+    // Vinheta (item 22): após o bloom, ANTES do HUD (HUD legível).
+    // Alpha máx 50 (sutil): 70 ainda pesava nos cantos. View default ativa.
+    {
+        if (vignetteTex_.getSize().x == 0)
+            vignetteTex_.loadFromImage(core::makeVignetteImage(128));
+        sf::Sprite v(vignetteTex_);
+        v.setPosition(0.f, 0.f);
+        v.setScale(viewW_ / 128.f, viewH_ / 128.f);
+        v.setColor(sf::Color(255, 255, 255, 50));
+        window->draw(v);
+    }
 
     // HUD em espaço de tela (view default): HP, TNT, estrato, morte/pause.
     // Tosco de propósito; HUD bonito é polimento.

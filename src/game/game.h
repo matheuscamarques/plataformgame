@@ -13,6 +13,7 @@
 #include "support/Progression/RunManager.h"
 #include "assets/Sprites/SpriteSet.h"
 #include "core/AudioSystem.h"
+#include "core/Bloom.h"
 #include "core/DayNightCycle.h"
 #include "core/MusicSystem.h"
 #include "support/Lighting/LightingSystem.h"
@@ -83,6 +84,8 @@ private:
     int lastPlayerLightTileY_ = -1;
     core::DayNightCycle dayNight_; // dono: relógio dia/noite (10 min)
     support::LightingSystem lighting_; // dono: lightmap por frame (GL)
+    core::Bloom bloom_; // dono: bright-pass + blur + additive (item 21)
+    sf::Texture vignetteTex_; // dono: vinheta 128px, upscale na tela (item 22)
     // Worker de chunks (camada 6): após `world` (destrói antes dele).
     std::unique_ptr<support::ChunkLoader> chunkLoader_;
     bool charView_ = false; // F3: ASCII por char, sem textura

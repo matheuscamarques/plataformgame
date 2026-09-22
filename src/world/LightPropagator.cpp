@@ -164,6 +164,10 @@ void LightPropagator::computeSkyLight(Chunk& c,
     // do vizinho de cima (luz real que desce); sem vizinho = skyLevel
     // (correto na superfície; chunk fundo sem vizinho relighta quando
     // o de cima gerar).
+    // Rocha pinta em gradiente (face -att por tile, ~4 tiles p/ pedra)
+    // em vez de cortar no primeiro sólido (faixa preta no corte). Mas o
+    // ar ABAIXO de sólido não herda (flag sealed): caverna selada segue
+    // escura — a lateral cobre o legítimo. Água translúcida não sela.
     for (int x = 0; x < Chunk::W; ++x) {
         uint8_t level = skyLevel;
         if (top) {
@@ -175,20 +179,29 @@ void LightPropagator::computeSkyLight(Chunk& c,
                         ? top->skyLight[bi]
                         : 0;
         }
+        bool sealed = false;
         for (int y = 0; y < Chunk::H; ++y) {
             const int i = y * Chunk::W + x;
             const Tile t = c.tiles[i];
             if (t == Tile::Air) {
-                c.skyLight[i] = level;
+                c.skyLight[i] = sealed ? 0 : level;
             } else if (t == Tile::Water) {
                 // Água atenua e continua descendo.
                 level = (level > 3) ? static_cast<uint8_t>(level - 3) : 0;
                 c.skyLight[i] = level;
             } else {
-                // Sólido: face com -att (material), sem propagar (bloqueia).
+                // Sólido: face com -att (material), continua descendo em
+                // gradiente; nunca entra na fila (não conduz — ver push).
                 const uint8_t att = LightPropagator::attenuationFor(t);
-                c.skyLight[i] = (level > att) ? static_cast<uint8_t>(level - att) : 0;
-                break;
+                if (level <= att) {
+                    // Sem luz p/ continuar: zera o resto e para.
+                    for (int y2 = y + 1; y2 < Chunk::H; ++y2)
+                        c.skyLight[y2 * Chunk::W + x] = 0;
+                    break;
+                }
+                level = static_cast<uint8_t>(level - att);
+                c.skyLight[i] = level;
+                sealed = true;
             }
         }
     }

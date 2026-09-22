@@ -58,6 +58,18 @@ int main() {
         assert(c.blockLight[8 * Chunk::W + 9] == 0);
         assert(c.blockLight[8 * Chunk::W + 12] == 0);
     }
+    { // PlayerLightPaintsFloor (sintoma: chão preto à noite com player no ar)
+        // Chão de pedra na row 10, fonte no ar em (4,8) com raycast.
+        // O raio marca a parede e corta; o flood pinta a face (7-2=5).
+        Chunk c;
+        for (int x = 0; x < Chunk::W; ++x)
+            c.tiles[10 * Chunk::W + x] = Tile::Stone;
+        LightPropagator::addBlockSource(c, 4, 8, 8, true);
+        assert(c.blockLight[8 * Chunk::W + 4] == 8);  // fonte
+        assert(c.blockLight[9 * Chunk::W + 4] == 7);  // ar abaixo
+        assert(c.blockLight[10 * Chunk::W + 4] == 5); // chão: face iluminada (7-2)
+        assert(c.blockLight[10 * Chunk::W + 15] == 0); // longe (13 tiles): sem luz
+    }
     { // VisibleCountBounded (vazio do centro: 256/256)
         Chunk c;
         RaycastLight::castRays(c, 8.f, 8.f);

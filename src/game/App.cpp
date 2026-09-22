@@ -108,6 +108,8 @@ void Game::run()
     // Overlay sutil (item 16): o grid carrega a cena, o ADD dá legibilidade.
     // Master 0.4 — sem ele o centro satura e o "ovo" volta.
     lighting_.setMasterIntensity(0.4f);
+    // Bloom 1x (item 21): buffers do tamanho da view; GL já tem contexto.
+    bloom_.init(static_cast<unsigned>(viewW_), static_cast<unsigned>(viewH_));
     float lastStat = 0.0f;
     int frames = 0;
     int updates = 0;
@@ -217,7 +219,7 @@ void Game::tick() {
     });
     support::GameContext ctx{getWorld(), p, &input_, enemies_,
                              throws_, explodes_, drops_, &targets,
-                             &screenshots_, &debugFeed_, &audio_};
+                             &screenshots_, &debugFeed_, &audio_, &camera};
 
     // Sprite atual primeiro: BodySystem (scheduler) deriva hitboxes dele.
     p->currentFrameId = run_.isDead()
@@ -307,16 +309,21 @@ void Game::tick() {
 
     // SFX de transição do player (poll fim-do-tick; cobre TODAS as fontes
     // de dano/movimento num lugar só, sem ctx nos métodos do Player).
+    // Screen shake (item 23) pega carona aqui: 0.3 no dano, 0.8 na morte.
+    camera.tickTrauma(1.f / 30.f);
     if (!frozen) {
         if (!wasGrounded && p->jumping)
             audio_.play(game::keyOf(game::Sfx::PlayerLand));
         if (phaseBefore == 0 && static_cast<int>(p->meleePhase) == 1)
             audio_.play(game::keyOf(game::Sfx::MeleeSwing));
         if (p->hp < hpBefore) {
-            if (p->hp <= 0)
+            if (p->hp <= 0) {
                 audio_.play(game::keyOf(game::Sfx::PlayerDeath));
-            else
+                camera.addTrauma(0.8f);
+            } else {
                 audio_.play(game::keyOf(game::Sfx::PlayerHurt));
+                camera.addTrauma(0.3f);
+            }
         }
     }
 }

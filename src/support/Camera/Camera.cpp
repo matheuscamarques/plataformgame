@@ -1,8 +1,11 @@
 #include "Camera.h"
 
+#include <algorithm>
 #include <cmath>
 
 #include "core/Math.h"
+#include "core/Time.h"
+#include "core/Time.h"
 
 namespace support {
 
@@ -21,6 +24,27 @@ void Camera::follow(float targetX, float targetY) {
     if (std::fabs(targetY - cy) * 2.0f > deadzone_.y) gy = targetY - viewH_ / 2.0f;
     pos_.x = core::lerp(pos_.x, gx, lerp_);
     pos_.y = core::lerp(pos_.y, gy, lerp_);
+}
+
+sf::Vector2f Camera::position() const {
+    const sf::Vector2f off = shakeOffset();
+    return {pos_.x + off.x, pos_.y + off.y};
+}
+
+void Camera::addTrauma(float t) {
+    trauma_ = std::min(1.f, trauma_ + t);
+}
+
+void Camera::tickTrauma(float dt) {
+    trauma_ = std::max(0.f, trauma_ - dt * 1.5f);
+}
+
+sf::Vector2f Camera::shakeOffset() const {
+    if (trauma_ <= 0.f) return {0.f, 0.f};
+    const float amt = trauma_ * trauma_; // quadrático: susto grande pesa
+    const float t = core::Time::elapsed();
+    return {std::sin(t * 91.7f) * 12.f * amt,
+            std::sin(t * 71.3f) * 12.f * amt};
 }
 
 sf::FloatRect Camera::viewRect() const {

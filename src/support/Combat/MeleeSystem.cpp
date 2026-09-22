@@ -6,6 +6,7 @@
 
 #include "entities/Player/Player.h"
 #include "game/SoundBank.h"
+#include "support/Camera/Camera.h"
 #include "support/Combat/Body.h"
 #include "support/Debug/DebugFeed.h"
 #include "support/Enemies/EnemySystem.h"
@@ -114,7 +115,10 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
                 ctx.audio->play(game::keyOf(game::Sfx::SlimeHurt));
         }
         s.resources.damagePosture(postureBase * postureMult);
-        if (applied > 0 && s.ai) s.ai->onTakeHit(s, applied, ctx);
+        if (applied > 0) {
+            if (ctx.camera) ctx.camera->addTrauma(0.15f); // hit conecta
+            if (s.ai) s.ai->onTakeHit(s, applied, ctx);
+        }
         s.lastHitSwing = p->meleeSwingId;
         if (particles_) {
             // Faísca no centro da parte (feedback anatômico);

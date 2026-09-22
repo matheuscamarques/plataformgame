@@ -5,7 +5,9 @@
 
 #include "defines.h"
 #include "entities/Entity.hpp"
+#include "entities/Player/Player.h"
 #include "game/SoundBank.h"
+#include "support/Camera/Camera.h"
 #include "support/Debug/DebugFeed.h"
 #include "support/Enemies/EnemyResources.h"
 #include "support/Enemies/EnemySystem.h"
@@ -45,6 +47,15 @@ int ExplosionSystem::explode(sf::Vector2f center, const ExplosionDef &def, GameC
     }
     // Visual: anel até o raio real (ThrowSystem desenha; sem ctx = sem custo).
     if (ctx.throws) ctx.throws->spawnBlast(center, def.radius);
+
+    // Screen shake pelo player (item 23): 0.4 colado, 0 além de 200px.
+    if (ctx.camera && ctx.player) {
+        const float dx = ctx.player->getCenterX() - center.x;
+        const float dy = ctx.player->getCenterY() - center.y;
+        const float d2 = dx * dx + dy * dy;
+        if (d2 < 200.f * 200.f)
+            ctx.camera->addTrauma(0.4f * (1.f - d2 / (200.f * 200.f)));
+    }
 
     if (ctx.debug)
         ctx.debug->pushLog("explode " + std::to_string(def.damage) +
