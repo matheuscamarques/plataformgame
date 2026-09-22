@@ -1,108 +1,134 @@
 #pragma once
+#include <cstdint>
+#include <vector>
+
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/System/Vector2.hpp>
-#include <string>
 
 #include "core/Inventory.h"
+#include "core/Equipment.h"
 
 namespace support {
 
 class InputMap;
+class DropSystem;
 
 } // namespace support
 
-class Player; // global (entities/Player/Player.h); completo só no .cpp
+class Player; // global; completo só no .cpp
 
 namespace support {
 
-// Grid 8×5 do inventário (fase 4b, teclado puro): setas movem o cursor,
-// F pega/solta, E abre/fecha, Esc fecha. Sem mouse (entra com botões
-// clicáveis, fase futura). Sem freeze: o jogo segue com o grid aberto.
+// UI de inventário estilo Dark Souls (teclado puro, sem mouse).
+// Máquina de estados: Closed -> Browse <-> ActionMenu -> ConfirmDrop.
+// Sem freeze: o jogo segue com o menu aberto (decisão); por isso a UI
+// consome todos os edges enquanto aberta (App faz o consume).
 //
-// Fase 4c (tabs): Q/Tab ciclam abas por ItemType; setas pulam slots que
-// não casam (vazios sempre casam, p/ permitir soltar em qualquer aba).
-// Fase 4d (painel): detalhe fixo à direita com dano/defesa quando >0.
-// Fase 4e (intents): R descarta (Key/Quest bloqueiam), T reordena via
-// Inventory::sort(), U/Enter usa consomível ou equipa arma/armadura.
-// R com o grid aberto consome o edge p/ o RunManager não restartar;
-// o App faz o consume + spawna o orbe a partir do pendingDrop().
+// Dependências injetadas (nullable; null = ação correspondente no-op):
+// inv_ (obrigatório p/ quase tudo), equipment_ (Equip/Unequip + aba),
+// player_ (Use/Drop), drops_ (Drop).
 class InventoryUI {
 public:
+    enum class MainTab : uint8_t { Inventory, Equipment, COUNT };
+    enum class SubTab : uint8_t {
+        All, Materials, Consumables, Weapons, Armor, Keys, COUNT
+    };
+    enum class UIState : uint8_t { Closed, Browse, ActionMenu, ConfirmDrop };
+    // Ações do menu (lista dinâmica por item; Cancel = Esc).
+    enum class MenuAction : uint8_t { Use, Equip, Unequip, Drop, Arrange, COUNT };
+
     static constexpr int   kCols     = 8;
     static constexpr int   kRows     = 5;
     static constexpr int   kSlots    = kCols * kRows; // == Inventory::kCapacity
-    static constexpr float kSlotSize = 48.f;
+    static constexpr float kSlotSize = 56.f;
     static constexpr float kPad      = 4.f;
 
-    // Abas: All + 1 por ItemType (Key cobre Key e Quest).
-    enum Tab : int {
-        TabAll = 0,
-        TabMaterial,
-        TabConsumable,
-        TabWeapon,
-        TabArmor,
-        TabKey,
-        TabCount,
-    };
-    static const char* tabName(int tab);
+    static const char* mainTabName(MainTab t);
+    static const char* subTabName(SubTab t);
+    static const char* menuActionName(MenuAction a);
+    static bool matchesSubTab(const core::ItemDef* def, SubTab sub);
 
-    bool isOpen() const { return open_; }
-    void toggle() { open_ = !open_; if (!open_) cancelHeld(); }
-    void close() { open_ = false; cancelHeld(); }
-    int  cursor() const { return cursor_; }
-    int  tab() const { return tab_; }
+    // Dependências (injetadas pelo Game a cada tick).
+    void setInventory(core::Inventory* inv)   { inv_ = inv; }
+    void setEquipment(core::Equipment* eq)    { equipment_ = eq; }
+    void setPlayer(::Player* p)               { player_ = p; }
+    void setDrops(DropSystem* d)              { drops_ = d; }
 
-    // Filtro da aba: vazio casa sempre; Key cobre Key+Quest.
-    static bool matchesTab(const core::ItemDef* def, int tab);
-    bool matchesSlot(const core::Inventory& inv, int index) const;
+    // Estado. open() reseta p/ Browse/Inventory/All/cursor 0.
+    bool isOpen() const { return state_ != UIState::Closed; }
+    UIState state() const { return state_; }
+    void open();
+    void close();
+    void toggle();
 
-    // Drop pendente p/ o App spawnar o orbe (inv já mutado aqui).
-    struct PendingDrop {
-        std::string defId;
-        int qty = 0;
-    };
-    bool hasPendingDrop() const { return pendingDrop_.qty > 0; }
-    PendingDrop takePendingDrop() {
-        PendingDrop out = pendingDrop_;
-        pendingDrop_ = PendingDrop{};
-        return out;
-    }
+    // Input. Retorna true se consumiu (sempre, enquanto aberto).
+    bool handleInput(const InputMap& input);
 
-    // Retorna true se consumiu o input (E/Esc sempre; resto só aberto).
-    // R/Q/Tab/T/U consomem mesmo em no-op, p/ nada vazar p/ o jogo.
-    // player == nullptr: Use vira no-op consumido (teste sem Player).
-    bool handleInput(const InputMap& input, core::Inventory& inv,
-                     ::Player* player = nullptr);
+    void render(sf::RenderTarget& target, const sf::Font& font,
+                float screenW, float screenH);
 
-    void render(sf::RenderTarget& target, const core::Inventory& inv,
-                const sf::Font& font, float screenW, float screenH) const;
+    // Observabilidade (testes).
+    int cursor() const { return cursor_; }
+    void setCursor(int i);
+    MainTab mainTab() const { return mainTab_; }
+    void setMainTab(MainTab t) { mainTab_ = t; cursor_ = 0; equipCursor_ = 0; }
+    SubTab subTab() const { return subTab_; }
+    void setSubTab(SubTab s) { subTab_ = s; cursor_ = 0; }
+    int equipCursor() const { return equipCursor_; }
+    int actionCursor() const { return actionCursor_; }
+
+    // Slots não-vazios que casam com a sub-tab (ordem de slot).
+    std::vector<int> filteredSlots() const;
+    // Ações disponíveis p/ o item atual (vazio = menu nem abre).
+    std::vector<MenuAction> menuActions() const;
+
+    // Executa ação do menu sobre o item atual (testes chamam direto).
+    void executeAction(MenuAction action);
 
 private:
-    bool open_     = false;
-    int  cursor_   = 0;   // slot selecionado (setas)
-    int  tab_      = TabAll;
-    int  heldSlot_ = -1;  // origem do arrasto (-1 = mãos vazias)
-    core::Item heldItem_; // item "na mão"
-    PendingDrop pendingDrop_;
+    core::Inventory* inv_        = nullptr;
+    core::Equipment* equipment_  = nullptr;
+    ::Player*        player_     = nullptr;
+    DropSystem*      drops_      = nullptr;
 
-    void cancelHeld() {
-        heldSlot_ = -1;
-        heldItem_ = core::Item{};
-        pendingDrop_ = PendingDrop{};
-    }
+    UIState state_     = UIState::Closed;
+    MainTab mainTab_   = MainTab::Inventory;
+    SubTab  subTab_    = SubTab::All;
+    int     cursor_      = 0; // slot do grid (índice; hotbar lê índice)
+    int     equipCursor_ = 0; // 0..3 (RightHand, Head, Chest, Legs)
+    int     actionCursor_ = 0; // índice em menuActions()
 
-    // Anda o cursor pulando slots que não casam com a aba (até 1 volta).
-    void stepCursor(int delta, const core::Inventory& inv);
-    void clampCursorToTab(const core::Inventory& inv);
+    void handleBrowse(const InputMap& input);
+    void handleActionMenu(const InputMap& input);
+    void handleConfirmDrop(const InputMap& input);
+    void openActionMenu();
 
-    sf::Vector2f gridOrigin(float screenW, float screenH) const;
-    sf::Vector2f slotPos(int index, float screenW, float screenH) const;
-    void drawTabBar(sf::RenderTarget& target, const sf::Font& font,
-                    float sw, float sh) const;
-    void drawDetailPanel(sf::RenderTarget& target, const core::Inventory& inv,
-                         const sf::Font& font, float sw, float sh) const;
+    bool slotMatches(int index) const; // vazio sempre casa
+    void stepCursor(int delta);        // pula fora da sub-tab (1 volta)
+    void cycleMainTab(int delta);      // troca + cursor 0
+    void cycleSubTab(int delta);       // troca + cursor 0
+
+    sf::Vector2f gridOrigin(float sw, float sh) const;
+    sf::Vector2f slotPos(int index, float sw, float sh) const;
+    sf::Vector2f detailOrigin(float sw, float sh) const;
+    static constexpr float kDetailW = 270.f;
+
+    void renderMainTabs(sf::RenderTarget& t, float sw, const sf::Font& f) const;
+    void renderSubTabs(sf::RenderTarget& t, float sw, const sf::Font& f) const;
+    void renderGrid(sf::RenderTarget& t, float sw, float sh,
+                    const sf::Font& f) const;
+    void renderEquipTab(sf::RenderTarget& t, float sw, float sh,
+                        const sf::Font& f) const;
+    void renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
+                           const sf::Font& f) const;
+    void renderActionMenu(sf::RenderTarget& t, float sw, float sh,
+                          const sf::Font& f) const;
+    void renderConfirmDrop(sf::RenderTarget& t, float sw, float sh,
+                           const sf::Font& f) const;
+    void renderFooter(sf::RenderTarget& t, float sw, float sh,
+                      const sf::Font& f) const;
 };
 
 } // namespace support

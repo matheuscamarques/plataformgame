@@ -706,9 +706,9 @@ void Game::render()
     hotbar_.render(*window, player.get()->inventory, activeHotbarSlot_,
                    viewW_, viewH_, font);
 
-    // Grid 4b: por cima da hotbar (view default ativa).
-    inventoryUI_.render(*window, player.get()->inventory, font,
-                        viewW_, viewH_);
+    // Menu Dark Souls: por cima da hotbar (view default ativa).
+    // Dependências já injetadas no tick (App); aqui só desenha.
+    inventoryUI_.render(*window, font, viewW_, viewH_);
 
     // Screenshot auto (F11): aqui, após todos os draws e antes do
     // display — o framebuffer contém exatamente este frame. No tick,

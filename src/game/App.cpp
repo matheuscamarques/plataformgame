@@ -202,28 +202,28 @@ void Game::tick() {
             input_.consume(support::Action::Pause);
             inventoryUI_.close();
         }
-        // Com o grid aberto, a UI dirige a navegação no inventário.
-        // Fase 4e: passa o player (U usa/equipa) e drena o drop pendente
-        // p/ orbe; consome os edges p/ o fixed-step não repetir e o
-        // RunManager não ver o R (restart) por baixo do descarte.
+        // Com o menu aberto, a UI dirige o input (máquina de estados).
+        // Injeta as dependências a cada tick e consome os edges p/ o
+        // fixed-step não repetir e o RunManager não ver o R (restart)
+        // por baixo do TabRight. Sem freeze: o jogo segue rodando.
         if (inventoryUI_.isOpen()) {
-            inventoryUI_.handleInput(input_, p->inventory, p);
+            inventoryUI_.setInventory(&p->inventory);
+            inventoryUI_.setEquipment(nullptr); // commit 3: p->equipment
+            inventoryUI_.setPlayer(p);
+            inventoryUI_.setDrops(drops_);
+            inventoryUI_.handleInput(input_);
             using A = support::Action;
-            if (input_.pressed(A::DropItem)) {
-                input_.consume(A::DropItem);
-                input_.consume(A::Restart);
-            }
+            if (input_.pressed(A::TabRight)) input_.consume(A::Restart);
+            if (input_.pressed(A::TabLeft)) input_.consume(A::TabLeft);
+            if (input_.pressed(A::TabRight)) input_.consume(A::TabRight);
+            if (input_.pressed(A::SubTabLeft)) input_.consume(A::SubTabLeft);
+            if (input_.pressed(A::SubTabRight))
+                input_.consume(A::SubTabRight);
+            if (input_.pressed(A::FirstSlot)) input_.consume(A::FirstSlot);
+            if (input_.pressed(A::LastSlot)) input_.consume(A::LastSlot);
             if (input_.pressed(A::ArrangeAll)) input_.consume(A::ArrangeAll);
-            if (input_.pressed(A::TabPrev)) input_.consume(A::TabPrev);
-            if (input_.pressed(A::TabNext)) input_.consume(A::TabNext);
             if (input_.pressed(A::UseItem)) input_.consume(A::UseItem);
-            if (inventoryUI_.hasPendingDrop() && drops_) {
-                const auto pd = inventoryUI_.takePendingDrop();
-                drops_->spawnItem(pd.defId, pd.qty,
-                                  {p->getCenterX(), p->getCenterY()});
-            } else if (inventoryUI_.hasPendingDrop()) {
-                inventoryUI_.takePendingDrop(); // sem drops_: descarta limpo
-            }
+            if (input_.pressed(A::Interact)) input_.consume(A::Interact);
         }
 
         // Mundo infinito: carrega/descarrega chunks em torno do tile do player.

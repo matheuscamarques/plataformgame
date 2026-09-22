@@ -6,9 +6,10 @@
 #include "core/ItemDef.h"
 #include "entities/Player/Player.h"
 #include "support/Input/InputMap.h"
+#include "support/Progression/DropSystem.h"
 #include "support/UI/InventoryUI.h"
 
-// Lógica da UI grid (fase 4b) — headless. Render fica no jogo.
+// Lógica da UI Dark Souls — headless. Render fica no jogo.
 namespace {
 sf::Event keyEvent(sf::Event::EventType t, sf::Keyboard::Key k) {
     sf::Event e{};
@@ -26,202 +27,273 @@ void release(support::InputMap& in, sf::Keyboard::Key k) {
     in.handleEvent(keyEvent(sf::Event::KeyReleased, k));
     in.beginFrame();
 }
+
+bool hasAction(const support::InventoryUI& ui,
+               support::InventoryUI::MenuAction a) {
+    for (auto x : ui.menuActions())
+        if (x == a) return true;
+    return false;
+}
 } // namespace
 
 int main() {
     using namespace support;
+    using MA = InventoryUI::MenuAction;
 
-    { // AbreFechaConsome (E alterna; aberto consome E/Esc, resto passa)
+    { // OpenCloseState (fechado não consome; E/Esc fecham no Browse)
         InventoryUI ui;
         core::Inventory inv;
         InputMap in;
+        ui.setInventory(&inv);
         assert(!ui.isOpen());
         in.beginFrame();
-        assert(!ui.handleInput(in, inv)); // fechado: não consome nada
-        press(in, sf::Keyboard::E);
-        ui.toggle(); // App faria isso no edge (aqui direto, sem input)
-        release(in, sf::Keyboard::E);
+        assert(!ui.handleInput(in)); // fechado: nada
+        ui.open();
         assert(ui.isOpen());
+        assert(ui.state() == InventoryUI::UIState::Browse);
         in.beginFrame();
-        assert(!ui.handleInput(in, inv)); // aberto, sem tecla: não consome
+        assert(ui.handleInput(in)); // aberto, sem tecla: consome
         press(in, sf::Keyboard::E);
-        assert(ui.handleInput(in, inv)); // E fecha + consome
+        assert(ui.handleInput(in)); // E fecha
         release(in, sf::Keyboard::E);
         assert(!ui.isOpen());
-        ui.toggle();
+        ui.open();
         press(in, sf::Keyboard::Escape);
-        assert(ui.handleInput(in, inv)); // Esc fecha + consome
+        assert(ui.handleInput(in)); // Esc no Browse fecha
         release(in, sf::Keyboard::Escape);
         assert(!ui.isOpen());
     }
-    { // NavegacaoCircular (setas andam o cursor com wrap)
+    { // EscBacksOutOfMenu (no ActionMenu, Esc volta — não fecha)
         InventoryUI ui;
         core::Inventory inv;
         InputMap in;
-        ui.toggle();
-        assert(ui.cursor() == 0);
-        press(in, sf::Keyboard::Right);
-        ui.handleInput(in, inv);
-        release(in, sf::Keyboard::Right);
-        assert(ui.cursor() == 1);
-        press(in, sf::Keyboard::Down);
-        ui.handleInput(in, inv);
-        release(in, sf::Keyboard::Down);
-        assert(ui.cursor() == 1 + 8);
-        press(in, sf::Keyboard::Left);
-        ui.handleInput(in, inv);
-        release(in, sf::Keyboard::Left);
-        assert(ui.cursor() == 8);
-        press(in, sf::Keyboard::Up);
-        ui.handleInput(in, inv);
-        release(in, sf::Keyboard::Up);
-        assert(ui.cursor() == 0);
-        press(in, sf::Keyboard::Left);
-        ui.handleInput(in, inv);
-        release(in, sf::Keyboard::Left);
-        assert(ui.cursor() == 39); // wrap
+        inv.add(core::Item{"potion", 3});
+        ui.setInventory(&inv);
+        ui.open();
+        press(in, sf::Keyboard::F);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::F);
+        assert(ui.state() == InventoryUI::UIState::ActionMenu);
+        press(in, sf::Keyboard::Escape);
+        assert(ui.handleInput(in));
+        release(in, sf::Keyboard::Escape);
+        assert(ui.state() == InventoryUI::UIState::Browse);
+        assert(ui.isOpen());
     }
-    { // PickPlaceSwap (F pega, F solta trocando com o cursor)
+    { // MainTabSwitch (R/Q ciclam Inventory<->Equipment, cursor reseta)
+        InventoryUI ui;
+        core::Inventory inv;
+        InputMap in;
+        ui.setInventory(&inv);
+        ui.open();
+        ui.setCursor(7);
+        press(in, sf::Keyboard::R);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::R);
+        assert(ui.mainTab() == InventoryUI::MainTab::Equipment);
+        assert(ui.cursor() == 0);
+        press(in, sf::Keyboard::Q);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Q);
+        assert(ui.mainTab() == InventoryUI::MainTab::Inventory);
+        press(in, sf::Keyboard::Tab); // hábito antigo: Tab avança
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Tab);
+        assert(ui.mainTab() == InventoryUI::MainTab::Equipment);
+    }
+    { // SubTabFilterNav (A/D filtram; setas pulam fora da aba)
+        InventoryUI ui;
+        core::Inventory inv;
+        InputMap in;
+        inv.add(core::Item{"stone", 10});     // slot 0: Material
+        inv.add(core::Item{"potion", 3});     // slot 1: Consumable
+        inv.add(core::Item{"iron_sword", 1}); // slot 2: Weapon
+        ui.setInventory(&inv);
+        ui.open();
+        press(in, sf::Keyboard::D);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::D);
+        assert(ui.subTab() == InventoryUI::SubTab::Materials);
+        assert(ui.cursor() == 0); // troca reseta
+        const auto slots = ui.filteredSlots();
+        assert(slots.size() == 1u && slots[0] == 0);
+        press(in, sf::Keyboard::Right);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Right);
+        assert(ui.cursor() == 3); // pula poção+espada
+        press(in, sf::Keyboard::A);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::A);
+        assert(ui.subTab() == InventoryUI::SubTab::All);
+        assert(ui.filteredSlots().size() == 3u);
+    }
+    { // EmptyCategory (só pedra; aba Wpn filtra tudo)
         InventoryUI ui;
         core::Inventory inv;
         InputMap in;
         inv.add(core::Item{"stone", 10});
-        inv.add(core::Item{"wood", 5});
-        ui.toggle();
-        // F no slot 0 (pedra): pega, buraco fica.
-        press(in, sf::Keyboard::F);
-        ui.handleInput(in, inv);
-        release(in, sf::Keyboard::F);
-        assert(inv.slot(0).isEmpty());
-        // Anda ao slot 1 (madeira), F: troca — pedra entra, madeira na mão.
+        ui.setInventory(&inv);
+        ui.open();
+        ui.setSubTab(InventoryUI::SubTab::Weapons);
+        assert(ui.filteredSlots().empty());
+    }
+    { // WrapAndHomeEnd (wrap circular + Home/End)
+        InventoryUI ui;
+        core::Inventory inv;
+        InputMap in;
+        ui.setInventory(&inv);
+        ui.open();
+        press(in, sf::Keyboard::Left);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Left);
+        assert(ui.cursor() == 39);
         press(in, sf::Keyboard::Right);
-        ui.handleInput(in, inv);
+        ui.handleInput(in);
         release(in, sf::Keyboard::Right);
+        assert(ui.cursor() == 0);
+        press(in, sf::Keyboard::Up);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Up);
+        assert(ui.cursor() == 32);
+        press(in, sf::Keyboard::Down);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Down);
+        assert(ui.cursor() == 0);
+        press(in, sf::Keyboard::End);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::End);
+        assert(ui.cursor() == 39);
+        press(in, sf::Keyboard::Home);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Home);
+        assert(ui.cursor() == 0);
+    }
+    { // MenuUse (F abre, F executa: onUse + consome 1)
+        InventoryUI ui;
+        core::Inventory inv;
+        InputMap in;
+        Player p;
+        p.hp = 9000;
+        inv.add(core::Item{"potion", 3});
+        ui.setInventory(&inv);
+        ui.setPlayer(&p);
+        ui.open();
+        assert(hasAction(ui, MA::Use));
         press(in, sf::Keyboard::F);
-        ui.handleInput(in, inv);
+        ui.handleInput(in);
         release(in, sf::Keyboard::F);
-        assert(inv.slot(1).defId == "stone");
-        assert(inv.slot(1).quantity == 10);
-        // F de novo no mesmo cursor: devolve a madeira, pega a pedra.
+        assert(ui.state() == InventoryUI::UIState::ActionMenu);
         press(in, sf::Keyboard::F);
-        ui.handleInput(in, inv);
+        ui.handleInput(in);
         release(in, sf::Keyboard::F);
-        assert(inv.slot(1).defId == "wood");
-        assert(inv.slot(1).quantity == 5);
-        // Anda ao slot 2 (vazio), F: solta a pedra, mãos vazias.
-        press(in, sf::Keyboard::Right);
-        ui.handleInput(in, inv);
-        release(in, sf::Keyboard::Right);
-        press(in, sf::Keyboard::F);
-        ui.handleInput(in, inv);
+        assert(ui.state() == InventoryUI::UIState::Browse);
+        assert(p.hp == 9030 && inv.count("potion") == 2);
+    }
+    { // MenuArrangeShortcut (T ordena por tipo+id)
+        InventoryUI ui;
+        core::Inventory inv;
+        InputMap in;
+        inv.add(core::Item{"potion", 3});
+        inv.add(core::Item{"stone", 10});
+        ui.setInventory(&inv);
+        ui.open();
+        press(in, sf::Keyboard::T);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::T);
+        assert(inv.slot(0).defId == "stone");
+        assert(inv.slot(1).defId == "potion");
+    }
+    { // MenuDropConfirm (F→Drop→F confirma; Esc cancela antes)
+        InventoryUI ui;
+        core::Inventory inv;
+        InputMap in;
+        Player p;
+        DropSystem drops;
+        inv.add(core::Item{"stone", 10});
+        ui.setInventory(&inv);
+        ui.setPlayer(&p);
+        ui.setDrops(&drops);
+        ui.open();
+        assert(hasAction(ui, MA::Drop));
+        press(in, sf::Keyboard::F); // abre menu
+        ui.handleInput(in);
         release(in, sf::Keyboard::F);
-        assert(inv.slot(2).defId == "stone");
-        assert(inv.slot(2).quantity == 10);
-        // F no slot vazio e sem nada na mão: no-op.
-        press(in, sf::Keyboard::Right);
-        ui.handleInput(in, inv);
-        release(in, sf::Keyboard::Right);
-        press(in, sf::Keyboard::F);
-        ui.handleInput(in, inv);
+        press(in, sf::Keyboard::Down); // Use -> Arrange? (lista: Drop, Arrange)
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Down);
+        press(in, sf::Keyboard::Up);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Up);
+        press(in, sf::Keyboard::F); // escolhe Drop -> Confirm
+        ui.handleInput(in);
         release(in, sf::Keyboard::F);
-        assert(inv.slot(3).isEmpty());
-        // Conservação: nada sumiu nem duplicou.
+        assert(ui.state() == InventoryUI::UIState::ConfirmDrop);
+        press(in, sf::Keyboard::Escape); // cancela: nada sai
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Escape);
+        assert(ui.state() == InventoryUI::UIState::Browse);
         assert(inv.count("stone") == 10);
-        assert(inv.count("wood") == 5);
+        press(in, sf::Keyboard::F); // menu de novo
+        ui.handleInput(in);
+        release(in, sf::Keyboard::F);
+        press(in, sf::Keyboard::F); // Drop (primeiro) -> Confirm
+        ui.handleInput(in);
+        release(in, sf::Keyboard::F);
+        press(in, sf::Keyboard::F); // confirma
+        ui.handleInput(in);
+        release(in, sf::Keyboard::F);
+        assert(ui.state() == InventoryUI::UIState::Browse);
+        assert(inv.slot(0).isEmpty()); // pilha saiu p/ orbe
+        assert(drops.activeItemCount() == 1u);
+    }
+    { // KeyHasNoDrop (chave: menu sem Drop; Exec Drop direto bloqueia)
+        InventoryUI ui;
+        core::Inventory inv;
+        InputMap in;
+        Player p;
+        DropSystem drops;
+        inv.add(core::Item{"rusty_key", 1});
+        ui.setInventory(&inv);
+        ui.setPlayer(&p);
+        ui.setDrops(&drops);
+        ui.open();
+        assert(!hasAction(ui, MA::Drop));
+        assert(hasAction(ui, MA::Arrange));
+        ui.executeAction(MA::Drop); // via código: bloqueado
+        assert(inv.slot(0).defId == "rusty_key");
+        assert(drops.activeItemCount() == 0u);
+    }
+    { // NoEquipmentNoEquipAction (sem equipment_: menu sem Equip)
+        InventoryUI ui;
+        core::Inventory inv;
+        InputMap in;
+        inv.add(core::Item{"iron_sword", 1});
+        ui.setInventory(&inv);
+        ui.open();
+        assert(!hasAction(ui, MA::Equip));
+        assert(hasAction(ui, MA::Drop));
+    }
+    { // NullSafety (sem dependências: sem crash, menu vazio)
+        InventoryUI ui;
+        InputMap in;
+        ui.open();
+        in.beginFrame();
+        assert(ui.handleInput(in));
+        press(in, sf::Keyboard::F);
+        assert(ui.handleInput(in));
+        release(in, sf::Keyboard::F);
+        assert(ui.state() == InventoryUI::UIState::Browse);
+        assert(ui.filteredSlots().empty());
+        assert(ui.menuActions().empty());
+        ui.executeAction(MA::Arrange); // no-op
+        ui.executeAction(MA::Drop);    // no-op
     }
     { // GridTem40 (constantes batem com o inventário)
         static_assert(InventoryUI::kSlots == core::Inventory::kCapacity,
                       "grid cobre o inventário inteiro");
         assert(InventoryUI::kCols == 8 && InventoryUI::kRows == 5);
     }
-    { // TabsCycleFilter (Q/Tab ciclam; setas pulam fora da aba)
-        InventoryUI ui;
-        core::Inventory inv;
-        InputMap in;
-        inv.add(core::Item{"stone", 10});      // slot 0: Material
-        inv.add(core::Item{"potion", 3});      // slot 1: Consumable
-        inv.add(core::Item{"iron_sword", 1});  // slot 2: Weapon
-        ui.toggle();
-        assert(ui.tab() == InventoryUI::TabAll && ui.cursor() == 0);
-        press(in, sf::Keyboard::Tab);
-        assert(ui.handleInput(in, inv)); // consome mesmo com efeito
-        release(in, sf::Keyboard::Tab);
-        assert(ui.tab() == InventoryUI::TabMaterial);
-        assert(ui.cursor() == 0); // pedra casa: fica
-        press(in, sf::Keyboard::Right);
-        ui.handleInput(in, inv);
-        release(in, sf::Keyboard::Right);
-        assert(ui.cursor() == 3); // pula poção+espada, cai no vazio
-        press(in, sf::Keyboard::Q);
-        ui.handleInput(in, inv);
-        release(in, sf::Keyboard::Q);
-        assert(ui.tab() == InventoryUI::TabAll);
-        press(in, sf::Keyboard::Q);
-        ui.handleInput(in, inv);
-        release(in, sf::Keyboard::Q);
-        assert(ui.tab() == InventoryUI::TabKey); // wrap p/ trás
-        press(in, sf::Keyboard::Tab);
-        ui.handleInput(in, inv);
-        release(in, sf::Keyboard::Tab);
-        assert(ui.tab() == InventoryUI::TabAll); // wrap p/ frente
-    }
-    { // ArrangeCallsSort (T reordena por tipo+id; consome o edge)
-        InventoryUI ui;
-        core::Inventory inv;
-        InputMap in;
-        inv.add(core::Item{"potion", 3}); // slot 0 primeiro (fora de ordem)
-        inv.add(core::Item{"stone", 10}); // slot 1
-        ui.toggle();
-        press(in, sf::Keyboard::T);
-        assert(ui.handleInput(in, inv));
-        release(in, sf::Keyboard::T);
-        assert(inv.slot(0).defId == "stone");
-        assert(inv.slot(1).defId == "potion");
-    }
-    { // DropPendingAndKeyBlock (R gera pendente; chave não sai)
-        InventoryUI ui;
-        core::Inventory inv;
-        InputMap in;
-        inv.add(core::Item{"stone", 10});    // slot 0
-        inv.add(core::Item{"rusty_key", 1}); // slot 1: Key, travada
-        ui.toggle();
-        press(in, sf::Keyboard::R);
-        assert(ui.handleInput(in, inv)); // consome (App drena + anti-restart)
-        release(in, sf::Keyboard::R);
-        assert(inv.slot(0).isEmpty());
-        assert(ui.hasPendingDrop());
-        const auto pd = ui.takePendingDrop();
-        assert(pd.defId == "stone" && pd.qty == 10);
-        assert(!ui.hasPendingDrop());
-        press(in, sf::Keyboard::Right);
-        ui.handleInput(in, inv);
-        release(in, sf::Keyboard::Right);
-        assert(ui.cursor() == 1);
-        press(in, sf::Keyboard::R);
-        assert(ui.handleInput(in, inv)); // consome mesmo bloqueando
-        release(in, sf::Keyboard::R);
-        assert(inv.slot(1).defId == "rusty_key"); // Key fica
-        assert(!ui.hasPendingDrop());
-    }
-    { // UsePotionHeals (U chama onUse e consome 1; sem player é no-op)
-        InventoryUI ui;
-        core::Inventory inv;
-        InputMap in;
-        Player p;
-        p.hp = 9000;
-        inv.add(core::Item{"potion", 3}); // slot 0, cursor 0
-        ui.toggle();
-        press(in, sf::Keyboard::U);
-        assert(ui.handleInput(in, inv, &p));
-        release(in, sf::Keyboard::U);
-        assert(p.hp == 9030);
-        assert(inv.count("potion") == 2);
-        press(in, sf::Keyboard::U);
-        assert(ui.handleInput(in, inv, nullptr)); // sem player: consome, nada faz
-        release(in, sf::Keyboard::U);
-        assert(p.hp == 9030 && inv.count("potion") == 2);
-    }
-    { // WeaponDefs (4d: dano/defesa populados p/ o painel)
+    { // WeaponDefs (dano/defesa/slots p/ o painel e o menu)
         const core::ItemDef* sword =
             core::ItemRegistry::instance().find("iron_sword");
         const core::ItemDef* helm =
@@ -232,9 +304,10 @@ int main() {
         assert(helm && helm->type == core::ItemType::Armor);
         assert(helm->defense == 4 && helm->stackMax == 1);
         assert(helm->equipSlot == core::EquipSlot::Head);
-        assert(InventoryUI::matchesTab(sword, InventoryUI::TabWeapon));
-        assert(InventoryUI::matchesTab(helm, InventoryUI::TabArmor));
-        assert(!InventoryUI::matchesTab(sword, InventoryUI::TabArmor));
+        assert(InventoryUI::matchesSubTab(sword,
+                                          InventoryUI::SubTab::Weapons));
+        assert(InventoryUI::matchesSubTab(helm, InventoryUI::SubTab::Armor));
+        assert(!InventoryUI::matchesSubTab(sword, InventoryUI::SubTab::Armor));
     }
     { // EquipMovesToSlot (inventário -> RightHand)
         core::Equipment eq;

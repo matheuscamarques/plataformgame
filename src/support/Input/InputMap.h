@@ -18,12 +18,15 @@ enum class Action : uint8_t {
     ToggleLightMask, // F7: máscara do raycast de luz
     Hotbar1, Hotbar2, Hotbar3, Hotbar4, Hotbar5, // fase 4a: 1-5
     ToggleInventory, // fase 4b: E abre/fecha grid
-    Interact,        // fase 4b: F pega/solta no grid
-    TabPrev,         // fase 4c: Q, aba anterior
-    TabNext,         // fase 4c: Tab, próxima aba
-    DropItem,        // fase 4e: R descarta selecionado (consome Restart!)
-    ArrangeAll,      // fase 4e: T reordena tudo
-    UseItem,         // fase 4e: U/Enter usa ou equipa o selecionado
+    Interact,        // F: abre/executa menu de ação (com grid aberto)
+    TabLeft,         // Q: tab principal anterior
+    TabRight,        // R: próxima tab principal (consome Restart!)
+    SubTabLeft,      // A: sub-tab anterior (só em Inventory)
+    SubTabRight,     // D: próxima sub-tab
+    FirstSlot,       // Home: primeiro slot
+    LastSlot,        // End: último slot
+    ArrangeAll,      // T: reordena tudo (atalho, também no menu)
+    UseItem,         // U/Enter: usa o selecionado (atalho, também no menu)
     COUNT
 };
 

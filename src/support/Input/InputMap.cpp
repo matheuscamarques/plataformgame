@@ -35,12 +35,16 @@ InputMap::InputMap() {
     bind(Action::Hotbar5, sf::Keyboard::Num5);
     bind(Action::ToggleInventory, sf::Keyboard::E);
     bind(Action::Interact, sf::Keyboard::F);
-    bind(Action::TabPrev, sf::Keyboard::Q);
-    bind(Action::TabNext, sf::Keyboard::Tab);
-    bind(Action::DropItem, sf::Keyboard::R);
+    bind(Action::TabLeft, sf::Keyboard::Q);
+    bind(Action::TabRight, sf::Keyboard::R);
+    bind(Action::SubTabLeft, sf::Keyboard::A);
+    bind(Action::SubTabRight, sf::Keyboard::D);
+    bind(Action::FirstSlot, sf::Keyboard::Home);
+    bind(Action::LastSlot, sf::Keyboard::End);
     bind(Action::ArrangeAll, sf::Keyboard::T);
     bind(Action::UseItem, sf::Keyboard::U);
     addBind(Action::UseItem, sf::Keyboard::Return);
+    addBind(Action::TabRight, sf::Keyboard::Tab); // hábito antigo: Tab avança
 
     addBind(Action::Left,  sf::Keyboard::A);
     addBind(Action::Right, sf::Keyboard::D);

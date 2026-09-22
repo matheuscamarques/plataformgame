@@ -73,7 +73,7 @@ private:
     support::RunManager run_; // valor: gate do tick (morte/pause)
     support::DebugFeed debugFeed_; // valor: números + log (F2/F4)
     support::HotbarUI hotbar_; // valor: 5 primeiros slots (fase 4a)
-    support::InventoryUI inventoryUI_; // valor: grid 8x5 (fase 4b)
+    support::InventoryUI inventoryUI_; // valor: menu Dark Souls (tabs+menu)
     int activeHotbarSlot_ = 0; // 0..4 via teclas 1-5
     support::ScreenshotSystem screenshots_; // valor: PNGs de debug (F10-12)
     support::DropSystem *drops_ = nullptr; // observa; dono é o scheduler
