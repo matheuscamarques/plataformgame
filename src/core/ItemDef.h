@@ -6,6 +6,8 @@
 #include <vector>
 
 #include "core/sprite_from_ascii.h"
+#include "core/EquipSlot.h"
+#include "core/Material.h"
 
 class Player;
 
@@ -15,8 +17,8 @@ namespace core {
 enum class ItemType : uint8_t {
     Material,   // minério, madeira, gel — empilha, sem uso direto
     Consumable, // poção, comida — onUse consome 1
-    Weapon,     // espada, machado — equipa no loadout
-    Armor,      // elmo, peitoral — equipa no loadout
+    Weapon,     // espada, machado — equipa no Equipment
+    Armor,      // elmo, peitoral — equipa no Equipment
     Key,        // progressão — não empilha, não descarta
     Quest,      // missão — idem
 };
@@ -42,6 +44,8 @@ struct ItemDef {
     float       weight    = 0.f; // reservado (sem peso no MVP)
     int         damage    = 0;   // arma: painel 4d (0 = não mostra)
     int         defense   = 0;   // armadura: idem
+    EquipSlot   equipSlot = EquipSlot::None; // None = não equipável
+    MaterialId  material  = MaterialId::Iron; // cor da peça no render
     // Sprite ASCII 8×8 (mesmo idioma de makeSprite; nulo = rect fallback).
     const char* const* spriteRows = nullptr;
     int spriteW = 0;

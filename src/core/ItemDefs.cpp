@@ -215,6 +215,61 @@ inline const char* const kItemHelmSprite[] = {
     "........",
 };
 
+// Fase 4f: machado + peitoral + perneiras (mesmo padrão: sprite 8×8,
+// stackMax 1, slot próprio). Completam os 4 slots do Equipment.
+inline const core::PaletteEntry kItemAxePal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {150, 155, 165}},
+    {'s', {105, 110, 120}},
+    {'H', {110, 75, 45}},
+};
+inline constexpr std::size_t kItemAxePalCount = 4;
+inline const char* const kItemAxeSprite[] = {
+    "..SSSS..",
+    "..SSSs..",
+    "...SS...",
+    "...SS...",
+    "...HS...",
+    "..HH....",
+    "..H.....",
+    ".HH.....",
+};
+
+inline const core::PaletteEntry kItemChestPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {150, 155, 165}},
+    {'s', {105, 110, 120}},
+    {'D', {60, 65, 75}},
+};
+inline constexpr std::size_t kItemChestPalCount = 4;
+inline const char* const kItemChestSprite[] = {
+    ".SSSSSS.",
+    "SSSSSSSS",
+    "SSSDDSSS",
+    "SSSSSSSS",
+    "sSSSSSSs",
+    "sSSSSSSs",
+    ".ssssss.",
+    "........",
+};
+
+inline const core::PaletteEntry kItemLegsPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {150, 155, 165}},
+    {'s', {105, 110, 120}},
+};
+inline constexpr std::size_t kItemLegsPalCount = 3;
+inline const char* const kItemLegsSprite[] = {
+    "SSSSSSSS",
+    "SSS..SSS",
+    "SS....SS",
+    "SS....SS",
+    "SS....SS",
+    "ss....ss",
+    "ss....ss",
+    "........",
+};
+
 
 REGISTER_ITEM("dynamite", [] {
     core::ItemDef def;
@@ -368,9 +423,30 @@ REGISTER_ITEM("iron_sword", [] {
     def.spritePalCount = kItemSwordPalCount;
     def.name = "Espada de Ferro";
     def.type = ItemType::Weapon;
+    def.rarity = ItemRarity::Common;
+    def.stackMax = 1;
+    def.damage = 12;
+    def.equipSlot = core::EquipSlot::RightHand;
+    def.material = core::MaterialId::Iron;
+    return def;
+}())
+
+REGISTER_ITEM("iron_axe", [] {
+    core::ItemDef def;
+    def.id = "iron_axe";
+    def.description = "Machado de ferro. Lento e brutal.";
+    def.spriteRows = kItemAxeSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemAxePal;
+    def.spritePalCount = kItemAxePalCount;
+    def.name = "Machado de Ferro";
+    def.type = ItemType::Weapon;
     def.rarity = ItemRarity::Uncommon;
     def.stackMax = 1;
-    def.damage = 8;
+    def.damage = 18;
+    def.equipSlot = core::EquipSlot::RightHand;
+    def.material = core::MaterialId::Iron;
     return def;
 }())
 
@@ -385,8 +461,48 @@ REGISTER_ITEM("iron_helm", [] {
     def.spritePalCount = kItemHelmPalCount;
     def.name = "Elmo de Ferro";
     def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Uncommon;
+    def.rarity = ItemRarity::Common;
     def.stackMax = 1;
     def.defense = 4;
+    def.equipSlot = core::EquipSlot::Head;
+    def.material = core::MaterialId::Iron;
+    return def;
+}())
+
+REGISTER_ITEM("iron_chest", [] {
+    core::ItemDef def;
+    def.id = "iron_chest";
+    def.description = "Peitoral de ferro. Aguenta porrada.";
+    def.spriteRows = kItemChestSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemChestPal;
+    def.spritePalCount = kItemChestPalCount;
+    def.name = "Peitoral de Ferro";
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Common;
+    def.stackMax = 1;
+    def.defense = 6;
+    def.equipSlot = core::EquipSlot::Chest;
+    def.material = core::MaterialId::Iron;
+    return def;
+}())
+
+REGISTER_ITEM("iron_legs", [] {
+    core::ItemDef def;
+    def.id = "iron_legs";
+    def.description = "Perneiras de ferro. Correr cansa.";
+    def.spriteRows = kItemLegsSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemLegsPal;
+    def.spritePalCount = kItemLegsPalCount;
+    def.name = "Perneiras de Ferro";
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Common;
+    def.stackMax = 1;
+    def.defense = 4;
+    def.equipSlot = core::EquipSlot::Legs;
+    def.material = core::MaterialId::Iron;
     return def;
 }())

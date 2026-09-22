@@ -2,6 +2,7 @@
 #include <cstdio>
 
 #include "core/Inventory.h"
+#include "core/Equipment.h"
 #include "core/ItemDef.h"
 #include "entities/Player/Player.h"
 #include "support/Input/InputMap.h"
@@ -226,12 +227,58 @@ int main() {
         const core::ItemDef* helm =
             core::ItemRegistry::instance().find("iron_helm");
         assert(sword && sword->type == core::ItemType::Weapon);
-        assert(sword->damage == 8 && sword->stackMax == 1);
+        assert(sword->damage == 12 && sword->stackMax == 1);
+        assert(sword->equipSlot == core::EquipSlot::RightHand);
         assert(helm && helm->type == core::ItemType::Armor);
         assert(helm->defense == 4 && helm->stackMax == 1);
+        assert(helm->equipSlot == core::EquipSlot::Head);
         assert(InventoryUI::matchesTab(sword, InventoryUI::TabWeapon));
         assert(InventoryUI::matchesTab(helm, InventoryUI::TabArmor));
         assert(!InventoryUI::matchesTab(sword, InventoryUI::TabArmor));
+    }
+    { // EquipMovesToSlot (inventário -> RightHand)
+        core::Equipment eq;
+        assert(eq.isEmpty());
+        core::Item old;
+        assert(eq.equip(core::Item{"iron_sword", 1}, &old));
+        assert(old.isEmpty());
+        assert(eq.get(core::EquipSlot::RightHand).defId == "iron_sword");
+        assert(!eq.isEmpty() && eq.isOccupied(core::EquipSlot::RightHand));
+        assert(!eq.isOccupied(core::EquipSlot::Head));
+    }
+    { // EquipSwapsOldBack (axe entra, sword volta no outOld)
+        core::Equipment eq;
+        assert(eq.equip(core::Item{"iron_sword", 1}));
+        core::Item old;
+        assert(eq.equip(core::Item{"iron_axe", 1}, &old));
+        assert(eq.get(core::EquipSlot::RightHand).defId == "iron_axe");
+        assert(old.defId == "iron_sword" && old.quantity == 1);
+    }
+    { // EquipSlotSeparation (elmo não mexe na arma)
+        core::Equipment eq;
+        assert(eq.equip(core::Item{"iron_sword", 1}));
+        assert(eq.equip(core::Item{"iron_helm", 1}));
+        assert(eq.equip(core::Item{"iron_chest", 1}));
+        assert(eq.equip(core::Item{"iron_legs", 1}));
+        assert(eq.get(core::EquipSlot::RightHand).defId == "iron_sword");
+        assert(eq.get(core::EquipSlot::Head).defId == "iron_helm");
+        assert(eq.get(core::EquipSlot::Chest).defId == "iron_chest");
+        assert(eq.get(core::EquipSlot::Legs).defId == "iron_legs");
+    }
+    { // UnequipReturnsItem (slot esvazia, item volta)
+        core::Equipment eq;
+        assert(eq.equip(core::Item{"iron_sword", 1}));
+        core::Item removed = eq.unequip(core::EquipSlot::RightHand);
+        assert(removed.defId == "iron_sword");
+        assert(eq.get(core::EquipSlot::RightHand).isEmpty());
+        assert(eq.unequip(core::EquipSlot::RightHand).isEmpty()); // 2× ok
+    }
+    { // NonEquippableFails (pedra e def desconhecido não equipam)
+        core::Equipment eq;
+        assert(!eq.equip(core::Item{"stone", 5})); // Material: None
+        assert(!eq.equip(core::Item{"nao_existe", 1})); // sem def
+        assert(!eq.equip(core::Item{})); // vazio
+        assert(eq.isEmpty());
     }
 
     std::printf("inventory_ui test OK\n");
