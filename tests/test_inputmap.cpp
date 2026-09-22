@@ -68,6 +68,18 @@ int main() {
     in.beginFrame(); // próximo frame sem evento: nada fantasma
     assert(!in.pressed(Action::ArrangeAll));
 
+    // ciclo completo do menu (E abre 1x: aperto -> consume -> release)
+    in.beginFrame();
+    in.handleEvent(keyEvent(sf::Event::KeyPressed, sf::Keyboard::E));
+    assert(in.pressed(Action::ToggleInventory));
+    in.consume(Action::ToggleInventory);
+    assert(!in.pressed(Action::ToggleInventory));
+    in.handleEvent(keyEvent(sf::Event::KeyReleased, sf::Keyboard::E));
+    in.beginFrame();
+    assert(!in.held(Action::ToggleInventory));
+    in.handleEvent(keyEvent(sf::Event::KeyPressed, sf::Keyboard::E));
+    assert(in.pressed(Action::ToggleInventory)); // aperto novo funciona
+
     std::printf("inputmap test OK\n");
     return 0;
 }

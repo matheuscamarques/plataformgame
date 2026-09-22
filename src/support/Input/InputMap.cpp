@@ -82,6 +82,11 @@ static bool anyPressed(const std::vector<sf::Keyboard::Key> &keys) {
 void InputMap::handleEvent(const sf::Event& e) {
     if (e.type != sf::Event::KeyPressed && e.type != sf::Event::KeyReleased)
         return;
+    // NOTA: repeat do SO desligado na Window (setKeyRepeatEnabled(false)).
+    // SFML2 não marca o evento como repeat, então o filtro é lá. Sem
+    // isso, o consume() do App limpava o nível e o repeat seguinte
+    // parecia um aperto novo (E abria e fechava o menu sozinho, F abria
+    // o ActionMenu e já executava, etc).
     bool down = (e.type == sf::Event::KeyPressed);
     for (std::size_t i = 0; i < kCount; ++i) {
         for (auto k : keys_[i]) {
