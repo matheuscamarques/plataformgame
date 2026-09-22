@@ -27,6 +27,7 @@
 #include "support/Enemies/EnemySystem.h"
 #include "support/Effects/ThrowSystem.h"
 #include "support/GameContext.h"
+#include "support/Progression/DropSystem.h"
 #include "support/Progression/StratumManager.h"
 
 // App: ciclo de vida (ctor/start/run/tick). Render em Renderer.cpp,
@@ -202,8 +203,28 @@ void Game::tick() {
             inventoryUI_.close();
         }
         // Com o grid aberto, a UI dirige a navegação no inventário.
-        if (inventoryUI_.isOpen())
-            inventoryUI_.handleInput(input_, p->inventory);
+        // Fase 4e: passa o player (U usa/equipa) e drena o drop pendente
+        // p/ orbe; consome os edges p/ o fixed-step não repetir e o
+        // RunManager não ver o R (restart) por baixo do descarte.
+        if (inventoryUI_.isOpen()) {
+            inventoryUI_.handleInput(input_, p->inventory, p);
+            using A = support::Action;
+            if (input_.pressed(A::DropItem)) {
+                input_.consume(A::DropItem);
+                input_.consume(A::Restart);
+            }
+            if (input_.pressed(A::ArrangeAll)) input_.consume(A::ArrangeAll);
+            if (input_.pressed(A::TabPrev)) input_.consume(A::TabPrev);
+            if (input_.pressed(A::TabNext)) input_.consume(A::TabNext);
+            if (input_.pressed(A::UseItem)) input_.consume(A::UseItem);
+            if (inventoryUI_.hasPendingDrop() && drops_) {
+                const auto pd = inventoryUI_.takePendingDrop();
+                drops_->spawnItem(pd.defId, pd.qty,
+                                  {p->getCenterX(), p->getCenterY()});
+            } else if (inventoryUI_.hasPendingDrop()) {
+                inventoryUI_.takePendingDrop(); // sem drops_: descarta limpo
+            }
+        }
 
         // Mundo infinito: carrega/descarrega chunks em torno do tile do player.
         int playerTileX = static_cast<int>(std::floor(p->getX() / core::kBlockSize));

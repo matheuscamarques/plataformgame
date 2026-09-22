@@ -177,6 +177,44 @@ inline const char* const kItemKeySprite[] = {
     "........",
 };
 
+// Fase 4d: 1 arma + 1 armadura p/ exercitar o painel (dano/defesa)
+// e as abas Arma/Armadura. Sem onEquip: equipa via verbo futuro.
+inline const core::PaletteEntry kItemSwordPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'B', {200, 205, 215}},
+    {'b', {140, 145, 155}},
+    {'H', {110, 75, 45}},
+};
+inline constexpr std::size_t kItemSwordPalCount = 4;
+inline const char* const kItemSwordSprite[] = {
+    "...BB...",
+    "...BB...",
+    "...BB...",
+    "...Bb...",
+    "...Bb...",
+    ".HHHHH..",
+    "...H....",
+    "...H....",
+};
+
+inline const core::PaletteEntry kItemHelmPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {150, 155, 165}},
+    {'s', {105, 110, 120}},
+    {'D', {60, 65, 75}},
+};
+inline constexpr std::size_t kItemHelmPalCount = 4;
+inline const char* const kItemHelmSprite[] = {
+    "..SSSS..",
+    ".SSSSSS.",
+    "SSSSDSSS",
+    "SSSDDSSS",
+    "SSSSSSSS",
+    ".ssssss.",
+    "........",
+    "........",
+};
+
 
 REGISTER_ITEM("dynamite", [] {
     core::ItemDef def;
@@ -316,5 +354,39 @@ REGISTER_ITEM("rusty_key", [] {
     def.type = ItemType::Key;
     def.rarity = ItemRarity::Rare;
     def.stackMax = 1; // não empilha: exercita o ramo stackMax == 1
+    return def;
+}())
+
+REGISTER_ITEM("iron_sword", [] {
+    core::ItemDef def;
+    def.id = "iron_sword";
+    def.description = "Espada de ferro. Corta slime.";
+    def.spriteRows = kItemSwordSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemSwordPal;
+    def.spritePalCount = kItemSwordPalCount;
+    def.name = "Espada de Ferro";
+    def.type = ItemType::Weapon;
+    def.rarity = ItemRarity::Uncommon;
+    def.stackMax = 1;
+    def.damage = 8;
+    return def;
+}())
+
+REGISTER_ITEM("iron_helm", [] {
+    core::ItemDef def;
+    def.id = "iron_helm";
+    def.description = "Elmo de ferro. Protege a cuca.";
+    def.spriteRows = kItemHelmSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemHelmPal;
+    def.spritePalCount = kItemHelmPalCount;
+    def.name = "Elmo de Ferro";
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Uncommon;
+    def.stackMax = 1;
+    def.defense = 4;
     return def;
 }())

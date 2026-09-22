@@ -23,6 +23,7 @@ enum class Action : uint8_t {
     TabNext,         // fase 4c: Tab, próxima aba
     DropItem,        // fase 4e: R descarta selecionado (consome Restart!)
     ArrangeAll,      // fase 4e: T reordena tudo
+    UseItem,         // fase 4e: U/Enter usa ou equipa o selecionado
     COUNT
 };
 
