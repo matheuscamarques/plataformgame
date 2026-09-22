@@ -8,6 +8,7 @@
 #include "support/Combat/Body.h"
 #include "support/Combat/SpriteFrame.h"
 #include "core/Cooldown.h"
+#include "core/Equipment.h"
 #include "core/Inventory.h"
 #include "core/Material.h"
 
@@ -57,6 +58,9 @@ class Player : public Entity
         // Inventário autoritativo (público, mesmo padrão de hp/loadout).
         // dynamiteCount morreu aqui: pilha "dynamite" manda no arremesso.
         core::Inventory inventory;
+        // Equipamento autoritativo (público, mesmo padrão). Seed de ferro
+        // no ctor (nasce equipado); sobrevive à morte como o inventário.
+        core::Equipment equipment;
 
         // Combate: HP + i-frames. Morte/restart ficam para o bloco B.
         int hp = 10000;

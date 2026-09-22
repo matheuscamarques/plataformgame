@@ -20,6 +20,12 @@ Entity(core::kIdPlayer,0,0,30,50) // AABB derivado do sprite 12x20 a 2.5x
     static auto schema = support::BodySchema::humanoid(50.f, 30.f);
     body.attach(&schema);
     topUpDynamite();
+    // Nasce equipado (set de ferro): render idêntico ao Loadout antigo.
+    // Direto no equipment (não passa pelo inventário, sem sobra).
+    equipment.equip(core::Item{"iron_sword", 1});
+    equipment.equip(core::Item{"iron_helm", 1});
+    equipment.equip(core::Item{"iron_chest", 1});
+    equipment.equip(core::Item{"iron_legs", 1});
     //this->setGravity(9.8f);
 }
 

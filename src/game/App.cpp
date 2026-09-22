@@ -208,7 +208,7 @@ void Game::tick() {
         // por baixo do TabRight. Sem freeze: o jogo segue rodando.
         if (inventoryUI_.isOpen()) {
             inventoryUI_.setInventory(&p->inventory);
-            inventoryUI_.setEquipment(nullptr); // commit 3: p->equipment
+            inventoryUI_.setEquipment(&p->equipment);
             inventoryUI_.setPlayer(p);
             inventoryUI_.setDrops(drops_);
             inventoryUI_.handleInput(input_);

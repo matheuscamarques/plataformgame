@@ -353,6 +353,75 @@ int main() {
         assert(!eq.equip(core::Item{})); // vazio
         assert(eq.isEmpty());
     }
+    { // SeedEquipped (player nasce com o set de ferro)
+        Player p;
+        assert(p.equipment.get(core::EquipSlot::RightHand).defId ==
+               "iron_sword");
+        assert(p.equipment.get(core::EquipSlot::Head).defId == "iron_helm");
+        assert(p.equipment.get(core::EquipSlot::Chest).defId ==
+               "iron_chest");
+        assert(p.equipment.get(core::EquipSlot::Legs).defId == "iron_legs");
+    }
+    { // EquipViaMenu (F→Equip: grid esvazia, antigo volta)
+        InventoryUI ui;
+        core::Inventory inv;
+        core::Equipment eq;
+        InputMap in;
+        eq.equip(core::Item{"iron_axe", 1}); // ocupando a mão
+        inv.add(core::Item{"iron_sword", 1});
+        ui.setInventory(&inv);
+        ui.setEquipment(&eq);
+        ui.open();
+        assert(hasAction(ui, MA::Equip));
+        press(in, sf::Keyboard::F);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::F);
+        assert(ui.state() == InventoryUI::UIState::ActionMenu);
+        press(in, sf::Keyboard::F); // Equip é o primeiro (sem onUse)
+        ui.handleInput(in);
+        release(in, sf::Keyboard::F);
+        assert(eq.get(core::EquipSlot::RightHand).defId == "iron_sword");
+        assert(inv.slot(0).defId == "iron_axe"); // antigo voltou
+    }
+    { // UnequipViaMenu (aba Equipment: F→Unequip volta p/ grid)
+        InventoryUI ui;
+        core::Inventory inv;
+        core::Equipment eq;
+        InputMap in;
+        eq.equip(core::Item{"iron_sword", 1});
+        ui.setInventory(&inv);
+        ui.setEquipment(&eq);
+        ui.open();
+        press(in, sf::Keyboard::R); // aba Equipment
+        ui.handleInput(in);
+        release(in, sf::Keyboard::R);
+        assert(ui.mainTab() == InventoryUI::MainTab::Equipment);
+        assert(hasAction(ui, MA::Unequip));
+        press(in, sf::Keyboard::F);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::F);
+        assert(ui.state() == InventoryUI::UIState::ActionMenu);
+        press(in, sf::Keyboard::F); // única opção: Unequip
+        ui.handleInput(in);
+        release(in, sf::Keyboard::F);
+        assert(eq.get(core::EquipSlot::RightHand).isEmpty());
+        assert(inv.count("iron_sword") == 1);
+    }
+    { // UnequipFullCancel (grid cheio: fica equipado)
+        InventoryUI ui;
+        core::Inventory inv;
+        core::Equipment eq;
+        eq.equip(core::Item{"iron_sword", 1});
+        inv.add(core::Item{"stone", 40 * 99}); // 40 slots cheios
+        assert(inv.usedSlots() == 40);
+        ui.setInventory(&inv);
+        ui.setEquipment(&eq);
+        ui.open();
+        ui.setMainTab(InventoryUI::MainTab::Equipment);
+        ui.executeAction(MA::Unequip);
+        assert(eq.get(core::EquipSlot::RightHand).defId == "iron_sword");
+        assert(inv.count("stone") == 40 * 99);
+    }
 
     std::printf("inventory_ui test OK\n");
     return 0;
