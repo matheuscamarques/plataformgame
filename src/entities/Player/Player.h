@@ -10,22 +10,9 @@
 #include "core/Cooldown.h"
 #include "core/Equipment.h"
 #include "core/Inventory.h"
-#include "core/Material.h"
 
 namespace sf { class Texture; }
 namespace support { class ThrowSystem; }
-
-// Loadout: 1 material p/ peça (forma compartilhada). Começa de ferro.
-struct Loadout {
-    core::MaterialId weapon = core::MaterialId::Iron;
-    core::MaterialId helm = core::MaterialId::Iron;
-    core::MaterialId chest = core::MaterialId::Iron;
-    core::MaterialId legs = core::MaterialId::Iron;
-    bool equipped = true;
-    // Identidade da arma ("sword", "axe", ...). Material continua em
-    // weapon acima; forma/dimensões derivam daqui. Vira registry com 3+.
-    std::string weaponId = "sword";
-};
 
 // Fase do swing atual. Idle = sem ataque em curso.
 enum class MeleePhase : uint8_t { Idle, Windup, Active, Recovery };
@@ -55,7 +42,7 @@ class Player : public Entity
         // S6: verbo de arremesso. Cooldown tickado no Game::tick (1/30 fixo);
         // lógica aqui para ser testável sem Game/janela.
         core::Cooldown throwCooldown{0.5f};
-        // Inventário autoritativo (público, mesmo padrão de hp/loadout).
+        // Inventário autoritativo (público, mesmo padrão de hp).
         // dynamiteCount morreu aqui: pilha "dynamite" manda no arremesso.
         core::Inventory inventory;
         // Equipamento autoritativo (público, mesmo padrão). Seed de ferro
@@ -66,7 +53,11 @@ class Player : public Entity
         int hp = 10000;
         int hpMax = 10000;
         core::Cooldown hurtIframes;
-        Loadout loadout; // público — mesmo padrão de hp, inventory
+
+        // Arma equipada (def do slot RightHand) ou nullptr = soco.
+        // Fonte única p/ render, BodySystem e meleeHitbox.
+        const core::ItemDef* weaponDef() const;
+        bool hasWeapon() const { return weaponDef() != nullptr; }
 
         // Melee light 3-hit. Estado avançado pelo MeleeSystem (tem dt).
         MeleePhase meleePhase = MeleePhase::Idle;
@@ -104,10 +95,6 @@ class Player : public Entity
         void collide(Entity entity);
         void collide(Component bloco);
 
-        // M (debug visual): Iron→Leather→Gold→Diamond→pelado→Iron.
-        // Pelado zera equipped (sem arma/armadura p/ teste do sprite
-        // base); o próximo ciclo reequipa no Iron. Testável sem Game.
-        void cycleMaterial();
         void tick();
 
         // Tenta arremessar na direção do facing com arco fixo.

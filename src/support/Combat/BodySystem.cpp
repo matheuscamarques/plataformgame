@@ -20,9 +20,11 @@ sf::FloatRect computeWeaponBbox(Player &p) {
     const float handY = arm->worldBox.top + arm->worldBox.height;
     // Offsets por arma via registry (mesma matemática de antes).
     float handOX = 4.f, handOY = 8.f;
-    if (const auto *wd0 = WeaponRegistry::instance().find(p.loadout.weaponId)) {
-        handOX = wd0->handOffsetX;
-        handOY = wd0->handOffsetY;
+    if (const core::ItemDef* wdef = p.weaponDef()) {
+        if (const auto *wd0 = WeaponRegistry::instance().find(wdef->id)) {
+            handOX = wd0->handOffsetX;
+            handOY = wd0->handOffsetY;
+        }
     }
     const float baseX = handX + handOX * static_cast<float>(p.facing) * s;
     const float baseY = handY + handOY * s;
@@ -33,11 +35,13 @@ sf::FloatRect computeWeaponBbox(Player &p) {
     // Dimensões por arma via registry (sem if por id).
     float sw = 16.f * s, sh = 8.f * s;
     float ox = 5.f * s, oy = 5.f * s;
-    if (const auto *wd = WeaponRegistry::instance().find(p.loadout.weaponId)) {
-        sw = wd->spriteW * s;
-        sh = wd->spriteH * s;
-        ox = wd->originX * s;
-        oy = wd->originY * s;
+    if (const core::ItemDef* wdef = p.weaponDef()) {
+        if (const auto *wd = WeaponRegistry::instance().find(wdef->id)) {
+            sw = wd->spriteW * s;
+            sh = wd->spriteH * s;
+            ox = wd->originX * s;
+            oy = wd->originY * s;
+        }
     }
     float left, top;
     if (p.facing >= 0) {
@@ -65,7 +69,7 @@ void BodySystem::tick(float /*dt*/, GameContext &ctx) {
             p.body.rebuild({p.getX(), p.getY()}, p.facing);
         }
         // A: sobrescreve Weapon com o bbox real (rebuild limpa por frame).
-        if (p.loadout.equipped) {
+        if (p.hasWeapon()) {
             if (auto *w = const_cast<PartState *>(
                     p.body.find(BodyPartId::Weapon))) {
                 w->worldBox = computeWeaponBbox(p);

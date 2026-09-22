@@ -16,7 +16,7 @@ bool near(float a, float b) { return std::fabs(a - b) < 0.01f; }
 int main() {
     { // MeleeHitboxFromSwingAim (arma + Active = rect E por snapshot)
         Player p; // (0,0,30,50), centro (15,25), facing 1, swingAim E
-        p.loadout.equipped = true;
+        assert(p.hasWeapon()); // seed: espada de ferro
         p.meleePhase = MeleePhase::Active;
         BodySchema s = BodySchema::humanoid(50.f, 50.f);
         p.body.attach(&s);
@@ -28,7 +28,7 @@ int main() {
     }
     { // FallbackToLightWhenNoWeapon (sem equipamento = kLight, soco)
         Player p;
-        p.loadout.equipped = false;
+        p.equipment.unequip(core::EquipSlot::RightHand);
         p.meleePhase = MeleePhase::Active;
         BodySchema s = BodySchema::humanoid(50.f, 50.f);
         p.body.attach(&s);
@@ -39,7 +39,7 @@ int main() {
     }
     { // NoHitboxOutsideActive (só Active acerta)
         Player p;
-        p.loadout.equipped = true;
+        assert(p.hasWeapon()); // seed: espada de ferro
         p.meleePhase = MeleePhase::Windup;
         BodySchema s = BodySchema::humanoid(50.f, 50.f);
         p.body.attach(&s);
@@ -50,10 +50,9 @@ int main() {
     { // AxeVsSwordReach (arma diferente = alcance diferente, sem lógica nova)
         // Espada: swing 16px de largura a 2.5x = 40px.
         // Machado: idle 8px de largura a 2.5x = 20px.
-        auto reachOf = [](const std::string &weaponId) {
+        auto reachOf = [](const std::string &defId) {
             Player p;
-            p.loadout.equipped = true;
-            p.loadout.weaponId = weaponId;
+            p.equipment.equip(core::Item{defId, 1});
             p.meleePhase = MeleePhase::Active;
             p.currentFrameId = SpriteFrameId::PlayerPunch;
             p.facing = 1;
@@ -65,8 +64,8 @@ int main() {
             assert(w != nullptr);
             return w->worldBox.width;
         };
-        const float sword = reachOf("sword");
-        const float axe = reachOf("axe");
+        const float sword = reachOf("iron_sword");
+        const float axe = reachOf("iron_axe");
         assert(near(sword, 40.f) && near(axe, 20.f));
         assert(sword > axe);
     }

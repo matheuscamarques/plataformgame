@@ -313,7 +313,7 @@ void Game::render()
 
         // ── 1. Weapon bbox sempre (ciano): onde a arma está agora,
         // mesmo fora do Active (só existe com arma visível).
-        if (p->loadout.equipped) {
+        if (p->hasWeapon()) {
             if (const auto *w = p->body.find(support::BodyPartId::Weapon)) {
                 if (w->worldBox.width > 0.5f) {
                     sf::RectangleShape r(
@@ -350,10 +350,10 @@ void Game::render()
             };
             const auto &hb = kPrev[static_cast<int>(aim)];
             float ws = 1.f, hs = 1.f;
-            if (p->loadout.equipped) {
+            if (p->hasWeapon()) {
                 if (const auto *wd =
                         support::WeaponRegistry::instance().find(
-                            p->loadout.weaponId)) {
+                            p->weaponDef()->id)) {
                     ws = wd->spriteW / 16.f;
                     hs = wd->spriteH / 8.f;
                 }
@@ -675,8 +675,9 @@ void Game::render()
         };
         text("HP " + std::to_string(p->hp) + "/" + std::to_string(p->hpMax), 16.f, 38.f);
         text("TNT:" + std::to_string(p->inventory.count("dynamite")) + " J  K melee", 16.f, 62.f);
-        text(std::string("Mat: ") + (p->loadout.equipped
-                                          ? core::materialName(p->loadout.weapon)
+        text(std::string("Mat: ") + (p->weaponDef()
+                                          ? core::materialName(
+                                                p->weaponDef()->material)
                                           : "--"),
              16.f, 110.f);
         const int pty = static_cast<int>(std::floor(p->getY() / core::kBlockSize));
@@ -739,13 +740,19 @@ void Game::drawPlayerSprite() {
 
 void Game::drawPlayerEquipment() {
     Player *p = player.get();
-    if (run_.isDead() || !p->loadout.equipped) return;
+    if (run_.isDead()) return;
     const float s = p->getH() / static_cast<float>(sprites::kPlayerH);
     const int f = p->facing;
-    const int mHelm = static_cast<int>(p->loadout.helm);
-    const int mChest = static_cast<int>(p->loadout.chest);
-    const int mLegs = static_cast<int>(p->loadout.legs);
-    const int mGlove = mHelm; // mesmo material do elmo (sem slot próprio)
+    // Material por peça equipada (-1 = slot vazio: peça some).
+    auto materialOf = [&](core::EquipSlot slot) {
+        const core::Item& it = p->equipment.get(slot);
+        if (it.isEmpty()) return -1;
+        const core::ItemDef* d = it.def();
+        return d ? static_cast<int>(d->material) : -1;
+    };
+    const int mHelm = materialOf(core::EquipSlot::Head);
+    const int mChest = materialOf(core::EquipSlot::Chest);
+    const int mLegs = materialOf(core::EquipSlot::Legs);
 
     // Peça full-width (12px) centralizada no centro-x da parte âncora.
     // Offsets em rows do sprite (nunca world): a âncora segue o Body,
@@ -769,12 +776,13 @@ void Game::drawPlayerEquipment() {
 
     // Luva centrada na mão; some se o braço está oculto no frame
     // (fromSchema: walkA/walkB/throw/punch mostram 1 braço só).
-    auto drawGlove = [&](support::BodyPartId arm) {
+    // Sem slot próprio: segue o elmo; sem elmo, sem luva.
+    auto drawGlove = [&](support::BodyPartId arm, int m) {
         const auto *part = p->body.find(arm);
         if (!part || part->fromSchema) return;
-        sf::Sprite spr(sprites_.gloves[mGlove]);
+        sf::Sprite spr(sprites_.gloves[m]);
         spr.setOrigin(sprites::kGloveW * 0.5f,
-                      static_cast<float>(sprites::kGloveH) * 0.5f);
+                      static_cast<float>(sprites::kGloveH * 0.5f));
         spr.setPosition(part->worldBox.left + part->worldBox.width * 0.5f,
                         part->worldBox.top + part->worldBox.height * 0.5f);
         spr.setScale(s * static_cast<float>(f), s);
@@ -782,27 +790,34 @@ void Game::drawPlayerEquipment() {
     };
 
     // Elmo 12x5: topo 2 rows acima do topo da cabeça (idle: rows 0-4).
-    drawFullWidth(sprites_.helm[mHelm], sprites::kHelmW,
-                  support::BodyPartId::Head, 0.f, -2.f);
+    if (mHelm >= 0)
+        drawFullWidth(sprites_.helm[mHelm], sprites::kHelmW,
+                      support::BodyPartId::Head, 0.f, -2.f);
     // Peitoral 12x8: topo no topo do torso (idle: rows 6-13).
-    drawFullWidth(sprites_.chest[mChest], sprites::kChestW,
-                  support::BodyPartId::Torso, 0.f, 0.f);
+    if (mChest >= 0)
+        drawFullWidth(sprites_.chest[mChest], sprites::kChestW,
+                      support::BodyPartId::Torso, 0.f, 0.f);
     // Perneiras 12x6: topo 2 rows acima da base do torso (idle: rows
     // 14-19, sobrepõe a coxa sob a túnica, como no layout antigo).
-    drawFullWidth(sprites_.legs[mLegs], sprites::kLegsW,
-                  support::BodyPartId::Torso, 1.f, -2.f);
+    if (mLegs >= 0)
+        drawFullWidth(sprites_.legs[mLegs], sprites::kLegsW,
+                      support::BodyPartId::Torso, 1.f, -2.f);
     // Botas 12x3: topo 1 row abaixo da base do torso (idle: rows 17-19).
-    drawFullWidth(sprites_.boots[mLegs], sprites::kBootsW,
-                  support::BodyPartId::Torso, 1.f, 1.f);
+    if (mLegs >= 0)
+        drawFullWidth(sprites_.boots[mLegs], sprites::kBootsW,
+                      support::BodyPartId::Torso, 1.f, 1.f);
 
-    drawGlove(support::BodyPartId::ArmL);
-    drawGlove(support::BodyPartId::ArmR);
+    if (mHelm >= 0) {
+        drawGlove(support::BodyPartId::ArmL, mHelm);
+        drawGlove(support::BodyPartId::ArmR, mHelm);
+    }
 }
 
 void Game::drawPlayerWeapon() {
     Player *p = player.get();
-    if (run_.isDead() || !p->loadout.equipped) return;
-    const int m = static_cast<int>(p->loadout.weapon);
+    if (run_.isDead() || !p->hasWeapon()) return;
+    const core::ItemDef* wdef = p->weaponDef();
+    const int m = static_cast<int>(wdef->material);
     const float s = p->getH() / static_cast<float>(sprites::kPlayerH);
     // Mão = base do ArmR (onde o pixel de pele termina, row 9 no idle).
     // Espelho de computeWeaponBbox em BodySystem — mudar um sem o outro
@@ -815,7 +830,7 @@ void Game::drawPlayerWeapon() {
     float originX = 4.f, originY = 20.f;
     // Machado só tem idle: mesma textura em toda fase (dado no registry).
     const support::WeaponDef *wd =
-        support::WeaponRegistry::instance().find(p->loadout.weaponId);
+        support::WeaponRegistry::instance().find(wdef->id);
     const bool phased = !wd || wd->hasSwingPhases;
     if (!phased) {
         tex = &sprites_.axeIdle[m];

@@ -15,7 +15,7 @@ int main() {
     { // SwingFreezesDirection (snapshot: input posterior não move o golpe)
         Player p;
         p.meleePhase = MeleePhase::Idle;
-        p.loadout.equipped = true;
+        assert(p.hasWeapon()); // seed: espada de ferro
         p.aimDir = AimDir::N;
 
         assert(p.startSwing());
@@ -26,7 +26,7 @@ int main() {
     }
     { // HitboxUsesSwingAim (N = 20px acima do centro)
         Player p;
-        p.loadout.equipped = true;
+        assert(p.hasWeapon()); // seed: espada de ferro
         p.meleePhase = MeleePhase::Active;
         p.meleeCombo = 0;
         p.swingAim = AimDir::N;
@@ -39,7 +39,7 @@ int main() {
     }
     { // FallbackSocoWhenUnequipped (N ignorado sem arma)
         Player p;
-        p.loadout.equipped = false;
+        p.equipment.unequip(core::EquipSlot::RightHand);
         p.meleePhase = MeleePhase::Active;
         p.meleeCombo = 0; // kLight[0].hx = 16
         p.swingAim = AimDir::N;

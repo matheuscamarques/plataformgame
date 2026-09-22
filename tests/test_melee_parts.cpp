@@ -43,7 +43,7 @@ int main() {
 
     { // TorsoHit1x (head escapa 7px acima; best=torso entre 1.0/0.6/0.7)
         Player p;
-        p.loadout.equipped = false; // soco: geometria fixa facing-E
+        p.equipment.unequip(core::EquipSlot::RightHand); // soco: geometria fixa facing-E
         p.setY(10.f); // soco [30,46]x[25,45]: head [11.2,17.8] fora
         EnemySystem enemies;
         enemies.spawn("slime", 32.f, 10.f);
@@ -63,7 +63,7 @@ int main() {
     }
     { // ArmHit06x (só ArmL; torso escapa 0.5px à direita)
         Player p;
-        p.loadout.equipped = false; // soco: geometria fixa facing-E
+        p.equipment.unequip(core::EquipSlot::RightHand); // soco: geometria fixa facing-E
         p.setX(-14.5f); // soco [15.5,31.5]x[15,35]: torso x>=32 fora
         EnemySystem enemies;
         enemies.spawn("slime", 32.f, 10.f);
@@ -83,7 +83,7 @@ int main() {
     }
     { // WhiffInsideAABB (cruza o corpo no canto sem partes, sem dano)
         Player p;
-        p.loadout.equipped = false; // soco: geometria fixa facing-E
+        p.equipment.unequip(core::EquipSlot::RightHand); // soco: geometria fixa facing-E
         p.setX(-13.f);
         p.setY(-24.f); // soco [17,33]x[9,11]: AABB ok, head x>=40 fora
         EnemySystem enemies;
@@ -114,7 +114,7 @@ int main() {
             {BodyPartId::LegL, {0.f, 12.f}, {10.f, 4.f}, 0.7f, 0.8f, false},
         };
         Player p;
-        p.loadout.equipped = false; // soco: geometria fixa facing-E
+        p.equipment.unequip(core::EquipSlot::RightHand); // soco: geometria fixa facing-E
         p.setX(20.f);
         EnemySystem enemies;
         enemies.spawn("slime", 32.f, 10.f);
@@ -137,7 +137,7 @@ int main() {
     }
     { // NoSchemaAABB (sem schema = legado 1x; regressão Fase C)
         Player p;
-        p.loadout.equipped = false; // soco: geometria fixa facing-E
+        p.equipment.unequip(core::EquipSlot::RightHand); // soco: geometria fixa facing-E
         EnemySystem enemies;
         enemies.spawn("slime", 32.f, 10.f);
         enemies.forEach([](Enemy &s) {
@@ -159,7 +159,7 @@ int main() {
     }
     { // DedupPerSwing (30 ticks = 1 aplicação; torso 1x)
         Player p;
-        p.loadout.equipped = false; // soco: geometria fixa facing-E
+        p.equipment.unequip(core::EquipSlot::RightHand); // soco: geometria fixa facing-E
         p.setY(10.f);
         EnemySystem enemies;
         enemies.spawn("slime", 32.f, 10.f);
@@ -179,7 +179,7 @@ int main() {
     }
     { // SparkSpawnsOnPartHit (faísca observável via activeDebris)
         Player p; // (0,0): best=head
-        p.loadout.equipped = false; // soco: geometria fixa facing-E
+        p.equipment.unequip(core::EquipSlot::RightHand); // soco: geometria fixa facing-E
         EnemySystem enemies;
         enemies.spawn("slime", 32.f, 10.f);
         rebuildAll(enemies);

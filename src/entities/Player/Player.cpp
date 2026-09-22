@@ -242,22 +242,9 @@ bool Player::tryThrow(support::ThrowSystem &throws) {    if (!throwCooldown.read
     return true;
 }
 
-void Player::cycleMaterial() {
-    if (!loadout.equipped) {
-        // Pelado → reequipa no Iron (fecha o ciclo de 5 estados).
-        loadout.equipped = true;
-        loadout.weapon = loadout.helm = loadout.chest = loadout.legs =
-            core::MaterialId::Iron;
-        return;
-    }
-    const int next =
-        static_cast<int>(loadout.weapon) + 1;
-    if (next >= static_cast<int>(core::MaterialId::COUNT)) {
-        loadout.equipped = false; // 5º estado: sem nada, p/ teste
-        return;
-    }
-    loadout.weapon = loadout.helm = loadout.chest = loadout.legs =
-        static_cast<core::MaterialId>(next);
+const core::ItemDef* Player::weaponDef() const {
+    const core::Item& w = equipment.get(core::EquipSlot::RightHand);
+    return w.isEmpty() ? nullptr : w.def();
 }
 
 bool Player::hurt(int dmg) {
@@ -361,11 +348,11 @@ sf::FloatRect Player::meleeHitbox() {
     // swingAim já é screen-space (tecla esquerda = W = esquerda da tela),
     // então NÃO espelha por facing — o * facing aqui duplicava o espelho
     // e jogava o W para a direita (melee só acertava à direita).
-    if (loadout.equipped) {
+    if (const core::ItemDef* wdef = weaponDef()) {
         const auto &hb = kAimHitbox[static_cast<int>(swingAim)];
         float ws = 1.f, hs = 1.f;
         if (const auto *wd =
-                support::WeaponRegistry::instance().find(loadout.weaponId)) {
+                support::WeaponRegistry::instance().find(wdef->id)) {
             ws = wd->spriteW / 16.f;
             hs = wd->spriteH / 8.f;
         }

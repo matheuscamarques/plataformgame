@@ -60,13 +60,13 @@ int main() {
 
     // consume mata o edge no mesmo frame (N ticks, 1 disparo)
     in.beginFrame();
-    in.handleEvent(keyEvent(sf::Event::KeyPressed, sf::Keyboard::M));
-    assert(in.pressed(Action::CycleMaterial));
-    in.consume(Action::CycleMaterial);
-    assert(!in.pressed(Action::CycleMaterial));
-    assert(!in.held(Action::CycleMaterial));
+    in.handleEvent(keyEvent(sf::Event::KeyPressed, sf::Keyboard::T));
+    assert(in.pressed(Action::ArrangeAll));
+    in.consume(Action::ArrangeAll);
+    assert(!in.pressed(Action::ArrangeAll));
+    assert(!in.held(Action::ArrangeAll));
     in.beginFrame(); // próximo frame sem evento: nada fantasma
-    assert(!in.pressed(Action::CycleMaterial));
+    assert(!in.pressed(Action::ArrangeAll));
 
     std::printf("inputmap test OK\n");
     return 0;

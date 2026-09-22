@@ -179,12 +179,6 @@ void Game::tick() {
             audio_.play(game::keyOf(game::Sfx::DynFuse));
         }
 
-        // M: cicla material do set inteiro (debug visual).
-        if (input_.pressed(support::Action::CycleMaterial)) {
-            input_.consume(support::Action::CycleMaterial);
-            p->cycleMaterial();
-        }
-
         // 1-5: slot ativo da hotbar (fase 4a; sem consumo — edge por frame).
         // Fora quando o grid está aberto (navegação é do grid).
         if (!inventoryUI_.isOpen())

@@ -16,7 +16,6 @@ InputMap::InputMap() {
     bind(Action::Heavy,   sf::Keyboard::K);
     bind(Action::Pause,   sf::Keyboard::Escape);
     bind(Action::Restart, sf::Keyboard::R);
-    bind(Action::CycleMaterial, sf::Keyboard::M);
     bind(Action::ToggleDebug, sf::Keyboard::F1);
     bind(Action::ToggleCharView, sf::Keyboard::F3);
     bind(Action::ScreenshotNow, sf::Keyboard::F12);

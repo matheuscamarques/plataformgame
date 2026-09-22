@@ -11,7 +11,7 @@ enum class Action : uint8_t {
     Left, Right, Up, Down,
     Jump, Roll, RunFast,
     Light, Heavy,
-    Pause, ToggleDebug, Restart, CycleMaterial, ToggleCharView,
+    Pause, ToggleDebug, Restart, ToggleCharView,
     ScreenshotNow, ToggleAutoMelee, ToggleAutoHurt, // F12, F11, F10
     ToggleHitboxes, ToggleAi, ToggleEvents, ToggleWorld, // F2,F5,F4,F6
     ToggleFileLog, // F9: log de eventos em logs/debug.log

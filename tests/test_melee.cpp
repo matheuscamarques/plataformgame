@@ -11,7 +11,7 @@ int main() {
 
     { // HitsSlimeInFrontOnce (head 2x: 30 → 14, sem duplo hit)
         Player p; // (0,0) 30x50 facing 1 → soco combo0 x=[30,46] y=[15,35]
-        p.loadout.equipped = false; // trava hitbox do soco (default é espada)
+        p.equipment.unequip(core::EquipSlot::RightHand); // soco (seed equipa espada)
         EnemySystem enemies;
         enemies.spawn("slime", 32.f, 10.f); // 40x30 sobre a hitbox
         // Body posicionado (como BodySystem 250 faz em jogo): hitbox
@@ -33,7 +33,7 @@ int main() {
     }
     { // HitsSlimeBehindWhenFacingLeft (regressão: W ia p/ direita)
         Player p; // (100,0) 30x50, centro (115,25)
-        p.loadout.equipped = false; // trava hitbox do soco (default é espada)
+        p.equipment.unequip(core::EquipSlot::RightHand); // soco (seed equipa espada)
         p.setX(100.f);
         p.facing = -1;
         p.aimDir = support::AimDir::W; // tecla esquerda = esquerda da tela
@@ -74,7 +74,7 @@ int main() {
     }
     { // ChainsComboInRecovery (combo 0 → 1; combo1 head overkilla)
         Player p;
-        p.loadout.equipped = false; // trava hitbox do soco (default é espada)
+        p.equipment.unequip(core::EquipSlot::RightHand); // soco (seed equipa espada)
         EnemySystem enemies;
         enemies.spawn("slime", 32.f, 10.f);
         enemies.forEach([](Enemy &s) {
