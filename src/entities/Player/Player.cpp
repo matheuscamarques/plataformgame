@@ -20,6 +20,7 @@ Entity(core::kIdPlayer,0,0,30,50) // AABB derivado do sprite 12x20 a 2.5x
     static auto schema = support::BodySchema::humanoid(50.f, 30.f);
     body.attach(&schema);
     topUpDynamite();
+    topUpStarterKit();
     // Nasce equipado (set de ferro): render idêntico ao Loadout antigo.
     // Direto no equipment (não passa pelo inventário, sem sobra).
     equipment.equip(core::Item{"iron_sword", 1});
@@ -231,6 +232,26 @@ void Player::topUpDynamite() {
     }
 }
 
+void Player::topUpStarterKit() {
+    // 1 pilha cheia de cada item do registry (ordem de registro;
+    // dinamite pula aqui — topUpDynamite dá 999 em 11 pilhas).
+    // Generoso como a dinamite: completa o que falta, nunca esvazia.
+    for (const std::string& id : core::ItemRegistry::instance().keys()) {
+        if (id == "dynamite") continue;
+        const core::ItemDef* def =
+            core::ItemRegistry::instance().find(id);
+        if (!def) continue;
+        for (int missing = def->stackMax - inventory.count(id);
+             missing > 0;) {
+            const int put = std::min(missing, 99);
+            const int left = inventory.add(
+                core::Item{id, static_cast<uint16_t>(put)});
+            missing -= put - left;
+            if (left > 0) break; // cheio: fica com o que coube
+        }
+    }
+}
+
 bool Player::tryThrow(support::ThrowSystem &throws) {    if (!throwCooldown.ready() || inventory.count("dynamite") <= 0)
         return false;
     // Arco fixo na direção do facing; sem mira manual no MVP.
@@ -264,6 +285,7 @@ void Player::respawn(float x, float y) {
     hurtIframes.reset();
     throwCooldown.reset();
     topUpDynamite();
+    topUpStarterKit();
     meleePhase = MeleePhase::Idle;
     meleeCombo = 0;
     meleeTimer = 0.f;

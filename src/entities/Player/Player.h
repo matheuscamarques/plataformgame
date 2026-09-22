@@ -106,6 +106,10 @@ class Player : public Entity
         // inventário sobrevive à morte. Nunca esvazia o resto.
         void topUpDynamite();
 
+        // Kit inicial: 1 pilha cheia de cada item do registry.
+        // Mesmo padrão generoso da dinamite (ctor + respawn).
+        void topUpStarterKit();
+
         // Dano com gate de i-frame (0.6s). Retorna se aplicou.
         // hp trava em 0; morte/restart vêm no bloco B.
         bool hurt(int dmg);

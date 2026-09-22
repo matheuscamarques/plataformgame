@@ -362,6 +362,23 @@ int main() {
                "iron_chest");
         assert(p.equipment.get(core::EquipSlot::Legs).defId == "iron_legs");
     }
+    { // StarterKit (1 pilha cheia de cada item do registry)
+        Player p;
+        assert(p.inventory.count("dynamite") == 999);
+        assert(p.inventory.count("slime_gel") == 99);
+        assert(p.inventory.count("stone") == 99);
+        assert(p.inventory.count("wood") == 99);
+        assert(p.inventory.count("iron_ore") == 99);
+        assert(p.inventory.count("copper_ore") == 99);
+        assert(p.inventory.count("gold_ore") == 99);
+        assert(p.inventory.count("potion") == 10);
+        assert(p.inventory.count("rusty_key") == 1);
+        assert(p.inventory.count("iron_sword") == 1);
+        assert(p.inventory.count("iron_axe") == 1);
+        assert(p.inventory.count("iron_helm") == 1);
+        assert(p.inventory.count("iron_chest") == 1);
+        assert(p.inventory.count("iron_legs") == 1);
+    }
     { // EquipViaMenu (F→Equip: grid esvazia, antigo volta)
         InventoryUI ui;
         core::Inventory inv;
