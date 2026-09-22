@@ -26,6 +26,13 @@ struct Throwable {
     bool         active      = false;
     bool         resting     = false;  // parou de se mover
     float        restingTimer = 0.f;   // tempo parado
+    // Cache da última escrita no grid de luz (evita re-flood por frame;
+    // item 15: TNT emite blockLight enquanto o fuse corre).
+    int          lastLightTileX = -9999;
+    int          lastLightTileY = -9999;
+    uint8_t      lastLightLevel = 0;
+    int          lastChunkX = -9999;
+    int          lastChunkY = -9999;
 };
 
 } // namespace support

@@ -105,6 +105,9 @@ void Game::run()
     // Raio VISUAL (centro à borda): 180 renderiza 360px de largura.
     // Aura difusa que ilumina o caminho (~3.6 tiles por lado).
     lighting_.setPlayerRadius(180.f);
+    // Overlay sutil (item 16): o grid carrega a cena, o ADD dá legibilidade.
+    // Master 0.4 — sem ele o centro satura e o "ovo" volta.
+    lighting_.setMasterIntensity(0.4f);
     float lastStat = 0.0f;
     int frames = 0;
     int updates = 0;

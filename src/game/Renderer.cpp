@@ -474,10 +474,13 @@ void Game::render()
     }
 
     // ─── Emissivos (ADD, após multiply: não são escurecidos) ───
-    // Grid-only p/ o player (Terraria puro): a luz vem do blockLight
-    // (App re-registra level 13); sem overlay ADD — o "ovo" morreu aqui.
-    // drawPlayerLight mantido na classe p/ reversão em 1 linha, mas sem
-    // chamada. TNT/blast mantêm glows próprios (alphas independentes).
+    // Grid carrega a cena (player level 13, TNT item 15); overlays dão o
+    // brilho legível: aura sutil do player (master 0.4, sem "ovo") +
+    // faísca/blast da TNT com halo (fake bloom, item 17: 2º draw maior
+    // e fraco). TNT/blast mantêm alphas próprios independentes.
+    lighting_.drawPlayerLight(*window,
+                              player.get()->getCenterX(),
+                              player.get()->getCenterY());
     throws_->forEachActive([&](const support::Throwable &t) {
         if (t.kind != support::ThrowKind::Dynamite) return;
         if (t.fuse <= 0.f) return;
@@ -489,10 +492,21 @@ void Game::render()
                                  static_cast<sf::Uint8>(gp.g),
                                  static_cast<sf::Uint8>(gp.b),
                                  static_cast<sf::Uint8>(gp.a)));
+        // Halo: mesma cor, ~2.2× o raio, 1/4 do alpha.
+        lighting_.drawRadial(*window, t.pos, gp.radius * 2.2f,
+                             sf::Color(
+                                 static_cast<sf::Uint8>(gp.r),
+                                 static_cast<sf::Uint8>(gp.g),
+                                 static_cast<sf::Uint8>(gp.b),
+                                 static_cast<sf::Uint8>(gp.a * 0.25f)));
     });
     throws_->renderBlasts(*window,
         [&](sf::Vector2f p, float r, sf::Color c) {
             lighting_.drawRadial(*window, p, r, c);
+            // Halo do blast: mesma cor, ~2.2× o raio, 1/4 do alpha.
+            lighting_.drawRadial(*window, p, r * 2.2f,
+                                 sf::Color(c.r, c.g, c.b,
+                                           static_cast<sf::Uint8>(c.a * 0.25f)));
         });
 
     overlay_.render(*window, font, *getWorld(), *player.get(), objects.size());

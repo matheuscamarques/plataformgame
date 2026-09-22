@@ -13,12 +13,26 @@
 #include "support/GameContext.h"
 #include "ParticleSystem.h"
 #include "support/Progression/PatienceSystem.h"
+#include "world/Chunk.h"
+#include "world/LightPropagator.h"
 #include "world/World.h"
 
 namespace support {
 
 namespace {
 constexpr float kRestThreshold = 4.f; // px/s — abaixo disso considera parado
+
+// Nível de luz da TNT no grid: 6 com fuse cheio, 12 prestes a explodir.
+// heat usa /0.8 (mesma base do tntGlowParams); fuse nasce em 1.0.
+uint8_t tntLightLevel(float fuse) {
+    const float heat = std::clamp(1.f - fuse / 0.8f, 0.f, 1.f);
+    return static_cast<uint8_t>(6.f + 6.f * heat);
+}
+
+// floor-div p/ tiles possivelmente negativos (mundo pode ser < 0).
+inline int chunkOfTile(int t) {
+    return t >= 0 ? t / Chunk::W : -((-t + Chunk::W - 1) / Chunk::W);
+}
 }
 
 Throwable *ThrowSystem::throwItem(sf::Vector2f from, sf::Vector2f vel, ThrowKind kind) {
@@ -53,6 +67,39 @@ void ThrowSystem::tick(float dt, GameContext &ctx) {
         } else {
             t.restingTimer = 0.f;
             t.resting = false;
+        }
+
+        // ── TNT emite luz no grid enquanto o fuse corre (item 15) ──
+        // Sem raycast (fonte rápida, oclusão irrelevante); re-flood só se
+        // tile ou nível mudar. addBlockSource preserva luz maior (player).
+        if (ctx.world && t.kind == ThrowKind::Dynamite && t.fuse > 0.f) {
+            const int tx = static_cast<int>(std::floor(t.pos.x / core::kBlockSize));
+            const int ty = static_cast<int>(std::floor(t.pos.y / core::kBlockSize));
+            const uint8_t lvl = tntLightLevel(t.fuse);
+            if (tx != t.lastLightTileX || ty != t.lastLightTileY ||
+                lvl != t.lastLightLevel) {
+                const int ccx = chunkOfTile(tx);
+                const int ccy = chunkOfTile(ty);
+                // Trocou de chunk: limpa o resíduo no anterior.
+                if ((t.lastChunkX != ccx || t.lastChunkY != ccy) &&
+                    t.lastChunkX != -9999) {
+                    if (Chunk* old = ctx.world->findChunk(t.lastChunkX, t.lastChunkY)) {
+                        old->blockLight.assign(Chunk::W * Chunk::H, 0);
+                        old->lightDirty = true;
+                    }
+                }
+                if (Chunk* c = ctx.world->findChunk(ccx, ccy)) {
+                    const int lx = tx - ccx * Chunk::W;
+                    const int ly = ty - ccy * Chunk::H;
+                    LightPropagator::addBlockSource(*c, lx, ly, lvl, false);
+                    c->lightDirty = true;
+                    t.lastLightTileX = tx;
+                    t.lastLightTileY = ty;
+                    t.lastLightLevel = lvl;
+                    t.lastChunkX = ccx;
+                    t.lastChunkY = ccy;
+                }
+            }
         }
 
         // Fuse
@@ -190,6 +237,17 @@ std::size_t ThrowSystem::activeBlastCount() const {
 }
 
 void ThrowSystem::handleFuse(Throwable &t, GameContext &ctx) {
+    // A luz do grid some com o objeto (chunk zerado + dirty). Se o player
+    // dividia o chunk, o guard do App re-adiciona no próximo tick.
+    t.lastLightTileX = -9999;
+    if (ctx.world && t.lastChunkX != -9999) {
+        if (Chunk* c = ctx.world->findChunk(t.lastChunkX, t.lastChunkY)) {
+            c->blockLight.assign(Chunk::W * Chunk::H, 0);
+            c->lightDirty = true;
+        }
+        t.lastChunkX = -9999;
+        t.lastChunkY = -9999;
+    }
     if (explosions_) {
         ExplosionDef def;
         def.radius      = t.radius;
