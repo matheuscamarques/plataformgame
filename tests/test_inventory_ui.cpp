@@ -386,7 +386,7 @@ int main() {
     { // GridCobreInventario (constantes batem com o inventário)
         static_assert(InventoryUI::kSlots == core::Inventory::kCapacity,
                       "grid cobre o inventário inteiro");
-        assert(InventoryUI::kCols == 8 && InventoryUI::kRows == 6);
+        assert(InventoryUI::kCols == 8 && InventoryUI::kRows == 10);
     }
     { // WeaponDefs (dano/defesa/slots p/ o painel e o menu)
         const core::ItemDef* sword =
@@ -508,6 +508,8 @@ int main() {
         assert(p.inventory.count("leather_boots") == 1);
         assert(p.inventory.count("gold_boots") == 1);
         assert(p.inventory.count("diamond_boots") == 1);
+        // Kit inteiro: 32 defs em 1 slot cada + dinamite 999 em 1 só.
+        assert(p.inventory.usedSlots() == 33);
     }
     { // EquipViaMenu (F→Equip: grid esvazia, antigo volta)
         InventoryUI ui;
@@ -559,15 +561,15 @@ int main() {
         core::Inventory inv;
         core::Equipment eq;
         eq.equip(core::Item{"iron_sword", 1});
-        inv.add(core::Item{"stone", 48 * 99}); // 48 slots cheios
-        assert(inv.usedSlots() == 48);
+        inv.add(core::Item{"stone", 80 * 99}); // 80 slots cheios
+        assert(inv.usedSlots() == 80);
         ui.setInventory(&inv);
         ui.setEquipment(&eq);
         ui.open();
         ui.setMainTab(InventoryUI::MainTab::Equipment);
         ui.executeAction(MA::Unequip);
         assert(eq.get(core::EquipSlot::RightHand).defId == "iron_sword");
-        assert(inv.count("stone") == 48 * 99);
+        assert(inv.count("stone") == 80 * 99);
     }
     { // EquipTabFiveSlots (Down circula 0..4, Boots por último)
         InventoryUI ui;

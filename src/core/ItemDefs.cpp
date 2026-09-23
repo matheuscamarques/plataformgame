@@ -376,7 +376,7 @@ REGISTER_ITEM("dynamite", [] {
     def.name = "Dinamite";
     def.type = ItemType::Consumable; // arremesso consome da pilha (verbo)
     def.rarity = ItemRarity::Common;
-    def.stackMax = 99;
+    def.stackMax = 999; // pilha única: 999 em 1 slot (kit cabe em 40)
     return def;
 }())
 

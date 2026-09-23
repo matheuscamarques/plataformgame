@@ -49,7 +49,7 @@ public:
     enum class MenuAction : uint8_t { Use, Equip, Unequip, Drop, Arrange, COUNT };
 
     static constexpr int   kCols     = 8;
-    static constexpr int   kRows     = 6;
+    static constexpr int   kRows     = 10;
     static constexpr int   kSlots    = kCols * kRows; // == Inventory::kCapacity
     static constexpr float kSlotSize = 56.f;
     static constexpr float kPad      = 4.f;

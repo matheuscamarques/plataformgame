@@ -1,7 +1,7 @@
 /**
  * @file src/core/Inventory.h
  * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
- * @brief Cabeçalho do inventário com 48 slots, pilhas e ouro.
+ * @brief Cabeçalho do inventário com 80 slots, pilhas e ouro.
  * @details Declara a classe Inventory pura com add, remove, count, swap e sort, incluído por Player e InventoryUI.
  */
 
@@ -17,7 +17,7 @@ namespace core {
 // add() retorna a sobra em vez de descartar.
 class Inventory {
 public:
-    static constexpr int kCapacity = 48; // 6 fileiras × 8 colunas
+    static constexpr int kCapacity = 80; // 10 fileiras × 8 colunas
 
     // Adiciona: preenche stacks existentes, depois slots vazios.
     // Retorna quanto SOBROU (0 = coube tudo). Def desconhecido = recusa.
