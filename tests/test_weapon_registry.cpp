@@ -30,9 +30,12 @@ int main() {
     }
     { // KeysHoldAll (base + variantes por item do Equipment)
         const auto &keys = WeaponRegistry::instance().keys();
-        assert(keys.size() == 4u);
+        assert(keys.size() == 10u);
         assert(keys[0] == "sword" && keys[1] == "axe");
         assert(keys[2] == "iron_sword" && keys[3] == "iron_axe");
+        assert(keys[4] == "gold_sword" && keys[5] == "gold_axe");
+        assert(keys[6] == "diamond_sword" && keys[7] == "diamond_axe");
+        assert(keys[8] == "leather_sword" && keys[9] == "leather_axe");
     }
     { // ItemVariantsMirrorBase (mesma geometria de sword/axe)
         const WeaponDef *s = WeaponRegistry::instance().find("iron_sword");
