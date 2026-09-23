@@ -838,9 +838,12 @@ void InventoryUI::renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
         equipment_->get(def->equipSlot).defId == sel->defId)
         line("(equipado)", 12, sf::Color(240, 220, 160));
     if (def->type == core::ItemType::Weapon ||
-        def->type == core::ItemType::Armor)
+        def->type == core::ItemType::Armor) {
         line(std::string("MAT: ") + core::materialName(def->material), 12,
              sf::Color(170, 170, 180));
+        line("Peso: " + std::to_string(static_cast<int>(def->weight)), 12,
+             sf::Color(170, 170, 180));
+    }
     if (def->throwable)
         line("BOOM: " + std::to_string(def->blastDamage) + "  r" +
                  std::to_string(static_cast<int>(def->blastRadius)) + "  t" +
@@ -896,6 +899,15 @@ void InventoryUI::renderStatusTab(sf::RenderTarget& t, float sw, float sh,
          sf::Color(120, 180, 255), y);
     line("Ouro: " + std::to_string(st.gold), 14,
          sf::Color(240, 220, 140), y);
+    if (player_) {
+        const float load = player_->equipLoad();
+        const bool heavy = player_->heavilyLoaded();
+        line("Carga: " + std::to_string(static_cast<int>(load)) + "/" +
+                 std::to_string(static_cast<int>(core::kMaxEquipLoad)) +
+                 (heavy ? " (pesada: sem correr)" : " (leve)"),
+             14,
+             heavy ? sf::Color(240, 120, 120) : sf::Color(170, 170, 180), y);
+    }
     (void)sh;
 }
 

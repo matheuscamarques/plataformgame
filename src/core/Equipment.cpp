@@ -48,4 +48,15 @@ bool Equipment::isEmpty() const {
     return true;
 }
 
+float Equipment::weight() const {
+    float total = 0.f;
+    for (int i = 1; i < kEquipSlotCount; ++i) {
+        const Item& it = slots_[i];
+        if (it.isEmpty()) continue;
+        if (const ItemDef* def = it.def())
+            total += def->weight * it.quantity;
+    }
+    return total;
+}
+
 } // namespace core

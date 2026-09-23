@@ -66,6 +66,12 @@ class Player : public Entity
         const core::ItemDef* weaponDef() const;
         bool hasWeapon() const { return weaponDef() != nullptr; }
 
+        // Carga equipada (mochila não pesa). Pesada = sem correr.
+        float equipLoad() const { return equipment.weight(); }
+        bool heavilyLoaded() const {
+            return equipLoad() > core::kMaxEquipLoad * 0.5f;
+        }
+
         // Melee light 3-hit. Estado avançado pelo MeleeSystem (tem dt).
         MeleePhase meleePhase = MeleePhase::Idle;
         int meleeCombo = 0;

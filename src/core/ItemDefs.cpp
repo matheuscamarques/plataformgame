@@ -521,6 +521,7 @@ REGISTER_ITEM("iron_sword", [] {
     def.spritePal = kItemSwordPal;
     def.spritePalCount = kItemSwordPalCount;
     def.name = "Espada de Ferro";
+    def.weight = 6.f;
     def.type = ItemType::Weapon;
     def.rarity = ItemRarity::Common;
     def.stackMax = 1;
@@ -540,6 +541,7 @@ REGISTER_ITEM("iron_axe", [] {
     def.spritePal = kItemAxePal;
     def.spritePalCount = kItemAxePalCount;
     def.name = "Machado de Ferro";
+    def.weight = 8.f;
     def.type = ItemType::Weapon;
     def.rarity = ItemRarity::Uncommon;
     def.stackMax = 1;
@@ -559,6 +561,7 @@ REGISTER_ITEM("iron_helm", [] {
     def.spritePal = kItemHelmPal;
     def.spritePalCount = kItemHelmPalCount;
     def.name = "Elmo de Ferro";
+    def.weight = 4.f;
     def.type = ItemType::Armor;
     def.rarity = ItemRarity::Common;
     def.stackMax = 1;
@@ -578,6 +581,7 @@ REGISTER_ITEM("iron_chest", [] {
     def.spritePal = kItemChestPal;
     def.spritePalCount = kItemChestPalCount;
     def.name = "Peitoral de Ferro";
+    def.weight = 9.f;
     def.type = ItemType::Armor;
     def.rarity = ItemRarity::Common;
     def.stackMax = 1;
@@ -597,6 +601,7 @@ REGISTER_ITEM("iron_legs", [] {
     def.spritePal = kItemLegsPal;
     def.spritePalCount = kItemLegsPalCount;
     def.name = "Perneiras de Ferro";
+    def.weight = 6.f;
     def.type = ItemType::Armor;
     def.rarity = ItemRarity::Common;
     def.stackMax = 1;
@@ -616,6 +621,7 @@ REGISTER_ITEM("leather_helm", [] {
     def.spritePal = kItemLeatherHelmPal;
     def.spritePalCount = kItemLeatherHelmPalCount;
     def.name = "Elmo de Couro";
+    def.weight = 2.f;
     def.type = ItemType::Armor;
     def.rarity = ItemRarity::Common;
     def.stackMax = 1;
@@ -635,6 +641,7 @@ REGISTER_ITEM("leather_chest", [] {
     def.spritePal = kItemLeatherChestPal;
     def.spritePalCount = kItemLeatherChestPalCount;
     def.name = "Peitoral de Couro";
+    def.weight = 5.f;
     def.type = ItemType::Armor;
     def.rarity = ItemRarity::Common;
     def.stackMax = 1;
@@ -654,6 +661,7 @@ REGISTER_ITEM("leather_legs", [] {
     def.spritePal = kItemLeatherLegsPal;
     def.spritePalCount = kItemLeatherLegsPalCount;
     def.name = "Perneiras de Couro";
+    def.weight = 3.f;
     def.type = ItemType::Armor;
     def.rarity = ItemRarity::Common;
     def.stackMax = 1;
@@ -674,6 +682,7 @@ REGISTER_ITEM("gold_sword", [] {
     def.spritePal = kItemGoldSwordPal;
     def.spritePalCount = kItemGoldSwordPalCount;
     def.name = "Espada de Ouro";
+    def.weight = 8.f;
     def.type = ItemType::Weapon;
     def.rarity = ItemRarity::Rare;
     def.stackMax = 1;
@@ -693,6 +702,7 @@ REGISTER_ITEM("gold_axe", [] {
     def.spritePal = kItemGoldAxePal;
     def.spritePalCount = kItemGoldAxePalCount;
     def.name = "Machado de Ouro";
+    def.weight = 10.f;
     def.type = ItemType::Weapon;
     def.rarity = ItemRarity::Rare;
     def.stackMax = 1;
@@ -712,6 +722,7 @@ REGISTER_ITEM("gold_helm", [] {
     def.spritePal = kItemGoldArmorPal;
     def.spritePalCount = kItemGoldArmorPalCount;
     def.name = "Elmo de Ouro";
+    def.weight = 5.f;
     def.type = ItemType::Armor;
     def.rarity = ItemRarity::Rare;
     def.stackMax = 1;
@@ -731,6 +742,7 @@ REGISTER_ITEM("gold_chest", [] {
     def.spritePal = kItemGoldArmorPal;
     def.spritePalCount = kItemGoldArmorPalCount;
     def.name = "Peitoral de Ouro";
+    def.weight = 12.f;
     def.type = ItemType::Armor;
     def.rarity = ItemRarity::Rare;
     def.stackMax = 1;
@@ -750,6 +762,7 @@ REGISTER_ITEM("gold_legs", [] {
     def.spritePal = kItemGoldArmorPal;
     def.spritePalCount = kItemGoldArmorPalCount;
     def.name = "Perneiras de Ouro";
+    def.weight = 8.f;
     def.type = ItemType::Armor;
     def.rarity = ItemRarity::Rare;
     def.stackMax = 1;
@@ -769,6 +782,7 @@ REGISTER_ITEM("diamond_sword", [] {
     def.spritePal = kItemDiamondSwordPal;
     def.spritePalCount = kItemDiamondSwordPalCount;
     def.name = "Espada de Diamante";
+    def.weight = 4.f;
     def.type = ItemType::Weapon;
     def.rarity = ItemRarity::Epic;
     def.stackMax = 1;
@@ -788,6 +802,7 @@ REGISTER_ITEM("diamond_axe", [] {
     def.spritePal = kItemDiamondAxePal;
     def.spritePalCount = kItemDiamondAxePalCount;
     def.name = "Machado de Diamante";
+    def.weight = 6.f;
     def.type = ItemType::Weapon;
     def.rarity = ItemRarity::Epic;
     def.stackMax = 1;
@@ -807,6 +822,7 @@ REGISTER_ITEM("diamond_helm", [] {
     def.spritePal = kItemDiamondArmorPal;
     def.spritePalCount = kItemDiamondArmorPalCount;
     def.name = "Elmo de Diamante";
+    def.weight = 3.f;
     def.type = ItemType::Armor;
     def.rarity = ItemRarity::Epic;
     def.stackMax = 1;
@@ -826,6 +842,7 @@ REGISTER_ITEM("diamond_chest", [] {
     def.spritePal = kItemDiamondArmorPal;
     def.spritePalCount = kItemDiamondArmorPalCount;
     def.name = "Peitoral de Diamante";
+    def.weight = 7.f;
     def.type = ItemType::Armor;
     def.rarity = ItemRarity::Epic;
     def.stackMax = 1;
@@ -845,6 +862,7 @@ REGISTER_ITEM("diamond_legs", [] {
     def.spritePal = kItemDiamondArmorPal;
     def.spritePalCount = kItemDiamondArmorPalCount;
     def.name = "Perneiras de Diamante";
+    def.weight = 5.f;
     def.type = ItemType::Armor;
     def.rarity = ItemRarity::Epic;
     def.stackMax = 1;
@@ -864,6 +882,7 @@ REGISTER_ITEM("leather_sword", [] {
     def.spritePal = kItemLeatherSwordPal;
     def.spritePalCount = kItemLeatherSwordPalCount;
     def.name = "Espada de Couro";
+    def.weight = 3.f;
     def.type = ItemType::Weapon;
     def.rarity = ItemRarity::Common;
     def.stackMax = 1;
@@ -883,6 +902,7 @@ REGISTER_ITEM("leather_axe", [] {
     def.spritePal = kItemLeatherAxePal;
     def.spritePalCount = kItemLeatherAxePalCount;
     def.name = "Machado de Couro";
+    def.weight = 4.f;
     def.type = ItemType::Weapon;
     def.rarity = ItemRarity::Common;
     def.stackMax = 1;
@@ -1101,6 +1121,7 @@ REGISTER_ITEM("iron_boots", [] {
     def.spritePal = kItemIronBootsPal;
     def.spritePalCount = kItemIronBootsPalCount;
     def.name = "Botas de Ferro";
+    def.weight = 3.f;
     def.type = ItemType::Armor;
     def.rarity = ItemRarity::Common;
     def.stackMax = 1;
@@ -1120,6 +1141,7 @@ REGISTER_ITEM("leather_boots", [] {
     def.spritePal = kItemLeatherBootsPal;
     def.spritePalCount = kItemLeatherBootsPalCount;
     def.name = "Botas de Couro";
+    def.weight = 2.f;
     def.type = ItemType::Armor;
     def.rarity = ItemRarity::Common;
     def.stackMax = 1;
@@ -1139,6 +1161,7 @@ REGISTER_ITEM("gold_boots", [] {
     def.spritePal = kItemGoldBootsPal;
     def.spritePalCount = kItemGoldBootsPalCount;
     def.name = "Botas de Ouro";
+    def.weight = 4.f;
     def.type = ItemType::Armor;
     def.rarity = ItemRarity::Rare;
     def.stackMax = 1;
@@ -1158,6 +1181,7 @@ REGISTER_ITEM("diamond_boots", [] {
     def.spritePal = kItemDiamondBootsPal;
     def.spritePalCount = kItemDiamondBootsPalCount;
     def.name = "Botas de Diamante";
+    def.weight = 3.f;
     def.type = ItemType::Armor;
     def.rarity = ItemRarity::Epic;
     def.stackMax = 1;

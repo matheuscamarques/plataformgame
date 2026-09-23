@@ -527,6 +527,38 @@ int main() {
         assert(!eq.equip(core::Item{})); // vazio
         assert(eq.isEmpty());
     }
+    { // EquipLoad (soma pesos; ferro 28, ouro 37, couro 15)
+        core::Equipment iron;
+        assert(iron.equip(core::Item{"iron_sword", 1}));
+        assert(iron.equip(core::Item{"iron_helm", 1}));
+        assert(iron.equip(core::Item{"iron_chest", 1}));
+        assert(iron.equip(core::Item{"iron_legs", 1}));
+        assert(iron.equip(core::Item{"iron_boots", 1}));
+        assert(iron.weight() == 6 + 4 + 9 + 6 + 3);
+        core::Equipment gold;
+        assert(gold.equip(core::Item{"gold_sword", 1}));
+        assert(gold.equip(core::Item{"gold_helm", 1}));
+        assert(gold.equip(core::Item{"gold_chest", 1}));
+        assert(gold.equip(core::Item{"gold_legs", 1}));
+        assert(gold.equip(core::Item{"gold_boots", 1}));
+        assert(gold.weight() == 8 + 5 + 12 + 8 + 4);
+        core::Equipment bare;
+        assert(bare.weight() == 0.f);
+    }
+    { // HeavilyLoaded (seed ferro corre; ouro não)
+        Player seed; // set ferro: 28/60 = leve
+        assert(seed.equipLoad() == 28.f);
+        assert(!seed.heavilyLoaded());
+        Player heavy;
+        heavy.equipment = core::Equipment{};
+        assert(heavy.equipment.equip(core::Item{"gold_sword", 1}));
+        assert(heavy.equipment.equip(core::Item{"gold_helm", 1}));
+        assert(heavy.equipment.equip(core::Item{"gold_chest", 1}));
+        assert(heavy.equipment.equip(core::Item{"gold_legs", 1}));
+        assert(heavy.equipment.equip(core::Item{"gold_boots", 1}));
+        assert(heavy.equipLoad() == 37.f);
+        assert(heavy.heavilyLoaded()); // >30: sem correr
+    }
     { // SeedEquipped (player nasce com o set de ferro)
         Player p;
         assert(p.equipment.get(core::EquipSlot::RightHand).defId ==

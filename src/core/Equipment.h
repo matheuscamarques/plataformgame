@@ -12,6 +12,10 @@
 
 namespace core {
 
+// Carga máxima equipada (DS: mochila não pesa, armadura sim).
+// >50% = pesada (sem correr); equipar nunca é recusado.
+inline constexpr float kMaxEquipLoad = 60.f;
+
 // Equipamento do player: 4 slots fixos (Dark Souls, sem Tetris).
 // Puro (sem SFML, sem Player): headless-safe. O slot natural vem do
 // def->equipSlot; equip() troca e devolve o antigo via outOld.
@@ -27,6 +31,9 @@ public:
     const Item& get(EquipSlot slot) const;
     bool        isOccupied(EquipSlot slot) const;
     bool        isEmpty() const;
+
+    // Soma def->weight × qty das peças (mochila não entra).
+    float weight() const;
 
     template <typename F>
     void forEach(F&& fn) const {

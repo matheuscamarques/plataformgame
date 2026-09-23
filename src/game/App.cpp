@@ -160,7 +160,9 @@ void Game::tick() {
     p->moveUp    = !uiOpen && input_.held(support::Action::Up);
     p->moveDown  = !uiOpen && input_.held(support::Action::Down);
     p->moveLeft  = !uiOpen && input_.held(support::Action::Left);
-    p->runFast   = !uiOpen && input_.held(support::Action::RunFast);
+    // Pesado (>50% da carga): sem correr (equip load, DS).
+    p->runFast   = !uiOpen && !p->heavilyLoaded() &&
+                   input_.held(support::Action::RunFast);
     if (p->moveLeft && !p->moveRight) p->facing = -1;
     if (p->moveRight && !p->moveLeft) p->facing = 1;
 
