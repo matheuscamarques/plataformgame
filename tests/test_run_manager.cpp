@@ -59,12 +59,14 @@ int main() {
         ctx.drops = &drops;
         ctx.input = &in;
 
-        run.tick(1.f / 30.f, ctx); // marca morto
+        run.tick(1.f / 30.f, ctx);
+        in.onTickEnd(); // tick observou: expira o latch // marca morto
         assert(run.isDead());
 
         in.beginFrame();
         in.handleEvent(keyEvent(sf::Event::KeyPressed, sf::Keyboard::R));
-        run.tick(1.f / 30.f, ctx); // R: restart
+        run.tick(1.f / 30.f, ctx);
+        in.onTickEnd(); // tick observou: expira o latch // R: restart
         assert(!run.isDead());
         assert(p.hp == 10000 && p.getX() == 999.f && p.getY() == 0.f); // x atual
         assert(enemies.count() == 2); // 2 slimes perto do respawn
@@ -92,10 +94,12 @@ int main() {
 
         p.hp = 0;
         run.tick(1.f / 30.f, ctx);
+        in.onTickEnd(); // tick observou: expira o latch
         assert(run.isDead());
         in.beginFrame();
         in.handleEvent(keyEvent(sf::Event::KeyPressed, sf::Keyboard::R));
         run.tick(1.f / 30.f, ctx);
+        in.onTickEnd(); // tick observou: expira o latch
         assert(!run.isDead() && p.hp == 10000);
         // No checkpoint do estrato 5 (ty 5000), fora da rocha:
         const int ty = static_cast<int>(p.getY() / 50.f);
@@ -114,10 +118,12 @@ int main() {
         in.beginFrame();
         in.handleEvent(keyEvent(sf::Event::KeyPressed, sf::Keyboard::Escape));
         run.tick(1.f / 30.f, ctx);
+        in.onTickEnd(); // tick observou: expira o latch
         assert(run.isPaused());
 
         in.beginFrame(); // sem evento: edge morreu, mantém
         run.tick(1.f / 30.f, ctx);
+        in.onTickEnd(); // tick observou: expira o latch
         assert(run.isPaused());
 
         // Novo edge: solta, vira frame, aperta de novo.
@@ -125,15 +131,18 @@ int main() {
         in.beginFrame();
         in.handleEvent(keyEvent(sf::Event::KeyPressed, sf::Keyboard::Escape));
         run.tick(1.f / 30.f, ctx);
+        in.onTickEnd(); // tick observou: expira o latch
         assert(!run.isPaused());
 
         p.hp = 0;
         in.handleEvent(keyEvent(sf::Event::KeyReleased, sf::Keyboard::Escape));
         in.beginFrame(); // edge do ESC morreu antes da morte
-        run.tick(1.f / 30.f, ctx); // morreu
+        run.tick(1.f / 30.f, ctx);
+        in.onTickEnd(); // tick observou: expira o latch // morreu
         in.beginFrame();
         in.handleEvent(keyEvent(sf::Event::KeyPressed, sf::Keyboard::Escape));
         run.tick(1.f / 30.f, ctx);
+        in.onTickEnd(); // tick observou: expira o latch
         assert(run.isDead() && !run.isPaused());
     }
     { // RWhileAliveRespawns (R vivo = reset no checkpoint atual)
@@ -152,6 +161,7 @@ int main() {
         in.beginFrame();
         in.handleEvent(keyEvent(sf::Event::KeyPressed, sf::Keyboard::R));
         run.tick(1.f / 30.f, ctx);
+        in.onTickEnd(); // tick observou: expira o latch
         assert(!run.isDead() && p.hp == 10000 && enemies.count() == 2);
     }
 

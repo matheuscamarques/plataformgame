@@ -32,6 +32,7 @@ void press(support::InputMap& in, sf::Keyboard::Key k) {
 
 void release(support::InputMap& in, sf::Keyboard::Key k) {
     in.handleEvent(keyEvent(sf::Event::KeyReleased, k));
+    in.onTickEnd(); // frame teve tick: expira o latch no próximo frame
     in.beginFrame();
 }
 

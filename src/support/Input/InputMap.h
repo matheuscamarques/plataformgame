@@ -64,19 +64,28 @@ public:
     // Copia curr_ -> prev_. Se pollingMode, re-lê curr_ do teclado.
     // NÃO chamar por tick: com fixed-step há N ticks por frame e a
     // segunda chamada apagaria o edge antes de ser lido.
+    // Latch: se nenhum tick rodou desde o último beginFrame (frame com
+    // 0 ticks — comum a 60fps com tick 30Hz), o edge é preservado p/ o
+    // próximo frame em vez de morrer sem ser lido. onTickEnd() marca.
     void beginFrame();
+
+    // Game::tick chama no fim de cada tick: houve observação dos edges.
+    // Sem isso, beginFrame preserva o latch (toque em frame sem tick
+    // nunca se perde).
+    void onTickEnd() { ticksRan_ = true; }
 
     // Consultas.
     bool held    (Action a) const;
-    bool pressed (Action a) const; // edge: subiu neste tick
+    bool pressed (Action a) const; // latch: até consume ou frame pós-tick
     bool released(Action a) const; // edge: desceu neste tick
 
     // Consome o edge: pressed() volta a false até o próximo aperto real.
     // Evita duplo-disparo com N ticks por frame (fixed-step): quem consome
-    // (ex.: tecla M) chama 1x e os ticks seguintes do frame não repetem.
+    // chama 1x e os ticks seguintes do frame não repetem.
     void consume(Action a) {
         if (!indexValid(a)) return;
         curr_[static_cast<std::size_t>(a)] = false;
+        latch_[static_cast<std::size_t>(a)] = false;
     }
 
     // Eixos para movimento e IA.
@@ -95,9 +104,11 @@ private:
     std::array<std::vector<sf::Keyboard::Key>, kCount> keys_{};
     std::array<bool, kCount> curr_{};
     std::array<bool, kCount> prev_{};
+    std::array<bool, kCount> latch_{}; // edge pegajoso até tick/consume
 
     bool pollingMode_ = false;
     bool enabled_     = true;
+    bool ticksRan_    = false; // algum tick rodou desde o beginFrame
 
     bool indexValid(Action a) const {
         return static_cast<std::size_t>(a) < kCount;

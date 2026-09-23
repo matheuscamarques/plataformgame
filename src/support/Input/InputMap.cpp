@@ -77,6 +77,7 @@ void InputMap::clearState(Action a) {
     auto i = static_cast<std::size_t>(a);
     curr_[i] = false;
     prev_[i] = false;
+    latch_[i] = false;
 }
 
 static bool anyPressed(const std::vector<sf::Keyboard::Key> &keys) {
@@ -93,11 +94,12 @@ void InputMap::handleEvent(const sf::Event& e) {
     // isso, o consume() do App limpava o nível e o repeat seguinte
     // parecia um aperto novo (E abria e fechava o menu sozinho, F abria
     // o ActionMenu e já executava, etc).
-    bool down = (e.type == sf::Event::KeyPressed);
+    const bool down = (e.type == sf::Event::KeyPressed);
     for (std::size_t i = 0; i < kCount; ++i) {
         for (auto k : keys_[i]) {
             if (k == e.key.code) {
                 curr_[i] = down;
+                if (down) latch_[i] = true; // sobrevive a frame sem tick
                 break;
             }
         }
@@ -111,6 +113,11 @@ void InputMap::beginFrame() {
         }
     }
     prev_ = curr_;
+    // Só expira o latch se algum tick observou (0-tick frames preservam).
+    if (ticksRan_) {
+        latch_.fill(false);
+        ticksRan_ = false;
+    }
 }
 
 bool InputMap::held(Action a) const {
@@ -120,8 +127,7 @@ bool InputMap::held(Action a) const {
 
 bool InputMap::pressed(Action a) const {
     if (!enabled_ || !indexValid(a)) return false;
-    auto i = static_cast<std::size_t>(a);
-    return curr_[i] && !prev_[i];
+    return latch_[static_cast<std::size_t>(a)];
 }
 
 bool InputMap::released(Action a) const {

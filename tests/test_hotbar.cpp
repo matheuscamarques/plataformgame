@@ -55,11 +55,13 @@ int main() {
         in.handleEvent(keyEvent(sf::Event::KeyPressed, sf::Keyboard::Num3));
         active = ui.handleInput(in, active);
         assert(active == 2);
+        in.onTickEnd();
         in.beginFrame();
         in.handleEvent(keyEvent(sf::Event::KeyPressed, sf::Keyboard::Num1));
         active = ui.handleInput(in, active);
         assert(active == 0);
         // Sem tecla: mantém.
+        in.onTickEnd();
         in.beginFrame();
         assert(ui.handleInput(in, active) == 0);
     }

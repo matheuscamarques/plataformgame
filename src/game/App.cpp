@@ -399,4 +399,9 @@ void Game::tick() {
             }
         }
     }
+
+    // Edges observados: libera o latch p/ o próximo beginFrame expirar.
+    // Sem isso, toque em frame com 0 ticks (60fps vs tick 30Hz) morria
+    // sem nunca ser lido (1-5/E pedindo várias apertadas).
+    input_.onTickEnd();
 }
