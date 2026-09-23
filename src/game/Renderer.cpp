@@ -37,6 +37,7 @@
 #include "support/Enemies/EnemySystem.h"
 #include "support/Enemies/SlimeAI.h"
 #include "support/Progression/DropSystem.h"
+#include "support/UI/ItemIcon.h"
 
 // Renderer: tudo que desenha (render + draws + helpers de char-view).
 
@@ -239,7 +240,7 @@ void Game::render()
         }
 
         // ── 2. Núcleo: dinamite usa sprite por fuse; tiers novos usam
-        // círculo na cor do tier (tamanho = tier).
+        // o ícone 8×8 do próprio item (mesma arte do inventário).
         if (t.kind == support::ThrowKind::Dynamite) {
             int frame = 0;
             if      (t.fuse < 0.33f) frame = 2; // crítico — pavio consumido
@@ -260,21 +261,43 @@ void Game::render()
             }
             window->draw(spr);
         } else {
-            float coreR = 4.f;
-            sf::Color coreC = sf::Color(220, 60, 60); // Tnt
-            if (t.kind == support::ThrowKind::C4) {
-                coreR = 5.f;
-                coreC = sf::Color(200, 180, 130);
-            } else if (t.kind == support::ThrowKind::Moab) {
-                coreR = 7.f;
-                coreC = sf::Color(110, 120, 70);
+            // Ícone do item voando (TNT/C4/MOAB); fallback: círculo do tier.
+            const char* defId = "tnt";
+            if (t.kind == support::ThrowKind::C4) defId = "c4";
+            else if (t.kind == support::ThrowKind::Moab) defId = "moab";
+            const core::ItemDef* dd =
+                core::ItemRegistry::instance().find(defId);
+            const sf::Texture* icon = dd ? support::itemIconFor(dd) : nullptr;
+            if (icon && dd->spriteW > 0) {
+                sf::Sprite spr(*icon);
+                const float sc = 2.5f; // mesmo do player
+                spr.setScale(sc, sc);
+                spr.setOrigin(dd->spriteW * 0.5f, dd->spriteH * 0.5f);
+                spr.setPosition(t.pos);
+                if (t.fuse < 0.15f) { // vai explodir: flash branco
+                    const float flash = 0.5f + 0.5f * std::sin(t.fuse * 60.f);
+                    spr.setColor(sf::Color(
+                        255, 255,
+                        static_cast<sf::Uint8>(180 + 75 * flash)));
+                }
+                window->draw(spr);
+            } else {
+                float coreR = 4.f;
+                sf::Color coreC = sf::Color(220, 60, 60); // Tnt
+                if (t.kind == support::ThrowKind::C4) {
+                    coreR = 5.f;
+                    coreC = sf::Color(200, 180, 130);
+                } else if (t.kind == support::ThrowKind::Moab) {
+                    coreR = 7.f;
+                    coreC = sf::Color(110, 120, 70);
+                }
+                if (t.fuse < 0.15f) coreC = sf::Color::White;
+                sf::CircleShape core(coreR);
+                core.setOrigin(coreR, coreR);
+                core.setPosition(t.pos);
+                core.setFillColor(coreC);
+                window->draw(core);
             }
-            if (t.fuse < 0.15f) coreC = sf::Color::White; // vai explodir
-            sf::CircleShape core(coreR);
-            core.setOrigin(coreR, coreR);
-            core.setPosition(t.pos);
-            core.setFillColor(coreC);
-            window->draw(core);
         }
     });
 
