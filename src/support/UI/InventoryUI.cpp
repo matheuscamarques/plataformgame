@@ -1,6 +1,14 @@
+/**
+ * @file src/support/UI/InventoryUI.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Implementa navegação, abas, menu e render do inventário.
+ * @details Implementa nomes de abas, filtros, cursor, compareStats e render de grid 8x5, equipamento e menus, manipulada por Game tick e render com Player e DropSystem.
+ */
+
 #include "support/UI/InventoryUI.h"
 
 #include <algorithm>
+#include <array>
 #include <sstream>
 #include <string>
 
@@ -67,6 +75,8 @@ void InventoryUI::open() {
     subTab_ = SubTab::All;
     cursor_ = 0;
     equipCursor_ = 0;
+    feedback_.clear();
+    snapCursor();
 }
 
 void InventoryUI::close() { state_ = UIState::Closed; }
@@ -74,10 +84,6 @@ void InventoryUI::close() { state_ = UIState::Closed; }
 void InventoryUI::toggle() {
     if (state_ == UIState::Closed) open();
     else close();
-}
-
-void InventoryUI::setCursor(int i) {
-    cursor_ = std::clamp(i, 0, kSlots - 1);
 }
 
 std::vector<int> InventoryUI::filteredSlots() const {
@@ -103,6 +109,7 @@ std::vector<InventoryUI::MenuAction> InventoryUI::menuActions() const {
         return out;
     }
     if (cursor_ < 0 || cursor_ >= kSlots) return out;
+    if (!slotMatches(cursor_)) return out; // F só em item visível
     const core::Item& item = inv_->slot(cursor_);
     if (item.isEmpty()) return out;
     const core::ItemDef* def = item.def();
@@ -119,59 +126,119 @@ std::vector<InventoryUI::MenuAction> InventoryUI::menuActions() const {
 
 // ─── Ações ───────────────────────────────────────────────────
 
-void InventoryUI::executeAction(MenuAction action) {
-    if (!inv_) return;
+const core::Item* InventoryUI::selectedItem() const {
+    if (!inv_) return nullptr;
+    if (mainTab_ == MainTab::Equipment) {
+        if (!equipment_) return nullptr;
+        const auto s = static_cast<core::EquipSlot>(equipCursor_ + 1);
+        const core::Item& i = equipment_->get(s);
+        return i.isEmpty() ? nullptr : &i;
+    }
+    if (cursor_ < 0 || cursor_ >= kSlots) return nullptr;
+    const core::Item& i = inv_->slot(cursor_);
+    return i.isEmpty() ? nullptr : &i;
+}
+
+InventoryUI::StatCompare InventoryUI::compareStats() const {
+    StatCompare out;
+    if (mainTab_ != MainTab::Inventory || !equipment_) return out;
+    const core::Item* sel = selectedItem();
+    if (!sel) return out;
+    const core::ItemDef* def = sel->def();
+    if (!def) return out;
+    const bool isWeapon = (def->type == core::ItemType::Weapon);
+    const bool isArmor = (def->type == core::ItemType::Armor);
+    if (!isWeapon && !isArmor) return out;
+    if (def->equipSlot == core::EquipSlot::None) return out;
+    const core::Item& cur = equipment_->get(def->equipSlot);
+    if (cur.isEmpty() || cur.defId == sel->defId) return out;
+    const core::ItemDef* curDef = cur.def();
+    if (!curDef) return out;
+    out.show = true;
+    out.equipped = isWeapon ? curDef->damage : curDef->defense;
+    out.diff = (isWeapon ? def->damage : def->defense) - out.equipped;
+    return out;
+}
+
+std::string InventoryUI::confirmText() const {
+    const core::Item* sel = selectedItem();
+    const core::ItemDef* def = sel ? sel->def() : nullptr;
+    if (!sel || !def)
+        return "Soltar?  [F] Sim  [Esc] Nao";
+    return "Soltar " + std::to_string(sel->quantity) + "x " + def->name +
+           "?  [F] Sim  [Esc] Nao";
+}
+
+bool InventoryUI::executeAction(MenuAction action) {
+    if (!inv_) return false;
 
     if (action == MenuAction::Unequip) {
-        if (mainTab_ != MainTab::Equipment || !equipment_) return;
+        if (mainTab_ != MainTab::Equipment || !equipment_) return false;
         const auto s = static_cast<core::EquipSlot>(equipCursor_ + 1);
         core::Item removed = equipment_->unequip(s);
-        if (removed.isEmpty()) return;
+        if (removed.isEmpty()) return false;
+        const core::ItemDef* def = removed.def();
         const int leftover = inv_->add(removed);
         if (leftover > 0) {
             removed.quantity = static_cast<uint16_t>(leftover);
             equipment_->equip(removed); // grid cheio: devolve
+            feedback_ = "Inventário cheio!";
+            return false;
         }
-        return;
+        feedback_ = std::string("Desequipado: ") + (def ? def->name : "?");
+        return true;
     }
 
-    if (mainTab_ != MainTab::Inventory) return;
-    if (cursor_ < 0 || cursor_ >= kSlots) return;
+    if (mainTab_ != MainTab::Inventory) return false;
+    if (action == MenuAction::Arrange) {
+        inv_->sort(); // global: não precisa de cursor válido
+        feedback_ = "Organizado por tipo";
+        return true;
+    }
+    if (!slotMatches(cursor_)) return false;
     core::Item& item = inv_->slot(cursor_);
-    if (item.isEmpty()) return;
+    if (item.isEmpty()) return false;
     const core::ItemDef* def = item.def();
-    if (!def) return;
+    if (!def) return false;
 
     switch (action) {
         case MenuAction::Use:
             if (def->onUse && player_) {
                 def->onUse(*player_);
                 inv_->remove(def->id, 1);
+                feedback_ = std::string("Usou: ") + def->name;
+                return true;
             }
-            break;
+            return false;
         case MenuAction::Equip: {
-            if (!equipment_) return;
-            if (def->equipSlot == core::EquipSlot::None) return;
+            if (!equipment_) return false;
+            if (def->equipSlot == core::EquipSlot::None) return false;
             core::Item old;
             if (equipment_->equip(item, &old)) {
                 item = old; // cursor recebe o antigo (ou esvazia)
+                feedback_ = std::string("Equipado: ") + def->name;
+                if (!old.isEmpty()) {
+                    const core::ItemDef* oldDef = old.def();
+                    feedback_ += std::string(" (trocou com ") +
+                                 (oldDef ? oldDef->name : "?") + ")";
+                }
+                return true;
             }
-            break;
+            return false;
         }
         case MenuAction::Drop: {
             using T = core::ItemType;
-            if (!drops_ || !player_) return;
-            if (def->type == T::Key || def->type == T::Quest) return;
+            if (!drops_ || !player_) return false;
+            if (def->type == T::Key || def->type == T::Quest) return false;
             drops_->spawnItem(def->id, item.quantity,
                               {player_->getCenterX(), player_->getCenterY()});
+            feedback_ = "Soltou " + std::to_string(item.quantity) + "x " +
+                        def->name;
             item = core::Item{};
-            break;
+            return true;
         }
-        case MenuAction::Arrange:
-            inv_->sort();
-            break;
         default:
-            break;
+            return false;
     }
 }
 
@@ -191,8 +258,26 @@ bool InventoryUI::handleInput(const InputMap& input) {
 bool InventoryUI::slotMatches(int index) const {
     if (!inv_ || index < 0 || index >= kSlots) return false;
     const core::Item& item = inv_->slot(index);
-    if (item.isEmpty()) return true; // vazio navega em toda aba
+    if (item.isEmpty()) return false; // vazio não navega (padrão DS)
     return matchesSubTab(item.def(), subTab_);
+}
+
+int InventoryUI::firstValid() const {
+    for (int i = 0; i < kSlots; ++i)
+        if (slotMatches(i)) return i;
+    return -1;
+}
+
+int InventoryUI::lastValid() const {
+    for (int i = kSlots - 1; i >= 0; --i)
+        if (slotMatches(i)) return i;
+    return -1;
+}
+
+void InventoryUI::snapCursor() {
+    if (slotMatches(cursor_)) return;
+    const int v = firstValid();
+    if (v >= 0) cursor_ = v; // sem válido: fica (grade vazia/filtrada)
 }
 
 void InventoryUI::stepCursor(int delta) {
@@ -208,6 +293,7 @@ void InventoryUI::cycleMainTab(int delta) {
         (static_cast<int>(mainTab_) + delta + n) % n);
     cursor_ = 0;
     equipCursor_ = 0;
+    snapCursor();
 }
 
 void InventoryUI::cycleSubTab(int delta) {
@@ -215,6 +301,7 @@ void InventoryUI::cycleSubTab(int delta) {
     subTab_ = static_cast<SubTab>(
         (static_cast<int>(subTab_) + delta + n) % n);
     cursor_ = 0;
+    snapCursor();
 }
 
 void InventoryUI::openActionMenu() {
@@ -262,10 +349,12 @@ void InventoryUI::handleBrowse(const InputMap& input) {
     // Grid: atalhos + Home/End + setas + F.
     if (input.pressed(Action::FirstSlot)) {
         cursor_ = 0;
+        snapCursor();
         return;
     }
     if (input.pressed(Action::LastSlot)) {
-        cursor_ = kSlots - 1;
+        const int v = lastValid();
+        cursor_ = (v >= 0) ? v : kSlots - 1;
         return;
     }
     if (input.pressed(Action::ArrangeAll)) {
@@ -324,10 +413,11 @@ void InventoryUI::handleConfirmDrop(const InputMap& input) {
 sf::Vector2f InventoryUI::gridOrigin(float sw, float sh) const {
     const float gw = kCols * kSlotSize + (kCols - 1) * kPad;
     const float gh = kRows * kSlotSize + (kRows - 1) * kPad;
-    // Bloco grid + vão + painel centralizado; grade sobe p/ tabs.
+    // Bloco grid + vão + painel centralizado, com respiro mínimo de 24px
+    // (em 800px o centrado daria 19px — apertado).
     const float totalW = gw + 16.f + kDetailW;
     (void)sh;
-    return {(sw - totalW) * 0.5f, 110.f};
+    return {std::max((sw - totalW) * 0.5f, 24.f), 110.f};
 }
 
 sf::Vector2f InventoryUI::slotPos(int i, float sw, float sh) const {
@@ -427,10 +517,18 @@ void InventoryUI::renderGrid(sf::RenderTarget& t, float sw, float sh,
                              const sf::Font& font) const {
     if (!inv_) return;
 
-    if (filteredSlots().empty()) {
+    // Visibilidade 1× por frame (DS: fora da aba some, não esmaece).
+    std::array<bool, kSlots> vis{};
+    bool any = false;
+    for (int i = 0; i < kSlots; ++i) {
+        vis[i] = slotMatches(i);
+        any = any || vis[i];
+    }
+    if (!any) {
         sf::Text msg;
         msg.setFont(font);
-        msg.setString("Nenhum item nesta categoria");
+        msg.setString(inv_->usedSlots() == 0 ? "Inventário vazio"
+                                             : "Nenhum item nesta categoria");
         msg.setCharacterSize(14);
         msg.setFillColor(sf::Color(150, 150, 150));
         const sf::Vector2f o = gridOrigin(sw, sh);
@@ -441,7 +539,6 @@ void InventoryUI::renderGrid(sf::RenderTarget& t, float sw, float sh,
     for (int i = 0; i < kSlots; ++i) {
         const sf::Vector2f p = slotPos(i, sw, sh);
         const bool sel = (i == cursor_);
-        const bool inTab = slotMatches(i);
 
         sf::RectangleShape bg({kSlotSize, kSlotSize});
         bg.setPosition(p);
@@ -452,17 +549,15 @@ void InventoryUI::renderGrid(sf::RenderTarget& t, float sw, float sh,
         bg.setOutlineThickness(sel ? 2.f : 1.f);
         t.draw(bg);
 
+        if (!vis[i]) continue; // fora da aba: some (grade esparsa)
         const core::Item& item = inv_->slot(i);
-        if (item.isEmpty()) continue;
         const core::ItemDef* def = item.def();
         if (!def) continue;
 
         sf::RectangleShape rb({kSlotSize - 4.f, kSlotSize - 4.f});
         rb.setPosition(p.x + 2.f, p.y + 2.f);
         rb.setFillColor(sf::Color::Transparent);
-        sf::Color edge = itemRarityColor(def->rarity);
-        if (!inTab) edge.a = 80;
-        rb.setOutlineColor(edge);
+        rb.setOutlineColor(itemRarityColor(def->rarity));
         rb.setOutlineThickness(2.f);
         t.draw(rb);
 
@@ -471,7 +566,6 @@ void InventoryUI::renderGrid(sf::RenderTarget& t, float sw, float sh,
             const float scale = (kSlotSize - 12.f) / def->spriteW;
             spr.setScale(scale, scale);
             spr.setPosition(p.x + 6.f, p.y + 6.f);
-            if (!inTab) spr.setColor(sf::Color(255, 255, 255, 90));
             t.draw(spr);
         }
 
@@ -480,8 +574,7 @@ void InventoryUI::renderGrid(sf::RenderTarget& t, float sw, float sh,
             q.setFont(font);
             q.setString(std::to_string(item.quantity));
             q.setCharacterSize(13);
-            q.setFillColor(inTab ? sf::Color::White
-                                 : sf::Color(255, 255, 255, 90));
+            q.setFillColor(sf::Color::White);
             q.setOutlineColor(sf::Color::Black);
             q.setOutlineThickness(1.f);
             q.setPosition(p.x + kSlotSize - 22.f, p.y + kSlotSize - 18.f);
@@ -492,20 +585,36 @@ void InventoryUI::renderGrid(sf::RenderTarget& t, float sw, float sh,
 
 void InventoryUI::renderEquipTab(sf::RenderTarget& t, float sw, float sh,
                                  const sf::Font& font) const {
-    // 4 slots de 96px: RightHand à esquerda, Head/Chest/Legs em coluna.
+    // 2 colunas (Arms | Armor), 3 linhas à direita. Tudo derivado de
+    // kEquipSlotSize/kEquipPad: bloco 216px centralizado na área do grid.
+    const float ss = kEquipSlotSize;
+    const float step = ss + kEquipPad; // 120
     const sf::Vector2f o = gridOrigin(sw, sh);
     const float gw = kCols * kSlotSize + (kCols - 1) * kPad;
     const float cx = o.x + gw * 0.5f;
-    const float cy = o.y + 150.f;
+    const float cy = o.y + 150.f; // centro da linha do meio
+    const float x0 = cx - (ss + kEquipPad + ss) * 0.5f;
+    const float yMid = cy - ss * 0.5f; // topo da linha do meio
     const sf::Vector2f pos[4] = {
-        {cx - 140.f, cy - 48.f},
-        {cx + 40.f, cy - 168.f},
-        {cx + 40.f, cy - 48.f},
-        {cx + 40.f, cy + 72.f},
+        {x0, yMid},                 // RightHand (Arms)
+        {x0 + step, yMid - step},   // Head
+        {x0 + step, yMid},          // Chest
+        {x0 + step, yMid + step},   // Legs
     };
+    auto header = [&](const std::string& s, float x, float y) {
+        sf::Text h;
+        h.setFont(font);
+        h.setString(s);
+        h.setCharacterSize(13);
+        h.setFillColor(sf::Color(200, 180, 120));
+        h.setPosition(x, y);
+        t.draw(h);
+    };
+    header("Arms", x0, yMid - 22.f);
+    header("Armor", x0 + step, yMid - step - 22.f);
     for (int i = 0; i < 4; ++i) {
         const bool sel = (i == equipCursor_);
-        sf::RectangleShape bg({96.f, 96.f});
+        sf::RectangleShape bg({ss, ss});
         bg.setPosition(pos[i]);
         bg.setFillColor(sel ? sf::Color(70, 70, 90, 240)
                             : sf::Color(40, 40, 50, 220));
@@ -529,7 +638,7 @@ void InventoryUI::renderEquipTab(sf::RenderTarget& t, float sw, float sh,
         if (const core::ItemDef* def = item.def()) {
             if (const sf::Texture* tex = itemIconFor(def)) {
                 sf::Sprite spr(*tex);
-                const float scale = (96.f - 16.f) / def->spriteW;
+                const float scale = (ss - 16.f) / def->spriteW;
                 spr.setScale(scale, scale);
                 spr.setPosition(pos[i].x + 8.f, pos[i].y + 8.f);
                 t.draw(spr);
@@ -551,21 +660,7 @@ void InventoryUI::renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
     t.draw(bg);
 
     // Item selecionado (grid ou slot de equipamento).
-    const core::Item* sel = nullptr;
-    if (mainTab_ == MainTab::Inventory) {
-        if (inv_ && cursor_ >= 0 && cursor_ < kSlots) {
-            const core::Item& i = inv_->slot(cursor_);
-            if (!i.isEmpty()) sel = &i;
-        }
-    } else if (equipment_) {
-        const auto s = static_cast<core::EquipSlot>(equipCursor_ + 1);
-        const core::Item& i = equipment_->get(s);
-        if (!i.isEmpty()) sel = &i;
-    }
-    if (!sel) return;
-    const core::ItemDef* def = sel->def();
-    if (!def) return;
-
+    const core::Item* sel = selectedItem();
     const float x = dp.x + 14.f;
     const float maxW = kDetailW - 28.f;
     float y = dp.y + 12.f;
@@ -578,8 +673,18 @@ void InventoryUI::renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
         tt.setFillColor(c);
         tt.setPosition(x, y);
         t.draw(tt);
-        y += tt.getLocalBounds().height + static_cast<float>(size) * 0.9f;
+        y += static_cast<float>(size) + 4.f; // passo fixo, sem drift
     };
+
+    if (!sel) {
+        line("Slot vazio", 14, sf::Color(150, 150, 150));
+        return;
+    }
+    const core::ItemDef* def = sel->def();
+    if (!def) {
+        line("Slot vazio", 14, sf::Color(150, 150, 150));
+        return;
+    }
 
     sf::Text name;
     name.setFont(font);
@@ -598,20 +703,11 @@ void InventoryUI::renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
     t.draw(sep);
     y += 10.f;
 
-    // Descrição com wrap por palavra.
+    // Descrição com wrap por palavra, teto de 8 linhas ("..." se cortar).
+    static constexpr int kDescMaxLines = 8;
     std::istringstream iss(def->description);
     std::string word, cur;
-    auto flush = [&](const std::string& s) {
-        if (s.empty()) return;
-        sf::Text tt;
-        tt.setFont(font);
-        tt.setString(s);
-        tt.setCharacterSize(12);
-        tt.setFillColor(sf::Color(200, 200, 200));
-        tt.setPosition(x, y);
-        t.draw(tt);
-        y += 17.f;
-    };
+    std::vector<std::string> wrapped;
     while (iss >> word) {
         const std::string test = cur.empty() ? word : cur + " " + word;
         sf::Text tmp;
@@ -619,13 +715,35 @@ void InventoryUI::renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
         tmp.setString(test);
         tmp.setCharacterSize(12);
         if (tmp.getLocalBounds().width > maxW) {
-            flush(cur);
+            if (!cur.empty()) wrapped.push_back(cur);
             cur = word;
         } else {
             cur = test;
         }
     }
-    flush(cur);
+    if (!cur.empty()) wrapped.push_back(cur);
+    for (std::size_t li = 0;
+         li < wrapped.size() && li < static_cast<std::size_t>(kDescMaxLines);
+         ++li) {
+        sf::Text tt;
+        tt.setFont(font);
+        tt.setString(wrapped[li]);
+        tt.setCharacterSize(12);
+        tt.setFillColor(sf::Color(200, 200, 200));
+        tt.setPosition(x, y);
+        t.draw(tt);
+        y += 12.f + 4.f;
+    }
+    if (wrapped.size() > static_cast<std::size_t>(kDescMaxLines)) {
+        sf::Text more;
+        more.setFont(font);
+        more.setString("...");
+        more.setCharacterSize(12);
+        more.setFillColor(sf::Color(150, 150, 150));
+        more.setPosition(x, y);
+        t.draw(more);
+        y += 12.f + 4.f;
+    }
     y += 6.f;
 
     // Stats (só quando aplicável) + material.
@@ -635,6 +753,21 @@ void InventoryUI::renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
     if (def->defense > 0)
         line("DEF: " + std::to_string(def->defense), 14,
              sf::Color(120, 180, 255));
+    // Comparação com o equipado ("Atual: 12 (+6)").
+    const StatCompare cmp = compareStats();
+    if (cmp.show) {
+        const std::string sign = cmp.diff > 0 ? "+" : "";
+        const sf::Color c = cmp.diff > 0   ? sf::Color(120, 220, 120)
+                            : cmp.diff < 0 ? sf::Color(240, 120, 120)
+                                           : sf::Color(170, 170, 180);
+        line("Atual: " + std::to_string(cmp.equipped) + " (" + sign +
+                 std::to_string(cmp.diff) + ")",
+             13, c);
+    }
+    // Marcador de equipado (mesmo defId no slot natural).
+    if (equipment_ && def->equipSlot != core::EquipSlot::None &&
+        equipment_->get(def->equipSlot).defId == sel->defId)
+        line("(equipado)", 12, sf::Color(240, 220, 160));
     if (def->type == core::ItemType::Weapon ||
         def->type == core::ItemType::Armor)
         line(std::string("MAT: ") + core::materialName(def->material), 12,
@@ -704,10 +837,11 @@ void InventoryUI::renderConfirmDrop(sf::RenderTarget& t, float sw, float sh,
     t.draw(bg);
     sf::Text tt;
     tt.setFont(font);
-    tt.setString("Soltar tudo?  [F] Sim  [Esc] Nao");
+    tt.setString(confirmText());
     tt.setCharacterSize(15);
     tt.setFillColor(sf::Color::White);
-    tt.setPosition(mx + 20.f, my + 22.f);
+    const float tw = tt.getLocalBounds().width;
+    tt.setPosition(mx + (mw - tw) * 0.5f, my + 22.f);
     t.draw(tt);
 }
 
@@ -721,6 +855,17 @@ void InventoryUI::renderFooter(sf::RenderTarget& t, float sw, float sh,
     gold.setFillColor(sf::Color(240, 220, 140));
     gold.setPosition(24.f, sh - 34.f);
     t.draw(gold);
+    // Feedback da última ação (some na próxima ação/abertura).
+    if (!feedback_.empty()) {
+        sf::Text fb;
+        fb.setFont(font);
+        fb.setString(feedback_);
+        fb.setCharacterSize(13);
+        fb.setFillColor(sf::Color(240, 220, 160));
+        const float fw = fb.getLocalBounds().width;
+        fb.setPosition((sw - fw) * 0.5f, sh - 34.f);
+        t.draw(fb);
+    }
     hints.setString("[Q][Tab] Tab  [A][D] Sub  [F] Acao  [E] Fechar");
     hints.setCharacterSize(12);
     hints.setFillColor(sf::Color(150, 150, 150));

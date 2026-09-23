@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_inventory_ui.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava lógica Dark Souls sem render no jogo.
+ * @details Cobre InventoryUI e Equipment, roda com make test que compila em build/tests/test_inventory_ui.
+ */
+
 #include <cassert>
 #include <cstdio>
 
@@ -120,7 +127,7 @@ int main() {
         press(in, sf::Keyboard::Right);
         ui.handleInput(in);
         release(in, sf::Keyboard::Right);
-        assert(ui.cursor() == 3); // pula poção+espada
+        assert(ui.cursor() == 0); // único da aba: volta p/ si
         press(in, sf::Keyboard::A);
         ui.handleInput(in);
         release(in, sf::Keyboard::A);
@@ -137,36 +144,72 @@ int main() {
         ui.setSubTab(InventoryUI::SubTab::Weapons);
         assert(ui.filteredSlots().empty());
     }
-    { // WrapAndHomeEnd (wrap circular + Home/End)
+    { // WrapAndHomeEnd (vazios não navegam; wrap entre válidos)
+        InventoryUI ui;
+        core::Inventory inv;
+        InputMap in;
+        for (int i = 0; i < 17; ++i)
+            inv.add(core::Item{"rusty_key", 1}); // stackMax 1: slots 0..16
+        ui.setInventory(&inv);
+        ui.open();
+        assert(ui.cursor() == 0);
+        press(in, sf::Keyboard::Right);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Right);
+        assert(ui.cursor() == 1);
+        press(in, sf::Keyboard::Down);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Down);
+        assert(ui.cursor() == 9); // 1+8, pula vazios
+        press(in, sf::Keyboard::Left);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Left);
+        assert(ui.cursor() == 8);
+        press(in, sf::Keyboard::Up);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Up);
+        assert(ui.cursor() == 0);
+        press(in, sf::Keyboard::Left);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Left);
+        assert(ui.cursor() == 16); // wrap reverso: último válido
+        press(in, sf::Keyboard::End);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::End);
+        assert(ui.cursor() == 16); // Last = último válido
+        press(in, sf::Keyboard::Home);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Home);
+        assert(ui.cursor() == 0);
+    }
+    { // EmptyNotNavigable (grade vazia: cursor parado, sem crash)
         InventoryUI ui;
         core::Inventory inv;
         InputMap in;
         ui.setInventory(&inv);
         ui.open();
-        press(in, sf::Keyboard::Left);
-        ui.handleInput(in);
-        release(in, sf::Keyboard::Left);
-        assert(ui.cursor() == 39);
         press(in, sf::Keyboard::Right);
         ui.handleInput(in);
         release(in, sf::Keyboard::Right);
         assert(ui.cursor() == 0);
-        press(in, sf::Keyboard::Up);
-        ui.handleInput(in);
-        release(in, sf::Keyboard::Up);
-        assert(ui.cursor() == 32);
-        press(in, sf::Keyboard::Down);
-        ui.handleInput(in);
-        release(in, sf::Keyboard::Down);
+        assert(ui.filteredSlots().empty());
+        assert(ui.selectedItem() == nullptr);
+    }
+    { // SnapToValid (abertura e trocas caem no 1º válido)
+        InventoryUI ui;
+        core::Inventory inv;
+        InputMap in;
+        inv.add(core::Item{"wood", 5}); // slot 0
+        inv.add(core::Item{"rusty_key", 1}); // slot 1 (stackMax 1)
+        inv.add(core::Item{"rusty_key", 1}); // slot 2
+        ui.setInventory(&inv);
+        ui.open();
         assert(ui.cursor() == 0);
-        press(in, sf::Keyboard::End);
-        ui.handleInput(in);
-        release(in, sf::Keyboard::End);
-        assert(ui.cursor() == 39);
-        press(in, sf::Keyboard::Home);
-        ui.handleInput(in);
-        release(in, sf::Keyboard::Home);
+        ui.setCursor(30); // vazio: volta p/ o 1º válido
         assert(ui.cursor() == 0);
+        ui.setSubTab(InventoryUI::SubTab::Weapons); // nada casa
+        assert(ui.filteredSlots().empty());
+        assert(ui.menuActions().empty()); // F sem efeito em inválido
     }
     { // MenuUse (F abre, F executa: onUse + consome 1)
         InventoryUI ui;
@@ -259,9 +302,61 @@ int main() {
         ui.open();
         assert(!hasAction(ui, MA::Drop));
         assert(hasAction(ui, MA::Arrange));
-        ui.executeAction(MA::Drop); // via código: bloqueado
+        assert(!ui.executeAction(MA::Drop)); // via código: bloqueado
         assert(inv.slot(0).defId == "rusty_key");
         assert(drops.activeItemCount() == 0u);
+    }
+    { // FeedbackAndBool (executeAction retorna; rodapé registra)
+        InventoryUI ui;
+        core::Inventory inv;
+        core::Equipment eq;
+        InputMap in;
+        (void)in;
+        inv.add(core::Item{"iron_sword", 1});
+        ui.setInventory(&inv);
+        ui.setEquipment(&eq);
+        ui.open();
+        assert(ui.executeAction(MA::Equip));
+        assert(ui.feedback() == "Equipado: Espada de Ferro");
+        assert(ui.executeAction(MA::Arrange));
+        assert(ui.feedback() == "Organizado por tipo");
+        assert(!ui.executeAction(MA::Drop)); // sem player/drops
+        assert(!ui.executeAction(MA::Unequip)); // aba errada
+    }
+    { // CompareStats (machado vs espada: +6; igual/sem ref: esconde)
+        InventoryUI ui;
+        core::Inventory inv;
+        core::Equipment eq;
+        eq.equip(core::Item{"iron_sword", 1}); // DMG 12
+        inv.add(core::Item{"iron_axe", 1});    // DMG 18, slot 0
+        ui.setInventory(&inv);
+        ui.setEquipment(&eq);
+        ui.open();
+        const auto cmp = ui.compareStats();
+        assert(cmp.show && cmp.equipped == 12 && cmp.diff == 6);
+        inv.add(core::Item{"iron_helm", 1}); // DEF 4, slot 1
+        ui.setCursor(1);                     // Head vazio: sem referência
+        assert(!ui.compareStats().show);
+        eq.equip(core::Item{"iron_helm", 1});
+        ui.setCursor(0);
+        eq.equip(core::Item{"iron_axe", 1}); // mesmo id: sem comparação
+        assert(!ui.compareStats().show);
+    }
+    { // ConfirmText (quantidade + nome; genérico sem item)
+        InventoryUI ui;
+        core::Inventory inv;
+        inv.add(core::Item{"stone", 10});
+        ui.setInventory(&inv);
+        ui.open();
+        assert(ui.confirmText() == "Soltar 10x Pedra?  [F] Sim  [Esc] Nao");
+        assert(ui.selectedItem() != nullptr);
+        assert(ui.selectedItem()->quantity == 10);
+        InventoryUI empty;
+        core::Inventory noInv;
+        empty.setInventory(&noInv);
+        empty.open();
+        assert(empty.selectedItem() == nullptr);
+        assert(empty.confirmText() == "Soltar?  [F] Sim  [Esc] Nao");
     }
     { // NoEquipmentNoEquipAction (sem equipment_: menu sem Equip)
         InventoryUI ui;

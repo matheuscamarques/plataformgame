@@ -1,5 +1,14 @@
+/**
+ * @file src/support/UI/InventoryUI.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara UI de inventário estilo Dark Souls via teclado.
+ * @details Define máquina Closed, Browse, ActionMenu e ConfirmDrop com abas, cursor, filtros e ações Use, Equip e Drop, incluída por game.h e dirigida por InputMap.
+ */
+
 #pragma once
+#include <algorithm>
 #include <cstdint>
+#include <string>
 #include <vector>
 
 #include <SFML/Graphics/Font.hpp>
@@ -44,6 +53,8 @@ public:
     static constexpr int   kSlots    = kCols * kRows; // == Inventory::kCapacity
     static constexpr float kSlotSize = 56.f;
     static constexpr float kPad      = 4.f;
+    static constexpr float kEquipSlotSize = 96.f;
+    static constexpr float kEquipPad      = 24.f;
 
     static const char* mainTabName(MainTab t);
     static const char* subTabName(SubTab t);
@@ -71,11 +82,23 @@ public:
 
     // Observabilidade (testes).
     int cursor() const { return cursor_; }
-    void setCursor(int i);
+    void setCursor(int i) {
+        cursor_ = std::clamp(i, 0, kSlots - 1);
+        snapCursor();
+    }
     MainTab mainTab() const { return mainTab_; }
-    void setMainTab(MainTab t) { mainTab_ = t; cursor_ = 0; equipCursor_ = 0; }
+    void setMainTab(MainTab t) {
+        mainTab_ = t;
+        cursor_ = 0;
+        equipCursor_ = 0;
+        snapCursor();
+    }
     SubTab subTab() const { return subTab_; }
-    void setSubTab(SubTab s) { subTab_ = s; cursor_ = 0; }
+    void setSubTab(SubTab s) {
+        subTab_ = s;
+        cursor_ = 0;
+        snapCursor();
+    }
     int equipCursor() const { return equipCursor_; }
     int actionCursor() const { return actionCursor_; }
 
@@ -84,8 +107,23 @@ public:
     // Ações disponíveis p/ o item atual (vazio = menu nem abre).
     std::vector<MenuAction> menuActions() const;
 
-    // Executa ação do menu sobre o item atual (testes chamam direto).
-    void executeAction(MenuAction action);
+    // Item sob o cursor (grid ou slot de equipamento), ou nullptr.
+    const core::Item* selectedItem() const;
+    // "DMG: 18 (atual 12, +6)" — só p/ arma/armadura com referência.
+    struct StatCompare {
+        bool show = false; // tem com o que comparar
+        int equipped = 0;  // valor atual no Equipment
+        int diff = 0;      // selecionado - atual
+    };
+    StatCompare compareStats() const;
+    // "Soltar 10x Pedra?" p/ o ConfirmDrop (fallback genérico sem item).
+    std::string confirmText() const;
+
+    // Executa ação do menu sobre o item atual. Retorna se algo aconteceu
+    // (false = bloqueado: sem deps, chave, grid cheio). Guarda feedback
+    // p/ o rodapé (última ação).
+    bool executeAction(MenuAction action);
+    const std::string& feedback() const { return feedback_; }
 
 private:
     core::Inventory* inv_        = nullptr;
@@ -99,14 +137,18 @@ private:
     int     cursor_      = 0; // slot do grid (índice; hotbar lê índice)
     int     equipCursor_ = 0; // 0..3 (RightHand, Head, Chest, Legs)
     int     actionCursor_ = 0; // índice em menuActions()
+    std::string feedback_;     // última ação (rodapé; limpa ao abrir)
 
     void handleBrowse(const InputMap& input);
     void handleActionMenu(const InputMap& input);
     void handleConfirmDrop(const InputMap& input);
     void openActionMenu();
 
-    bool slotMatches(int index) const; // vazio sempre casa
-    void stepCursor(int delta);        // pula fora da sub-tab (1 volta)
+    bool slotMatches(int index) const; // ocupado + casa com a sub-tab
+    int firstValid() const; // 1º slot navegável (-1 = nenhum)
+    int lastValid() const;  // último navegável (-1 = nenhum)
+    void snapCursor();      // cursor p/ o 1º válido (ou fica)
+    void stepCursor(int delta); // pula inválidos (1 volta)
     void cycleMainTab(int delta);      // troca + cursor 0
     void cycleSubTab(int delta);       // troca + cursor 0
 
