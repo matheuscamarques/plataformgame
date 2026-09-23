@@ -122,18 +122,31 @@ void Game::render()
     float vx1 = camPos.x + viewW_ + 60.0f, vy1 = camPos.y + viewH_ + 60.0f;
     // Céu dinâmico do ciclo dia/noite (superfície) ou fundo temático
     // por estrato (subterrâneo: o chapado pré-dia/noite, 9325d6d tirou).
-    // O estrato continua no HUD; o fundo volta a mudar descendo.
+    // Anti-flap + anti-pop na travessia (era o "estoura e reseta"):
+    // - deadband 25px: raspando a superfície mostra céu (cabeça pra fora
+    //   do buraco não alterna mais céu↔chapado por frame);
+    // - blend 150px: céu derrete no estrato (à noite, escuro→escuro).
+    // Fundo usa playerY; gradiente do estrato, playerY em tiles.
     {
         const float playerY  = player.get()->getY();
         const float playerCX = player.get()->getCenterX();
         const float surfY    = getWorld()->surfaceYAt(playerCX);
-        if (playerY < surfY) {
-            window->clear(lighting_.ambientSky(playerY, surfY));
+        const sf::Color sky = lighting_.ambientSky(playerY, surfY);
+        const float depth = playerY - surfY;
+        if (depth < 25.f) {
+            window->clear(sky);
         } else {
-            // Gradiente ±60 tiles nas fronteiras (sem corte seco).
-            const support::StratumBg bg = support::stratumBgSmooth(
+            const support::StratumBg sg = support::stratumBgSmooth(
                 playerY / static_cast<float>(core::kBlockSize));
-            window->clear(sf::Color(bg.r, bg.g, bg.b));
+            sf::Color ground(sg.r, sg.g, sg.b);
+            constexpr float kBlendPx = 150.f; // 3 tiles céu→solo
+            if (depth < 25.f + kBlendPx) {
+                const support::StratumBg top{sky.r, sky.g, sky.b};
+                const float t = (depth - 25.f) / kBlendPx;
+                const support::StratumBg m = support::lerpBg(top, sg, t);
+                ground = sf::Color(m.r, m.g, m.b);
+            }
+            window->clear(ground);
         }
     }
     // Tiles em batch pré-renderizado (camadas 1+5: 1 sprite/chunk);
