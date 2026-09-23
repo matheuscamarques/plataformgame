@@ -994,7 +994,7 @@ REGISTER_ITEM("c4", [] {
 REGISTER_ITEM("moab", [] {
     core::ItemDef def;
     def.id = "moab";
-    def.description = "MOAB, a 'mãe de todas as bombas'. Não jogue em casa.";
+    def.description = "MOAB, a 'mãe de todas as bombas'. Apaga um chunk inteiro do mapa.";
     def.spriteRows = kItemMoabSprite;
     def.spriteW = 8;
     def.spriteH = 8;
@@ -1007,9 +1007,9 @@ REGISTER_ITEM("moab", [] {
     def.throwable = true;
     def.throwKind = support::ThrowKind::Moab;
     def.fuse = 1.5f;
-    def.blastRadius = 160.f;
+    def.blastRadius = 800.f; // 16 tiles: engole um chunk inteiro (16×16)
     def.blastDamage = 140;
-    def.blastTiles = 10;
+    def.blastTiles = 16;
     return def;
 }())
 

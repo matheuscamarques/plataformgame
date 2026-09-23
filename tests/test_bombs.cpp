@@ -72,7 +72,7 @@ int main() {
         assert(!p.tryThrowSlot(ts, 0));
         assert(p.inventory.count("c4") == 4);
     }
-    { // MoabMaiorQueTudo (stats colossais no ar)
+    { // MoabApagaChunk (raio cobre 16x16 tiles = 1 chunk)
         Player p;
         ThrowSystem ts;
         p.inventory = core::Inventory{};
@@ -81,8 +81,8 @@ int main() {
         assert(p.inventory.count("moab") == 0); // última unidade limpa
         ts.forEachActive([&](const Throwable& t) {
             assert(t.kind == ThrowKind::Moab);
-            assert(t.radius == 160.f && t.damage == 140);
-            assert(t.tilesRadius == 10);
+            assert(t.radius == 800.f && t.damage == 140);
+            assert(t.tilesRadius == 16);
         });
     }
 
