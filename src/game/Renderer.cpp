@@ -104,7 +104,11 @@ void Game::render()
     camPos.x = std::round(camPos.x - viewW_ * 0.5f) + viewW_ * 0.5f;
     camPos.y = std::round(camPos.y - viewH_ * 0.5f) + viewH_ * 0.5f;
     auto view = window->getDefaultView();
-    view.move(camPos.x, camPos.y);
+    // View explícita no tamanho atual: getDefaultView() NÃO acompanha
+    // resize (provado em probe: segue 800×600 após setSize 1920×1080),
+    // e mundo estourado + HUD deslocado era o sintoma em tela cheia.
+    // camPos = canto superior-esquerdo (Camera::position), já com snap.
+    view.reset(sf::FloatRect(camPos.x, camPos.y, viewW_, viewH_));
     window->setView(view);
     // View do mundo salva: o HUD troca p/ default depois, e o foco do
     // screenshot precisa converter mundo→pixel nesta view (não na default).
@@ -680,10 +684,11 @@ void Game::render()
         window->draw(v);
     }
 
-    // HUD em espaço de tela (view default): HP, TNT, estrato, morte/pause.
-    // Tosco de propósito; HUD bonito é polimento.
+    // HUD em espaço de tela (view explícita 1:1 — default não acompanha
+    // resize): HP, TNT, estrato, morte/pause. Tosco de propósito; HUD
+    // bonito é polimento.
     {
-        window->setView(window->getDefaultView());
+        window->setView(sf::View(sf::FloatRect(0.f, 0.f, viewW_, viewH_)));
         // Log de eventos (canal F4): últimas linhas do feed, topo-right.
         if (overlay_.visible() && overlay_.events()) {
             int row = 0;
