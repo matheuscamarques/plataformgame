@@ -452,6 +452,19 @@ int main() {
                       "grid cobre o inventário inteiro");
         assert(InventoryUI::kCols == 8 && InventoryUI::kRows == 10);
     }
+    { // OpenTransition (ease-out 0→1 em 0.15s; offset 14→0)
+        InventoryUI ui;
+        ui.open();
+        const float t0 = ui.openTime();
+        assert(ui.openT(t0) == 0.f);
+        const float mid = ui.openT(t0 + 0.075f);
+        assert(mid > 0.8f && mid < 0.95f); // ease-out: 0.875 em u=0.5
+        assert(ui.openT(t0 + 0.15f) == 1.f);
+        assert(ui.openT(t0 + 10.f) == 1.f);
+        assert(ui.openOffset(t0) == 14.f);
+        assert(ui.openOffset(t0 + 10.f) == 0.f);
+        assert(ui.flashSlot() == -1); // sem equip ainda
+    }
     { // WeaponDefs (dano/defesa/slots p/ o painel e o menu)
         const core::ItemDef* sword =
             core::ItemRegistry::instance().find("iron_sword");
@@ -655,6 +668,8 @@ int main() {
         assert(eq.get(core::EquipSlot::RightHand).defId == "iron_axe");
         assert(eq.get(core::EquipSlot::LeftHand).defId == "iron_sword");
         assert(inv.slot(0).isEmpty() && !inv.slot(1).isEmpty());
+        assert(ui.flashTab() == InventoryUI::MainTab::Inventory);
+        assert(ui.flashSlot() == 0); // marca o slot de origem
     }
     { // UnequipViaMenu (aba Equipment: F→Unequip volta p/ grid)
         InventoryUI ui;
@@ -679,6 +694,8 @@ int main() {
         release(in, sf::Keyboard::F);
         assert(eq.get(core::EquipSlot::RightHand).isEmpty());
         assert(inv.count("iron_sword") == 1);
+        assert(ui.flashTab() == InventoryUI::MainTab::Equipment);
+        assert(ui.flashSlot() == 0);
     }
     { // UnequipFullCancel (grid cheio: fica equipado)
         InventoryUI ui;

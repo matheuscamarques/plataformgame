@@ -19,7 +19,9 @@
 #include "core/Material.h"
 #include "core/AudioSystem.h"
 #include "core/MusicSystem.h"
+#include "core/Time.h"
 #include "entities/Player/Player.h"
+#include "game/SoundBank.h"
 #include "support/Input/InputMap.h"
 #include "support/Progression/DropSystem.h"
 #include "support/UI/ItemIcon.h"
@@ -84,10 +86,15 @@ void InventoryUI::open() {
     equipCursor_ = 0;
     sysCursor_ = 0;
     feedback_.clear();
+    openTime_ = core::Time::elapsed();
     snapCursor();
+    playUi(static_cast<int>(game::Sfx::UiSelect));
 }
 
-void InventoryUI::close() { state_ = UIState::Closed; }
+void InventoryUI::close() {
+    if (state_ != UIState::Closed) playUi(static_cast<int>(game::Sfx::UiCancel));
+    state_ = UIState::Closed;
+}
 
 void InventoryUI::toggle() {
     if (state_ == UIState::Closed) open();
@@ -115,6 +122,21 @@ InventoryUI::StatusInfo InventoryUI::status() const {
         }
     }
     return out;
+}
+
+float InventoryUI::openT(float now) const {
+    float u = (now - openTime_) / 0.15f;
+    u = std::clamp(u, 0.f, 1.f);
+    return 1.f - (1.f - u) * (1.f - u) * (1.f - u); // ease-out cúbico
+}
+
+float InventoryUI::openOffset(float now) const {
+    return (1.f - openT(now)) * 14.f; // desliza 14px na abertura
+}
+
+void InventoryUI::playUi(int sfx) const {
+    if (!audio_) return; // teste headless: sem áudio, sem som
+    audio_->play(game::keyOf(static_cast<game::Sfx>(sfx)), 0.5f);
 }
 
 std::vector<int> InventoryUI::filteredSlots() const {
@@ -218,6 +240,10 @@ bool InventoryUI::executeAction(MenuAction action) {
             return false;
         }
         feedback_ = std::string("Desequipado: ") + (def ? def->name : "?");
+        flashTab_ = MainTab::Equipment;
+        flashSlot_ = equipCursor_;
+        flashTime_ = core::Time::elapsed();
+        playUi(static_cast<int>(game::Sfx::UiEquip));
         return true;
     }
 
@@ -225,6 +251,7 @@ bool InventoryUI::executeAction(MenuAction action) {
     if (action == MenuAction::Arrange) {
         inv_->sort(); // global: não precisa de cursor válido
         feedback_ = "Organizado por tipo";
+        playUi(static_cast<int>(game::Sfx::UiConfirm));
         return true;
     }
     if (!slotMatches(cursor_)) return false;
@@ -239,6 +266,7 @@ bool InventoryUI::executeAction(MenuAction action) {
                 def->onUse(*player_);
                 inv_->remove(def->id, 1);
                 feedback_ = std::string("Usou: ") + def->name;
+                playUi(static_cast<int>(game::Sfx::UiConfirm));
                 return true;
             }
             return false;
@@ -265,6 +293,10 @@ bool InventoryUI::executeAction(MenuAction action) {
                     feedback_ += std::string(" (trocou com ") +
                                  (oldDef ? oldDef->name : "?") + ")";
                 }
+                flashTab_ = MainTab::Inventory;
+                flashSlot_ = cursor_;
+                flashTime_ = core::Time::elapsed();
+                playUi(static_cast<int>(game::Sfx::UiEquip));
                 return true;
             }
             return false;
@@ -278,6 +310,7 @@ bool InventoryUI::executeAction(MenuAction action) {
             feedback_ = "Soltou " + std::to_string(item.quantity) + "x " +
                         def->name;
             item = core::Item{};
+            playUi(static_cast<int>(game::Sfx::UiDrop));
             return true;
         }
         default:
@@ -324,10 +357,13 @@ void InventoryUI::snapCursor() {
 }
 
 void InventoryUI::stepCursor(int delta) {
+    const int before = cursor_;
     for (int i = 0; i < kSlots; ++i) {
         cursor_ = (cursor_ + delta + kSlots) % kSlots;
-        if (slotMatches(cursor_)) return;
+        if (slotMatches(cursor_)) break;
     }
+    if (cursor_ != before)
+        playUi(static_cast<int>(game::Sfx::UiMove));
 }
 
 void InventoryUI::cycleMainTab(int delta) {
@@ -337,6 +373,7 @@ void InventoryUI::cycleMainTab(int delta) {
     cursor_ = 0;
     equipCursor_ = 0;
     snapCursor();
+    playUi(static_cast<int>(game::Sfx::UiSelect));
 }
 
 void InventoryUI::cycleSubTab(int delta) {
@@ -345,12 +382,14 @@ void InventoryUI::cycleSubTab(int delta) {
         (static_cast<int>(subTab_) + delta + n) % n);
     cursor_ = 0;
     snapCursor();
+    playUi(static_cast<int>(game::Sfx::UiSelect));
 }
 
 void InventoryUI::openActionMenu() {
     if (menuActions().empty()) return;
     actionCursor_ = 0;
     state_ = UIState::ActionMenu;
+    playUi(static_cast<int>(game::Sfx::UiSelect));
 }
 
 void InventoryUI::adjustVolume(int delta) {
@@ -359,6 +398,7 @@ void InventoryUI::adjustVolume(int delta) {
     if (audio_) audio_->setMasterVolume(v);
     if (music_) music_->setMasterVolume(v);
     feedback_ = "Volume: " + std::to_string(volumePct_) + "%";
+    playUi(static_cast<int>(game::Sfx::UiMove)); // ouve o nível novo
 }
 
 void InventoryUI::activateSystemRow() {
@@ -366,6 +406,7 @@ void InventoryUI::activateSystemRow() {
         feedback_ = "Save em breve";
     } else if (sysCursor_ == 2) {
         quitRequested_ = true;
+        playUi(static_cast<int>(game::Sfx::UiConfirm));
     }
     // Linha 0 (Volume): ajusta com A/D, F não faz nada.
 }
@@ -398,19 +439,27 @@ void InventoryUI::handleBrowse(const InputMap& input) {
     }
 
     if (mainTab_ == MainTab::Equipment) {
-        if (input.pressed(Action::Up) || input.pressed(Action::Left))
+        if (input.pressed(Action::Up) || input.pressed(Action::Left)) {
             equipCursor_ = (equipCursor_ + 5) % 6;
-        if (input.pressed(Action::Down) || input.pressed(Action::Right))
+            playUi(static_cast<int>(game::Sfx::UiMove));
+        }
+        if (input.pressed(Action::Down) || input.pressed(Action::Right)) {
             equipCursor_ = (equipCursor_ + 1) % 6;
+            playUi(static_cast<int>(game::Sfx::UiMove));
+        }
         if (input.pressed(Action::Interact)) openActionMenu();
         return;
     }
 
     if (mainTab_ == MainTab::System) {
-        if (input.pressed(Action::Up))
+        if (input.pressed(Action::Up)) {
             sysCursor_ = (sysCursor_ + kSysRows - 1) % kSysRows;
-        if (input.pressed(Action::Down))
+            playUi(static_cast<int>(game::Sfx::UiMove));
+        }
+        if (input.pressed(Action::Down)) {
             sysCursor_ = (sysCursor_ + 1) % kSysRows;
+            playUi(static_cast<int>(game::Sfx::UiMove));
+        }
         if (input.pressed(Action::Left)) adjustVolume(-10);
         if (input.pressed(Action::Right)) adjustVolume(10);
         if (input.pressed(Action::Interact)) activateSystemRow();
@@ -448,6 +497,7 @@ void InventoryUI::handleBrowse(const InputMap& input) {
 void InventoryUI::handleActionMenu(const InputMap& input) {
     if (input.pressed(Action::Pause)) {
         state_ = UIState::Browse; // Esc volta, não fecha
+        playUi(static_cast<int>(game::Sfx::UiCancel));
         return;
     }
     const auto actions = menuActions();
@@ -456,10 +506,14 @@ void InventoryUI::handleActionMenu(const InputMap& input) {
         return;
     }
     const int n = static_cast<int>(actions.size());
-    if (input.pressed(Action::Up))
+    if (input.pressed(Action::Up)) {
         actionCursor_ = (actionCursor_ + n - 1) % n;
-    if (input.pressed(Action::Down))
+        playUi(static_cast<int>(game::Sfx::UiMove));
+    }
+    if (input.pressed(Action::Down)) {
         actionCursor_ = (actionCursor_ + 1) % n;
+        playUi(static_cast<int>(game::Sfx::UiMove));
+    }
     if (input.pressed(Action::Interact)) {
         if (actions[actionCursor_] == MenuAction::Drop) {
             state_ = UIState::ConfirmDrop;
@@ -473,6 +527,7 @@ void InventoryUI::handleActionMenu(const InputMap& input) {
 void InventoryUI::handleConfirmDrop(const InputMap& input) {
     if (input.pressed(Action::Pause)) {
         state_ = UIState::Browse; // Esc cancela, não fecha
+        playUi(static_cast<int>(game::Sfx::UiCancel));
         return;
     }
     if (input.pressed(Action::Interact)) {
@@ -490,7 +545,10 @@ sf::Vector2f InventoryUI::gridOrigin(float sw, float sh) const {
     // (em 800px o centrado daria 19px — apertado).
     const float totalW = gw + 16.f + kDetailW;
     (void)sh;
-    return {std::max((sw - totalW) * 0.5f, 24.f), 110.f};
+    // Entrada: desliza 14px de cima nos 0.15s iniciais.
+    const float slide =
+        openOffset(core::Time::elapsed());
+    return {std::max((sw - totalW) * 0.5f, 24.f), 110.f + slide};
 }
 
 sf::Vector2f InventoryUI::slotPos(int i, float sw, float sh) const {
@@ -512,8 +570,10 @@ void InventoryUI::render(sf::RenderTarget& target, const sf::Font& font,
                          float sw, float sh) {
     if (state_ == UIState::Closed) return;
 
+    const float now = core::Time::elapsed();
     sf::RectangleShape dim({sw, sh});
-    dim.setFillColor(sf::Color(0, 0, 0, 180));
+    dim.setFillColor(sf::Color(0, 0, 0, static_cast<sf::Uint8>(
+                                            180.f * openT(now))));
     target.draw(dim);
 
     renderMainTabs(target, sw, font);
@@ -539,10 +599,11 @@ void InventoryUI::renderMainTabs(sf::RenderTarget& t, float sw,
     constexpr int n = static_cast<int>(MainTab::COUNT);
     const float tabW = 150.f, tabH = 36.f, gap = 4.f;
     const float x0 = (sw - (n * tabW + (n - 1) * gap)) * 0.5f;
+    const float y0 = 16.f + openOffset(core::Time::elapsed());
     for (int i = 0; i < n; ++i) {
         const bool active = (static_cast<int>(mainTab_) == i);
         sf::RectangleShape bg({tabW, tabH});
-        bg.setPosition(x0 + i * (tabW + gap), 16.f);
+        bg.setPosition(x0 + i * (tabW + gap), y0);
         bg.setFillColor(active ? sf::Color(80, 70, 50, 240)
                                : sf::Color(30, 30, 40, 220));
         bg.setOutlineColor(active ? sf::Color(255, 220, 100)
@@ -557,7 +618,7 @@ void InventoryUI::renderMainTabs(sf::RenderTarget& t, float sw,
                                 : sf::Color(160, 160, 160));
         const auto b = txt.getLocalBounds();
         txt.setPosition(x0 + i * (tabW + gap) + (tabW - b.width) * 0.5f,
-                        16.f + (tabH - b.height) * 0.5f - 4.f);
+                        y0 + (tabH - b.height) * 0.5f - 4.f);
         t.draw(txt);
     }
 }
@@ -567,10 +628,11 @@ void InventoryUI::renderSubTabs(sf::RenderTarget& t, float sw,
     constexpr int n = static_cast<int>(SubTab::COUNT);
     const float tabW = 110.f, tabH = 28.f, gap = 4.f;
     const float x0 = (sw - (n * tabW + (n - 1) * gap)) * 0.5f;
+    const float y0 = 64.f + openOffset(core::Time::elapsed());
     for (int i = 0; i < n; ++i) {
         const bool active = (static_cast<int>(subTab_) == i);
         sf::RectangleShape bg({tabW, tabH});
-        bg.setPosition(x0 + i * (tabW + gap), 64.f);
+        bg.setPosition(x0 + i * (tabW + gap), y0);
         bg.setFillColor(active ? sf::Color(60, 60, 80, 240)
                                : sf::Color(25, 25, 35, 200));
         bg.setOutlineColor(active ? sf::Color(200, 180, 100)
@@ -585,7 +647,7 @@ void InventoryUI::renderSubTabs(sf::RenderTarget& t, float sw,
                                 : sf::Color(150, 150, 150));
         const auto b = txt.getLocalBounds();
         txt.setPosition(x0 + i * (tabW + gap) + (tabW - b.width) * 0.5f,
-                        64.f + (tabH - b.height) * 0.5f - 3.f);
+                        y0 + (tabH - b.height) * 0.5f - 3.f);
         t.draw(txt);
     }
 }
@@ -625,6 +687,21 @@ void InventoryUI::renderGrid(sf::RenderTarget& t, float sw, float sh,
                                : sf::Color(90, 90, 100));
         bg.setOutlineThickness(sel ? 2.f : 1.f);
         t.draw(bg);
+
+        // Flash do último Equip (0.4s, some sozinho).
+        if (flashTab_ == MainTab::Inventory && i == flashSlot_) {
+            const float age = core::Time::elapsed() - flashTime_;
+            if (age >= 0.f && age < 0.4f) {
+                sf::RectangleShape fl({kSlotSize, kSlotSize});
+                fl.setPosition(p);
+                fl.setFillColor(sf::Color::Transparent);
+                fl.setOutlineColor(sf::Color(
+                    255, 220, 100,
+                    static_cast<sf::Uint8>(255.f * (1.f - age / 0.4f))));
+                fl.setOutlineThickness(3.f);
+                t.draw(fl);
+            }
+        }
 
         if (!vis[i]) continue; // fora da aba: some (grade esparsa)
         const core::Item& item = inv_->slot(i);
@@ -701,6 +778,20 @@ void InventoryUI::renderEquipTab(sf::RenderTarget& t, float sw, float sh,
                                : sf::Color(90, 90, 100));
         bg.setOutlineThickness(sel ? 2.f : 1.f);
         t.draw(bg);
+
+        if (flashTab_ == MainTab::Equipment && i == flashSlot_) {
+            const float age = core::Time::elapsed() - flashTime_;
+            if (age >= 0.f && age < 0.4f) {
+                sf::RectangleShape fl({ss, ss});
+                fl.setPosition(pos[i]);
+                fl.setFillColor(sf::Color::Transparent);
+                fl.setOutlineColor(sf::Color(
+                    255, 220, 100,
+                    static_cast<sf::Uint8>(255.f * (1.f - age / 0.4f))));
+                fl.setOutlineThickness(3.f);
+                t.draw(fl);
+            }
+        }
 
         const core::EquipSlot s = core::equipDisplaySlot(i);
         sf::Text label;

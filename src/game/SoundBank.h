@@ -31,7 +31,7 @@ enum class Sfx : uint8_t {
     DwarfAlert, DwarfThrow, DwarfMelee, DwarfHurt, DwarfDeath,
     DwarfWarn1, DwarfWarn2, DwarfWarn3, DwarfBetray,
     // UI
-    UiSelect,
+    UiSelect, UiMove, UiConfirm, UiCancel, UiEquip, UiDrop,
     COUNT
 };
 
@@ -63,6 +63,11 @@ inline const char* keyOf(Sfx s) {
         case Sfx::DwarfWarn3:    return "dwarf_warn3";
         case Sfx::DwarfBetray:   return "dwarf_betray";
         case Sfx::UiSelect:      return "ui_select";
+        case Sfx::UiMove:        return "ui_move";
+        case Sfx::UiConfirm:     return "ui_confirm";
+        case Sfx::UiCancel:      return "ui_cancel";
+        case Sfx::UiEquip:       return "ui_equip";
+        case Sfx::UiDrop:        return "ui_drop";
         default:                 return "?";
     }
 }
@@ -181,6 +186,25 @@ inline void buildSoundBank(core::AudioSystem& a) {
     a.registerSound("ui_select",
         tone({{660.f, 0.f, 0.06f, 1.f}}, 0.06f, Wave::Sine,
              {0.002f,0.01f,0.3f,0.03f}, 0.30f));
+    a.registerSound("ui_move",
+        tone({{440.f, 0.f, 0.04f, 1.f}}, 0.04f, Wave::Sine,
+             {0.002f,0.005f,0.3f,0.02f}, 0.22f));
+    a.registerSound("ui_confirm",
+        tone({{660.f, 0.f, 0.05f, 1.f}, {880.f, 0.05f, 0.08f, 1.f}},
+             0.13f, Wave::Sine,
+             {0.002f,0.01f,0.3f,0.03f}, 0.30f));
+    a.registerSound("ui_cancel",
+        tone({{330.f, 0.f, 0.06f, 1.f}, {220.f, 0.06f, 0.09f, 1.f}},
+             0.15f, Wave::Sine,
+             {0.002f,0.01f,0.3f,0.04f}, 0.28f));
+    a.registerSound("ui_equip",
+        tone({{520.f, 0.f, 0.05f, 1.f}, {780.f, 0.05f, 0.06f, 1.f}},
+             0.11f, Wave::Square,
+             {0.002f,0.008f,0.25f,0.03f}, 0.22f));
+    a.registerSound("ui_drop",
+        tone({{180.f, 0.f, 0.09f, 1.f}, {120.f, 0.09f, 0.08f, 1.f}},
+             0.17f, Wave::Sine,
+             {0.003f,0.01f,0.4f,0.05f}, 0.30f));
 }
 
 } // namespace game

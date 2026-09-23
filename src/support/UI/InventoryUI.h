@@ -145,6 +145,16 @@ public:
         quitRequested_ = false;
         return out;
     }
+
+    // Progresso da abertura 0..1 (ease-out; p/ teste com tempo falso).
+    float openT(float now) const;
+    float openTime() const { return openTime_; }
+    // Deslocamento vertical da entrada (px, some em 0.15s).
+    float openOffset(float now) const;
+
+    // Flash do último Equip/Unequip (aba+slot, -1 = nenhum).
+    int flashSlot() const { return flashSlot_; }
+    MainTab flashTab() const { return flashTab_; }
     // "DMG: 18 (atual 12, +6)" — só p/ arma/armadura com referência.
     struct StatCompare {
         bool show = false; // tem com o que comparar
@@ -178,6 +188,10 @@ private:
     int     sysCursor_   = 0; // linha da aba System (0..kSysRows-1)
     int     volumePct_   = 70; // dono é a UI; aplica ao ajustar
     bool    quitRequested_ = false;
+    float   openTime_    = 0.f; // Time::elapsed() no open()
+    MainTab flashTab_    = MainTab::Inventory;
+    int     flashSlot_   = -1; // slot do último equip (-1 = nenhum)
+    float   flashTime_   = -10.f;
     std::string feedback_;     // última ação (rodapé; limpa ao abrir)
 
     void handleBrowse(const InputMap& input);
@@ -186,6 +200,7 @@ private:
     void openActionMenu();
     void adjustVolume(int delta); // aplica em audio_+music_ (se setados)
     void activateSystemRow();     // F na linha sysCursor_
+    void playUi(int sfx) const;   // game::Sfx como int (sem incluir Bank)
 
     bool slotMatches(int index) const; // ocupado + casa com a sub-tab
     int firstValid() const; // 1º slot navegável (-1 = nenhum)
