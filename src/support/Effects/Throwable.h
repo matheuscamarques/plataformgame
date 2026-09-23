@@ -16,8 +16,18 @@ enum class ThrowKind : uint8_t {
     GoldNugget,   // stub — passivo futuro
     Rock,         // stub — variação futura
     Spit,         // projétil de slime: linear, sem fuse, dano no impacto
-    Barrel        // barril do anão: rola, detona no fuse (sem quique ainda)
+    Barrel,       // barril do anão: rola, detona no fuse (sem quique ainda)
+    Tnt,          // escada de bombas: TNT (média)
+    C4,           // C4 militar (grande)
+    Moab          // MOAB (colossal)
 };
+
+// Bombas do player (fuse + telegraph + glow + luz no grid).
+// Spit/Barrel/Nugget/Rock ficam de fora (comportamento próprio).
+inline bool isPlayerBomb(ThrowKind k) {
+    return k == ThrowKind::Dynamite || k == ThrowKind::Tnt ||
+           k == ThrowKind::C4 || k == ThrowKind::Moab;
+}
 
 struct Throwable {
     sf::Vector2f pos{0.f, 0.f};

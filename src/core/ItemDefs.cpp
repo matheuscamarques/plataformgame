@@ -377,6 +377,12 @@ REGISTER_ITEM("dynamite", [] {
     def.type = ItemType::Consumable; // arremesso consome da pilha (verbo)
     def.rarity = ItemRarity::Common;
     def.stackMax = 999; // pilha única: 999 em 1 slot (kit cabe em 40)
+    def.throwable = true; // J joga (legado); stats = padrão do Throwable
+    def.throwKind = support::ThrowKind::Dynamite;
+    def.fuse = 1.0f;
+    def.blastRadius = 40.f;
+    def.blastDamage = 25;
+    def.blastTiles = 3;
     return def;
 }())
 
@@ -883,6 +889,127 @@ REGISTER_ITEM("leather_axe", [] {
     def.damage = 9;
     def.equipSlot = core::EquipSlot::RightHand;
     def.material = core::MaterialId::Leather;
+    return def;
+}())
+
+// ---- Escada de bombas (mundo real, destruição crescente) ----
+inline const core::PaletteEntry kItemTntPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'R', {220, 60, 60}},
+    {'r', {150, 40, 40}},
+    {'Y', {240, 200, 80}},
+};
+inline constexpr std::size_t kItemTntPalCount = 4;
+inline const char* const kItemTntSprite[] = {
+    "..RRRR..",
+    "..RRRR..",
+    "..YYYY..",
+    "..RRRR..",
+    "..RRRR..",
+    "..YYYY..",
+    "..RRRR..",
+    "........",
+};
+
+inline const core::PaletteEntry kItemC4Pal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'T', {200, 180, 130}},
+    {'t', {140, 125, 90}},
+    {'W', {150, 150, 150}},
+};
+inline constexpr std::size_t kItemC4PalCount = 4;
+inline const char* const kItemC4Sprite[] = {
+    "........",
+    ".TTTTTT.",
+    ".TTTTTT.",
+    ".TTTTttT",
+    ".WWWWW..",
+    "..W.....",
+    "..W.....",
+    "........",
+};
+
+inline const core::PaletteEntry kItemMoabPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'O', {110, 120, 70}},
+    {'o', {75, 85, 50}},
+    {'F', {150, 150, 150}},
+};
+inline constexpr std::size_t kItemMoabPalCount = 4;
+inline const char* const kItemMoabSprite[] = {
+    "...OO...",
+    "...OO...",
+    "..OOOO..",
+    "..OOOO..",
+    ".FOOOOF.",
+    ".FOOOOF.",
+    "..o..o..",
+    "........",
+};
+
+REGISTER_ITEM("tnt", [] {
+    core::ItemDef def;
+    def.id = "tnt";
+    def.description = "Trinitrotolueno: 1kg equivale a 1kg de si mesmo.";
+    def.spriteRows = kItemTntSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemTntPal;
+    def.spritePalCount = kItemTntPalCount;
+    def.name = "TNT";
+    def.type = ItemType::Consumable;
+    def.rarity = ItemRarity::Uncommon;
+    def.stackMax = 99;
+    def.throwable = true;
+    def.throwKind = support::ThrowKind::Tnt;
+    def.fuse = 1.0f;
+    def.blastRadius = 70.f;
+    def.blastDamage = 45;
+    def.blastTiles = 5;
+    return def;
+}())
+
+REGISTER_ITEM("c4", [] {
+    core::ItemDef def;
+    def.id = "c4";
+    def.description = "C4 militar: plástico estável, boom ~1.3x a TNT.";
+    def.spriteRows = kItemC4Sprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemC4Pal;
+    def.spritePalCount = kItemC4PalCount;
+    def.name = "Carga C4";
+    def.type = ItemType::Consumable;
+    def.rarity = ItemRarity::Rare;
+    def.stackMax = 32;
+    def.throwable = true;
+    def.throwKind = support::ThrowKind::C4;
+    def.fuse = 0.8f;
+    def.blastRadius = 110.f;
+    def.blastDamage = 80;
+    def.blastTiles = 7;
+    return def;
+}())
+
+REGISTER_ITEM("moab", [] {
+    core::ItemDef def;
+    def.id = "moab";
+    def.description = "MOAB, a 'mãe de todas as bombas'. Não jogue em casa.";
+    def.spriteRows = kItemMoabSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemMoabPal;
+    def.spritePalCount = kItemMoabPalCount;
+    def.name = "MOAB";
+    def.type = ItemType::Consumable;
+    def.rarity = ItemRarity::Epic;
+    def.stackMax = 16;
+    def.throwable = true;
+    def.throwKind = support::ThrowKind::Moab;
+    def.fuse = 1.5f;
+    def.blastRadius = 160.f;
+    def.blastDamage = 140;
+    def.blastTiles = 10;
     return def;
 }())
 

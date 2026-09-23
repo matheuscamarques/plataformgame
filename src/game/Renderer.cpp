@@ -208,10 +208,10 @@ void Game::render()
         });
     }
 
-    // Throwables visíveis: TNT animada por fuse + telegraph do raio.
-    // Outros kinds continuam no círculo dourado.
+    // Throwables visíveis: bomba do player tem telegraph + núcleo por
+    // tier; outros kinds continuam no círculo dourado.
     throws_->forEachActive([&](const support::Throwable &t) {
-        if (t.kind != support::ThrowKind::Dynamite) {
+        if (!support::isPlayerBomb(t.kind)) {
             sf::CircleShape c(3.f);
             c.setOrigin(3.f, 3.f);
             c.setPosition(t.pos);
@@ -238,25 +238,44 @@ void Game::render()
             window->draw(ring);
         }
 
-        // ── 2. Sprite da TNT, frame por fuse ──
-        int frame = 0;
-        if      (t.fuse < 0.33f) frame = 2; // crítico — pavio consumido
-        else if (t.fuse < 0.66f) frame = 1; // queimando
-        // else: frame 0 (fresco)
+        // ── 2. Núcleo: dinamite usa sprite por fuse; tiers novos usam
+        // círculo na cor do tier (tamanho = tier).
+        if (t.kind == support::ThrowKind::Dynamite) {
+            int frame = 0;
+            if      (t.fuse < 0.33f) frame = 2; // crítico — pavio consumido
+            else if (t.fuse < 0.66f) frame = 1; // queimando
+            // else: frame 0 (fresco)
 
-        const float scale = 2.5f; // mesmo do player
-        sf::Sprite spr(sprites_.tnt[frame]);
-        spr.setOrigin(3.f, 4.f); // centro do sprite 6x8
-        spr.setPosition(t.pos);
-        spr.setScale(scale, scale);
+            const float scale = 2.5f; // mesmo do player
+            sf::Sprite spr(sprites_.tnt[frame]);
+            spr.setOrigin(3.f, 4.f); // centro do sprite 6x8
+            spr.setPosition(t.pos);
+            spr.setScale(scale, scale);
 
-        // Flash branco no último 15% (o "vai explodir agora").
-        if (t.fuse < 0.15f) {
-            const float flash = 0.5f + 0.5f * std::sin(t.fuse * 60.f);
-            spr.setColor(sf::Color(255, 255,
-                static_cast<sf::Uint8>(180 + 75 * flash)));
+            // Flash branco no último 15% (o "vai explodir agora").
+            if (t.fuse < 0.15f) {
+                const float flash = 0.5f + 0.5f * std::sin(t.fuse * 60.f);
+                spr.setColor(sf::Color(255, 255,
+                    static_cast<sf::Uint8>(180 + 75 * flash)));
+            }
+            window->draw(spr);
+        } else {
+            float coreR = 4.f;
+            sf::Color coreC = sf::Color(220, 60, 60); // Tnt
+            if (t.kind == support::ThrowKind::C4) {
+                coreR = 5.f;
+                coreC = sf::Color(200, 180, 130);
+            } else if (t.kind == support::ThrowKind::Moab) {
+                coreR = 7.f;
+                coreC = sf::Color(110, 120, 70);
+            }
+            if (t.fuse < 0.15f) coreC = sf::Color::White; // vai explodir
+            sf::CircleShape core(coreR);
+            core.setOrigin(coreR, coreR);
+            core.setPosition(t.pos);
+            core.setFillColor(coreC);
+            window->draw(core);
         }
-        window->draw(spr);
     });
 
     particles_->render(*window);
@@ -592,7 +611,7 @@ void Game::render()
                               player.get()->getCenterX(),
                               player.get()->getCenterY());
     throws_->forEachActive([&](const support::Throwable &t) {
-        if (t.kind != support::ThrowKind::Dynamite) return;
+        if (!support::isPlayerBomb(t.kind)) return;
         if (t.fuse <= 0.f) return;
         const auto gp =
             support::tntGlowParams(t.fuse, core::Time::elapsed());

@@ -15,6 +15,7 @@
 #include "core/sprite_from_ascii.h"
 #include "core/EquipSlot.h"
 #include "core/Material.h"
+#include "support/Effects/Throwable.h"
 
 class Player;
 
@@ -53,6 +54,14 @@ struct ItemDef {
     int         defense   = 0;   // armadura: idem
     EquipSlot   equipSlot = EquipSlot::None; // None = não equipável
     MaterialId  material  = MaterialId::Iron; // cor da peça no render
+    // Bomba arremessável (J joga o slot ativo da hotbar): stats vão
+    // direto p/ o Throwable (fonte única, sem switch por id).
+    bool                 throwable   = false;
+    support::ThrowKind   throwKind   = support::ThrowKind::Dynamite;
+    float                fuse        = 1.0f;
+    float                blastRadius = 0.f; // px (0 = sem explosão)
+    int                  blastDamage = 0;
+    int                  blastTiles  = 0;   // raio de quebra em tiles
     // Sprite ASCII 8×8 (mesmo idioma de makeSprite; nulo = rect fallback).
     const char* const* spriteRows = nullptr;
     int spriteW = 0;

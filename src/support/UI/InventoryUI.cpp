@@ -773,6 +773,11 @@ void InventoryUI::renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
         def->type == core::ItemType::Armor)
         line(std::string("MAT: ") + core::materialName(def->material), 12,
              sf::Color(170, 170, 180));
+    if (def->throwable)
+        line("BOOM: " + std::to_string(def->blastDamage) + "  r" +
+                 std::to_string(static_cast<int>(def->blastRadius)) + "  t" +
+                 std::to_string(def->blastTiles),
+             13, sf::Color(255, 150, 80));
     if (sel->quantity > 1)
         line("x" + std::to_string(sel->quantity), 12,
              sf::Color(220, 220, 220));

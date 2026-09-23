@@ -76,10 +76,10 @@ void ThrowSystem::tick(float dt, GameContext &ctx) {
             t.resting = false;
         }
 
-        // ── TNT emite luz no grid enquanto o fuse corre (item 15) ──
+        // ── Bomba do player emite luz no grid enquanto o fuse corre ──
         // Sem raycast (fonte rápida, oclusão irrelevante); re-flood só se
         // tile ou nível mudar. addBlockSource preserva luz maior (player).
-        if (ctx.world && t.kind == ThrowKind::Dynamite && t.fuse > 0.f) {
+        if (ctx.world && isPlayerBomb(t.kind) && t.fuse > 0.f) {
             const int tx = static_cast<int>(std::floor(t.pos.x / core::kBlockSize));
             const int ty = static_cast<int>(std::floor(t.pos.y / core::kBlockSize));
             const uint8_t lvl = tntLightLevel(t.fuse);

@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <iostream>
 #include "defines.h"
+#include "physics/PlayerPhysics.hpp"
 #include "support/Combat/WeaponRegistry.h"
 #include "support/Effects/ThrowSystem.h"
 
@@ -158,76 +159,63 @@ void Player::collide(Component bloco)
 }
 
 void Player::tick() {
-    inWater = false; // reset; collide() seta de novo se houver água
-    // Snapshot do input p/ mira: o pulo consome moveUp abaixo; sem a
-    // cópia, segurar ↑ no ar perde o N após ~5 ticks de subida.
-    const bool aimUp = moveUp;
-    const bool aimDown = moveDown;
-    const bool aimLeft = moveLeft;
-    const bool aimRight = moveRight;
+    // Wrapper fino sobre physics::step (fonte única do movimento).
+    // Comportamento bit-idêntico ao tick antigo: monta State/Input,
+    // roda o step puro e escreve de volta (membros + Entity + cooldowns).
+    physics::State st;
+    st.x = getX();
+    st.y = getY();
+    st.vx = getVx();
+    st.vy = getVy();
+    st.runFast = runFast;
+    st.jumping = jumping;
+    st.jumpingRecharge = jumpingRecharge;
+    st.inWater = inWater;
+    st.facing = facing;
+    st.aim = aimDir;
+    st.walkFrame = walkFrame;
+    st.walkTimer = walkTimer;
+    st.throwAnimT = throwAnimT;
+    st.hurtT = hurtIframes.remaining();
+    st.throwT = throwCooldown.remaining();
 
+    physics::Input in{moveUp, moveDown, moveLeft, moveRight, runFast};
+    const physics::Output out =
+        physics::step(st, in, physics::kFixedDt);
+    const physics::State &s = out.state;
 
-    if (moveUp && jumping) {
-			setY(getY() - core::kBlockSize * 1.0f / 2);
-
-			jumpingRecharge += core::kBlockSize * 1.0/ 2 ;
-			if (jumpingRecharge > core::kBlockSize * 5) {
-				jumping = false;
-				jumpingRecharge = 0.0f;
-				moveUp = false;
-			}
-	}
-
-    float vxRunSpeed = runFast ? 5.0f : 0.0f;
-
-    // Gravidade com arrasto: acelera até a velocidade terminal.
-    // No pulo (teleporte) mantém 9.8 (pulo idêntico ao antigo); fora
-    // dele, acumula. Pouso zera no collide(); knockback p/ cima faz
-    // arco (soma e cai).
-    if (moveUp && jumping) {
-        setVy(9.8f);
+    moveUp = s.moveUp;
+    moveDown = s.moveDown;
+    moveLeft = s.moveLeft;
+    moveRight = s.moveRight;
+    runFast = s.runFast;
+    jumping = s.jumping;
+    jumpingRecharge = s.jumpingRecharge;
+    inWater = s.inWater;
+    aimDir = s.aim;
+    walkFrame = s.walkFrame;
+    walkTimer = s.walkTimer;
+    throwAnimT = s.throwAnimT;
+    if (s.hurtT > 0.f) {
+        hurtIframes.trigger(s.hurtT);
     } else {
-        float vy = getVy() + kGravity;
-        if (vy > kTerminalVelocity) vy = kTerminalVelocity;
-        setVy(vy);
+        hurtIframes.reset();
     }
-
-    if(moveLeft){
-        setVx(-9.8f - vxRunSpeed);
-    }
-    if(moveRight)
-        setVx(9.8f + vxRunSpeed);
-
-    if(!moveLeft && !moveRight){
-        setVx(0.0f);
-    }
-
-    // Mira segue o input todo tick; o swing congela a sua (snapshot).
-    aimDir = support::resolveAim(aimUp, aimDown, aimLeft, aimRight, facing);
-
-    // Walk anim (10fps, só no chão): parado volta ao frame 0.
-    // jumping=true = no chão (pode pular); false = no ar.
-    if ((moveLeft || moveRight) && jumping) {
-        walkTimer += 1.0f / 30.0f;
-        if (walkTimer >= 0.10f) {
-            walkTimer = 0.f;
-            walkFrame = (walkFrame + 1) % 4;
-        }
+    if (s.throwT > 0.f) {
+        throwCooldown.trigger(s.throwT);
     } else {
-        walkFrame = 0;
-        walkTimer = 0.f;
+        throwCooldown.reset();
     }
 
-    // Timer de ataque (frame telegraph).
-    if (throwAnimT > 0.f) throwAnimT -= 1.0f / 30.0f;
-
-    // Cooldowns do Player, tickados pelo Player (1 só lugar).
-    // Sem o hurtIframes aqui, i-frames nunca expiram e o sprite
-    // trava em kPlayerHurt (pick tem hurt como 1ª prioridade).
-    hurtIframes.tick(1.0f / 30.0f);
-    throwCooldown.tick(1.0f / 30.0f);
-
-    Entity::tick();
+    // Integração já feita no step; aqui só o sync do Entity
+    // (era Entity::tick sem o x += vx): posição do shape + sensores.
+    setX(s.x);
+    setY(s.y);
+    setVx(s.vx);
+    setVy(s.vy);
+    this->left = getX();
+    this->top = getY();
+    this->setPosition(getX(), getY());
 }
 
 void Player::topUpDynamite() {
@@ -258,6 +246,29 @@ void Player::topUpStarterKit() {
             if (left > 0) break; // cheio: fica com o que coube
         }
     }
+}
+
+bool Player::tryThrowSlot(support::ThrowSystem &throws, int slot) {
+    if (!throwCooldown.ready()) return false;
+    if (slot < 0 || slot >= core::Inventory::kCapacity) return false;
+    core::Item& item = inventory.slot(slot);
+    if (item.isEmpty()) return false;
+    const core::ItemDef* def = item.def();
+    if (!def || !def->throwable) return false;
+    // Mesmo arco da dinamite; stats do def (sem switch por id).
+    sf::Vector2f vel{220.f * static_cast<float>(facing), -320.f};
+    support::Throwable* t = throws.throwItem({getCenterX(), getCenterY()},
+                                             vel, def->throwKind);
+    if (!t) return false;
+    t->fuse        = def->fuse;
+    t->radius      = def->blastRadius;
+    t->damage      = def->blastDamage;
+    t->tilesRadius = def->blastTiles;
+    if (item.quantity <= 1) item = core::Item{};
+    else --item.quantity;
+    throwCooldown.trigger();
+    throwAnimT = kThrowAnimDur;
+    return true;
 }
 
 bool Player::tryThrow(support::ThrowSystem &throws) {    if (!throwCooldown.ready() || inventory.count("dynamite") <= 0)
