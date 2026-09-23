@@ -130,10 +130,9 @@ void Game::render()
         if (playerY < surfY) {
             window->clear(lighting_.ambientSky(playerY, surfY));
         } else {
-            const int pty =
-                static_cast<int>(std::floor(playerY / core::kBlockSize));
-            const support::StratumBg bg =
-                support::stratumBg(support::stratumAt(pty));
+            // Gradiente ±60 tiles nas fronteiras (sem corte seco).
+            const support::StratumBg bg = support::stratumBgSmooth(
+                playerY / static_cast<float>(core::kBlockSize));
             window->clear(sf::Color(bg.r, bg.g, bg.b));
         }
     }

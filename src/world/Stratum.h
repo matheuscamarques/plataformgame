@@ -71,4 +71,39 @@ inline StratumBg stratumBg(int s) {
     }
 }
 
+// Metade da faixa de transição nas fronteiras (tiles p/ cada lado).
+// Queda livre (~15 tiles/s): 60 = ~4s de gradiente por fronteira.
+inline constexpr float kStratumBlend = 60.f;
+
+inline StratumBg lerpBg(StratumBg a, StratumBg b, float t) {
+    if (t < 0.f) t = 0.f;
+    if (t > 1.f) t = 1.f;
+    const auto mix = [](uint8_t x, uint8_t y, float t) {
+        return static_cast<uint8_t>(x + (y - x) * t + 0.5f);
+    };
+    return {mix(a.r, b.r, t), mix(a.g, b.g, t), mix(a.b, b.b, t)};
+}
+
+// Cor com gradiente: chapada no miolo, interpola ±blend nas fronteiras.
+// Contínua por construção (na fronteira vale a cor de cima dos 2 lados).
+inline StratumBg stratumBgSmooth(float ty) {
+    const int tyi = ty < 0.f ? static_cast<int>(ty) - 1 : static_cast<int>(ty);
+    const int s = stratumAt(tyi);
+    // Borda inferior do estrato s (ty onde ele começa; s=0 não tem).
+    if (s >= 1) {
+        const float ty0 = 200.f + (s - 1) * 1200.f;
+        const float d = ty - ty0; // >= 0 dentro do estrato
+        if (d >= 0.f && d < kStratumBlend)
+            return lerpBg(stratumBg(s - 1), stratumBg(s), d / kStratumBlend);
+    }
+    // Borda superior (ty onde o próximo começa; s=10 não tem).
+    if (s <= 9) {
+        const float ty1 = 200.f + s * 1200.f;
+        const float d = ty1 - ty; // > 0 dentro do estrato
+        if (d > 0.f && d < kStratumBlend)
+            return lerpBg(stratumBg(s), stratumBg(s + 1), 1.f - d / kStratumBlend);
+    }
+    return stratumBg(s);
+}
+
 } // namespace support

@@ -88,6 +88,29 @@ int main() {
         StratumBg sky = stratumBg(0);
         assert(sky.r == 135 && sky.g == 206 && sky.b == 235); // céu intacto
     }
+    { // BgSmoothGradient (chapado no miolo, contínuo na fronteira)
+        // Fronteira estrato 1→2 em ty=1400 (banda 1200, blend 60).
+        StratumBg prev = stratumBg(1), cur = stratumBg(2);
+        StratumBg atEdge = stratumBgSmooth(1400.f);
+        assert(atEdge.r == prev.r && atEdge.g == prev.g &&
+               atEdge.b == prev.b); // chega com a cor de cima
+        StratumBg past = stratumBgSmooth(1400.f + kStratumBlend);
+        assert(past.r == cur.r && past.g == cur.g &&
+               past.b == cur.b); // 60 depois, chapado novo
+        assert(stratumBgSmooth(2000.f).r == cur.r); // miolo chapado
+        // Meio do blend = ponto médio (margem de arredondamento).
+        StratumBg mid = stratumBgSmooth(1400.f + kStratumBlend * 0.5f);
+        assert(abs(mid.r - (prev.r + cur.r) / 2) <= 1);
+        assert(abs(mid.g - (prev.g + cur.g) / 2) <= 1);
+        assert(abs(mid.b - (prev.b + cur.b) / 2) <= 1);
+        // Sem salto: 1 tile através da fronteira muda pouco.
+        StratumBg below = stratumBgSmooth(1399.f);
+        StratumBg above = stratumBgSmooth(1401.f);
+        assert(abs(below.r - above.r) + abs(below.g - above.g) +
+                   abs(below.b - above.b) <=
+               abs(prev.r - cur.r) + abs(prev.g - cur.g) +
+                   abs(prev.b - cur.b));
+    }
 
     std::printf("strata test OK\n");
     return 0;
