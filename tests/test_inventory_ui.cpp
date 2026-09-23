@@ -80,23 +80,23 @@ int main() {
         assert(ui.state() == InventoryUI::UIState::Browse);
         assert(ui.isOpen());
     }
-    { // MainTabSwitch (R/Q ciclam Inventory<->Equipment, cursor reseta)
+    { // MainTabSwitch (Tab/Q ciclam Inventory<->Equipment, cursor reseta)
         InventoryUI ui;
         core::Inventory inv;
         InputMap in;
         ui.setInventory(&inv);
         ui.open();
         ui.setCursor(7);
-        press(in, sf::Keyboard::R);
+        press(in, sf::Keyboard::Tab);
         ui.handleInput(in);
-        release(in, sf::Keyboard::R);
+        release(in, sf::Keyboard::Tab);
         assert(ui.mainTab() == InventoryUI::MainTab::Equipment);
         assert(ui.cursor() == 0);
         press(in, sf::Keyboard::Q);
         ui.handleInput(in);
         release(in, sf::Keyboard::Q);
         assert(ui.mainTab() == InventoryUI::MainTab::Inventory);
-        press(in, sf::Keyboard::Tab); // hábito antigo: Tab avança
+        press(in, sf::Keyboard::Tab);
         ui.handleInput(in);
         release(in, sf::Keyboard::Tab);
         assert(ui.mainTab() == InventoryUI::MainTab::Equipment);
@@ -425,9 +425,9 @@ int main() {
         ui.setInventory(&inv);
         ui.setEquipment(&eq);
         ui.open();
-        press(in, sf::Keyboard::R); // aba Equipment
+        press(in, sf::Keyboard::Tab); // aba Equipment
         ui.handleInput(in);
-        release(in, sf::Keyboard::R);
+        release(in, sf::Keyboard::Tab);
         assert(ui.mainTab() == InventoryUI::MainTab::Equipment);
         assert(hasAction(ui, MA::Unequip));
         press(in, sf::Keyboard::F);

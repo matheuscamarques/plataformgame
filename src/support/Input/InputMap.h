@@ -20,7 +20,7 @@ enum class Action : uint8_t {
     ToggleInventory, // fase 4b: E abre/fecha grid
     Interact,        // F: abre/executa menu de ação (com grid aberto)
     TabLeft,         // Q: tab principal anterior
-    TabRight,        // R: próxima tab principal (consome Restart!)
+    TabRight,        // Tab: próxima tab principal
     SubTabLeft,      // A: sub-tab anterior (só em Inventory)
     SubTabRight,     // D: próxima sub-tab
     FirstSlot,       // Home: primeiro slot

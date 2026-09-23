@@ -721,7 +721,7 @@ void InventoryUI::renderFooter(sf::RenderTarget& t, float sw, float sh,
     gold.setFillColor(sf::Color(240, 220, 140));
     gold.setPosition(24.f, sh - 34.f);
     t.draw(gold);
-    hints.setString("[Q][R] Tab  [A][D] Sub  [F] Acao  [E] Fechar");
+    hints.setString("[Q][Tab] Tab  [A][D] Sub  [F] Acao  [E] Fechar");
     hints.setCharacterSize(12);
     hints.setFillColor(sf::Color(150, 150, 150));
     const float w = hints.getLocalBounds().width;

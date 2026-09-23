@@ -10,7 +10,7 @@ int main() {
         assert(p.hurtIframes.running());   // arrancou
         for (int i = 0; i < 20; ++i) p.tick(); // ~0.66s > 0.6s
         assert(!p.hurtIframes.running());  // expirou
-        assert(p.hp == 90);
+        assert(p.hp == 9990);
     }
     { // ThrowCooldownTicksInPlayerTick (1 só lugar, sem Game)
         Player p;

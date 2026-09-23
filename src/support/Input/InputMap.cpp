@@ -35,7 +35,7 @@ InputMap::InputMap() {
     bind(Action::ToggleInventory, sf::Keyboard::E);
     bind(Action::Interact, sf::Keyboard::F);
     bind(Action::TabLeft, sf::Keyboard::Q);
-    bind(Action::TabRight, sf::Keyboard::R);
+    bind(Action::TabRight, sf::Keyboard::Tab); // R é só Restart agora
     bind(Action::SubTabLeft, sf::Keyboard::A);
     bind(Action::SubTabRight, sf::Keyboard::D);
     bind(Action::FirstSlot, sf::Keyboard::Home);
@@ -43,7 +43,6 @@ InputMap::InputMap() {
     bind(Action::ArrangeAll, sf::Keyboard::T);
     bind(Action::UseItem, sf::Keyboard::U);
     addBind(Action::UseItem, sf::Keyboard::Return);
-    addBind(Action::TabRight, sf::Keyboard::Tab); // hábito antigo: Tab avança
 
     addBind(Action::Left,  sf::Keyboard::A);
     addBind(Action::Right, sf::Keyboard::D);

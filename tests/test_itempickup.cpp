@@ -94,7 +94,7 @@ int main() {
     { // InventarioCheioDeixaSobra (coleta parcial não perde item)
         DropSystem drops;
         Player p;
-        assert(p.inventory.remove("dynamite", 999)); // ctor semeia; limpa
+        p.inventory = core::Inventory{}; // zera o kit do ctor
         for (int i = 0; i < 40; ++i) p.inventory.add({"stone", 99});
         assert(p.inventory.usedSlots() == 40);
         GameContext ctx{};

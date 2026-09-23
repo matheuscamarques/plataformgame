@@ -101,7 +101,7 @@ int main() {
         ctx.player = &p;
         ctx.enemies = &enemies;
         for (int i = 0; i < 35; ++i) { pinY(enemies); enemies.tick(1.f / 30.f, ctx); }
-        assert(p.hp == 88); // 100 - 12, exatamente 1 hit
+        assert(p.hp == 9988); // 10000 - 12, exatamente 1 hit
     }
     { // MeleeMissesOutOfRange (sai no meio do windup)
         Player p;
@@ -115,7 +115,7 @@ int main() {
         for (int i = 0; i < 15; ++i) { pinY(enemies); enemies.tick(1.f / 30.f, ctx); }
         p.setX(280.f); // dx=180: longe do golpe, perto p/ não recuar
         for (int i = 0; i < 15; ++i) { pinY(enemies); enemies.tick(1.f / 30.f, ctx); }
-        assert(p.hp == 100);
+        assert(p.hp == 10000);
     }
     { // DeathRemovesDwarf (caminho genérico do DeathSystem)
         EnemySystem enemies;

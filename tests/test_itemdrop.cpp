@@ -36,26 +36,28 @@ int main() {
     }
     { // DelayBloqueiaColetaPrecoce (0.5s grudado não coleta)
         DropSystem drops;
-        Player p; // ctor semeia dinamite; irrelevante aqui
+        Player p; // ctor semeia kit; conta relativo à base
+        const int stone0 = p.inventory.count("stone");
         GameContext ctx{};
         ctx.player = &p;
         drops.spawnItem("stone", 1, {p.getCenterX(), p.getCenterY()});
         drops.tick(0.1f, ctx);
         assert(drops.activeItemCount() == 1u); // delay segurou
-        assert(p.inventory.count("stone") == 0);
+        assert(p.inventory.count("stone") == stone0);
         for (int i = 0; i < 30; ++i) drops.tick(1.f / 30.f, ctx);
-        assert(p.inventory.count("stone") == 1); // coletou após o delay
+        assert(p.inventory.count("stone") == stone0 + 1); // coletou
         assert(drops.activeItemCount() == 0u);
     }
     { // MagnetAtrai (40px some em 2s, igual ao XP)
         DropSystem drops;
         Player p;
+        const int wood0 = p.inventory.count("wood");
         GameContext ctx{};
         ctx.player = &p;
         drops.spawnItem("wood", 3,
                         {p.getCenterX() + 40.f, p.getCenterY()});
         for (int i = 0; i < 60; ++i) drops.tick(1.f / 30.f, ctx);
-        assert(p.inventory.count("wood") == 3);
+        assert(p.inventory.count("wood") == wood0 + 3);
         assert(drops.activeItemCount() == 0u);
     }
 

@@ -144,11 +144,16 @@ void Game::run()
 void Game::tick() {
     tickCount_++;
     Player *p = player.get();
-    p->moveRight = input_.held(support::Action::Right);
-    p->moveUp    = input_.held(support::Action::Up);
-    p->moveDown  = input_.held(support::Action::Down);
-    p->moveLeft  = input_.held(support::Action::Left);
-    p->runFast   = input_.held(support::Action::RunFast);
+    // DS-style sem freeze: com o menu aberto o input vai p/ a UI ou p/
+    // nada — o player não anda, pula, mira, corre, arremessa ou golpeia
+    // (o mundo segue rodando). Zera aqui em cima p/ valer no tick inteiro;
+    // consumir só o edge não bastaria (held() move).
+    const bool uiOpen = inventoryUI_.isOpen();
+    p->moveRight = !uiOpen && input_.held(support::Action::Right);
+    p->moveUp    = !uiOpen && input_.held(support::Action::Up);
+    p->moveDown  = !uiOpen && input_.held(support::Action::Down);
+    p->moveLeft  = !uiOpen && input_.held(support::Action::Left);
+    p->runFast   = !uiOpen && input_.held(support::Action::RunFast);
     if (p->moveLeft && !p->moveRight) p->facing = -1;
     if (p->moveRight && !p->moveLeft) p->facing = 1;
 
@@ -169,11 +174,12 @@ void Game::tick() {
             audio_.play(game::keyOf(game::Sfx::PlayerJump));
         p->tick();
 
-        // S6: J (Action::Light) arremessa dinamite.
+        // S6: J (Action::Light) arremessa dinamite. Fora com menu aberto.
         // Cooldown cobre o edge por frame: pressed fica alto em todos os
         // ticks do frame, o 2º tick já encontra cooldown rodando.
         // (throwCooldown é tickado no Player::tick, junto dos outros.)
-        if (input_.pressed(support::Action::Light) && p->tryThrow(*throws_)) {
+        if (!uiOpen && input_.pressed(support::Action::Light) &&
+            p->tryThrow(*throws_)) {
             // SFX arremesso + pavio (tryThrow true = saiu da mão).
             audio_.play(game::keyOf(game::Sfx::ThrowDyn));
             audio_.play(game::keyOf(game::Sfx::DynFuse));
@@ -207,7 +213,9 @@ void Game::tick() {
             inventoryUI_.setDrops(drops_);
             inventoryUI_.handleInput(input_);
             using A = support::Action;
-            if (input_.pressed(A::TabRight)) input_.consume(A::Restart);
+            // R é só Restart: com o menu aberto ele não faz nada (sem
+            // restart acidental navegando). Fechou o menu, R restarta.
+            if (input_.pressed(A::Restart)) input_.consume(A::Restart);
             if (input_.pressed(A::TabLeft)) input_.consume(A::TabLeft);
             if (input_.pressed(A::TabRight)) input_.consume(A::TabRight);
             if (input_.pressed(A::SubTabLeft)) input_.consume(A::SubTabLeft);
@@ -218,6 +226,9 @@ void Game::tick() {
             if (input_.pressed(A::ArrangeAll)) input_.consume(A::ArrangeAll);
             if (input_.pressed(A::UseItem)) input_.consume(A::UseItem);
             if (input_.pressed(A::Interact)) input_.consume(A::Interact);
+            // K (Heavy) o MeleeSystem lê via ctx — consome aqui p/ o
+            // player não golpear navegando no menu.
+            if (input_.pressed(A::Heavy)) input_.consume(A::Heavy);
         }
 
         // Mundo infinito: carrega/descarrega chunks em torno do tile do player.
