@@ -538,17 +538,25 @@ void Game::render()
     }
 
     // ─── Astros PÓS-multiply (item 18, fix lua escura) ───
-    // Pré-multiply o tint noturno os apagava (lua cinza). Aqui brilham,
-    // mas SÓ onde o céu chega: gate por skyLight (sem lua em caverna).
-    // View de mundo ainda ativa; tiles já desenhados não importam mais.
+    // Pré-multiply o tint noturno os apagava (lua cinza). Aqui brilham.
+    // Regras p/ não parecerem adesivo perseguindo o player:
+    // 1. Subterrâneo = sem astros (nem sol nem lua nem estrelas);
+    // 2. Gate no footprint INTEIRO (disco + halo): se qualquer ponto
+    //    do halo encosta em rocha, some tudo (sem sangrar por cima).
     {
+        const float playerY = player.get()->getY();
+        const float surfY =
+            getWorld()->surfaceYAt(player.get()->getCenterX());
+        const bool under = playerY > surfY;
+        if (!under) {
         const float h = dayNight_.hour();
         const auto s = dayNight_.sample();
         const float darkness = 1.f - std::clamp(s.sunIntensity + s.moonIntensity,
                                                 0.f, 1.f);
         const float bs = static_cast<float>(core::kBlockSize);
         constexpr int W = support::Chunk::W;
-        auto skyOpen = [&](float wx, float wy) -> float {            const int tx = static_cast<int>(std::floor(wx / bs));
+        auto skyOpen = [&](float wx, float wy) -> float {            
+            const int tx = static_cast<int>(std::floor(wx / bs));
             const int ty = static_cast<int>(std::floor(wy / bs));
             const int cx = tx >= 0 ? tx / W : -((-tx + W - 1) / W);
             const int cy = ty >= 0 ? ty / W : -((-ty + W - 1) / W);
@@ -577,11 +585,12 @@ void Game::render()
             return sf::Vector2f(camPos.x + t * viewW_,
                                 camPos.y + viewH_ * (0.08f + 0.30f * (1.f - (2.f * t - 1.f) * (2.f * t - 1.f))));
         };
-        // Sol (disco + halo).
+        // Sol (disco + halo). Gate no halo inteiro (84px): se a borda
+        // encosta em rocha, some tudo em vez de sangrar por cima.
         const float sv = core::arcVisibility(core::sunAngle(h));
         if (sv > 0.01f) {
             const sf::Vector2f sp = arcPos(core::sunAngle(h));
-            const float g = skyOpenArea(sp.x, sp.y, 30.f);
+            const float g = skyOpenArea(sp.x, sp.y, 84.f);
             if (g > 0.01f) {
                 for (int i = 3; i >= 1; --i) {
                     const float r = 30.f * (1.f + i * 0.6f);
@@ -636,6 +645,7 @@ void Game::render()
             }
             window->draw(stars);
         }
+        } // !under: sem astros no subterrâneo
     }
 
     // ─── Emissivos (ADD, após multiply: não são escurecidos) ───
