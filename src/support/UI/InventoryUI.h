@@ -49,7 +49,7 @@ public:
     enum class MenuAction : uint8_t { Use, Equip, Unequip, Drop, Arrange, COUNT };
 
     static constexpr int   kCols     = 8;
-    static constexpr int   kRows     = 5;
+    static constexpr int   kRows     = 6;
     static constexpr int   kSlots    = kCols * kRows; // == Inventory::kCapacity
     static constexpr float kSlotSize = 56.f;
     static constexpr float kPad      = 4.f;
@@ -135,7 +135,7 @@ private:
     MainTab mainTab_   = MainTab::Inventory;
     SubTab  subTab_    = SubTab::All;
     int     cursor_      = 0; // slot do grid (índice; hotbar lê índice)
-    int     equipCursor_ = 0; // 0..3 (RightHand, Head, Chest, Legs)
+    int     equipCursor_ = 0; // 0..4 (mão, Head, Chest, Legs, Boots)
     int     actionCursor_ = 0; // índice em menuActions()
     std::string feedback_;     // última ação (rodapé; limpa ao abrir)
 

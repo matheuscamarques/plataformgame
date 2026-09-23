@@ -30,13 +30,13 @@ int main() {
         assert(inv.slot(0).quantity == 99);
         assert(inv.slot(1).quantity == 21);
     }
-    { // AddOverflow (39 stacks cheias + 1 livre: sobra 151 de 250)
+    { // AddOverflow (47 stacks cheias + 1 livre: sobra 151 de 250)
         Inventory inv;
-        for (int i = 0; i < 39; ++i) assert(inv.add(Item{"stone", 99}) == 0);
-        assert(inv.usedSlots() == 39);
+        for (int i = 0; i < 47; ++i) assert(inv.add(Item{"stone", 99}) == 0);
+        assert(inv.usedSlots() == 47);
         assert(inv.add(Item{"stone", 250}) == 151);
-        assert(inv.count("stone") == 39 * 99 + 99);
-        assert(inv.usedSlots() == 40);
+        assert(inv.count("stone") == 47 * 99 + 99);
+        assert(inv.usedSlots() == 48);
     }
     { // AddRecusaDesconhecido (def fora do registry não entra)
         Inventory inv;

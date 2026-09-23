@@ -339,9 +339,9 @@ void InventoryUI::handleBrowse(const InputMap& input) {
 
     if (mainTab_ == MainTab::Equipment) {
         if (input.pressed(Action::Up) || input.pressed(Action::Left))
-            equipCursor_ = (equipCursor_ + 3) % 4;
+            equipCursor_ = (equipCursor_ + 4) % 5;
         if (input.pressed(Action::Down) || input.pressed(Action::Right))
-            equipCursor_ = (equipCursor_ + 1) % 4;
+            equipCursor_ = (equipCursor_ + 1) % 5;
         if (input.pressed(Action::Interact)) openActionMenu();
         return;
     }
@@ -595,11 +595,12 @@ void InventoryUI::renderEquipTab(sf::RenderTarget& t, float sw, float sh,
     const float cy = o.y + 150.f; // centro da linha do meio
     const float x0 = cx - (ss + kEquipPad + ss) * 0.5f;
     const float yMid = cy - ss * 0.5f; // topo da linha do meio
-    const sf::Vector2f pos[4] = {
-        {x0, yMid},                 // RightHand (Arms)
-        {x0 + step, yMid - step},   // Head
-        {x0 + step, yMid},          // Chest
-        {x0 + step, yMid + step},   // Legs
+    const sf::Vector2f pos[5] = {
+        {x0, yMid - step},          // RightHand (Arms, alinha Head)
+        {x0 + step, yMid - 2 * step}, // Head
+        {x0 + step, yMid - step},   // Chest
+        {x0 + step, yMid},          // Legs
+        {x0 + step, yMid + step},   // Boots
     };
     auto header = [&](const std::string& s, float x, float y) {
         sf::Text h;
@@ -610,9 +611,9 @@ void InventoryUI::renderEquipTab(sf::RenderTarget& t, float sw, float sh,
         h.setPosition(x, y);
         t.draw(h);
     };
-    header("Arms", x0, yMid - 22.f);
-    header("Armor", x0 + step, yMid - step - 22.f);
-    for (int i = 0; i < 4; ++i) {
+    header("Arms", x0, yMid - step - 22.f);
+    header("Armor", x0 + step, yMid - 2 * step - 22.f);
+    for (int i = 0; i < 5; ++i) {
         const bool sel = (i == equipCursor_);
         sf::RectangleShape bg({ss, ss});
         bg.setPosition(pos[i]);

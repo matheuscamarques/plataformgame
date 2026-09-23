@@ -34,6 +34,7 @@ Entity(core::kIdPlayer,0,0,30,50) // AABB derivado do sprite 12x20 a 2.5x
     equipment.equip(core::Item{"iron_helm", 1});
     equipment.equip(core::Item{"iron_chest", 1});
     equipment.equip(core::Item{"iron_legs", 1});
+    equipment.equip(core::Item{"iron_boots", 1});
     //this->setGravity(9.8f);
 }
 

@@ -885,3 +885,116 @@ REGISTER_ITEM("leather_axe", [] {
     def.material = core::MaterialId::Leather;
     return def;
 }())
+
+// ---- Botas (slot Boots): mesma forma, paleta por material ----
+inline const char* const kItemBootsSprite[] = {
+    "........",
+    "........",
+    ".SS..SS.",
+    ".SS..SS.",
+    ".SS..SS.",
+    ".SS..SS.",
+    ".SSSSSSS",
+    "........",
+};
+
+inline const core::PaletteEntry kItemIronBootsPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {150, 155, 165}},
+    {'s', {105, 110, 120}},
+};
+inline constexpr std::size_t kItemIronBootsPalCount = 3;
+inline const core::PaletteEntry kItemLeatherBootsPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {160, 110, 70}},
+    {'s', {100, 70, 45}},
+};
+inline constexpr std::size_t kItemLeatherBootsPalCount = 3;
+inline const core::PaletteEntry kItemGoldBootsPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {220, 190, 90}},
+    {'s', {170, 140, 50}},
+};
+inline constexpr std::size_t kItemGoldBootsPalCount = 3;
+inline const core::PaletteEntry kItemDiamondBootsPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {180, 220, 240}},
+    {'s', {100, 150, 190}},
+};
+inline constexpr std::size_t kItemDiamondBootsPalCount = 3;
+
+REGISTER_ITEM("iron_boots", [] {
+    core::ItemDef def;
+    def.id = "iron_boots";
+    def.description = "Botas de ferro. Firmes no chão.";
+    def.spriteRows = kItemBootsSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemIronBootsPal;
+    def.spritePalCount = kItemIronBootsPalCount;
+    def.name = "Botas de Ferro";
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Common;
+    def.stackMax = 1;
+    def.defense = 3;
+    def.equipSlot = core::EquipSlot::Boots;
+    def.material = core::MaterialId::Iron;
+    return def;
+}())
+
+REGISTER_ITEM("leather_boots", [] {
+    core::ItemDef def;
+    def.id = "leather_boots";
+    def.description = "Botas de couro. Silenciosas.";
+    def.spriteRows = kItemBootsSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemLeatherBootsPal;
+    def.spritePalCount = kItemLeatherBootsPalCount;
+    def.name = "Botas de Couro";
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Common;
+    def.stackMax = 1;
+    def.defense = 1;
+    def.equipSlot = core::EquipSlot::Boots;
+    def.material = core::MaterialId::Leather;
+    return def;
+}())
+
+REGISTER_ITEM("gold_boots", [] {
+    core::ItemDef def;
+    def.id = "gold_boots";
+    def.description = "Botas de ouro. Pesadas e vistosas.";
+    def.spriteRows = kItemBootsSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemGoldBootsPal;
+    def.spritePalCount = kItemGoldBootsPalCount;
+    def.name = "Botas de Ouro";
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Rare;
+    def.stackMax = 1;
+    def.defense = 4;
+    def.equipSlot = core::EquipSlot::Boots;
+    def.material = core::MaterialId::Gold;
+    return def;
+}())
+
+REGISTER_ITEM("diamond_boots", [] {
+    core::ItemDef def;
+    def.id = "diamond_boots";
+    def.description = "Botas de diamante. Inquebráveis.";
+    def.spriteRows = kItemBootsSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemDiamondBootsPal;
+    def.spritePalCount = kItemDiamondBootsPalCount;
+    def.name = "Botas de Diamante";
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Epic;
+    def.stackMax = 1;
+    def.defense = 6;
+    def.equipSlot = core::EquipSlot::Boots;
+    def.material = core::MaterialId::Diamond;
+    return def;
+}())

@@ -383,10 +383,10 @@ int main() {
         ui.executeAction(MA::Arrange); // no-op
         ui.executeAction(MA::Drop);    // no-op
     }
-    { // GridTem40 (constantes batem com o inventário)
+    { // GridCobreInventario (constantes batem com o inventário)
         static_assert(InventoryUI::kSlots == core::Inventory::kCapacity,
                       "grid cobre o inventário inteiro");
-        assert(InventoryUI::kCols == 8 && InventoryUI::kRows == 5);
+        assert(InventoryUI::kCols == 8 && InventoryUI::kRows == 6);
     }
     { // WeaponDefs (dano/defesa/slots p/ o painel e o menu)
         const core::ItemDef* sword =
@@ -445,6 +445,8 @@ int main() {
         assert(eq.get(core::EquipSlot::Head).defId == "iron_helm");
         assert(eq.get(core::EquipSlot::Chest).defId == "iron_chest");
         assert(eq.get(core::EquipSlot::Legs).defId == "iron_legs");
+        assert(eq.equip(core::Item{"iron_boots", 1}));
+        assert(eq.get(core::EquipSlot::Boots).defId == "iron_boots");
     }
     { // UnequipReturnsItem (slot esvazia, item volta)
         core::Equipment eq;
@@ -469,6 +471,7 @@ int main() {
         assert(p.equipment.get(core::EquipSlot::Chest).defId ==
                "iron_chest");
         assert(p.equipment.get(core::EquipSlot::Legs).defId == "iron_legs");
+        assert(p.equipment.get(core::EquipSlot::Boots).defId == "iron_boots");
     }
     { // StarterKit (1 pilha cheia de cada item do registry)
         Player p;
@@ -501,6 +504,10 @@ int main() {
         assert(p.inventory.count("diamond_helm") == 1);
         assert(p.inventory.count("diamond_chest") == 1);
         assert(p.inventory.count("diamond_legs") == 1);
+        assert(p.inventory.count("iron_boots") == 1);
+        assert(p.inventory.count("leather_boots") == 1);
+        assert(p.inventory.count("gold_boots") == 1);
+        assert(p.inventory.count("diamond_boots") == 1);
     }
     { // EquipViaMenu (F→Equip: grid esvazia, antigo volta)
         InventoryUI ui;
@@ -552,15 +559,35 @@ int main() {
         core::Inventory inv;
         core::Equipment eq;
         eq.equip(core::Item{"iron_sword", 1});
-        inv.add(core::Item{"stone", 40 * 99}); // 40 slots cheios
-        assert(inv.usedSlots() == 40);
+        inv.add(core::Item{"stone", 48 * 99}); // 48 slots cheios
+        assert(inv.usedSlots() == 48);
         ui.setInventory(&inv);
         ui.setEquipment(&eq);
         ui.open();
         ui.setMainTab(InventoryUI::MainTab::Equipment);
         ui.executeAction(MA::Unequip);
         assert(eq.get(core::EquipSlot::RightHand).defId == "iron_sword");
-        assert(inv.count("stone") == 40 * 99);
+        assert(inv.count("stone") == 48 * 99);
+    }
+    { // EquipTabFiveSlots (Down circula 0..4, Boots por último)
+        InventoryUI ui;
+        core::Inventory inv;
+        core::Equipment eq;
+        InputMap in;
+        ui.setInventory(&inv);
+        ui.setEquipment(&eq);
+        ui.open();
+        ui.setMainTab(InventoryUI::MainTab::Equipment);
+        for (int i = 0; i < 4; ++i) {
+            press(in, sf::Keyboard::Down);
+            ui.handleInput(in);
+            release(in, sf::Keyboard::Down);
+        }
+        assert(ui.equipCursor() == 4);
+        press(in, sf::Keyboard::Down);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Down);
+        assert(ui.equipCursor() == 0); // wrap
     }
 
     std::printf("inventory_ui test OK\n");

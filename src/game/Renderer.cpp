@@ -760,6 +760,9 @@ void Game::drawPlayerEquipment() {
     const int mHelm = materialOf(core::EquipSlot::Head);
     const int mChest = materialOf(core::EquipSlot::Chest);
     const int mLegs = materialOf(core::EquipSlot::Legs);
+    // Bota própria; sem ela, segue a perneira (comportamento antigo).
+    int mBoots = materialOf(core::EquipSlot::Boots);
+    if (mBoots < 0) mBoots = mLegs;
 
     // Peça full-width (12px) centralizada no centro-x da parte âncora.
     // Offsets em rows do sprite (nunca world): a âncora segue o Body,
@@ -810,8 +813,8 @@ void Game::drawPlayerEquipment() {
         drawFullWidth(sprites_.legs[mLegs], sprites::kLegsW,
                       support::BodyPartId::Torso, 1.f, -2.f);
     // Botas 12x3: topo 1 row abaixo da base do torso (idle: rows 17-19).
-    if (mLegs >= 0)
-        drawFullWidth(sprites_.boots[mLegs], sprites::kBootsW,
+    if (mBoots >= 0)
+        drawFullWidth(sprites_.boots[mBoots], sprites::kBootsW,
                       support::BodyPartId::Torso, 1.f, 1.f);
 
     if (mHelm >= 0) {

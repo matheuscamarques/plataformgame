@@ -19,6 +19,7 @@ enum class EquipSlot : uint8_t {
     Head,
     Chest,
     Legs,
+    Boots,
     COUNT
 };
 
@@ -30,6 +31,7 @@ inline const char* equipSlotName(EquipSlot s) {
         case EquipSlot::Head:      return "Head";
         case EquipSlot::Chest:     return "Chest";
         case EquipSlot::Legs:      return "Legs";
+        case EquipSlot::Boots:     return "Boots";
         default:                   return "";
     }
 }

@@ -102,13 +102,13 @@ int main() {
         DropSystem drops;
         Player p;
         p.inventory = core::Inventory{}; // zera o kit do ctor
-        for (int i = 0; i < 40; ++i) p.inventory.add({"stone", 99});
-        assert(p.inventory.usedSlots() == 40);
+        for (int i = 0; i < 48; ++i) p.inventory.add({"stone", 99});
+        assert(p.inventory.usedSlots() == 48);
         GameContext ctx{};
         ctx.player = &p;
         drops.spawnItem("stone", 200, {p.getCenterX(), p.getCenterY()});
         for (int i = 0; i < 60; ++i) drops.tick(1.f / 30.f, ctx);
-        assert(p.inventory.count("stone") == 40 * 99);
+        assert(p.inventory.count("stone") == 48 * 99);
         assert(drops.activeItemCount() == 1u); // sobra ficou no chão
     }
 
