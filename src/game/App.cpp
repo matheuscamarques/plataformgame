@@ -228,6 +228,8 @@ void Game::tick() {
             inventoryUI_.setEquipment(&p->equipment);
             inventoryUI_.setPlayer(p);
             inventoryUI_.setDrops(drops_);
+            inventoryUI_.setAudio(&audio_);
+            inventoryUI_.setMusic(&music_);
             inventoryUI_.handleInput(input_);
             using A = support::Action;
             // R é só Restart: com o menu aberto ele não faz nada (sem
@@ -246,6 +248,8 @@ void Game::tick() {
             // K (Heavy) o MeleeSystem lê via ctx — consome aqui p/ o
             // player não golpear navegando no menu.
             if (input_.pressed(A::Heavy)) input_.consume(A::Heavy);
+            // F em Sair (aba System): fecha a janela, sai do loop.
+            if (inventoryUI_.consumeQuitRequest()) window->close();
         }
 
         // Mundo infinito: carrega/descarrega chunks em torno do tile do player.

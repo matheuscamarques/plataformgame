@@ -32,6 +32,7 @@ public:
     void tick(float dt);
 
     void setMasterVolume(float v) { master_ = v; }
+    float masterVolume() const { return master_; }
     // Idempotentes: chamar todo tick é seguro (sem restart).
     void pause();
     void resume();

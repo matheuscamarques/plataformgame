@@ -87,7 +87,7 @@ int main() {
         assert(ui.state() == InventoryUI::UIState::Browse);
         assert(ui.isOpen());
     }
-    { // MainTabSwitch (Tab/Q ciclam Inventory<->Equipment, cursor reseta)
+    { // MainTabSwitch (Tab/Q ciclam 4 abas, cursor reseta)
         InventoryUI ui;
         core::Inventory inv;
         InputMap in;
@@ -107,6 +107,70 @@ int main() {
         ui.handleInput(in);
         release(in, sf::Keyboard::Tab);
         assert(ui.mainTab() == InventoryUI::MainTab::Equipment);
+        press(in, sf::Keyboard::Tab);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Tab);
+        assert(ui.mainTab() == InventoryUI::MainTab::Status);
+        press(in, sf::Keyboard::Tab);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Tab);
+        assert(ui.mainTab() == InventoryUI::MainTab::System);
+        press(in, sf::Keyboard::Tab);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Tab);
+        assert(ui.mainTab() == InventoryUI::MainTab::Inventory); // wrap
+    }
+    { // StatusTab (HP/arma/DEF/ouro do player; zeros sem player)
+        InventoryUI ui;
+        Player p; // seed ferro: espada 12, defesas 4+6+4+3
+        ui.setPlayer(&p);
+        ui.setEquipment(&p.equipment);
+        ui.setInventory(&p.inventory);
+        const auto st = ui.status();
+        assert(st.hp == 10000 && st.hpMax == 10000);
+        assert(st.weaponName == "Espada de Ferro" && st.damage == 12);
+        assert(st.defense == 4 + 6 + 4 + 3);
+        assert(st.gold == 0);
+        InventoryUI bare;
+        const auto z = bare.status();
+        assert(z.hp == 0 && z.damage == 0 && z.defense == 0);
+        assert(z.weaponName == "Soco");
+    }
+    { // SystemTab (volume A/D, Save em breve, Sair pede quit)
+        InventoryUI ui;
+        InputMap in;
+        ui.open();
+        ui.setMainTab(InventoryUI::MainTab::System);
+        assert(ui.volumePct() == 70 && ui.sysCursor() == 0);
+        press(in, sf::Keyboard::D);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::D);
+        assert(ui.volumePct() == 80);
+        press(in, sf::Keyboard::A);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::A);
+        press(in, sf::Keyboard::A);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::A);
+        assert(ui.volumePct() == 60);
+        press(in, sf::Keyboard::Down);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Down);
+        assert(ui.sysCursor() == 1);
+        press(in, sf::Keyboard::F);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::F);
+        assert(ui.feedback() == "Save em breve");
+        assert(!ui.consumeQuitRequest());
+        press(in, sf::Keyboard::Down);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Down);
+        assert(ui.sysCursor() == 2);
+        press(in, sf::Keyboard::F);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::F);
+        assert(ui.consumeQuitRequest()); // 1 disparo
+        assert(!ui.consumeQuitRequest());
     }
     { // SubTabFilterNav (A/D filtram; setas pulam fora da aba)
         InventoryUI ui;

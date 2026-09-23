@@ -17,6 +17,8 @@
 
 #include "core/ItemDef.h"
 #include "core/Material.h"
+#include "core/AudioSystem.h"
+#include "core/MusicSystem.h"
 #include "entities/Player/Player.h"
 #include "support/Input/InputMap.h"
 #include "support/Progression/DropSystem.h"
@@ -27,7 +29,12 @@ namespace support {
 // ─── Nomes / filtro ──────────────────────────────────────────
 
 const char* InventoryUI::mainTabName(MainTab t) {
-    return t == MainTab::Equipment ? "Equipment" : "Inventory";
+    switch (t) {
+        case MainTab::Equipment: return "Equipment";
+        case MainTab::Status:    return "Status";
+        case MainTab::System:    return "System";
+        default:                 return "Inventory";
+    }
 }
 
 const char* InventoryUI::subTabName(SubTab s) {
@@ -75,6 +82,7 @@ void InventoryUI::open() {
     subTab_ = SubTab::All;
     cursor_ = 0;
     equipCursor_ = 0;
+    sysCursor_ = 0;
     feedback_.clear();
     snapCursor();
 }
@@ -84,6 +92,29 @@ void InventoryUI::close() { state_ = UIState::Closed; }
 void InventoryUI::toggle() {
     if (state_ == UIState::Closed) open();
     else close();
+}
+
+InventoryUI::StatusInfo InventoryUI::status() const {
+    StatusInfo out;
+    if (inv_) out.gold = inv_->gold();
+    if (!player_) return out;
+    out.hp = player_->hp;
+    out.hpMax = player_->hpMax;
+    if (const core::ItemDef* wdef = player_->weaponDef()) {
+        out.weaponName = wdef->name;
+        out.damage = wdef->damage;
+    }
+    if (equipment_) {
+        static const core::EquipSlot armor[] = {
+            core::EquipSlot::Head, core::EquipSlot::Chest,
+            core::EquipSlot::Legs, core::EquipSlot::Boots};
+        for (auto s : armor) {
+            const core::Item& it = equipment_->get(s);
+            if (it.isEmpty()) continue;
+            if (const core::ItemDef* d = it.def()) out.defense += d->defense;
+        }
+    }
+    return out;
 }
 
 std::vector<int> InventoryUI::filteredSlots() const {
@@ -310,6 +341,23 @@ void InventoryUI::openActionMenu() {
     state_ = UIState::ActionMenu;
 }
 
+void InventoryUI::adjustVolume(int delta) {
+    volumePct_ = std::clamp(volumePct_ + delta, 0, 100);
+    const float v = volumePct_ / 100.f;
+    if (audio_) audio_->setMasterVolume(v);
+    if (music_) music_->setMasterVolume(v);
+    feedback_ = "Volume: " + std::to_string(volumePct_) + "%";
+}
+
+void InventoryUI::activateSystemRow() {
+    if (sysCursor_ == 1) {
+        feedback_ = "Save em breve";
+    } else if (sysCursor_ == 2) {
+        quitRequested_ = true;
+    }
+    // Linha 0 (Volume): ajusta com A/D, F não faz nada.
+}
+
 void InventoryUI::handleBrowse(const InputMap& input) {
     // Fechar (App consome o edge antes do RunManager; aqui é p/ teste).
     if (input.pressed(Action::ToggleInventory) || input.pressed(Action::Pause)) {
@@ -345,6 +393,19 @@ void InventoryUI::handleBrowse(const InputMap& input) {
         if (input.pressed(Action::Interact)) openActionMenu();
         return;
     }
+
+    if (mainTab_ == MainTab::System) {
+        if (input.pressed(Action::Up))
+            sysCursor_ = (sysCursor_ + kSysRows - 1) % kSysRows;
+        if (input.pressed(Action::Down))
+            sysCursor_ = (sysCursor_ + 1) % kSysRows;
+        if (input.pressed(Action::Left)) adjustVolume(-10);
+        if (input.pressed(Action::Right)) adjustVolume(10);
+        if (input.pressed(Action::Interact)) activateSystemRow();
+        return;
+    }
+
+    if (mainTab_ != MainTab::Inventory) return; // Status: só tabs/fechar
 
     // Grid: atalhos + Home/End + setas + F.
     if (input.pressed(Action::FirstSlot)) {
@@ -447,8 +508,12 @@ void InventoryUI::render(sf::RenderTarget& target, const sf::Font& font,
     if (mainTab_ == MainTab::Inventory) {
         renderSubTabs(target, sw, font);
         renderGrid(target, sw, sh, font);
-    } else {
+    } else if (mainTab_ == MainTab::Equipment) {
         renderEquipTab(target, sw, sh, font);
+    } else if (mainTab_ == MainTab::Status) {
+        renderStatusTab(target, sw, sh, font);
+    } else {
+        renderSystemTab(target, sw, sh, font);
     }
     renderDetailPanel(target, sw, sh, font);
     renderFooter(target, sw, sh, font);
@@ -650,6 +715,9 @@ void InventoryUI::renderEquipTab(sf::RenderTarget& t, float sw, float sh,
 
 void InventoryUI::renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
                                     const sf::Font& font) const {
+    // Painel só existe em Inventory/Equipment.
+    if (mainTab_ != MainTab::Inventory && mainTab_ != MainTab::Equipment)
+        return;
     const sf::Vector2f dp = detailOrigin(sw, sh);
     const float ph = std::max(220.f, sh - dp.y - 60.f);
 
@@ -798,6 +866,68 @@ void InventoryUI::renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
     } else {
         line("[F] Drop", 12, sf::Color(240, 220, 160));
     }
+}
+
+void InventoryUI::renderStatusTab(sf::RenderTarget& t, float sw, float sh,
+                                   const sf::Font& font) const {
+    const StatusInfo st = status();
+    const float pw = 420.f;
+    const float px = (sw - pw) * 0.5f;
+    const float py = 110.f;
+
+    auto line = [&](const std::string& s, int size, sf::Color c, float& y) {
+        sf::Text tt;
+        tt.setFont(font);
+        tt.setString(s);
+        tt.setCharacterSize(static_cast<unsigned>(size));
+        tt.setFillColor(c);
+        tt.setPosition(px + 20.f, y);
+        t.draw(tt);
+        y += static_cast<float>(size) + 8.f;
+    };
+
+    float y = py + 16.f;
+    line("HP: " + std::to_string(st.hp) + " / " + std::to_string(st.hpMax),
+         18, sf::Color(255, 150, 150), y);
+    line("Arma: " + st.weaponName, 15, sf::Color(230, 230, 230), y);
+    line("DMG: " + std::to_string(st.damage), 14,
+         sf::Color(255, 200, 100), y);
+    line("DEF: " + std::to_string(st.defense) + " (armaduras)", 14,
+         sf::Color(120, 180, 255), y);
+    line("Ouro: " + std::to_string(st.gold), 14,
+         sf::Color(240, 220, 140), y);
+    (void)sh;
+}
+
+void InventoryUI::renderSystemTab(sf::RenderTarget& t, float sw, float sh,
+                                  const sf::Font& font) const {
+    const float pw = 420.f;
+    const float px = (sw - pw) * 0.5f;
+    const float py = 110.f;
+    const char* rows[kSysRows] = {"Volume", "Save", "Sair do jogo"};
+
+    for (int i = 0; i < kSysRows; ++i) {
+        const bool sel = (i == sysCursor_);
+        std::string label = rows[i];
+        if (i == 0) label += ": " + std::to_string(volumePct_) + "%";
+        if (i == 1) label += " (em breve)";
+        sf::Text tt;
+        tt.setFont(font);
+        tt.setString((sel ? "> " : "  ") + label);
+        tt.setCharacterSize(16);
+        tt.setFillColor(sel ? sf::Color(255, 220, 100)
+                            : sf::Color(200, 200, 200));
+        tt.setPosition(px + 20.f, py + 16.f + i * 34.f);
+        t.draw(tt);
+    }
+    sf::Text hint;
+    hint.setFont(font);
+    hint.setString("A/D ajusta volume  F ativa");
+    hint.setCharacterSize(12);
+    hint.setFillColor(sf::Color(150, 150, 150));
+    hint.setPosition(px + 20.f, py + 16.f + kSysRows * 34.f + 8.f);
+    t.draw(hint);
+    (void)sh;
 }
 
 void InventoryUI::renderActionMenu(sf::RenderTarget& t, float sw, float sh,

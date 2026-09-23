@@ -26,6 +26,11 @@ class DropSystem;
 
 } // namespace support
 
+namespace core {
+class AudioSystem;
+class MusicSystem;
+} // namespace core
+
 class Player; // global; completo só no .cpp
 
 namespace support {
@@ -40,7 +45,13 @@ namespace support {
 // player_ (Use/Drop), drops_ (Drop).
 class InventoryUI {
 public:
-    enum class MainTab : uint8_t { Inventory, Equipment, COUNT };
+    enum class MainTab : uint8_t {
+        Inventory,
+        Equipment,
+        Status,
+        System,
+        COUNT
+    };
     enum class SubTab : uint8_t {
         All, Materials, Consumables, Weapons, Armor, Keys, COUNT
     };
@@ -66,6 +77,8 @@ public:
     void setEquipment(core::Equipment* eq)    { equipment_ = eq; }
     void setPlayer(::Player* p)               { player_ = p; }
     void setDrops(DropSystem* d)              { drops_ = d; }
+    void setAudio(core::AudioSystem* a)       { audio_ = a; }
+    void setMusic(core::MusicSystem* m)       { music_ = m; }
 
     // Estado. open() reseta p/ Browse/Inventory/All/cursor 0.
     bool isOpen() const { return state_ != UIState::Closed; }
@@ -109,6 +122,29 @@ public:
 
     // Item sob o cursor (grid ou slot de equipamento), ou nullptr.
     const core::Item* selectedItem() const;
+
+    // Stats p/ a aba Status (zeros sem player).
+    struct StatusInfo {
+        int hp = 0;
+        int hpMax = 0;
+        std::string weaponName = "Soco";
+        int damage = 0;  // DMG da arma (0 = soco)
+        int defense = 0; // soma das armaduras
+        int gold = 0;
+    };
+    StatusInfo status() const;
+
+    // Aba System: volume 0..100 (dono é a UI; empurra p/ audio/music).
+    int volumePct() const { return volumePct_; }
+    int sysCursor() const { return sysCursor_; }
+    static constexpr int kSysRows = 3; // Volume, Save, Sair
+
+    // Pedido de quit (F em Sair). Consome ao ler (1 disparo).
+    bool consumeQuitRequest() {
+        const bool out = quitRequested_;
+        quitRequested_ = false;
+        return out;
+    }
     // "DMG: 18 (atual 12, +6)" — só p/ arma/armadura com referência.
     struct StatCompare {
         bool show = false; // tem com o que comparar
@@ -130,6 +166,8 @@ private:
     core::Equipment* equipment_  = nullptr;
     ::Player*        player_     = nullptr;
     DropSystem*      drops_      = nullptr;
+    core::AudioSystem* audio_    = nullptr;
+    core::MusicSystem* music_    = nullptr;
 
     UIState state_     = UIState::Closed;
     MainTab mainTab_   = MainTab::Inventory;
@@ -137,12 +175,17 @@ private:
     int     cursor_      = 0; // slot do grid (índice; hotbar lê índice)
     int     equipCursor_ = 0; // 0..4 (mão, Head, Chest, Legs, Boots)
     int     actionCursor_ = 0; // índice em menuActions()
+    int     sysCursor_   = 0; // linha da aba System (0..kSysRows-1)
+    int     volumePct_   = 70; // dono é a UI; aplica ao ajustar
+    bool    quitRequested_ = false;
     std::string feedback_;     // última ação (rodapé; limpa ao abrir)
 
     void handleBrowse(const InputMap& input);
     void handleActionMenu(const InputMap& input);
     void handleConfirmDrop(const InputMap& input);
     void openActionMenu();
+    void adjustVolume(int delta); // aplica em audio_+music_ (se setados)
+    void activateSystemRow();     // F na linha sysCursor_
 
     bool slotMatches(int index) const; // ocupado + casa com a sub-tab
     int firstValid() const; // 1º slot navegável (-1 = nenhum)
@@ -163,6 +206,10 @@ private:
                     const sf::Font& f) const;
     void renderEquipTab(sf::RenderTarget& t, float sw, float sh,
                         const sf::Font& f) const;
+    void renderStatusTab(sf::RenderTarget& t, float sw, float sh,
+                         const sf::Font& f) const;
+    void renderSystemTab(sf::RenderTarget& t, float sw, float sh,
+                         const sf::Font& f) const;
     void renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
                            const sf::Font& f) const;
     void renderActionMenu(sf::RenderTarget& t, float sw, float sh,
