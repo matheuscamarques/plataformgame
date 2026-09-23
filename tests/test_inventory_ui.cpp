@@ -508,10 +508,10 @@ int main() {
         assert(p.inventory.count("leather_boots") == 1);
         assert(p.inventory.count("gold_boots") == 1);
         assert(p.inventory.count("diamond_boots") == 1);
-        assert(p.inventory.count("tnt") == 99);
-        assert(p.inventory.count("c4") == 32);
-        assert(p.inventory.count("daisy") == 24);
-        assert(p.inventory.count("moab") == 16);
+        assert(p.inventory.count("tnt") == 999);
+        assert(p.inventory.count("c4") == 999);
+        assert(p.inventory.count("daisy") == 999);
+        assert(p.inventory.count("moab") == 999);
         // Kit inteiro: 36 defs em 1 slot cada + dinamite 999 em 1 só.
         assert(p.inventory.usedSlots() == 37);
     }

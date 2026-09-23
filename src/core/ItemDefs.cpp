@@ -959,7 +959,7 @@ REGISTER_ITEM("tnt", [] {
     def.name = "TNT";
     def.type = ItemType::Consumable;
     def.rarity = ItemRarity::Uncommon;
-    def.stackMax = 99;
+    def.stackMax = 999;
     def.throwable = true;
     def.throwKind = support::ThrowKind::Tnt;
     def.fuse = 1.0f;
@@ -981,7 +981,7 @@ REGISTER_ITEM("c4", [] {
     def.name = "Carga C4";
     def.type = ItemType::Consumable;
     def.rarity = ItemRarity::Rare;
-    def.stackMax = 32;
+    def.stackMax = 999;
     def.throwable = true;
     def.throwKind = support::ThrowKind::C4;
     def.fuse = 0.8f;
@@ -1022,7 +1022,7 @@ REGISTER_ITEM("daisy", [] {
     def.name = "Daisy Cutter";
     def.type = ItemType::Consumable;
     def.rarity = ItemRarity::Epic;
-    def.stackMax = 24;
+    def.stackMax = 999;
     def.throwable = true;
     def.throwKind = support::ThrowKind::Daisy;
     def.fuse = 1.2f;
@@ -1044,7 +1044,7 @@ REGISTER_ITEM("moab", [] {
     def.name = "MOAB";
     def.type = ItemType::Consumable;
     def.rarity = ItemRarity::Epic;
-    def.stackMax = 16;
+    def.stackMax = 999;
     def.throwable = true;
     def.throwKind = support::ThrowKind::Moab;
     def.fuse = 1.5f;
