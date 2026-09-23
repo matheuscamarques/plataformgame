@@ -287,6 +287,11 @@ const core::ItemDef* Player::weaponDef() const {
     return w.isEmpty() ? nullptr : w.def();
 }
 
+const core::ItemDef* Player::offHandDef() const {
+    const core::Item& w = equipment.get(core::EquipSlot::LeftHand);
+    return w.isEmpty() ? nullptr : w.def();
+}
+
 bool Player::hurt(int dmg) {
     if (dmg <= 0 || hp <= 0 || !hurtIframes.ready()) return false;
     hp -= dmg;
@@ -410,6 +415,10 @@ sf::FloatRect Player::meleeHitbox() {
     return sf::FloatRect{cx - d.hx * 0.5f, cy - d.hy * 0.5f, d.hx, d.hy};
 }
 
-int Player::meleeDamage() const { return kLight[meleeCombo].damage; }
+int Player::meleeDamage() const {
+    int dmg = kLight[meleeCombo].damage;
+    if (const core::ItemDef* off = offHandDef()) dmg += off->damage;
+    return dmg;
+}
 
 float Player::meleePosture() const { return kLight[meleeCombo].posture; }

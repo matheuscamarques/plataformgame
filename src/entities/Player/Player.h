@@ -65,6 +65,8 @@ class Player : public Entity
         // Fonte única p/ render, BodySystem e meleeHitbox.
         const core::ItemDef* weaponDef() const;
         bool hasWeapon() const { return weaponDef() != nullptr; }
+        // Segunda arma (LeftHand): dano soma no melee. nullptr = sem.
+        const core::ItemDef* offHandDef() const;
 
         // Carga equipada (mochila não pesa). Pesada = sem correr.
         float equipLoad() const { return equipment.weight(); }

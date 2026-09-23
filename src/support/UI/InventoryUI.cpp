@@ -134,8 +134,9 @@ std::vector<InventoryUI::MenuAction> InventoryUI::menuActions() const {
     if (mainTab_ == MainTab::Equipment) {
         // F sobre item equipado: Unequip como única opção.
         if (equipment_) {
-            const auto s = static_cast<core::EquipSlot>(equipCursor_ + 1);
-            if (!equipment_->get(s).isEmpty()) out.push_back(MenuAction::Unequip);
+            const core::Item& it =
+                equipment_->get(core::equipDisplaySlot(equipCursor_));
+            if (!it.isEmpty()) out.push_back(MenuAction::Unequip);
         }
         return out;
     }
@@ -161,8 +162,8 @@ const core::Item* InventoryUI::selectedItem() const {
     if (!inv_) return nullptr;
     if (mainTab_ == MainTab::Equipment) {
         if (!equipment_) return nullptr;
-        const auto s = static_cast<core::EquipSlot>(equipCursor_ + 1);
-        const core::Item& i = equipment_->get(s);
+        const core::Item& i =
+            equipment_->get(core::equipDisplaySlot(equipCursor_));
         return i.isEmpty() ? nullptr : &i;
     }
     if (cursor_ < 0 || cursor_ >= kSlots) return nullptr;
@@ -205,7 +206,7 @@ bool InventoryUI::executeAction(MenuAction action) {
 
     if (action == MenuAction::Unequip) {
         if (mainTab_ != MainTab::Equipment || !equipment_) return false;
-        const auto s = static_cast<core::EquipSlot>(equipCursor_ + 1);
+        const core::EquipSlot s = core::equipDisplaySlot(equipCursor_);
         core::Item removed = equipment_->unequip(s);
         if (removed.isEmpty()) return false;
         const core::ItemDef* def = removed.def();
@@ -244,8 +245,19 @@ bool InventoryUI::executeAction(MenuAction action) {
         case MenuAction::Equip: {
             if (!equipment_) return false;
             if (def->equipSlot == core::EquipSlot::None) return false;
+            // Arma: direita livre → direita; senão esquerda livre;
+            // senão troca a direita. Armadura: slot natural.
+            core::EquipSlot target = def->equipSlot;
+            if (def->type == core::ItemType::Weapon) {
+                if (!equipment_->isOccupied(core::EquipSlot::RightHand))
+                    target = core::EquipSlot::RightHand;
+                else if (!equipment_->isOccupied(core::EquipSlot::LeftHand))
+                    target = core::EquipSlot::LeftHand;
+                else
+                    target = core::EquipSlot::RightHand; // swap
+            }
             core::Item old;
-            if (equipment_->equip(item, &old)) {
+            if (equipment_->equipTo(target, item, &old)) {
                 item = old; // cursor recebe o antigo (ou esvazia)
                 feedback_ = std::string("Equipado: ") + def->name;
                 if (!old.isEmpty()) {
@@ -387,9 +399,9 @@ void InventoryUI::handleBrowse(const InputMap& input) {
 
     if (mainTab_ == MainTab::Equipment) {
         if (input.pressed(Action::Up) || input.pressed(Action::Left))
-            equipCursor_ = (equipCursor_ + 4) % 5;
+            equipCursor_ = (equipCursor_ + 5) % 6;
         if (input.pressed(Action::Down) || input.pressed(Action::Right))
-            equipCursor_ = (equipCursor_ + 1) % 5;
+            equipCursor_ = (equipCursor_ + 1) % 6;
         if (input.pressed(Action::Interact)) openActionMenu();
         return;
     }
@@ -650,22 +662,23 @@ void InventoryUI::renderGrid(sf::RenderTarget& t, float sw, float sh,
 
 void InventoryUI::renderEquipTab(sf::RenderTarget& t, float sw, float sh,
                                  const sf::Font& font) const {
-    // 2 colunas (Arms | Armor), 3 linhas à direita. Tudo derivado de
-    // kEquipSlotSize/kEquipPad: bloco 216px centralizado na área do grid.
+    // 2 colunas (Arms | Armor): mãos à esquerda, 4 peças à direita.
+    // Tudo derivado de kEquipSlotSize/kEquipPad.
     const float ss = kEquipSlotSize;
     const float step = ss + kEquipPad; // 120
     const sf::Vector2f o = gridOrigin(sw, sh);
     const float gw = kCols * kSlotSize + (kCols - 1) * kPad;
     const float cx = o.x + gw * 0.5f;
-    const float cy = o.y + 150.f; // centro da linha do meio
+    const float cy = o.y + 150.f; // centro do bloco
     const float x0 = cx - (ss + kEquipPad + ss) * 0.5f;
-    const float yMid = cy - ss * 0.5f; // topo da linha do meio
-    const sf::Vector2f pos[5] = {
-        {x0, yMid - step},          // RightHand (Arms, alinha Head)
-        {x0 + step, yMid - 2 * step}, // Head
-        {x0 + step, yMid - step},   // Chest
-        {x0 + step, yMid},          // Legs
-        {x0 + step, yMid + step},   // Boots
+    const float topR = cy - (4 * ss + 3 * kEquipPad) * 0.5f;
+    const sf::Vector2f pos[6] = {
+        {x0, topR},               // RightHand (Arms)
+        {x0, topR + step},        // LeftHand (Arms)
+        {x0 + step, topR},        // Head
+        {x0 + step, topR + step}, // Chest
+        {x0 + step, topR + 2 * step}, // Legs
+        {x0 + step, topR + 3 * step}, // Boots
     };
     auto header = [&](const std::string& s, float x, float y) {
         sf::Text h;
@@ -676,9 +689,9 @@ void InventoryUI::renderEquipTab(sf::RenderTarget& t, float sw, float sh,
         h.setPosition(x, y);
         t.draw(h);
     };
-    header("Arms", x0, yMid - step - 22.f);
-    header("Armor", x0 + step, yMid - 2 * step - 22.f);
-    for (int i = 0; i < 5; ++i) {
+    header("Arms", x0, topR - 22.f);
+    header("Armor", x0 + step, topR - 22.f);
+    for (int i = 0; i < 6; ++i) {
         const bool sel = (i == equipCursor_);
         sf::RectangleShape bg({ss, ss});
         bg.setPosition(pos[i]);
@@ -689,7 +702,7 @@ void InventoryUI::renderEquipTab(sf::RenderTarget& t, float sw, float sh,
         bg.setOutlineThickness(sel ? 2.f : 1.f);
         t.draw(bg);
 
-        const auto s = static_cast<core::EquipSlot>(i + 1);
+        const core::EquipSlot s = core::equipDisplaySlot(i);
         sf::Text label;
         label.setFont(font);
         label.setString(core::equipSlotName(s));
@@ -833,10 +846,14 @@ void InventoryUI::renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
                  std::to_string(cmp.diff) + ")",
              13, c);
     }
-    // Marcador de equipado (mesmo defId no slot natural).
-    if (equipment_ && def->equipSlot != core::EquipSlot::None &&
-        equipment_->get(def->equipSlot).defId == sel->defId)
-        line("(equipado)", 12, sf::Color(240, 220, 160));
+    // Marcador de equipado (slot natural ou mão esquerda p/ arma).
+    if (equipment_ && def->equipSlot != core::EquipSlot::None) {
+        const bool worn =
+            equipment_->get(def->equipSlot).defId == sel->defId ||
+            (def->type == core::ItemType::Weapon &&
+             equipment_->get(core::EquipSlot::LeftHand).defId == sel->defId);
+        if (worn) line("(equipado)", 12, sf::Color(240, 220, 160));
+    }
     if (def->type == core::ItemType::Weapon ||
         def->type == core::ItemType::Armor) {
         line(std::string("MAT: ") + core::materialName(def->material), 12,

@@ -25,6 +25,10 @@ public:
     // def, ou não equipável. Slot ocupado: substitui e devolve o antigo.
     bool equip(const Item& item, Item* outOld = nullptr);
 
+    // Equipa em slot explícito. Vale o natural do def + LeftHand p/
+    // Weapon (segunda arma). Qualquer outro par slot/def = false.
+    bool equipTo(EquipSlot slot, const Item& item, Item* outOld = nullptr);
+
     // Remove e devolve o item do slot (vazio se já estava vazio).
     Item unequip(EquipSlot slot);
 

@@ -527,6 +527,28 @@ int main() {
         assert(!eq.equip(core::Item{})); // vazio
         assert(eq.isEmpty());
     }
+    { // EquipToSlot (alvo explícito; esquerda só arma)
+        core::Equipment eq;
+        assert(eq.equipTo(core::EquipSlot::LeftHand,
+                          core::Item{"iron_sword", 1}));
+        assert(eq.get(core::EquipSlot::LeftHand).defId == "iron_sword");
+        assert(!eq.equipTo(core::EquipSlot::LeftHand,
+                           core::Item{"iron_helm", 1})); // armadura não
+        assert(!eq.equipTo(core::EquipSlot::Head,
+                           core::Item{"iron_sword", 1})); // espada no elmo não
+        assert(!eq.equipTo(core::EquipSlot::None,
+                           core::Item{"iron_sword", 1}));
+    }
+    { // OffHandBonus (esquerda vazia no seed; espada soma +12)
+        Player p;
+        assert(p.equipment.get(core::EquipSlot::LeftHand).isEmpty());
+        assert(p.offHandDef() == nullptr);
+        const int base = p.meleeDamage();
+        assert(p.equipment.equipTo(core::EquipSlot::LeftHand,
+                                   core::Item{"iron_sword", 1}));
+        assert(p.offHandDef() && p.offHandDef()->damage == 12);
+        assert(p.meleeDamage() == base + 12);
+    }
     { // EquipLoad (soma pesos; ferro 28, ouro 37, couro 15)
         core::Equipment iron;
         assert(iron.equip(core::Item{"iron_sword", 1}));
@@ -611,13 +633,14 @@ int main() {
         // Kit inteiro: 36 defs em 1 slot cada + dinamite 999 em 1 só.
         assert(p.inventory.usedSlots() == 37);
     }
-    { // EquipViaMenu (F→Equip: grid esvazia, antigo volta)
+    { // EquipViaMenu (F→Equip: direita livre, esq, depois troca)
         InventoryUI ui;
         core::Inventory inv;
         core::Equipment eq;
         InputMap in;
-        eq.equip(core::Item{"iron_axe", 1}); // ocupando a mão
-        inv.add(core::Item{"iron_sword", 1});
+        eq.equip(core::Item{"iron_axe", 1}); // ocupando a direita
+        inv.add(core::Item{"iron_sword", 1}); // slot 0
+        inv.add(core::Item{"iron_sword", 1}); // slot 1 (stackMax 1)
         ui.setInventory(&inv);
         ui.setEquipment(&eq);
         ui.open();
@@ -626,11 +649,12 @@ int main() {
         ui.handleInput(in);
         release(in, sf::Keyboard::F);
         assert(ui.state() == InventoryUI::UIState::ActionMenu);
-        press(in, sf::Keyboard::F); // Equip é o primeiro (sem onUse)
+        press(in, sf::Keyboard::F); // Equip: direita ocupada → esquerda
         ui.handleInput(in);
         release(in, sf::Keyboard::F);
-        assert(eq.get(core::EquipSlot::RightHand).defId == "iron_sword");
-        assert(inv.slot(0).defId == "iron_axe"); // antigo voltou
+        assert(eq.get(core::EquipSlot::RightHand).defId == "iron_axe");
+        assert(eq.get(core::EquipSlot::LeftHand).defId == "iron_sword");
+        assert(inv.slot(0).isEmpty() && !inv.slot(1).isEmpty());
     }
     { // UnequipViaMenu (aba Equipment: F→Unequip volta p/ grid)
         InventoryUI ui;
@@ -671,7 +695,7 @@ int main() {
         assert(eq.get(core::EquipSlot::RightHand).defId == "iron_sword");
         assert(inv.count("stone") == 80 * 99);
     }
-    { // EquipTabFiveSlots (Down circula 0..4, Boots por último)
+    { // EquipTabSixSlots (Down circula 0..5, Boots=5)
         InventoryUI ui;
         core::Inventory inv;
         core::Equipment eq;
@@ -680,12 +704,12 @@ int main() {
         ui.setEquipment(&eq);
         ui.open();
         ui.setMainTab(InventoryUI::MainTab::Equipment);
-        for (int i = 0; i < 4; ++i) {
+        for (int i = 0; i < 5; ++i) {
             press(in, sf::Keyboard::Down);
             ui.handleInput(in);
             release(in, sf::Keyboard::Down);
         }
-        assert(ui.equipCursor() == 4);
+        assert(ui.equipCursor() == 5);
         press(in, sf::Keyboard::Down);
         ui.handleInput(in);
         release(in, sf::Keyboard::Down);

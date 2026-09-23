@@ -13,7 +13,18 @@ bool Equipment::equip(const Item& item, Item* outOld) {
     if (item.isEmpty()) return false;
     const ItemDef* def = item.def();
     if (!def) return false;
-    const int idx = indexOf(def->equipSlot);
+    return equipTo(def->equipSlot, item, outOld);
+}
+
+bool Equipment::equipTo(EquipSlot slot, const Item& item, Item* outOld) {
+    if (item.isEmpty()) return false;
+    const ItemDef* def = item.def();
+    if (!def) return false;
+    const bool natural = (slot == def->equipSlot);
+    const bool offhand =
+        (slot == EquipSlot::LeftHand && def->type == ItemType::Weapon);
+    if (!natural && !offhand) return false;
+    const int idx = indexOf(slot);
     if (idx < 0) return false; // None = não equipável
 
     if (outOld) *outOld = slots_[idx];

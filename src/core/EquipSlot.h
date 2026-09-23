@@ -16,6 +16,7 @@ namespace core {
 enum class EquipSlot : uint8_t {
     None,
     RightHand,
+    LeftHand, // segunda arma (dano soma no melee)
     Head,
     Chest,
     Legs,
@@ -28,12 +29,22 @@ inline constexpr int kEquipSlotCount = static_cast<int>(EquipSlot::COUNT);
 inline const char* equipSlotName(EquipSlot s) {
     switch (s) {
         case EquipSlot::RightHand: return "Right Hand";
+        case EquipSlot::LeftHand:  return "Left Hand";
         case EquipSlot::Head:      return "Head";
         case EquipSlot::Chest:     return "Chest";
         case EquipSlot::Legs:      return "Legs";
         case EquipSlot::Boots:     return "Boots";
         default:                   return "";
     }
+}
+
+// Ordem de exibição na aba Equipment (mãos primeiro).
+inline EquipSlot equipDisplaySlot(int i) {
+    static constexpr EquipSlot kOrder[] = {
+        EquipSlot::RightHand, EquipSlot::LeftHand, EquipSlot::Head,
+        EquipSlot::Chest, EquipSlot::Legs, EquipSlot::Boots};
+    if (i < 0 || i >= 6) return EquipSlot::None;
+    return kOrder[i];
 }
 
 } // namespace core

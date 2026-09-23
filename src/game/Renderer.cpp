@@ -868,10 +868,33 @@ void Game::drawPlayerEquipment() {
 
 void Game::drawPlayerWeapon() {
     Player *p = player.get();
-    if (run_.isDead() || !p->hasWeapon()) return;
-    const core::ItemDef* wdef = p->weaponDef();
-    const int m = static_cast<int>(wdef->material);
+    if (run_.isDead()) return;
     const float s = p->getH() / static_cast<float>(sprites::kPlayerH);
+    // Direção pela rotação, não pelo flip: flip + rotação espelharia
+    // errado em NW/SW. Fora do swing segue o input (aimDir); no swing,
+    // o snapshot — swingAim idle congela no último golpe (lâmina
+    // invertida para sempre). Tabela calibrada p/ sprite horizontal
+    // (swing, lâmina p/ direita); sprite vertical (idle/windup, lâmina
+    // em cima) ganha +90°. Windup é aproximado (lâmina na diagonal).
+    // Vale p/ as duas mãos.
+    const bool verticalSprite = (p->meleePhase == MeleePhase::Idle ||
+                                 p->meleePhase == MeleePhase::Windup);
+    float angle = 0.f;
+    using support::AimDir;
+    switch (p->effectiveAim()) {
+        case AimDir::E: angle = 0.f; break;
+        case AimDir::NE: angle = -45.f; break;
+        case AimDir::N: angle = -90.f; break;
+        case AimDir::NW: angle = -135.f; break;
+        case AimDir::W: angle = 180.f; break;
+        case AimDir::SW: angle = 135.f; break;
+        case AimDir::S: angle = 90.f; break;
+        case AimDir::SE: angle = 45.f; break;
+        default: break;
+    }
+    if (verticalSprite) angle += 90.f;
+    if (const core::ItemDef* wdef = p->weaponDef()) {
+    const int m = static_cast<int>(wdef->material);
     // Mão = base do ArmR (onde o pixel de pele termina, row 9 no idle).
     // Espelho de computeWeaponBbox em BodySystem — mudar um sem o outro
     // desalinha desenho e hitbox.
@@ -902,28 +925,6 @@ void Game::drawPlayerWeapon() {
                 break;
         }
     }
-    // Direção pela rotação, não pelo flip: flip + rotação espelharia
-    // errado em NW/SW. Fora do swing segue o input (aimDir); no swing,
-    // o snapshot — swingAim idle congela no último golpe (lâmina
-    // invertida para sempre). Tabela calibrada p/ sprite horizontal
-    // (swing, lâmina p/ direita); sprite vertical (idle/windup, lâmina
-    // em cima) ganha +90°. Windup é aproximado (lâmina na diagonal).
-    const bool verticalSprite = (p->meleePhase == MeleePhase::Idle ||
-                                 p->meleePhase == MeleePhase::Windup);
-    float angle = 0.f;
-    using support::AimDir;
-    switch (p->effectiveAim()) {
-        case AimDir::E: angle = 0.f; break;
-        case AimDir::NE: angle = -45.f; break;
-        case AimDir::N: angle = -90.f; break;
-        case AimDir::NW: angle = -135.f; break;
-        case AimDir::W: angle = 180.f; break;
-        case AimDir::SW: angle = 135.f; break;
-        case AimDir::S: angle = 90.f; break;
-        case AimDir::SE: angle = 45.f; break;
-        default: break;
-    }
-    if (verticalSprite) angle += 90.f;
     sf::Sprite spr;
     spr.setTexture(*tex);
     spr.setOrigin(originX, originY);
@@ -931,6 +932,29 @@ void Game::drawPlayerWeapon() {
     spr.setScale(s, s);
     spr.setRotation(angle);
     window->draw(spr);
+    } // RightHand
+
+    // Off-hand (LeftHand): pose idle na mão esquerda, sem fases e sem
+    // hitbox. Desenha mesmo sem arma na direita (soco + espada funciona).
+    if (const core::ItemDef* off = p->offHandDef()) {
+        const int mo = static_cast<int>(off->material);
+        if (const auto *armL = p->body.find(support::BodyPartId::ArmL)) {
+            const float hx =
+                armL->worldBox.left + armL->worldBox.width * 0.5f;
+            const float hy = armL->worldBox.top + armL->worldBox.height;
+            const support::WeaponDef *wod =
+                support::WeaponRegistry::instance().find(off->id);
+            const sf::Texture *otex = &sprites_.swordIdle[mo];
+            if (wod && !wod->hasSwingPhases) otex = &sprites_.axeIdle[mo];
+            sf::Sprite ospr;
+            ospr.setTexture(*otex);
+            ospr.setOrigin(4.f, 20.f);
+            ospr.setPosition(hx, hy);
+            ospr.setScale(s, s);
+            ospr.setRotation(angle);
+            window->draw(ospr);
+        }
+    }
 }
 
 void Game::drawEnemiesSprites() {
