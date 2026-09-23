@@ -1,7 +1,7 @@
 /**
  * @file tests/test_time.cpp
  * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
- * @brief Teste headless que trava fixedStep 1 por 60 com troca estável.
+ * @brief Teste headless que trava fixedStep 1 por 30 com troca estável.
  * @details Cobre Time e Math, roda com make test que compila em build/tests/test_time.
  */
 
@@ -14,11 +14,11 @@
 #include "core/Math.h"
 
 int main() {
-    // default 1/60 preservado para quem não trava valor próprio
-    assert(std::fabs(core::Time::fixedStep() - 1.0f / 60.0f) < 1e-6f);
-
-    core::Time::setFixedStep(1.0f / 30.0f);
+    // default 1/30: casa com os dt=1/30 de todos os ticks (30 TPS).
     assert(std::fabs(core::Time::fixedStep() - 1.0f / 30.0f) < 1e-6f);
+
+    core::Time::setFixedStep(1.0f / 60.0f);
+    assert(std::fabs(core::Time::fixedStep() - 1.0f / 60.0f) < 1e-6f);
 
     // sem tempo passado: zero ticks, delta >= 0, frames conta
     core::Time::beginFrame();
@@ -27,7 +27,7 @@ int main() {
     assert(core::Time::frameCount() == 1);
     float e0 = core::Time::elapsed();
 
-    // 40ms > passo 1/30 (~33.3ms): pelo menos 1 tick
+    // 40ms > passo 1/60 (~16.7ms): pelo menos 1 tick
     std::this_thread::sleep_for(std::chrono::milliseconds(40));
     core::Time::beginFrame();
     int n = core::Time::consumeTicks();

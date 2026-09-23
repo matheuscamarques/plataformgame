@@ -11,7 +11,9 @@
 
 namespace core {
 
-float Time::fixedStep_ = 1.0f / 60.0f;
+float Time::fixedStep_ = 1.0f / 30.0f; // 30 TPS: casa com os dt=1/30
+// de todos os ticks (App, Player, cooldowns). 1/60 aqui + dt 1/30 lá
+// rodava o jogo em 2x em display 60fps.
 float Time::delta_ = 0.0f;
 float Time::elapsed_ = 0.0f;
 float Time::accumulator_ = 0.0f;
