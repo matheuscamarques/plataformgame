@@ -1,3 +1,10 @@
+/**
+ * @file src/world/BlockRegistry.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Implementa registro global e caches por estrato de blocos.
+ * @details Implementa singleton com add, find, baseFor, flavorsFor e raresFor com cache lazy por estrato, consumido pela Generation para escolher rochas.
+ */
+
 #include "BlockRegistry.h"
 
 namespace support {

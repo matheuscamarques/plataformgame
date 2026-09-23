@@ -1,3 +1,10 @@
+/**
+ * @file src/world/BlockRegistry.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Catálogo extensível de blocos geráveis por estrato.
+ * @details Declara BlockEntry, BlockRegistry e macro REGISTER_BLOCK para auto-registro em static-init, incluído pelos arquivos Blocks e pela Generation.
+ */
+
 #pragma once
 #include <cstdint>
 #include <vector>

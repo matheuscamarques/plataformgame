@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Enemies/EnemySystem.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Opera spawn, iteração, física, IA e remoção por distância.
+ * @details Implementa spawn, forEach, tick, removeDead e despawnFar com Skills e áudio, chamado pelo loop via GameContext.
+ */
+
 #include "EnemySystem.h"
 
 #include <algorithm>

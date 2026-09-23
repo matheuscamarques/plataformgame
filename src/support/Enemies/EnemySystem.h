@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Enemies/EnemySystem.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara Enemy, Factory e o sistema dono de corpos e IAs.
+ * @details Define struct Enemy com Body e Behavior mais Factory spawnEnemy e EnemySystem prioridade 150, usado por Game e Spawns.
+ */
+
 #pragma once
 
 #include <functional>

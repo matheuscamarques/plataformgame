@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Combat/SpriteFrame.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Define identificadores leves de frame para player, slime e anão.
+ * @details Expõe enum SpriteFrameId de 1 byte, lido por Enemy e BodySystem e resolvido no SpriteFrameRegistry para render.
+ */
+
 #pragma once
 #include <cstdint>
 

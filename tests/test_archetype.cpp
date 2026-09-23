@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_archetype.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava arquétipos slime e anão para Factory e Spawn.
+ * @details Cobre EnemyArchetype e EnemySystem, roda com make test que compila em build/tests/test_archetype.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <string>

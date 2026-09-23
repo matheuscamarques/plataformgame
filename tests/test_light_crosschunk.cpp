@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_light_crosschunk.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava luz cross-chunk até fixpoint sem GL.
+ * @details Cobre RaycastLight e World, roda com make test que compila em build/tests/test_light_crosschunk.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

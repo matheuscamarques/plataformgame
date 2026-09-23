@@ -1,3 +1,10 @@
+/**
+ * @file src/world/World.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Interface pública do mundo para features e game loop.
+ * @details Declara update, tileAt, breakTile, queries espaciais e iteração por retângulo sobre ChunkManager, incluída por features sem acesso direto a chunks.
+ */
+
 #pragma once
 #include <cmath>
 #include <cstdint>

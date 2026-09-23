@@ -1,3 +1,8 @@
+# @file Makefile
+# @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+# @brief Build C++17 determinístico com ccache, testes e viewers de noise e luz.
+# @details Define CXXFLAGS travados sem FMA, LDLIBS SFML e alvos all, run, test, test-all, test-layers, noise-view e light-view.
+
 CXX ?= g++
 # -O2 com determinismo travado: -g p/ gdb, -ffp-contract=off p/ não
 # fundir a*b+c em FMA, -fno-fast-math p/ sin/cos/sqrt estáveis.

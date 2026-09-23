@@ -1,3 +1,10 @@
+/**
+ * @file src/core/ItemDefs.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Registro inicial dos itens jogáveis via macro no boot.
+ * @details Cria defs de TNT, gel, minérios, madeira e poção com sprites ASCII, carregado uma vez no ItemRegistry.
+ */
+
 // Defs iniciais (estático, 1× no boot via REGISTER_ITEM).
 // Conjunto mínimo jogável: TNT da pilha, gel do slime, minérios,
 // madeira/pedra de construção e poção. Mesmo padrão de
@@ -295,6 +302,67 @@ inline const core::PaletteEntry kItemLeatherLegsPal[] = {
 };
 inline constexpr std::size_t kItemLeatherLegsPalCount = 3;
 
+// Matriz completa (falta do review): ouro e diamante no set inteiro +
+// armas de couro. Mesmas formas do ferro, paleta por material.
+inline const core::PaletteEntry kItemGoldSwordPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'B', {240, 200, 80}},
+    {'b', {170, 140, 50}},
+    {'H', {110, 75, 45}},
+};
+inline constexpr std::size_t kItemGoldSwordPalCount = 4;
+inline const core::PaletteEntry kItemDiamondSwordPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'B', {180, 220, 240}},
+    {'b', {100, 150, 190}},
+    {'H', {60, 65, 75}},
+};
+inline constexpr std::size_t kItemDiamondSwordPalCount = 4;
+inline const core::PaletteEntry kItemLeatherSwordPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'B', {160, 110, 70}},
+    {'b', {100, 70, 45}},
+    {'H', {80, 55, 35}},
+};
+inline constexpr std::size_t kItemLeatherSwordPalCount = 4;
+
+inline const core::PaletteEntry kItemGoldAxePal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {240, 200, 80}},
+    {'s', {170, 140, 50}},
+    {'H', {110, 75, 45}},
+};
+inline constexpr std::size_t kItemGoldAxePalCount = 4;
+inline const core::PaletteEntry kItemDiamondAxePal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {180, 220, 240}},
+    {'s', {100, 150, 190}},
+    {'H', {60, 65, 75}},
+};
+inline constexpr std::size_t kItemDiamondAxePalCount = 4;
+inline const core::PaletteEntry kItemLeatherAxePal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {160, 110, 70}},
+    {'s', {100, 70, 45}},
+    {'H', {80, 55, 35}},
+};
+inline constexpr std::size_t kItemLeatherAxePalCount = 4;
+
+inline const core::PaletteEntry kItemGoldArmorPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {220, 190, 90}},
+    {'s', {170, 140, 50}},
+    {'D', {255, 230, 130}},
+};
+inline constexpr std::size_t kItemGoldArmorPalCount = 4;
+inline const core::PaletteEntry kItemDiamondArmorPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {180, 220, 240}},
+    {'s', {100, 150, 190}},
+    {'D', {220, 240, 255}},
+};
+inline constexpr std::size_t kItemDiamondArmorPalCount = 4;
+
 
 REGISTER_ITEM("dynamite", [] {
     core::ItemDef def;
@@ -585,6 +653,235 @@ REGISTER_ITEM("leather_legs", [] {
     def.stackMax = 1;
     def.defense = 2;
     def.equipSlot = core::EquipSlot::Legs;
+    def.material = core::MaterialId::Leather;
+    return def;
+}())
+
+// ---- Matriz ouro/diamante + armas de couro (mesmo padrão) ----
+REGISTER_ITEM("gold_sword", [] {
+    core::ItemDef def;
+    def.id = "gold_sword";
+    def.description = "Espada de ouro. Brilha mais do que corta.";
+    def.spriteRows = kItemSwordSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemGoldSwordPal;
+    def.spritePalCount = kItemGoldSwordPalCount;
+    def.name = "Espada de Ouro";
+    def.type = ItemType::Weapon;
+    def.rarity = ItemRarity::Rare;
+    def.stackMax = 1;
+    def.damage = 14;
+    def.equipSlot = core::EquipSlot::RightHand;
+    def.material = core::MaterialId::Gold;
+    return def;
+}())
+
+REGISTER_ITEM("gold_axe", [] {
+    core::ItemDef def;
+    def.id = "gold_axe";
+    def.description = "Machado de ouro. Pesado e vistoso.";
+    def.spriteRows = kItemAxeSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemGoldAxePal;
+    def.spritePalCount = kItemGoldAxePalCount;
+    def.name = "Machado de Ouro";
+    def.type = ItemType::Weapon;
+    def.rarity = ItemRarity::Rare;
+    def.stackMax = 1;
+    def.damage = 21;
+    def.equipSlot = core::EquipSlot::RightHand;
+    def.material = core::MaterialId::Gold;
+    return def;
+}())
+
+REGISTER_ITEM("gold_helm", [] {
+    core::ItemDef def;
+    def.id = "gold_helm";
+    def.description = "Elmo de ouro. Chama atenção (inclusive de slime).";
+    def.spriteRows = kItemHelmSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemGoldArmorPal;
+    def.spritePalCount = kItemGoldArmorPalCount;
+    def.name = "Elmo de Ouro";
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Rare;
+    def.stackMax = 1;
+    def.defense = 5;
+    def.equipSlot = core::EquipSlot::Head;
+    def.material = core::MaterialId::Gold;
+    return def;
+}())
+
+REGISTER_ITEM("gold_chest", [] {
+    core::ItemDef def;
+    def.id = "gold_chest";
+    def.description = "Peitoral de ouro. Reluzente.";
+    def.spriteRows = kItemChestSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemGoldArmorPal;
+    def.spritePalCount = kItemGoldArmorPalCount;
+    def.name = "Peitoral de Ouro";
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Rare;
+    def.stackMax = 1;
+    def.defense = 8;
+    def.equipSlot = core::EquipSlot::Chest;
+    def.material = core::MaterialId::Gold;
+    return def;
+}())
+
+REGISTER_ITEM("gold_legs", [] {
+    core::ItemDef def;
+    def.id = "gold_legs";
+    def.description = "Perneiras de ouro. Barulhentas.";
+    def.spriteRows = kItemLegsSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemGoldArmorPal;
+    def.spritePalCount = kItemGoldArmorPalCount;
+    def.name = "Perneiras de Ouro";
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Rare;
+    def.stackMax = 1;
+    def.defense = 5;
+    def.equipSlot = core::EquipSlot::Legs;
+    def.material = core::MaterialId::Gold;
+    return def;
+}())
+
+REGISTER_ITEM("diamond_sword", [] {
+    core::ItemDef def;
+    def.id = "diamond_sword";
+    def.description = "Espada de diamante. Corta quase tudo.";
+    def.spriteRows = kItemSwordSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemDiamondSwordPal;
+    def.spritePalCount = kItemDiamondSwordPalCount;
+    def.name = "Espada de Diamante";
+    def.type = ItemType::Weapon;
+    def.rarity = ItemRarity::Epic;
+    def.stackMax = 1;
+    def.damage = 20;
+    def.equipSlot = core::EquipSlot::RightHand;
+    def.material = core::MaterialId::Diamond;
+    return def;
+}())
+
+REGISTER_ITEM("diamond_axe", [] {
+    core::ItemDef def;
+    def.id = "diamond_axe";
+    def.description = "Machado de diamante. Fim de conversa.";
+    def.spriteRows = kItemAxeSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemDiamondAxePal;
+    def.spritePalCount = kItemDiamondAxePalCount;
+    def.name = "Machado de Diamante";
+    def.type = ItemType::Weapon;
+    def.rarity = ItemRarity::Epic;
+    def.stackMax = 1;
+    def.damage = 30;
+    def.equipSlot = core::EquipSlot::RightHand;
+    def.material = core::MaterialId::Diamond;
+    return def;
+}())
+
+REGISTER_ITEM("diamond_helm", [] {
+    core::ItemDef def;
+    def.id = "diamond_helm";
+    def.description = "Elmo de diamante. Praticamente eterno.";
+    def.spriteRows = kItemHelmSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemDiamondArmorPal;
+    def.spritePalCount = kItemDiamondArmorPalCount;
+    def.name = "Elmo de Diamante";
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Epic;
+    def.stackMax = 1;
+    def.defense = 8;
+    def.equipSlot = core::EquipSlot::Head;
+    def.material = core::MaterialId::Diamond;
+    return def;
+}())
+
+REGISTER_ITEM("diamond_chest", [] {
+    core::ItemDef def;
+    def.id = "diamond_chest";
+    def.description = "Peitoral de diamante. Muralha vestível.";
+    def.spriteRows = kItemChestSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemDiamondArmorPal;
+    def.spritePalCount = kItemDiamondArmorPalCount;
+    def.name = "Peitoral de Diamante";
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Epic;
+    def.stackMax = 1;
+    def.defense = 12;
+    def.equipSlot = core::EquipSlot::Chest;
+    def.material = core::MaterialId::Diamond;
+    return def;
+}())
+
+REGISTER_ITEM("diamond_legs", [] {
+    core::ItemDef def;
+    def.id = "diamond_legs";
+    def.description = "Perneiras de diamante. Inquebráveis.";
+    def.spriteRows = kItemLegsSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemDiamondArmorPal;
+    def.spritePalCount = kItemDiamondArmorPalCount;
+    def.name = "Perneiras de Diamante";
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Epic;
+    def.stackMax = 1;
+    def.defense = 8;
+    def.equipSlot = core::EquipSlot::Legs;
+    def.material = core::MaterialId::Diamond;
+    return def;
+}())
+
+REGISTER_ITEM("leather_sword", [] {
+    core::ItemDef def;
+    def.id = "leather_sword";
+    def.description = "Espada de treino em couro. Não corta, ensina.";
+    def.spriteRows = kItemSwordSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemLeatherSwordPal;
+    def.spritePalCount = kItemLeatherSwordPalCount;
+    def.name = "Espada de Couro";
+    def.type = ItemType::Weapon;
+    def.rarity = ItemRarity::Common;
+    def.stackMax = 1;
+    def.damage = 6;
+    def.equipSlot = core::EquipSlot::RightHand;
+    def.material = core::MaterialId::Leather;
+    return def;
+}())
+
+REGISTER_ITEM("leather_axe", [] {
+    core::ItemDef def;
+    def.id = "leather_axe";
+    def.description = "Machado de treino em couro. Pesa pouco.";
+    def.spriteRows = kItemAxeSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemLeatherAxePal;
+    def.spritePalCount = kItemLeatherAxePalCount;
+    def.name = "Machado de Couro";
+    def.type = ItemType::Weapon;
+    def.rarity = ItemRarity::Common;
+    def.stackMax = 1;
+    def.damage = 9;
+    def.equipSlot = core::EquipSlot::RightHand;
     def.material = core::MaterialId::Leather;
     return def;
 }())

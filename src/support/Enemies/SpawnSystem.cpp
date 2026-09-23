@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Enemies/SpawnSystem.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Controla budget por estrato, spawn ponderado e despawn distante.
+ * @details Implementa tick com janela de spawn e budgetForStratum usando ArchetypeRegistry, chamado pelo loop com World e player.
+ */
+
 #include "SpawnSystem.h"
 
 #include <cmath>

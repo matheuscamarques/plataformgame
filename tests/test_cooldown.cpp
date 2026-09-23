@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_cooldown.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava Cooldown pronto, dispara, expira e reinicia.
+ * @details Cobre core Cooldown com remaining, roda com make test que compila em build/tests/test_cooldown.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

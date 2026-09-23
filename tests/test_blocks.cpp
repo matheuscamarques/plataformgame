@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_blocks.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava todo Tile com nome e cor menos Air.
+ * @details Cobre BlockDef e BLOCKS, roda com make test que compila em build/tests/test_blocks.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <string_view>

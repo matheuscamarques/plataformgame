@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_ores.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava um veio por estrato sem minério raso.
+ * @details Cobre Generation em faixas, roda com make test que compila em build/tests/test_ores.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <initializer_list>

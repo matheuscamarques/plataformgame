@@ -1,3 +1,10 @@
+/**
+ * @file src/core/DropTable.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Tabela de drops com chances, quantidades e filtro por nível.
+ * @details Resolve rolls determinísticos com LCG e salt por posição via rollDrops, usado por EnemyArchetype e sistemas de loot.
+ */
+
 #pragma once
 #include <cstdint>
 #include <string>

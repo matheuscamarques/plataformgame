@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Enemies/VariantRegistry.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Define variantes do anão por profundidade com bônus e skills extras.
+ * @details Expõe VariantDef e singleton com forDepth mais registerDefaultVariants, aplicado pela Factory de S3 a S7.
+ */
+
 #pragma once
 #include <SFML/Graphics/Color.hpp>
 #include <algorithm>

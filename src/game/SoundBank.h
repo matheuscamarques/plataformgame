@@ -1,3 +1,10 @@
+/**
+ * @file src/game/SoundBank.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Define e constrói 26 efeitos sonoros sintetizados.
+ * @details Declara enum Sfx mais keyOf e buildSoundBank que sintetiza buffers via Synth e registra no AudioSystem no boot, usada por combate, mundo e UI.
+ */
+
 #pragma once
 #include "core/AudioSystem.h"
 #include "core/Synth.h"

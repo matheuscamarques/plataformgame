@@ -1,3 +1,10 @@
+/**
+ * @file src/world/LightPropagator.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Calcula céu, flood de luz e imagem do lightmap.
+ * @details Implementa attenuationFor, computeSkyLight, floods, fontes do jogador e blur com costura cross-chunk, chamado por ChunkManager e World no relight e render.
+ */
+
 #include "world/LightPropagator.h"
 #include "world/Chunk.h"
 #include "world/RaycastLight.h"

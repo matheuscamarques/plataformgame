@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_slime_stress.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava 50 slimes por 600 ticks sem cair do mundo.
+ * @details Cobre EnemySystem e World, roda com make test que compila em build/tests/test_slime_stress.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

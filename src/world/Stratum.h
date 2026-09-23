@@ -1,3 +1,10 @@
+/**
+ * @file src/world/Stratum.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Divide a vertical em 11 estratos com nomes e cores.
+ * @details Define STRATUM_TOP, stratumAt O1, checkpointTy e stratumBg por faixa de ty, usado pela Generation, BlockRegistry e render de fundo.
+ */
+
 #pragma once
 #include <cstdint>
 

@@ -1,3 +1,10 @@
+/**
+ * @file src/world/Tile.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Enum estável de IDs de tile com contrato de save.
+ * @details Lista Tile de Air a COUNT com ordem imutável e nunca reutiliza IDs, incluída por quase todo o módulo world para tipos de bloco.
+ */
+
 #pragma once
 #include <cstdint>
 #include <cstddef>

@@ -1,3 +1,10 @@
+/**
+ * @file src/core/BodyPart.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Enum que identifica partes do corpo para hitboxes e renderização.
+ * @details Define BodyPartId com cabeça, torso, braços, pernas e arma, usado por Body, Renderer e sprite_from_ascii para ligar pixel a dano.
+ */
+
 #pragma once
 #include <cstdint>
 

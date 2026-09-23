@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Enemies/DwarfAI.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara estados, config e hooks da IA do anão básico.
+ * @details Define enum DwarfState e classe DwarfAI com onTick e onTakeHit, usada por EnemySystem e criada via BehaviorRegistry.
+ */
+
 #pragma once
 
 #include <cstdint>

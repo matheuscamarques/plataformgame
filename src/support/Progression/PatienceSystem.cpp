@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Progression/PatienceSystem.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Atualiza paciência do anão por mineração e pepitas.
+ * @details Implementa patienceOnMine com raio de 4 tiles e dano por minério, patienceOnNugget por estágio e tick com regen, chamada por DwarfAI e ThrowSystem via PatienceSystem.h.
+ */
+
 #include "PatienceSystem.h"
 #include "core/Config.h"
 

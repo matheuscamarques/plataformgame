@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_trenches.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava fossa e monte com máscara estável em 128.
+ * @details Cobre Generation e oceano, roda com make test que compila em build/tests/test_trenches.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <initializer_list>

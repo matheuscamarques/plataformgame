@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_time.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava fixedStep 1 por 60 com troca estável.
+ * @details Cobre Time e Math, roda com make test que compila em build/tests/test_time.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

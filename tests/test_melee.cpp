@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_melee.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava windup active recovery com 1 hit e combo.
+ * @details Cobre MeleeSystem e head 2x, roda com make test que compila em build/tests/test_melee.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "entities/Player/Player.h"

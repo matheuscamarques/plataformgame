@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Skills/SkillSystem.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara funções livres de uso e tick de skills por inimigo.
+ * @details Expõe namespace SkillSystem com tryUse, tick e clear, incluído por EnemySystem e IAs via GameContext.
+ */
+
 #pragma once
 
 #include <string>

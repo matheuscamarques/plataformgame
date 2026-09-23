@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Combat/ContactDamageSystem.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara o sistema de dano por sobreposição entre player e slime.
+ * @details Define classe ContactDamageSystem prioridade 310 com tick, registrado no loop de Systems via GameContext.
+ */
+
 #pragma once
 #include "core/System.h"
 

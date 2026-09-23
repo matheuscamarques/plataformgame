@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_weapon_rotation.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava idle no input e swing no snapshot.
+ * @details Cobre Player effectiveAim, roda com make test que compila em build/tests/test_weapon_rotation.
+ */
+
 #include <cassert>
 #include <cstdio>
 

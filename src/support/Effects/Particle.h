@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Effects/Particle.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Define dados de partícula individual e seus tipos.
+ * @details Declara enum ParticleKind com detritos, poeira e faísca mais struct Particle com posição, velocidade, cor e tempo de vida, usada pelo ParticleSystem em pools.
+ */
+
 #pragma once
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/System/Vector2.hpp>

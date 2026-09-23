@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_inputmap.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava teclas para ações com pressionar e soltar.
+ * @details Cobre InputMap e Action, roda com make test que compila em build/tests/test_inputmap.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "support/Input/InputMap.h"

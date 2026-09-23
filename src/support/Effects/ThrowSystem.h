@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Effects/ThrowSystem.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara sistema de arremessáveis e efeitos visuais de explosão.
+ * @details Define classe System com pool de 64, BlastVisual, throwItem, spawnBlast, tickBlasts e glow radial puro tntGlowParams, usada por Player e Renderer sem depender de LightingSystem.
+ */
+
 #pragma once
 #include "core/System.h"
 #include "core/Pool.h"

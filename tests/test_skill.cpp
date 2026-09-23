@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_skill.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava skill cara com gate de stamina insuficiente.
+ * @details Cobre SkillSystem e custo, roda com make test que compila em build/tests/test_skill.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "entities/Player/Player.h"

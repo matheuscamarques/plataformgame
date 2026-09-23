@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_chunkloader.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava ChunkLoader async igual ao sync com timeout.
+ * @details Cobre worker e adoção na main, roda com make test que compila em build/tests/test_chunkloader.
+ */
+
 #include <cassert>
 #include <chrono>
 #include <cstdio>

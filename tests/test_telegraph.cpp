@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_telegraph.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava windup só em contato com rearma cheio.
+ * @details Cobre ContactDamageSystem, roda com make test que compila em build/tests/test_telegraph.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "entities/Player/Player.h"

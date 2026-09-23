@@ -1,3 +1,10 @@
+/**
+ * @file src/world/ChunkLoader.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Executa fila de geração de chunks em thread auxiliar.
+ * @details Implementa start, stop, request com dedup e tryTake com filas mutexadas, roda Builder puro em loop, consumido por ChunkManager updateAsync e World.
+ */
+
 #include "world/ChunkLoader.h"
 #include "world/Chunk.h" // completo aqui: fila/move/destrói unique_ptr
 

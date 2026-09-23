@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_throw.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava spawn, gravidade, fuse e teto do pool.
+ * @details Cobre ThrowSystem e explosão, roda com make test que compila em build/tests/test_throw.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "support/Effects/ThrowSystem.h"

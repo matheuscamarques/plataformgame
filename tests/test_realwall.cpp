@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_realwall.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava parede real bloqueando e chão sustentando.
+ * @details Cobre Entity e colisão, roda com make test que compila em build/tests/test_realwall.
+ */
+
 #include <cstdio>
 #include <memory>
 #include <vector>

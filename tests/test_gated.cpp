@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_gated.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava VolcanicBomb e SolarFlare nunca gerados.
+ * @details Cobre BlockRegistry e hook, roda com make test que compila em build/tests/test_gated.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "world/BlockRegistry.h"

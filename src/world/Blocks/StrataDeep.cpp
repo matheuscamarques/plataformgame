@@ -1,3 +1,10 @@
+/**
+ * @file src/world/Blocks/StrataDeep.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Registra variações visuais dos estratos profundos S6 a S10.
+ * @details Declara dezenas de flavors via REGISTER_BLOCK com cores, chances e salts próprios, consultados pela Generation para variedade em grandes profundidades.
+ */
+
 #include "../BlockRegistry.h"
 
 namespace support {

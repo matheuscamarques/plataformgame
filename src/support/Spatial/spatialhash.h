@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Spatial/spatialhash.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara grade espacial com consulta sem duplicatas e debug visual.
+ * @details Define classe SpatialHash com insert, remove, query e debugCells, incluída por World e EnemySystem para colisão.
+ */
+
 #pragma once
 
 #include <unordered_map>

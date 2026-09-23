@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_equipment_offset.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava overlay na grade do sprite com escala.
+ * @details Cobre EquipmentLayout sem Body, roda com make test que compila em build/tests/test_equipment_offset.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

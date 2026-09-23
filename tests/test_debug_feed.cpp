@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_debug_feed.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava números que expiram e log com teto sem GL.
+ * @details Cobre DebugFeed puro de CPU, roda com make test que compila em build/tests/test_debug_feed.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <filesystem>

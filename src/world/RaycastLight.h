@@ -1,3 +1,10 @@
+/**
+ * @file src/world/RaycastLight.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Raycast de luz com oclusão para sombra e visibilidade.
+ * @details Declara ChunkProvider, constantes de raios e castRays local e cross-chunk que escreve visibleMask, incluída por LightPropagator e Chunk.
+ */
+
 #pragma once
 #include <cmath>
 #include <functional>

@@ -1,3 +1,10 @@
+/**
+ * @file src/game/game.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Implementa acessores pequenos e ciclo de vida do Game.
+ * @details Define destrutor, setWindow, get e set de World e Player e toggle de chunks assíncronos, complementa App, Renderer, Input e Bootstrapper via game.h.
+ */
+
 #include "game.h"
 
 #include "entities/Player/Player.h"

@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Debug/ScreenshotSystem.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara sistema de screenshots focadas e automáticas.
+ * @details Define classe com foco em coords de mundo, constantes 240px e zoom 3x, toggles F10, F11 e F12 e contadores, usada pelo Game e GameContext sem GL em testes.
+ */
+
 #pragma once
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>

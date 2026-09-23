@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Debug/DebugOverlay.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara overlay de debug com canais por tecla de função.
+ * @details Define classe DebugOverlay com toggles F1, F2, F4, F5, F6 e F7 para hitboxes, IA, eventos, mundo e luz, incluída por game.h e controlada via InputMap.
+ */
+
 #pragma once
 
 #include <SFML/Graphics.hpp>

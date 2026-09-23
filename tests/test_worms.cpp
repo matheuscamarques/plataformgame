@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_worms.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava túneis conectados com bocas independentes.
+ * @details Cobre Generation em grade, roda com make test que compila em build/tests/test_worms.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <initializer_list>

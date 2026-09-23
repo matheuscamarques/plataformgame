@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Inventory.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Cabeçalho do inventário com 40 slots, pilhas e ouro.
+ * @details Declara a classe Inventory pura com add, remove, count, swap e sort, incluído por Player e InventoryUI.
+ */
+
 #pragma once
 #include <array>
 

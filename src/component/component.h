@@ -1,3 +1,10 @@
+/**
+ * @file src/component/component.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara retângulo SFML nomeado base para colisão e desenho.
+ * @details Define classe Component com herança de RectangleShape e FloatRect mais acesso a posição, tamanho e nome, incluída por Entity e sistemas de colisão.
+ */
+
 //
 // Created by sanonichan on 01/03/2022.
 //

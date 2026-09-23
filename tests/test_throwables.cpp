@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_throwables.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava TNT por strlen e anel até expirar.
+ * @details Cobre ThrowSystem sem render, roda com make test que compila em build/tests/test_throwables.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <cstring>

@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Spatial/spatialhash.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Implementa grade uniforme para inserir, remover e consultar entidades.
+ * @details Define insert, remove, update e query com chave int64 de célula, usado por física e colisão via Entity bounds.
+ */
+
 #include "spatialhash.h"
 #include "entities/Entity.hpp"
 

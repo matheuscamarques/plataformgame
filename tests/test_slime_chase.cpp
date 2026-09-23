@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_slime_chase.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava perseguição próxima em 2 fases com pouso.
+ * @details Cobre EnemySystem e World, roda com make test que compila em build/tests/test_slime_chase.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

@@ -1,3 +1,10 @@
+/**
+ * @file src/world/ChunkManager.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Gera, carrega e descarta chunks com LRU e relight.
+ * @details Implementa update síncrono, buildBare puro, stampTree, evict e relight de vizinhos, chamado por World para streaming em torno do jogador.
+ */
+
 #include "ChunkManager.h"
 
 #include <chrono>

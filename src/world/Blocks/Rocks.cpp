@@ -1,3 +1,10 @@
+/**
+ * @file src/world/Blocks/Rocks.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Registra rochas base e variações comuns por estrato.
+ * @details Define blocos base de S3 a S10 e flavors de S1 a S5 com máscaras de estrato, consumidos pela Generation via strataRock e BlockRegistry.
+ */
+
 #include "../BlockRegistry.h"
 
 namespace support {

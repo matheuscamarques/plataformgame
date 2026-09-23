@@ -1,3 +1,7 @@
+<!-- @file: README.md | @author: Matheus de Camargo Marques <matheuscamarques@gmail.com> -->
+<!-- @brief: README principal com pitch, features, build, controles e roadmap. -->
+<!-- @details: Documento de entrada do repo, leitura no GitHub com links de Build, Controls, Architecture e Contributing. -->
+
 # PlataformGame
 
 > A 2D action-platformer with an infinite procedural underworld and per-part combat —

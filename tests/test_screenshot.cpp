@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_screenshot.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava screenshot sem pasta com flags e dedup.
+ * @details Cobre ScreenshotSystem sem janela, roda com make test que compila em build/tests/test_screenshot.
+ */
+
 #include <cassert>
 #include <cstdio>
 

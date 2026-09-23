@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_aim_snapshot.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava snapshot de mira que congela direção do golpe.
+ * @details Cobre AimDir e Player, roda com make test que compila em build/tests/test_aim_snapshot.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

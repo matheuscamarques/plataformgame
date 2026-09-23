@@ -1,3 +1,7 @@
+<!-- @file: docs/PARALLEL_WORK.md | @author: Matheus de Camargo Marques <matheuscamarques@gmail.com> -->
+<!-- @brief: Contrato de trabalho paralelo com áreas, donos e verificação. -->
+<!-- @details: Mapeia donos por área e 6 regras com make test e test-layers, leitura obrigatória antes do PR. -->
+
 # Trabalho em paralelo (2+ devs / agentes)
 
 Fronteiras pós-split: cada área tem dono e arquivos exclusivos.

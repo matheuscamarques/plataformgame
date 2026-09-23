@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Progression/PatienceSystem.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara estado puro de paciência e vínculo do anão.
+ * @details Define struct PatienceState com valor, avisos, cooldown e estágio passivo mais funções puras de mina, pepita e traição, incluída por DwarfAI sem ciclo de includes.
+ */
+
 #pragma once
 #include "core/Cooldown.h"
 

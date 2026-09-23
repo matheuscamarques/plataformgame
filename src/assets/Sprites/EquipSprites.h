@@ -1,3 +1,10 @@
+/**
+ * @file src/assets/Sprites/EquipSprites.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Define sprites ASCII de armas e armaduras por material.
+ * @details Guarda medidas e matrizes de espada, elmo, peitoral, pernas, botas e luvas mais paleta base, usadas por SpriteSet para criar uma textura por material.
+ */
+
 #pragma once
 
 #include "core/sprite_from_ascii.h"

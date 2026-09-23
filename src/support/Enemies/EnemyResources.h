@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Enemies/EnemyResources.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara HP, mana, stamina, postura e stagger com regras por tier.
+ * @details Expõe struct Cost e EnemyResources com tick e takeDamage, incluído por Enemy, Factory e SkillSystem.
+ */
+
 #pragma once
 #include "core/Cooldown.h"
 #include <algorithm>

@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_chunks.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava snapshot textual de tiles e entidades.
+ * @details Cobre ChunkManager e serialização, roda com make test que compila em build/tests/test_chunks.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <string>

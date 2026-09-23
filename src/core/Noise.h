@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Noise.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Ruído determinístico por posição para geração infinita do mundo.
+ * @details Oferece hash2, rand01, valueNoise2D e fbm sem estado global, usado por geração de terreno e cavernas.
+ */
+
 #pragma once
 
 #include <cmath>

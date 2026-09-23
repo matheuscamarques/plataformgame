@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_camera.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava follow com deadzone e retorno à origem.
+ * @details Cobre Camera centralizada e simétrica, roda com make test que compila em build/tests/test_camera.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

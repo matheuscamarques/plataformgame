@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_dwarf.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava IA completa do anão com patrulha e ataque.
+ * @details Cobre DwarfAI e SpawnSystem, roda com make test que compila em build/tests/test_dwarf.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

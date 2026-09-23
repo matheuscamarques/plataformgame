@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_loop.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava loop throw explode slime morre com XP.
+ * @details Cobre sistemas ponta a ponta, roda com make test que compila em build/tests/test_loop.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "core/System.h"

@@ -1,3 +1,10 @@
+/**
+ * @file src/entities/Entity.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Implementa entidade física com velocidade, gravidade e sensores.
+ * @details Inicializa posição, velocidade e caixas bottom, top e laterais, aplica tick de movimento e desenho, base para Player e plataformas via Entity.hpp.
+ */
+
 
 #include "Entity.hpp"
 #include "defines.h"

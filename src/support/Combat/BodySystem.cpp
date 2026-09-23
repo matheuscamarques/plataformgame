@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Combat/BodySystem.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Reconstrói hitboxes do player e inimigos e a bbox da arma equipada.
+ * @details Implementa computeWeaponBbox e tick pós-movimento, chamado pelo loop via GameContext com player, enemies e WeaponRegistry.
+ */
+
 #include "BodySystem.h"
 
 #include "assets/SpriteFrameRegistry.h"

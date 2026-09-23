@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Material.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Tabela de materiais com cores para variantes de equipamento.
+ * @details Mapeia MaterialId para cores principal, sombra e detalhe via materialColors, usado por ItemDef e render de equipamentos.
+ */
+
 #pragma once
 #include <SFML/Graphics/Color.hpp>
 #include <cstdint>

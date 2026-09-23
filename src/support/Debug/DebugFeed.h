@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Debug/DebugFeed.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Gerencia números de dano, log em memória e log em arquivo.
+ * @details Define structs DamageNumber e DebugFeed com push, tick com TTL, cap de 5 logs e arquivo logs debug.log, usada via GameContext por sistemas de combate com dono Game.
+ */
+
 #pragma once
 #include <SFML/System/Vector2.hpp>
 

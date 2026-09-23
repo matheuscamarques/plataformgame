@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Combat/ContactDamageSystem.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Aplica dano de contato com separação, telegraph e empurrão do slime.
+ * @details Implementa tick com teste AABB, windup de mordida e pushback, chamado pelo loop após melee usando player e enemies.
+ */
+
 #include "ContactDamageSystem.h"
 
 #include <algorithm>

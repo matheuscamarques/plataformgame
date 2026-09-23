@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_islands.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava runs 4 a 7 fora de oceano e maciço.
+ * @details Cobre Generation e isOceanColumn, roda com make test que compila em build/tests/test_islands.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <initializer_list>

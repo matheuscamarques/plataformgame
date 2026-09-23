@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Enemies/EnemyArchetype.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Define dados do inimigo e registro de arquétipos por chave.
+ * @details Expõe struct EnemyArchetype mais ArchetypeRegistry e REGISTER_ENEMY_ARCHETYPE, consumido por Factory, Spawn e Death.
+ */
+
 #pragma once
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/System/Vector2.hpp>

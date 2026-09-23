@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_sfx.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava enum para key com bank de 26 sem OpenAL.
+ * @details Cobre AudioSystem e SoundBank, roda com make test que compila em build/tests/test_sfx.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <string>

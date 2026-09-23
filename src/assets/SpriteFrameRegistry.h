@@ -1,3 +1,10 @@
+/**
+ * @file src/assets/SpriteFrameRegistry.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara estrutura e acesso aos dados de frames de sprite.
+ * @details Define struct SpriteFrameData com rows, tamanho e paleta mais função frameData, incluída por quem precisa converter id em pixels sem arrastar Sprites.
+ */
+
 #pragma once
 #include <cstddef>
 

@@ -1,3 +1,10 @@
+/**
+ * @file src/core/System.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Base de sistemas atualizáveis com agendador por prioridade.
+ * @details Define System com tick e SystemScheduler com ordenação estável, usado por Game e todos os sistemas via GameContext.
+ */
+
 #pragma once
 
 #include <algorithm>

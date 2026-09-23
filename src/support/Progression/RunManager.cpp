@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Progression/RunManager.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Controla pause, morte e respawn da run atual.
+ * @details Implementa tick que alterna pause e detecta morte mais restart que reposiciona no checkpoint e limpa inimigos e pools, chamada pelo Game antes do scheduler via RunManager.h.
+ */
+
 #include "RunManager.h"
 
 #include <cmath>

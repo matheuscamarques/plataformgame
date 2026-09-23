@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_drops.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava spawn, expiração, coleta e teto do pool.
+ * @details Cobre DropSystem e magnetismo, roda com make test que compila em build/tests/test_drops.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "entities/Player/Player.h"

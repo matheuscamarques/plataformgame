@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_celestial.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava matemática pura dos astros sol e lua.
+ * @details Cobre Celestial sem janela, roda com make test que compila em build/tests/test_celestial.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

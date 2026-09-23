@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_tilebatch.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava 1 draw por chunk com dirty no rebuild.
+ * @details Cobre TileRenderer CPU puro, roda com make test que compila em build/tests/test_tilebatch.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <memory>

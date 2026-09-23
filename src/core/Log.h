@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Log.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Cabeçalho do logger com níveis e macros de escrita por stream.
+ * @details Define LogLevel e Log com write e setMinLevel mais macros LOG, incluído em todo o jogo para debug.
+ */
+
 #pragma once
 
 #include <sstream>

@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Combat/DeathSystem.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Rola drops do arquétipo e remove inimigos mortos com recompensas.
+ * @details Implementa tick que usa ArchetypeRegistry e rollDrops mais removeDead, chamado pelo loop com DropSystem e ParticleSystem injetados.
+ */
+
 #include "DeathSystem.h"
 
 #include "core/Config.h"

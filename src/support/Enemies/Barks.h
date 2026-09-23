@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Enemies/Barks.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Define falas do anão e seleção determinística por salt.
+ * @details Expõe enum BarkId e singleton BarkRegistry com pick, usado por DwarfAI para alertas, ataque e traição.
+ */
+
 #pragma once
 #include <cstdint>
 #include <string>

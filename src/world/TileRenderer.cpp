@@ -1,3 +1,10 @@
+/**
+ * @file src/world/TileRenderer.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Constrói batch de quads dos tiles estáticos do chunk.
+ * @details Implementa rebuild em coords locais e isTileKind para colide, água e lava, chamado por ChunkManager e World antes do desenho.
+ */
+
 #include "world/TileRenderer.h"
 #include "world/Chunk.h"
 #include "core/Config.h"

@@ -1,3 +1,10 @@
+/**
+ * @file src/core/sprite_from_ascii.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Construtor de texturas pixel art a partir de arte ASCII.
+ * @details Mapeia caracteres para cores e partes do corpo via makeSprite, usado por itens, Player e inimigos.
+ */
+
 #pragma once
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Image.hpp>

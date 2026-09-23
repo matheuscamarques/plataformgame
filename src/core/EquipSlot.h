@@ -1,3 +1,10 @@
+/**
+ * @file src/core/EquipSlot.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Enum de slots de equipamento com nomes para interface.
+ * @details Define EquipSlot com mão direita, cabeça, peito e pernas, usado por ItemDef e Equipment para quebrar ciclo de includes.
+ */
+
 #pragma once
 #include <cstdint>
 

@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_spawn.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava player assentado com faixa, peso e teto.
+ * @details Cobre SpawnSystem e surfaceHeight, roda com make test que compila em build/tests/test_spawn.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "core/Config.h"

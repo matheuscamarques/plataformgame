@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_lavanoclip.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava lava sem colidir como parede igual água.
+ * @details Cobre Entity e Player collide, roda com make test que compila em build/tests/test_lavanoclip.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "entities/Entity.hpp"

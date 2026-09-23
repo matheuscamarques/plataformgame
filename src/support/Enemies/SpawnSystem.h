@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Enemies/SpawnSystem.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara spawn contínuo com caps global e por estrato.
+ * @details Define classe SpawnSystem prioridade 410 com budgetForStratum e intervalos, registrado no loop via GameContext.
+ */
+
 #pragma once
 #include <cstddef>
 

@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Input/InputMap.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Mapeia teclas físicas para ações lógicas e bordas por frame.
+ * @details Implementa binds padrão com setas, WASD, espaço e F1 a F12 mais beginFrame, handleEvent e pressed, usada por Game pollEvents e UIs via InputMap.h.
+ */
+
 #include "InputMap.h"
 
 namespace support {

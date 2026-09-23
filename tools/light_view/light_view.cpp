@@ -1,3 +1,10 @@
+/**
+ * @file tools/light_view/light_view.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Ferramenta que gera golden images de luz em PNG para inspeção.
+ * @details Roda com make light-view, escreve em build/light e usa só Chunk e propagação CPU sem GL na lógica.
+ */
+
 // light_view: golden images de luz (CPU puro, sem GL na lógica).
 // Gera PNGs + dump de grid em build/light/ p/ inspeção humana.
 // Uso: make light-view && ./build/tools/light_view (a partir da raiz).

@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Inventory.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Implementação do inventário com empilhamento e remoção atômica.
+ * @details Adiciona completando pilhas e ocupando vazios e remove tudo ou nada, usado por Player, loot e comércio.
+ */
+
 #include "core/Inventory.h"
 
 #include <algorithm>

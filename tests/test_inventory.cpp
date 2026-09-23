@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_inventory.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava inventário com stacking e registry de itens.
+ * @details Cobre Inventory e ItemDef, roda com make test que compila em build/tests/test_inventory.
+ */
+
 #include <cassert>
 #include <cstdio>
 

@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_melee_parts.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava narrowphase com maior damageMult tocado.
+ * @details Cobre Body e partículas, roda com make test que compila em build/tests/test_melee_parts.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

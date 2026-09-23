@@ -1,3 +1,7 @@
+<!-- @file: docs/MELEE_PER_PART_PLAN.md | @author: Matheus de Camargo Marques <matheuscamarques@gmail.com> -->
+<!-- @brief: Plano de migração do melee para narrowphase anatômico por parte. -->
+<!-- @details: Descreve contexto, decisões de whiff e postura, patch no MeleeSystem e testes, leitura direta em docs. -->
+
 # Plano — alinhar melee com per-part narrowphase
 
 ## Contexto do produto

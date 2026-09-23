@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Combat/Body.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Implementa schemas humanoide e anão e reconstrução das hitboxes por parte.
+ * @details Define BodySchema humanoid e dwarf mais Body rebuild e rebuildFromSprite, usado por BodySystem e Factory via BodySchemaRegistry.
+ */
+
 #include "Body.h"
 
 #include <cmath>

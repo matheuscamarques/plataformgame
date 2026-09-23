@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_body_from_sprite.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava rebuild de Body a partir de pixels do sprite.
+ * @details Cobre sprite ASCII e BodyPartId, roda com make test que compila em build/tests/test_body_from_sprite.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

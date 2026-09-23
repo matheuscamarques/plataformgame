@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_lakes.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava lagos com seco fora e água onde molhado.
+ * @details Cobre Generation e noise úmido, roda com make test que compila em build/tests/test_lakes.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <initializer_list>

@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Cooldown.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Temporizador genérico com trigger, tick e consulta de prontidão.
+ * @details Controla remaining com tick sem negativar e expõe ready, ratio e reset, usado por inimigos, skills e sistemas de combate.
+ */
+
 #pragma once
 #include <algorithm>
 

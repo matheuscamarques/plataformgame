@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Effects/ParticleSystem.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Atualiza e emite partículas de quebra e impacto.
+ * @details Implementa tick com gravidade, colisão e TTL mais spawnTileBreak e spawnHitSpark com cores por material, chamado pelo scheduler via GameContext e ExplosionSystem.
+ */
+
 #include "ParticleSystem.h"
 
 #include <algorithm>

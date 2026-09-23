@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_weapon_registry.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava sword e axe com sprite e origem corretos.
+ * @details Cobre WeaponRegistry e WeaponDef, roda com make test que compila em build/tests/test_weapon_registry.
+ */
+
 #include <cassert>
 #include <cstdio>
 

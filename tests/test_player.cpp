@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_player.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava i-frames expirando via tick e cooldown.
+ * @details Cobre Player hurt e throw, roda com make test que compila em build/tests/test_player.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "entities/Player/Player.h"

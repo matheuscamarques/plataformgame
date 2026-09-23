@@ -1,3 +1,10 @@
+/**
+ * @file src/support/UI/HotbarUI.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara barra rápida dos cinco primeiros slots visíveis.
+ * @details Define classe com constantes de 5 slots e 48px, handleInput testável headless e render com fonte, incluída por game.h e usada com Inventory do Player.
+ */
+
 #pragma once
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>

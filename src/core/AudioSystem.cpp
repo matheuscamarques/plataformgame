@@ -1,3 +1,10 @@
+/**
+ * @file src/core/AudioSystem.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Implementação do mixer de efeitos sonoros com pool de 16 canais simultâneos.
+ * @details Registra buffers com registerSound, toca com play e playAt com atenuação quadrática e libera vozes em tick, usado por Game e SoundBank.
+ */
+
 #include "core/AudioSystem.h"
 #include <cmath>
 

@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Random.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Gerador global para efeitos visuais fora da gameplay.
+ * @details Expõe rng, seedRng e randRange com mt19937, usado por partículas e spawn, gameplay usa Noise.h.
+ */
+
 #pragma once
 #include <random>
 

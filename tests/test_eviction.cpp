@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_eviction.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava modified ocioso evicta e fresco sobrevive.
+ * @details Cobre ChunkManager e janela, roda com make test que compila em build/tests/test_eviction.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "world/ChunkManager.h"

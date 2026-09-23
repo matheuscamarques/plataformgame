@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Skills/UtilityAI.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Pontua skills por alcance, custo, repetição e HP para elite.
+ * @details Implementa UtilityAI choose com score determinístico sobre SkillRegistry, chamado por DwarfAI para escolher skill.
+ */
+
 #include "UtilityAI.h"
 
 #include <cmath>

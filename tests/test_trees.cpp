@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_trees.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava árvores sem colisão e sem seam entre chunks.
+ * @details Cobre Generation e World, roda com make test que compila em build/tests/test_trees.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <initializer_list>

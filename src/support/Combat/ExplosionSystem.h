@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Combat/ExplosionSystem.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara dados de explosão, alvos e interface do sistema síncrono.
+ * @details Define ExplosionDef, ExplosionTarget e classe ExplosionSystem prioridade 320, usado por ThrowSystem e skills via explode.
+ */
+
 #pragma once
 #include "core/Cooldown.h"
 #include "core/System.h"

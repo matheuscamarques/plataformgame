@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Skills/UtilityAI.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara escolha determinística da melhor skill utilizável agora.
+ * @details Define classe UtilityAI com choose estático, incluída por DwarfAI e alimentada por SkillRegistry via GameContext.
+ */
+
 #pragma once
 #include <string>
 #include <vector>

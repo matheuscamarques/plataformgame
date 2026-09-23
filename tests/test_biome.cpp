@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_biome.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava tabela clima para bioma e topo por bioma.
+ * @details Cobre Generation em grade sintética, roda com make test que compila em build/tests/test_biome.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <initializer_list>

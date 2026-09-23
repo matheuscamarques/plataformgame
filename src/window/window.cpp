@@ -1,3 +1,10 @@
+/**
+ * @file src/window/window.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Cria janela SFML e inicia o loop do jogo.
+ * @details Implementa construtor que cria RenderWindow com vsync, desliga repeat, injeta no Game e chama start e run, instanciada pelo main com Game via window.h.
+ */
+
 #include "./window.h"
 
 Window::Window(int width, int height,const char *title, Game *game)

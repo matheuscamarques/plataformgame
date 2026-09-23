@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_explosion.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava raio, whiff, headshot 2x e knockback.
+ * @details Cobre ExplosionSystem e Body, roda com make test que compila em build/tests/test_explosion.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_itempickup.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava coleta integrando morte, explosão e inventário.
+ * @details Cobre DropTable e World, roda com make test que compila em build/tests/test_itempickup.
+ */
+
 #include <cassert>
 #include <cstdio>
 

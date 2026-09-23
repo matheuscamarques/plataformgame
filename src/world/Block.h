@@ -1,3 +1,10 @@
+/**
+ * @file src/world/Block.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Tabela BLOCKS de cor, nome, tipo e drop por Tile.
+ * @details Expõe BlockKind, BlockDef e tabela BLOCKS indexada por Tile, consultada por ChunkManager, World e TileRenderer para criar entidades e cores.
+ */
+
 #pragma once
 #include "Tile.h"
 #include <SFML/Graphics/Color.hpp>

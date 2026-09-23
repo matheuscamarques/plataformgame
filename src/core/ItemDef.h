@@ -1,3 +1,10 @@
+/**
+ * @file src/core/ItemDef.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Definição estática de itens com tipo, raridade e efeitos.
+ * @details Descreve ItemDef com pilha, dano, defesa, sprite e callbacks com Player, usado por Item, Inventory e Equipment.
+ */
+
 #pragma once
 #include <cstdint>
 #include <functional>

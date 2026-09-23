@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Log.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Implementação do logger colorido com níveis e destinos separados.
+ * @details Escreve Info e Debug em stdout e Warn e Error em stderr com flush, chamado pelas macros LOG via Log.h.
+ */
+
 #include "Log.h"
 
 #include <iostream>

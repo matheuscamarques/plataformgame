@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Combat/DeathSystem.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara o sistema que limpa mortos e entrega partículas e drops.
+ * @details Define classe DeathSystem prioridade 330 com setters de Drop e Particle, registrado no loop via GameContext.
+ */
+
 #pragma once
 #include "core/System.h"
 

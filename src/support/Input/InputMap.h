@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Input/InputMap.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara ações lógicas e interface de estado do teclado.
+ * @details Define enum Action com movimento, combate, pause, debug, hotbar e inventário mais classe InputMap com bind e consulta, incluída por Game, Player e UIs.
+ */
+
 #pragma once
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Event.hpp>

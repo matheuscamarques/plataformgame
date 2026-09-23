@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_light_pixel.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava golden lógico de pixels e parâmetros sem GL.
+ * @details Cobre LightingSystem e ciclo, roda com make test que compila em build/tests/test_light_pixel.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

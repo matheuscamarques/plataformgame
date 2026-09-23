@@ -1,3 +1,10 @@
+/**
+ * @file src/world/ChunkLoader.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Geração assíncrona opcional de chunks fora da main thread.
+ * @details Declara Builder, request, tryTake e controle start e stop com GL restrito à main, incluído por ChunkManager e World como opt-in.
+ */
+
 #pragma once
 
 #include <condition_variable>

@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_death.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava remover morto, manter vivo e dropar XP.
+ * @details Cobre DeathSystem e DropSystem, roda com make test que compila em build/tests/test_death.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "support/Combat/DeathSystem.h"

@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_behavior_registry.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava slime registrado via macro e desconhecido nulo.
+ * @details Cobre BehaviorRegistry com chaves, roda com make test que compila em build/tests/test_behavior_registry.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "support/Enemies/BehaviorRegistry.h"

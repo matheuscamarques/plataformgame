@@ -1,3 +1,10 @@
+/**
+ * @file src/assets/Sprites/SpriteSet.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Agrega todas as texturas SFML do jogo e as constrói.
+ * @details Define struct SpriteSet com texturas de jogador, inimigos, equipamentos por material e TNT mais função build que converte ASCII em texturas no boot via Game.
+ */
+
 #pragma once
 #include <cstddef>
 

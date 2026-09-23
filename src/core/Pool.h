@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Pool.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Pool genérico reutilizável sem alocação em caminho quente.
+ * @details Gerencia slots ativos com acquire e release e iteração segura, usado por ThrowSystem, efeitos e projéteis.
+ */
+
 #pragma once
 #include <cstddef>
 #include <cstdint>

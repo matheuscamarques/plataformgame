@@ -1,3 +1,10 @@
+/**
+ * @file src/game/App.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Executa loop principal de atualização e orquestra sistemas.
+ * @details Implementa Game run, start e tick que atualiza input, câmera, chunks, inimigos, arremessos, drops e áudio, chamado por Bootstrapper e Window.
+ */
+
 #include "game.h"
 
 #include <cmath>

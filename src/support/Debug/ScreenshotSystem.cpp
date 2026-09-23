@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Debug/ScreenshotSystem.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Captura PNGs com foco no jogador para debug visual.
+ * @details Implementa timestamp, recorte centrado com zoom inteiro, salvamento em screenshots e modos auto melee e hurt, chamada por Game via ScreenshotSystem.h.
+ */
+
 #include "ScreenshotSystem.h"
 
 #include <algorithm>

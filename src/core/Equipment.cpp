@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Equipment.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Implementação do equipamento com quatro slots fixos do jogador.
+ * @details Equipa no slot do def, troca e devolve o antigo e suporta unequip e get, usado por Player e telas de inventário.
+ */
+
 #include "core/Equipment.h"
 
 namespace core {

@@ -1,3 +1,10 @@
+/**
+ * @file src/assets/PlayerSprite.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Decide qual sprite do jogador exibir conforme estado atual.
+ * @details Funções inline resolvePlayerSprite e textureForFrame escolhem id do frame por chão, velocidade, dano e ataque, chamadas por Game tick e Renderer sem precisar de GL.
+ */
+
 #pragma once
 #include <cmath>
 

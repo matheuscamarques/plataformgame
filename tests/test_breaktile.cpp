@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_breaktile.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava breakTile sem dangling após quebrar chunk.
+ * @details Cobre World e activePlatforms, roda com make test que compila em build/tests/test_breaktile.
+ */
+
 #include <algorithm>
 #include <cassert>
 #include <cstdio>

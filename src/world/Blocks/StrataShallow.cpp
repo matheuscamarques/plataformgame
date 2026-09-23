@@ -1,3 +1,10 @@
+/**
+ * @file src/world/Blocks/StrataShallow.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Registra variações visuais dos estratos rasos S1 a S5.
+ * @details Declara flavors como dirt com raiz, micélio e quartzo via REGISTER_BLOCK, usados pela Generation para variedade perto da superfície.
+ */
+
 #include "../BlockRegistry.h"
 
 namespace support {

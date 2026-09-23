@@ -1,3 +1,10 @@
+/**
+ * @file src/support/GameContext.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Agrega referências compartilhadas para todos os sistemas.
+ * @details Define struct com ponteiros sem ownership para mundo, jogador, input, inimigos, explosões, drops, câmera, áudio e debug, passada a cada tick pelo scheduler do Game.
+ */
+
 #pragma once
 
 #include <vector>

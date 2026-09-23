@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_hash.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava hash2 determinístico com negativas por seed.
+ * @details Cobre Noise e rand01, roda com make test que compila em build/tests/test_hash.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

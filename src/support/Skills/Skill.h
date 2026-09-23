@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Skills/Skill.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Define Skill como dado mais callback com registro por chave.
+ * @details Expõe struct SkillDef com custos e ranges mais SkillRegistry e REGISTER_SKILL, usado por DwarfAI e SlimeAI via SkillSystem.
+ */
+
 #pragma once
 #include <functional>
 #include <string>

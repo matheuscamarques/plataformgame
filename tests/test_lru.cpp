@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_lru.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava modificado sobrevive e limpo cai ao teleportar.
+ * @details Cobre ChunkManager LRU, roda com make test que compila em build/tests/test_lru.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "world/ChunkManager.h"

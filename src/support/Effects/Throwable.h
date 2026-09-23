@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Effects/Throwable.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Define dados de projétil arremessável com pavio e dano.
+ * @details Declara enum ThrowKind e struct Throwable com posição, velocidade, fuse, raios de explosão e quebra, usada pelo ThrowSystem e Player tryThrow.
+ */
+
 #pragma once
 #include <SFML/System/Vector2.hpp>
 #include <cstdint>

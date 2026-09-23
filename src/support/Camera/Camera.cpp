@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Camera/Camera.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Aplica seguimento com deadzone, interpolação e tremor de tela.
+ * @details Implementa setViewport, follow com recentralização por eixo via lerp, mais trauma com decaimento e offset, usada por Game tick e Renderer via Camera.h.
+ */
+
 #include "Camera.h"
 
 #include <algorithm>

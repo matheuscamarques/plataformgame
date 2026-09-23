@@ -1,3 +1,10 @@
+/**
+ * @file src/world/TileRenderer.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Batch de tiles com um draw call por chunk.
+ * @details Declara rebuild CPU headless-safe, upload GL e drawLayer com conversão mundo-local, incluída por Chunk, ChunkManager e render.
+ */
+
 #pragma once
 #include <SFML/Graphics/RenderTarget.hpp>
 

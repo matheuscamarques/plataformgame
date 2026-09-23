@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_wall.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava chão longo sem parede invisível na emenda.
+ * @details Cobre Entity em pior ordem, roda com make test que compila em build/tests/test_wall.
+ */
+
 // Harness: player andando sobre chao longo, processando vizinho ANTES do chao
 // (pior ordem possivel do hash) — reproduz a parede invisivel nas emendas.
 #include <cstdio>

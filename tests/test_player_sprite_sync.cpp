@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_player_sprite_sync.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava sprite seguindo meleePhase e swingAim.
+ * @details Cobre resolvePlayerSprite, roda com make test que compila em build/tests/test_player_sprite_sync.
+ */
+
 #include <cassert>
 #include <cstdio>
 

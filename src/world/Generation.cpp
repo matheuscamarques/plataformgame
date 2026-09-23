@@ -1,3 +1,10 @@
+/**
+ * @file src/world/Generation.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Implementa terreno procedural determinístico por seed.
+ * @details Calcula superfície, cavernas, biomas, minérios, lagos, ilhas e árvores com noise, expõe tileType e colunas, usado por ChunkManager para preencher chunks.
+ */
+
 #include "Generation.h"
 
 #include <cmath>

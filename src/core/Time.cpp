@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Time.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Implementação do relógio com delta clampado e passo fixo.
+ * @details Mede delta com steady clock, acumula elapsed e consome ticks fixos, chamado pelo loop em Game.
+ */
+
 #include "Time.h"
 
 #include <chrono>

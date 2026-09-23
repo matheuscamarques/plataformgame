@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_slime_patrol.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava patrulha sem aggro com pouso e distância.
+ * @details Cobre EnemySystem e World, roda com make test que compila em build/tests/test_slime_patrol.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

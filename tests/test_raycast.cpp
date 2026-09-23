@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_raycast.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava oclusão igual BFS com Ar e Água passando.
+ * @details Cobre RaycastLight e grids, roda com make test que compila em build/tests/test_raycast.
+ */
+
 #include <cassert>
 #include <cstdio>
 

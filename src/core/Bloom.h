@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Bloom.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Efeito de brilho por captura com bright-pass, blur separável e soma aditiva.
+ * @details Fotografa a cena em endScene, extrai brilho, borra e soma antes do HUD, usado por Game, vira no-op sem shader disponível.
+ */
+
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <cstdio>

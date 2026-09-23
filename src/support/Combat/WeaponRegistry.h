@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Combat/WeaponRegistry.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Registra WeaponDefs por id com macro de auto-registro ordenado.
+ * @details Expõe singleton com add, find, has e keys mais REGISTER_WEAPON, incluído por WeaponDefs e consultado no BodySystem.
+ */
+
 #pragma once
 #include <string>
 #include <unordered_map>

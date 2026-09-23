@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_culling.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava culling igual filtro força-bruta por rect.
+ * @details Cobre World e forEachEntityInRect, roda com make test que compila em build/tests/test_culling.
+ */
+
 #include <algorithm>
 #include <cassert>
 #include <cstdio>

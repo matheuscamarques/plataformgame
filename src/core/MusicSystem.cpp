@@ -1,3 +1,10 @@
+/**
+ * @file src/core/MusicSystem.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Implementação da música por estrato com crossfade entre vozes.
+ * @details Troca tracks com playStratum e avança fade em tick alternando vozes, usado por Game ao mudar de profundidade.
+ */
+
 #include "core/MusicSystem.h"
 #include <algorithm>
 

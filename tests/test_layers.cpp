@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_layers.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava topo, terra e pedra com caverna vencendo.
+ * @details Cobre computeColumn e DIRT_DEPTH, roda com make test que compila em build/tests/test_layers.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <initializer_list>

@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_collision.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava player pousando no chão via tick sem janela.
+ * @details Cobre World e gravidade, roda com make test que compila em build/tests/test_collision.
+ */
+
 // Harness: replica Game::tick sem janela/teclado e verifica se o player pousa.
 #include <cmath>
 #include <cstdio>

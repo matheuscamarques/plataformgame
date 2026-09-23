@@ -1,3 +1,10 @@
+/**
+ * @file src/world/ChunkManager.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Streaming determinístico de chunks por seed com LRU.
+ * @details Declara update, updateAsync, buildBare, find e evict com mapa por chunkKey, usado pela World como fachada de chunks.
+ */
+
 #pragma once
 
 #include <cstddef>

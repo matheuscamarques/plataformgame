@@ -1,3 +1,10 @@
+/**
+ * @file src/core/EntityKind.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Enum tipado de entidades mais IDs legados do jogo.
+ * @details Define EntityKind para Player, Slime, Dwarf, TNT e Rock com kId legados, usado por Behavior, SpawnSystem e defines.h.
+ */
+
 #pragma once
 
 #include <cstdint>

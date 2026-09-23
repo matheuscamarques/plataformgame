@@ -1,3 +1,10 @@
+/**
+ * @file src/game/Bootstrapper.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Monta mundo, jogador, janela e sistemas no início.
+ * @details Implementa Game main que cria World, Player, scheduler com combate, inimigos, efeitos e progressão, chamado uma vez pelo entrypoint via Window.
+ */
+
 #include "game.h"
 
 #include <stdexcept>

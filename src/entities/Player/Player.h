@@ -1,3 +1,10 @@
+/**
+ * @file src/entities/Player/Player.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara estado completo do jogador e ações de combate.
+ * @details Define classe Player com flags de movimento, corpo, cooldowns, inventário, equipamento, HP, mira e melee, incluída por Game, UI e sistemas de combate.
+ */
+
 #pragma once
 
 #include <string>

@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Enemies/DwarfAI.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Implementa patrulha, alerta, dinamite, melee e recuo do anão.
+ * @details Implementa DwarfAI onTick com UtilityAI e SkillSystem mais barks e paciência, registrado com SUPPORT_REGISTER_BEHAVIOR dwarf.
+ */
+
 #include "DwarfAI.h"
 
 #include <cmath>

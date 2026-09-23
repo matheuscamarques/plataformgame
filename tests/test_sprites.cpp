@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_sprites.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava widths, telegraphs e prioridade sem GL.
+ * @details Cobre PlayerSprite ASCII, roda com make test que compila em build/tests/test_sprites.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <cstring>

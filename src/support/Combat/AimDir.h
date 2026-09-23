@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Combat/AimDir.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Define a direção de mira em 8 vias com helpers de conversão.
+ * @details Expõe enum AimDir mais aimVector e resolveAim, incluído por Player e IAs para tiro e melee direcional.
+ */
+
 #pragma once
 #include <SFML/System/Vector2.hpp>
 #include <cstdint>

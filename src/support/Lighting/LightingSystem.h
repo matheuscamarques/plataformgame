@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Lighting/LightingSystem.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara fachada de iluminação com ciclo dia e noite.
+ * @details Define classe com init GL, ciclo lido por referência, drawPlayerLight, drawRadial e helpers puros de cor e tint, incluída por game.h e usada pelo Renderer.
+ */
+
 #pragma once
 #include "core/DayNightCycle.h"
 #include <algorithm>

@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Celestial.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Funções puras que calculam posição do sol, lua e estrelas por hora.
+ * @details Calcula ângulos com sol às 6h, lua defasada 12h e offsets determinísticos de estrelas, usado pelo Renderer para desenhar o céu.
+ */
+
 #pragma once
 #include <cmath>
 #include <cstdint>

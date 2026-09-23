@@ -1,3 +1,10 @@
+/**
+ * @file src/world/Generation.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Interface pura da geração de mundo sem SFML ou entidades.
+ * @details Declara tileType, ColumnData, máscaras, biomas, árvores, mar e lava com constantes calibradas, incluída por ChunkManager e ChunkLoader.
+ */
+
 #pragma once
 #include <cstdint>
 

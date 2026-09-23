@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Enemies/SlimeAI.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara a IA simples de patrulha e perseguição do slime.
+ * @details Define classe SlimeAI com onTick e flag chasing, usada por EnemySystem e criada via BehaviorRegistry.
+ */
+
 #pragma once
 
 #include "entities/Entity.hpp"

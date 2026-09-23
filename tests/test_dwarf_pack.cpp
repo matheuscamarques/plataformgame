@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_dwarf_pack.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava pack de anões com barks e paciência.
+ * @details Cobre variantes, explosão e UtilityAI, roda com make test que compila em build/tests/test_dwarf_pack.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <string>

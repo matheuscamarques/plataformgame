@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_flavor.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava determinismo com fração calibrada e ore intacto.
+ * @details Cobre strataRock e tileType, roda com make test que compila em build/tests/test_flavor.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "core/Noise.h"

@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_wall_corner.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava canto sem túnel lateral com gate do teto.
+ * @details Cobre Entity e sensores laterais, roda com make test que compila em build/tests/test_wall_corner.
+ */
+
 // Regressão: túnel lateral em canto de parede (pior na esquerda).
 // Tiles 50px, player 30x50. Cobre: correção esquerda com largura do
 // player (+30 em vez de +50, embed de 20px dentro da parede),

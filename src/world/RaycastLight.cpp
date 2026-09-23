@@ -1,3 +1,10 @@
+/**
+ * @file src/world/RaycastLight.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Marca tiles visíveis por raios com oclusão em chunk.
+ * @details Implementa castRays com DDA de passo 0.5, 96 raios e alcance 16, mais variante cross-chunk em pixels de mundo, usado pelo LightPropagator para sombra dura.
+ */
+
 #include "world/RaycastLight.h"
 #include "world/Chunk.h"
 #include "world/Tile.h"

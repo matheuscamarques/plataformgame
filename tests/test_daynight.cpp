@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_daynight.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava dia e noite com skyColor e ambiente sem GL.
+ * @details Cobre DayNightCycle e Lighting, roda com make test que compila em build/tests/test_daynight.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

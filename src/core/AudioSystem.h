@@ -1,3 +1,10 @@
+/**
+ * @file src/core/AudioSystem.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Cabeçalho que declara o mixer de efeitos sonoros com pool fixo de vozes.
+ * @details Define a classe AudioSystem com mapa de buffers, vetor de canais e volume mestre, incluído por Game, SoundBank e GameContext.
+ */
+
 #pragma once
 #include <SFML/Audio/Sound.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>

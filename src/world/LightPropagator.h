@@ -1,3 +1,10 @@
+/**
+ * @file src/world/LightPropagator.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Propagação de luz por tile com costura entre chunks.
+ * @details Declara sky e block light 0 a 15, relightChunk, buildLightImage e updateTexture com vizinhos, incluída por ChunkManager, World e Chunk.
+ */
+
 #pragma once
 #include <SFML/Graphics/Image.hpp>
 #include <cstdint>

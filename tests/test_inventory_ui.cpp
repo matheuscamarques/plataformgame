@@ -489,6 +489,18 @@ int main() {
         assert(p.inventory.count("leather_helm") == 1);
         assert(p.inventory.count("leather_chest") == 1);
         assert(p.inventory.count("leather_legs") == 1);
+        assert(p.inventory.count("leather_sword") == 1);
+        assert(p.inventory.count("leather_axe") == 1);
+        assert(p.inventory.count("gold_sword") == 1);
+        assert(p.inventory.count("gold_axe") == 1);
+        assert(p.inventory.count("gold_helm") == 1);
+        assert(p.inventory.count("gold_chest") == 1);
+        assert(p.inventory.count("gold_legs") == 1);
+        assert(p.inventory.count("diamond_sword") == 1);
+        assert(p.inventory.count("diamond_axe") == 1);
+        assert(p.inventory.count("diamond_helm") == 1);
+        assert(p.inventory.count("diamond_chest") == 1);
+        assert(p.inventory.count("diamond_legs") == 1);
     }
     { // EquipViaMenu (F→Equip: grid esvazia, antigo volta)
         InventoryUI ui;

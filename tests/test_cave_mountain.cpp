@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_cave_mountain.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava caverna modulada por montanha com teto global.
+ * @details Cobre mecanismo e monotonicidade, roda com make test que compila em build/tests/test_cave_mountain.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <initializer_list>

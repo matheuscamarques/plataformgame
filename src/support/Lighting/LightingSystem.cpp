@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Lighting/LightingSystem.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Desenha luz radial do jogador e clarões de explosão.
+ * @details Implementa init com textura radial, drawRadial com BlendAdd e drawPlayerLight em coords de mundo, chamada pelo Renderer com parâmetros do ThrowSystem via LightingSystem.h.
+ */
+
 #include "support/Lighting/LightingSystem.h"
 #include "core/RadialTexture.h"
 #include <algorithm>

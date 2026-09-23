@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Debug/DebugOverlay.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Renderiza informações de debug do mundo e entidades.
+ * @details Implementa render que desenha query de colisão, células do SpatialHash e contagens com fonte do Game, chamada por Game render quando overlay visível via DebugOverlay.h.
+ */
+
 #include "DebugOverlay.h"
 
 #include "defines.h"

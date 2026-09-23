@@ -1,3 +1,10 @@
+/**
+ * @file src/entities/Player/Player.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Implementa lógica do jogador, física, combate e inventário.
+ * @details Configura AABB 30x50, gravidade e equipamento inicial de ferro, processa tick, colisão, arremesso, melee, dano e respawn, chamado por Game App e sistemas.
+ */
+
 #include "Player.h"
 #include <algorithm>
 #include <iostream>

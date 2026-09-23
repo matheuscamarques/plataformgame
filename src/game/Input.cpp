@@ -1,3 +1,10 @@
+/**
+ * @file src/game/Input.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Processa eventos SFML e atalhos de debug por frame.
+ * @details Implementa pollEvents que drena eventos, trata fechar e resize, atualiza InputMap e alterna overlay, inventário e screenshots, chamada por Game run antes do tick.
+ */
+
 #include "game.h"
 
 #include "entities/Player/Player.h"

@@ -1,3 +1,10 @@
+/**
+ * @file src/core/DayNightCycle.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Relógio de ciclo dia e noite com interpolação de cores e luz.
+ * @details Avança horas com tick, expõe hour e sample com sol e lua, usado por Game e LightingSystem para céu e iluminação.
+ */
+
 #pragma once
 #include <algorithm>
 #include <cmath>

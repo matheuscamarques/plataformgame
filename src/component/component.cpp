@@ -1,3 +1,10 @@
+/**
+ * @file src/component/component.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Implementa retângulo nomeado base com posição e tamanho.
+ * @details Define construtores e getters e setters de x, y, w, h e bordas de Component herdando RectangleShape e FloatRect, usado por Entity e tiles.
+ */
+
 //
 // Created by sanonichan on 01/03/2022.
 //

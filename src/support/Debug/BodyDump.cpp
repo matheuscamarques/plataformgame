@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Debug/BodyDump.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Imprime diagnóstico de hitboxes do corpo para debug.
+ * @details Implementa dumpBody que percorre parts, conta pixels por caractere na matriz ASCII e escreve bbox e fallback, chamada pelo Renderer em modo debug via BodyDump.h.
+ */
+
 #include "BodyDump.h"
 
 #include <iomanip>

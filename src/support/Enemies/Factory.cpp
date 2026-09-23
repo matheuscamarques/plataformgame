@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Enemies/Factory.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Cria Enemy a partir de arquétipo, behavior, schema e variante.
+ * @details Implementa Factory spawnEnemy com ArchetypeRegistry, BehaviorRegistry e VariantRegistry, chamado por EnemySystem e SpawnSystem.
+ */
+
 #include "EnemySystem.h"
 
 #include <cmath>

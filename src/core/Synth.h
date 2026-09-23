@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Synth.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Síntese procedural de áudio mono para efeitos e música.
+ * @details Gera ondas com ADSR e envelope em SoundBuffer via out-param, usado por SoundBank e Music.h.
+ */
+
 #pragma once
 #include <SFML/Audio/SoundBuffer.hpp>
 #include <algorithm>

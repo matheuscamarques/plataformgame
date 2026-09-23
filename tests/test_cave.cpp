@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_cave.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava nunca caverna até surfaceY mais 2.
+ * @details Cobre Generation e mountainMask, roda com make test que compila em build/tests/test_cave.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <initializer_list>

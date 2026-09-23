@@ -1,3 +1,10 @@
+/**
+ * @file src/game/Renderer.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Desenha mundo, entidades, luz, partículas e HUD.
+ * @details Implementa Game render com TileRenderer, sprites de jogador e inimigos via SpriteFrameRegistry, equipamentos, TNT, glows e overlays, chamado todo frame pelo loop.
+ */
+
 #include "game.h"
 
 #include <algorithm>

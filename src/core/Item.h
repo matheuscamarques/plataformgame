@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Item.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Instância leve de item que aponta para a definição compartilhada.
+ * @details Guarda defId e quantidade com acesso via def e testes de vazio, usado por Inventory, Equipment e cursor.
+ */
+
 #pragma once
 #include <cstdint>
 #include <string>

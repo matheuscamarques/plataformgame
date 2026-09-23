@@ -1,3 +1,10 @@
+/**
+ * @file src/core/RadialTexture.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Imagens radiais geradas por CPU para luz e vinheta.
+ * @details Cria disco branco com falloff e vinheta preta por makeRadialImage, usado por LightingSystem com BlendAdd.
+ */
+
 #pragma once
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Image.hpp>

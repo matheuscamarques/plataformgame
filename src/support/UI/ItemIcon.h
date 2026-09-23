@@ -1,3 +1,10 @@
+/**
+ * @file src/support/UI/ItemIcon.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Fornece ícone, cor e nome por raridade para UIs.
+ * @details Define itemIconFor com cache de texturas geradas de spriteRows mais itemRarityColor e itemRarityName, usada por HotbarUI e InventoryUI só no render com GL.
+ */
+
 #pragma once
 #include <string>
 #include <unordered_map>

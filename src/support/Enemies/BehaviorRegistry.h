@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Enemies/BehaviorRegistry.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Registra fábricas de Behavior por chave com macro de auto-registro.
+ * @details Expõe singleton com add, create e keys mais SUPPORT_REGISTER_BEHAVIOR, usado pela Factory para criar IAs sem branch.
+ */
+
 #pragma once
 
 #include <functional>

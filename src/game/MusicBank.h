@@ -1,3 +1,10 @@
+/**
+ * @file src/game/MusicBank.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Define seis temas musicais procedurais por estrato.
+ * @details Cria MusicTracks com escala, BPM, baixo, melodia e percussão em 64 steps via funções inline, construídas uma vez pelo MusicSystem no Game run.
+ */
+
 #pragma once
 #include "core/Music.h"
 

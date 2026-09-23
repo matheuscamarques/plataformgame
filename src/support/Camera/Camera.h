@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Camera/Camera.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara câmera 2D com seguimento, conversão e screen shake.
+ * @details Define classe Camera com viewport, lerp, deadzone, follow, trauma e conversões mundo-tela, incluída por game.h e usada por GameContext e Renderer.
+ */
+
 #pragma once
 
 #include <SFML/System/Vector2.hpp>

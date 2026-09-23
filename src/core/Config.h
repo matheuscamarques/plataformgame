@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Config.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Configuração central do mundo com tamanho de bloco e seed padrão.
+ * @details Centraliza kBlockSize e kWorldSeed para uso em todo o jogo, incluído por defines.h e sistemas de mundo e física.
+ */
+
 #pragma once
 
 #include <cstdint>

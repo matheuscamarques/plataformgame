@@ -1,3 +1,10 @@
+/**
+ * @file src/world/Blocks/Rares.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Registra um bloco raro por estrato de S1 a S10.
+ * @details Usa REGISTER_BLOCK com chance baixa e salt próprio via hash01 uniforme, dois com generates falso para sistemas futuros, lido pela Generation via BlockRegistry.
+ */
+
 #include "../BlockRegistry.h"
 
 namespace support {

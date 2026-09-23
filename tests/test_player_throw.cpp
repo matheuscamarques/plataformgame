@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_player_throw.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava tryThrow com cooldown, facing e pool cheio.
+ * @details Cobre ThrowSystem e inventário, roda com make test que compila em build/tests/test_player_throw.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "entities/Player/Player.h"

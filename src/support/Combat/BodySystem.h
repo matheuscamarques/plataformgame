@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Combat/BodySystem.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara o sistema que atualiza hitboxes por parte antes do combate.
+ * @details Define classe BodySystem prioridade 250 com tick, registrado no loop de Systems via GameContext.
+ */
+
 #pragma once
 #include "core/System.h"
 

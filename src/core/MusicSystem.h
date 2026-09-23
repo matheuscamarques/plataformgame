@@ -1,3 +1,10 @@
+/**
+ * @file src/core/MusicSystem.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Cabeçalho da música procedural por estrato com duas vozes.
+ * @details Declara MusicSystem com mapa estável de buffers e controle de pause, incluído por Game e alimentado por MusicBank.
+ */
+
 #pragma once
 #include "core/Music.h"
 #include <SFML/Audio/Sound.hpp>

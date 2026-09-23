@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_spatialhash.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava insert, query e remoção com negativas.
+ * @details Cobre SpatialHash e Entity, roda com make test que compila em build/tests/test_spatialhash.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <vector>

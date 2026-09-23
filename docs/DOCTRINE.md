@@ -1,3 +1,7 @@
+<!-- @file: docs/DOCTRINE.md | @author: Matheus de Camargo Marques <matheuscamarques@gmail.com> -->
+<!-- @brief: Doutrina do fallback de parte sem pixels no Body com teste trava. -->
+<!-- @details: Documenta a regra preservada em Body.cpp com teste WeaponFallsBackWhenNoPixels, leitura direta em docs. -->
+
 # Doutrina — decisões de arquitetura pendentes
 
 ## P1 — Fallback de parte sem pixels: preservar ou invalidar?

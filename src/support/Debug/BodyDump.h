@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Debug/BodyDump.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara função de despejo textual do estado do Body.
+ * @details Declara dumpBody com stream, Body, matriz ASCII e paleta para diagnóstico, incluída pelo Renderer e testes sem depender de GL.
+ */
+
 #pragma once
 #include <iosfwd>
 

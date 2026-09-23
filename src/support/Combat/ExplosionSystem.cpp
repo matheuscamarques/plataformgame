@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Combat/ExplosionSystem.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Executa explosão com quebra de tiles, dano em área e screen shake.
+ * @details Implementa explode mais breakTiles e applyToTarget, chamado por dinamite, barril e skills via GameContext e ExplosionTarget.
+ */
+
 #include "ExplosionSystem.h"
 
 #include <cmath>

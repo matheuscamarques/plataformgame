@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Enemies/Behavior.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara a interface de identidade e ciclo de vida dos inimigos.
+ * @details Define classe Behavior com kind, onTick, onSpawn e onDeath, implementada por SlimeAI e DwarfAI via BehaviorRegistry.
+ */
+
 #pragma once
 
 #include "core/EntityKind.h"

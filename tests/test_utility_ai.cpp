@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_utility_ai.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava especial com bônus se hp baixo senão penalidade.
+ * @details Cobre UtilityAI e Skill, roda com make test que compila em build/tests/test_utility_ai.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <string>

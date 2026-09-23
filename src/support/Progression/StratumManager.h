@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Progression/StratumManager.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara progresso vertical com checkpoints por estrato.
+ * @details Define classe System com prioridades, deepest, current, máscara e respawnPoint no checkpoint, incluída por game.h e RunManager para respawn e HUD.
+ */
+
 #pragma once
 #include "core/System.h"
 #include <SFML/System/Vector2.hpp>

@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_itemdrop.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava orbes com spawn, expiração e delay sem GL.
+ * @details Cobre DropSystem e registry, roda com make test que compila em build/tests/test_itemdrop.
+ */
+
 #include <cassert>
 #include <cstdio>
 

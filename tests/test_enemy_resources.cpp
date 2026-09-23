@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_enemy_resources.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava mana e stamina com custo, regen e gate.
+ * @details Cobre EnemyResources e Cost, roda com make test que compila em build/tests/test_enemy_resources.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

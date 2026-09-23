@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_hotbar.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava hotbar com mapeamento e input sem textura.
+ * @details Cobre Inventory e HotbarUI, roda com make test que compila em build/tests/test_hotbar.
+ */
+
 #include <cassert>
 #include <cstdio>
 

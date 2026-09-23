@@ -1,3 +1,10 @@
+/**
+ * @file src/entities/Entity.hpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara entidade jogável com física e caixas de colisão.
+ * @details Define classe Entity herdando Component com tick, draw, velocidade, gravidade e mapa de bounds, incluída por Player, App e Renderer.
+ */
+
 #pragma once
 
 #include <SFML/Graphics.hpp>

@@ -1,3 +1,10 @@
+/**
+ * @file src/assets/SpriteFrameRegistry.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Mapeia cada SpriteFrameId para seus dados ASCII e paleta.
+ * @details Implementa frameData com switch que retorna rows, dimensões e paleta de Sprites, usado pelo Renderer e BodyDump via SpriteFrameRegistry.h.
+ */
+
 #include "SpriteFrameRegistry.h"
 
 #include "assets/Sprites/SpriteSet.h"

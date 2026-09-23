@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_particle.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava spawn, expiração e pool sob stress.
+ * @details Cobre ParticleSystem e debris, roda com make test que compila em build/tests/test_particle.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "support/Effects/ParticleSystem.h"

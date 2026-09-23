@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Effects/ParticleSystem.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara sistema de partículas em dois pools otimizados.
+ * @details Define classe System com pools debris e dust, tick, render e emissores para tiles e faíscas, incluída pelo Bootstrapper e usada via GameContext.
+ */
+
 #pragma once
 #include "core/Pool.h"
 #include "core/System.h"

@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_palette_sanity.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava 1 char igual 1 parte sem H e F juntos.
+ * @details Cobre Player e Enemy sprites, roda com make test que compila em build/tests/test_palette_sanity.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <cstring>

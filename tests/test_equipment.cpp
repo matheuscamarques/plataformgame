@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_equipment.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava larguras de botas e luvas nos sprites.
+ * @details Cobre EquipSprites com widths, roda com make test que compila em build/tests/test_equipment.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <cstring>

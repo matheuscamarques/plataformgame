@@ -1,3 +1,10 @@
+/**
+ * @file tools/noise_view/noise_view.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Visualizador standalone das 12 camadas de noise em PNG.
+ * @details Roda como noise_view seed x0 x1 y0 y1 camada saida.png, linka só Generation sem Entity.
+ */
+
 // Visualizador de noise standalone (P1 da camada de cavernas).
 // Uso: noise_view seed x0 x1 y0 y1 camada saida.png
 //   camadas: relief | surface | tiles

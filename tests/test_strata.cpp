@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_strata.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava estratos contíguos com checkpoint e respawn.
+ * @details Cobre StratumManager até 12000, roda com make test que compila em build/tests/test_strata.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "entities/Player/Player.h"

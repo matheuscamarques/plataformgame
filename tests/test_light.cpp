@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_light.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava luz por tile em grids sem GL.
+ * @details Cobre LightPropagator e Chunk, roda com make test que compila em build/tests/test_light.
+ */
+
 #include <cassert>
 #include <cstdio>
 

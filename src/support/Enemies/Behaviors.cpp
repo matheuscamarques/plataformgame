@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Enemies/Behaviors.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Define arquétipos slime e anão mais skills iniciais por dados.
+ * @details Usa REGISTER_ENEMY_ARCHETYPE e REGISTER_SKILL para stats e drops, lido pela Factory e SpawnSystem sem editar código.
+ */
+
 #include "EnemyArchetype.h"
 #include "support/Skills/Skill.h"
 

@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Combat/MeleeSystem.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Executa swing do player com hit único por swing e dano por parte.
+ * @details Implementa tick que lê input Heavy e testa hitbox contra Body parts, chamado pelo loop com EnemySystem e ParticleSystem.
+ */
+
 #include "MeleeSystem.h"
 
 #include <SFML/Graphics/Rect.hpp>

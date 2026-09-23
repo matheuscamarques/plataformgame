@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_lava.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava lava só no fundo e bedrock em 12000.
+ * @details Cobre Generation por faixas, roda com make test que compila em build/tests/test_lava.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <initializer_list>

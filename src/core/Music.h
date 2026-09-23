@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Music.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Dados de composição musical com escalas e síntese de tracks.
+ * @details Define Scale, MusicTrack com 64 steps e synthesizeTrack em RAM, usado por MusicBank e MusicSystem.
+ */
+
 #pragma once
 #include "core/Synth.h"
 #include <initializer_list>

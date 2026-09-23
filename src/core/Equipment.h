@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Equipment.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Cabeçalho do equipamento com quatro slots fixos sem interface gráfica.
+ * @details Declara a classe Equipment pura e headless com equip, unequip e forEach, incluído por Player e UI e Item.
+ */
+
 #pragma once
 #include <array>
 

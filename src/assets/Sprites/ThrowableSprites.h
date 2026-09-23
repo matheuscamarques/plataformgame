@@ -1,3 +1,10 @@
+/**
+ * @file src/assets/Sprites/ThrowableSprites.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Define sprites ASCII da TNT em três estágios.
+ * @details Guarda dimensões 6x8, paleta e matrizes fresh, burning e critical escolhidas pelo fuse, convertidas em texturas por SpriteSet build.
+ */
+
 #pragma once
 
 #include "core/sprite_from_ascii.h"

@@ -1,3 +1,10 @@
+/**
+ * @file src/game/game.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara classe central Game com todos os subsistemas.
+ * @details Define membros de janela, mundo, jogador, câmera, input, overlay, scheduler, sprites, áudio, luz e UI mais métodos run, tick e render, incluída por todos os módulos.
+ */
+
 #pragma once
 
 #include <SFML/System.hpp>

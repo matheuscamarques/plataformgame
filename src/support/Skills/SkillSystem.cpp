@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Skills/SkillSystem.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Executa skills com checagem de cooldown e pagamento de recursos.
+ * @details Implementa tryUse, tick e clear sobre Enemy skillCds, chamado por SlimeAI, DwarfAI e EnemySystem a cada frame.
+ */
+
 #include "SkillSystem.h"
 
 #include "support/Enemies/EnemySystem.h"

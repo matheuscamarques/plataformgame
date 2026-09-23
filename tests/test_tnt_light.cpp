@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_tnt_light.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava dinamite acesa com luz que zera ao explodir.
+ * @details Cobre ThrowSystem e blockLight, roda com make test que compila em build/tests/test_tnt_light.
+ */
+
 #include <cassert>
 #include <cstdio>
 

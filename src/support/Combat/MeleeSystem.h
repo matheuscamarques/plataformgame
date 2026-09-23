@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Combat/MeleeSystem.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara o sistema de melee do player com prioridade de combate.
+ * @details Define classe MeleeSystem prioridade 300 com tick e setter de partículas, registrado no loop via GameContext.
+ */
+
 #pragma once
 #include "core/System.h"
 

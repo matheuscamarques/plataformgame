@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_surface.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava máscara, relevo e altura determinísticos.
+ * @details Cobre Noise e surfaceHeight, roda com make test que compila em build/tests/test_surface.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>

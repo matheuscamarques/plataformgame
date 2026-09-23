@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Enemies/SlimeAI.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Implementa patrulha, perseguição, pulo e cusparada do slime.
+ * @details Implementa SlimeAI onTick com velocidades e SkillSystem slime_spit, registrado com SUPPORT_REGISTER_BEHAVIOR slime.
+ */
+
 #include "SlimeAI.h"
 #include "BehaviorRegistry.h"
 #include "support/Enemies/EnemySystem.h"

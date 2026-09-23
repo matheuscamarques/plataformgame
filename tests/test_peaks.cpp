@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_peaks.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava picos nevados com spawn no flanco.
+ * @details Cobre snowcap e surfaceHeight, roda com make test que compila em build/tests/test_peaks.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <initializer_list>

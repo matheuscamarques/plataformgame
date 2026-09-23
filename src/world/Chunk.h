@@ -1,3 +1,10 @@
+/**
+ * @file src/world/Chunk.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Contêiner de tiles 16x16 com luz, entidades e batch visual.
+ * @details Guarda tiles, sky e block light, visibleMask, entidades, SpatialHash e caches SFML, usado por ChunkManager, World, luz e render.
+ */
+
 #pragma once
 
 #include <algorithm>

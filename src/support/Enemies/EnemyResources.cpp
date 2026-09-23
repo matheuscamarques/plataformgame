@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Enemies/EnemyResources.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Implementa pagamento, regen, dano e stagger dos recursos do inimigo.
+ * @details Define canPay, pay, tick, takeDamage e damagePosture com regra trash, chamado por SkillSystem e sistemas de combate.
+ */
+
 #include "EnemyResources.h"
 
 #include <algorithm>

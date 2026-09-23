@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Progression/DropSystem.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Gera, atrai e coleta orbes de XP e itens.
+ * @details Implementa spawnXP e spawnItem com física, magnetismo, coleta por proximidade, cores por raridade e sons, tickado pelo scheduler e renderizado em mundo via DropSystem.h.
+ */
+
 #include "DropSystem.h"
 
 #include <SFML/Graphics/CircleShape.hpp>

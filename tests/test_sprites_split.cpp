@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_sprites_split.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava split com famílias íntegras e agregado ok.
+ * @details Cobre Player Enemy Equip SpriteSet, roda com make test que compila em build/tests/test_sprites_split.
+ */
+
 #include <cassert>
 #include <cstdio>
 

@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_synth.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava síntese com lógica pura sem OpenAL.
+ * @details Cobre Music e MusicBank, roda com make test que compila em build/tests/test_synth.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

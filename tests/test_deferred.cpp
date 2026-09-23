@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_deferred.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava morte adiada com erase só em removeDead.
+ * @details Cobre EnemySystem e iteração segura, roda com make test que compila em build/tests/test_deferred.
+ */
+
 #include <cassert>
 #include <cstdio>
 

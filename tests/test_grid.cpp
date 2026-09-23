@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_grid.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava query 150x150 com 4 células ou 6 desalinhadas.
+ * @details Cobre SpatialHash e debugCells, roda com make test que compila em build/tests/test_grid.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <vector>

@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Progression/StratumManager.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Detecta estrato atual e desbloqueia checkpoints de descida.
+ * @details Implementa tick que converte Y em estrato, atualiza deepest e máscara, toca som e calcula respawnPoint, chamado pelo scheduler via StratumManager.h.
+ */
+
 #include "StratumManager.h"
 
 #include <cmath>

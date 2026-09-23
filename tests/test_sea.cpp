@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_sea.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava oceano preenchendo sem mexer na altura.
+ * @details Cobre isOceanColumn e areia, roda com make test que compila em build/tests/test_sea.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <initializer_list>

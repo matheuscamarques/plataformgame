@@ -1,3 +1,10 @@
+/**
+ * @file src/world/World.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Fachada que liga chunks, luz, física e render do mundo.
+ * @details Implementa update, tileAt, breakTile, query e listas ativas a partir de ChunkManager, chamada pelo game loop e features.
+ */
+
 #include "World.h"
 
 #include <algorithm>

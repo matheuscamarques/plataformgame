@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Math.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Utilitários escalares puros para clamp, lerp e aproximação.
+ * @details Oferece PI, clamp, lerp, sign e approach sem estado, incluído por física, IA e câmera.
+ */
+
 #pragma once
 
 // Utilitários escalares puros (header-only, sem estado).

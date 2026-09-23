@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_contact.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava contato com telegraph 0,35s e separação em 1 tick.
+ * @details Cobre ContactDamageSystem colado, roda com make test que compila em build/tests/test_contact.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <SFML/Graphics/Rect.hpp>

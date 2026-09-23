@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_material.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava 4 cores distintas e ASCII com widths exatas.
+ * @details Cobre Material sem build GL, roda com make test que compila em build/tests/test_material.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>

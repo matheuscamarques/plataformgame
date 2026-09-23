@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_weapon_reach.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava alcance da arma a partir de Body e facing.
+ * @details Cobre BodySystem e contexto, roda com make test que compila em build/tests/test_weapon_reach.
+ */
+
 #include <cassert>
 #include <cmath>
 #include <cstdio>

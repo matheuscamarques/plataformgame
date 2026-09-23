@@ -1,3 +1,10 @@
+/**
+ * @file src/core/Time.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Cabeçalho do relógio global com delta e acumulador de ticks.
+ * @details Declara Time estático com beginFrame, deltaTime e consumeTicks, incluído pelo loop principal em Game.
+ */
+
 #pragma once
 
 #include <cstdint>

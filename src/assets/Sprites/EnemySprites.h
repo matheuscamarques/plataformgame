@@ -1,3 +1,10 @@
+/**
+ * @file src/assets/Sprites/EnemySprites.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Define sprites ASCII do slime e do anão inimigo.
+ * @details Contém dimensões, paletas com BodyPartId e matrizes de caracteres 14x12 e 14x18, consumidas por SpriteSet build para gerar texturas.
+ */
+
 #pragma once
 
 #include "core/sprite_from_ascii.h"

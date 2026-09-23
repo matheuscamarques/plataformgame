@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Combat/BodySchemaRegistry.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Registra schemas corporais humanoid e dwarf com auto-registro no load.
+ * @details Expõe singleton com add e get mais registerDefaultBodySchemas, usado pela Factory para anexar BodySchema ao Enemy.
+ */
+
 #pragma once
 #include <string>
 #include <unordered_map>

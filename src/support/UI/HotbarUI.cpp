@@ -1,3 +1,10 @@
+/**
+ * @file src/support/UI/HotbarUI.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Renderiza e troca os cinco slots rápidos do inventário.
+ * @details Implementa handleInput para teclas 1 a 5 e render com fundo, seleção e ícones via ItemIcon, chamada todo frame pelo Game Renderer com inventário do Player.
+ */
+
 #include "support/UI/HotbarUI.h"
 
 #include "core/ItemDef.h"

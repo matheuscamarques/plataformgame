@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_registry.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava registry com base por estrato em sync.
+ * @details Cobre BlockRegistry e BLOCKS, roda com make test que compila em build/tests/test_registry.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include <string_view>

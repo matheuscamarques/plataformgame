@@ -1,3 +1,10 @@
+/**
+ * @file src/assets/Sprites/PlayerSprites.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Define sprites ASCII e paleta do jogador 12x20.
+ * @details Contém largura, altura, paleta com partes do corpo e frames idle, walk, jump, throw, punch, hurt e death, usados por SpriteSet e testes de largura.
+ */
+
 #pragma once
 
 #include "core/sprite_from_ascii.h"

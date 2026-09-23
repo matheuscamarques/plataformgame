@@ -1,3 +1,10 @@
+/**
+ * @file src/world/ChunkKey.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Chaves e conversão de coordenadas de chunk e tile.
+ * @details Fornece ChunkCoord, floorDiv para negativos, chunkKey int64 e conversões com chunkSize, usado por ChunkManager e World para indexar mapa.
+ */
+
 #pragma once
 #include <cstdint>
 

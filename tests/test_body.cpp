@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_body.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava Body por partes com schema, rebuild e facing.
+ * @details Cobre BodySchema humanoide e anão, roda com make test que compila em build/tests/test_body.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "support/Combat/Body.h"

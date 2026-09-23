@@ -1,3 +1,10 @@
+/**
+ * @file tests/test_run_manager.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava progressão com drops, inimigos e estratos.
+ * @details Cobre RunManager e World, roda com make test que compila em build/tests/test_run_manager.
+ */
+
 #include <cassert>
 #include <cstdio>
 #include "entities/Player/Player.h"

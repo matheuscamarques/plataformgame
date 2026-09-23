@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Combat/Body.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara PartDef, BodySchema, PartState e Body para combate por partes.
+ * @details Define dados de hitbox com multiplicadores mais attach, rebuild e find, incluído por BodySystem, Melee e Explosion.
+ */
+
 #pragma once
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>

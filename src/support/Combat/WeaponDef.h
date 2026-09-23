@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Combat/WeaponDef.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Define forma, pivot e offsets da arma para swing e hitbox.
+ * @details Expõe struct WeaponDef com sprite, origem e handOffset, consumido por BodySystem e render via WeaponRegistry.
+ */
+
 #pragma once
 #include <string>
 

@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Progression/DropSystem.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara sistema de drops com pools de XP e itens.
+ * @details Define structs XPOrb e ItemOrb mais classe System com tick, render, spawn e clear e raios de magnet e coleta, usada pelo EnemySystem, Player e InventoryUI.
+ */
+
 #pragma once
 #include "core/Inventory.h"
 #include "core/Pool.h"

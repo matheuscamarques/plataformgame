@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Effects/ThrowSystem.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Simula arremessos, colisões, pavio e explosões.
+ * @details Implementa tick com física, quique, repouso, luz da TNT no grid e chamada a ExplosionSystem e ParticleSystem, orquestrada pelo scheduler via GameContext.
+ */
+
 #include "ThrowSystem.h"
 
 #include <cmath>

@@ -1,3 +1,10 @@
+/**
+ * @file src/support/Progression/RunManager.h
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Declara estado de run com morte, pause e restart.
+ * @details Define classe com flags dead e paused, tick e restart no checkpoint mais fundo via StratumManager, incluída por game.h e gateada antes dos sistemas.
+ */
+
 #pragma once
 
 namespace support {
