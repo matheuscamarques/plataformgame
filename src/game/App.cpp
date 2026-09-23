@@ -182,14 +182,18 @@ void Game::tick() {
         p->tick();
 
         // S6: J (Action::Light) arremessa a bomba do slot ativo da
-        // hotbar (1-5 seleciona; T organiza). Sem bomba no slot, cai na
-        // dinamite da pilha (legado). Fora com menu aberto.
+        // hotbar (1-5 seleciona; T organiza). A hotbar só mostra
+        // consumíveis/arremessáveis; o índice ativo mapeia p/ o slot
+        // real via realSlot (-1 = vazio). Sem bomba, cai na dinamite
+        // da pilha (legado). Fora com menu aberto.
         // Cooldown cobre o edge por frame: pressed fica alto em todos os
         // ticks do frame, o 2º tick já encontra cooldown rodando.
         // (throwCooldown é tickado no Player::tick, junto dos outros.)
         if (!uiOpen && input_.pressed(support::Action::Light)) {
             // Slot primeiro (curto-circuito: legado só se o slot falhar).
-            const bool thrown = p->tryThrowSlot(*throws_, activeHotbarSlot_) ||
+            const int real =
+                support::HotbarUI::realSlot(p->inventory, activeHotbarSlot_);
+            const bool thrown = p->tryThrowSlot(*throws_, real) ||
                                 p->tryThrow(*throws_);
             if (thrown) {
                 // SFX arremesso + pavio (saiu da mão).

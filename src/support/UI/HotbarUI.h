@@ -6,6 +6,8 @@
  */
 
 #pragma once
+#include <vector>
+
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
@@ -18,14 +20,24 @@ namespace support {
 
 class InputMap;
 
-// Hotbar 4a: 5 primeiros slots do inventário, sempre visíveis.
-// Sem inventário separado (fonte única — Terraria/Minecraft).
+// Hotbar: só consumíveis ou arremessáveis (poção, bombas), na ordem do
+// inventário, compactados nos 5 visíveis. Sem inventário separado
+// (fonte única — Terraria/Minecraft).
 // Lógica (slot ativo) testável headless; render precisa de GL.
 class HotbarUI {
 public:
     static constexpr int   kSlots     = 5;
     static constexpr float kSlotSize  = 48.f;
     static constexpr float kPad       = 4.f;
+
+    // Critério da hotbar: Consumable ou throwable (arma/equip nunca entra).
+    static bool showsItem(const core::ItemDef* def);
+
+    // Índices reais (no Inventory) dos itens exibidos, em ordem.
+    static std::vector<int> filteredSlots(const core::Inventory& inv);
+
+    // Slot real p/ o índice ativo 0..4 (-1 = vazio/fora da lista).
+    static int realSlot(const core::Inventory& inv, int active);
 
     // Devolve o novo slot ativo se 1..5 foi apertado, senão `current`.
     int handleInput(const InputMap& input, int current) const;

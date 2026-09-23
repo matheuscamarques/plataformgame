@@ -27,15 +27,25 @@ sf::Event keyEvent(sf::Event::EventType t, sf::Keyboard::Key k) {
 int main() {
     using namespace support;
 
-    { // LePrimeirosSlots (hotbar espelha slots 0..4, sem cópia)
+    { // FiltraConsumiveis (pedra/espada não entram; poção/bomba sim)
         core::Inventory inv;
-        inv.add(core::Item{"stone", 10});
-        inv.add(core::Item{"wood", 5});
-        assert(inv.slot(0).defId == "stone");
-        assert(inv.slot(1).defId == "wood");
-        assert(inv.slot(2).isEmpty());
-        assert(inv.slot(4).isEmpty());
+        inv.add(core::Item{"stone", 10});     // slot 0: fora
+        inv.add(core::Item{"potion", 3});     // slot 1: entra
+        inv.add(core::Item{"iron_sword", 1}); // slot 2: fora
+        inv.add(core::Item{"tnt", 5});        // slot 3: entra
+        const auto slots = HotbarUI::filteredSlots(inv);
+        assert(slots.size() == 2u);
+        assert(slots[0] == 1 && slots[1] == 3);
         assert(HotbarUI::kSlots == 5);
+    }
+    { // RealSlotMapeia (índice ativo -> slot real; fora -> -1)
+        core::Inventory inv;
+        inv.add(core::Item{"stone", 10}); // slot 0: fora
+        inv.add(core::Item{"potion", 3}); // slot 1
+        assert(HotbarUI::realSlot(inv, 0) == 1);
+        assert(HotbarUI::realSlot(inv, 1) == -1); // só 1 na lista
+        assert(HotbarUI::realSlot(inv, 4) == -1);
+        assert(HotbarUI::realSlot(inv, -1) == -1);
     }
     { // TeclasSelecionamSlot (1..5 via evento sintético, padrão inputmap)
         HotbarUI ui;

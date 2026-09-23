@@ -22,9 +22,33 @@ int HotbarUI::handleInput(const InputMap& input, int current) const {
     return current;
 }
 
+bool HotbarUI::showsItem(const core::ItemDef* def) {
+    if (!def) return false;
+    return def->type == core::ItemType::Consumable || def->throwable;
+}
+
+std::vector<int> HotbarUI::filteredSlots(const core::Inventory& inv) {
+    std::vector<int> out;
+    for (int i = 0; i < core::Inventory::kCapacity &&
+            static_cast<int>(out.size()) < kSlots;
+         ++i) {
+        const core::Item& item = inv.slot(i);
+        if (item.isEmpty()) continue;
+        if (showsItem(item.def())) out.push_back(i);
+    }
+    return out;
+}
+
+int HotbarUI::realSlot(const core::Inventory& inv, int active) {
+    const std::vector<int> slots = filteredSlots(inv);
+    if (active < 0 || active >= static_cast<int>(slots.size())) return -1;
+    return slots[active];
+}
+
 void HotbarUI::render(sf::RenderTarget& target, const core::Inventory& inv,
-                      int activeSlot, float screenW, float screenH,
-                      const sf::Font& font) const {
+                       int activeSlot, float screenW, float screenH,
+                       const sf::Font& font) const {
+    const std::vector<int> slots = filteredSlots(inv);
     for (int i = 0; i < kSlots; ++i) {
         const sf::Vector2f p = slotPos(i, screenW, screenH);
         const bool active = (i == activeSlot);
@@ -38,7 +62,8 @@ void HotbarUI::render(sf::RenderTarget& target, const core::Inventory& inv,
         bg.setOutlineThickness(active ? 2.f : 1.f);
         target.draw(bg);
 
-        const core::Item& item = inv.slot(i);
+        if (i >= static_cast<int>(slots.size())) continue;
+        const core::Item& item = inv.slot(slots[i]);
         if (item.isEmpty()) continue;
         const core::ItemDef* def = item.def();
         if (!def) continue;
