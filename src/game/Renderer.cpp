@@ -261,9 +261,10 @@ void Game::render()
             }
             window->draw(spr);
         } else {
-            // Ícone do item voando (TNT/C4/MOAB); fallback: círculo do tier.
+            // Ícone do item voando (tiers de bomba); fallback: círculo.
             const char* defId = "tnt";
             if (t.kind == support::ThrowKind::C4) defId = "c4";
+            else if (t.kind == support::ThrowKind::Daisy) defId = "daisy";
             else if (t.kind == support::ThrowKind::Moab) defId = "moab";
             const core::ItemDef* dd =
                 core::ItemRegistry::instance().find(defId);

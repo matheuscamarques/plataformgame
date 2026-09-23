@@ -510,9 +510,10 @@ int main() {
         assert(p.inventory.count("diamond_boots") == 1);
         assert(p.inventory.count("tnt") == 99);
         assert(p.inventory.count("c4") == 32);
+        assert(p.inventory.count("daisy") == 24);
         assert(p.inventory.count("moab") == 16);
-        // Kit inteiro: 35 defs em 1 slot cada + dinamite 999 em 1 só.
-        assert(p.inventory.usedSlots() == 36);
+        // Kit inteiro: 36 defs em 1 slot cada + dinamite 999 em 1 só.
+        assert(p.inventory.usedSlots() == 37);
     }
     { // EquipViaMenu (F→Equip: grid esvazia, antigo volta)
         InventoryUI ui;

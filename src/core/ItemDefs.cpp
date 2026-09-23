@@ -991,6 +991,47 @@ REGISTER_ITEM("c4", [] {
     return def;
 }())
 
+// ---- Degrau entre C4 e MOAB: BLU-82 Daisy Cutter ----
+inline const core::PaletteEntry kItemDaisyPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'D', {190, 170, 90}},
+    {'d', {130, 115, 60}},
+    {'F', {150, 150, 150}},
+};
+inline constexpr std::size_t kItemDaisyPalCount = 4;
+inline const char* const kItemDaisySprite[] = {
+    "...DD...",
+    "...DD...",
+    "..DDDD..",
+    "..DDDD..",
+    "..DDDD..",
+    "..DDDD..",
+    "...dd...",
+    "........",
+};
+
+REGISTER_ITEM("daisy", [] {
+    core::ItemDef def;
+    def.id = "daisy";
+    def.description = "BLU-82 Daisy Cutter: abria clareiras na selva. Mãe da MOAB.";
+    def.spriteRows = kItemDaisySprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemDaisyPal;
+    def.spritePalCount = kItemDaisyPalCount;
+    def.name = "Daisy Cutter";
+    def.type = ItemType::Consumable;
+    def.rarity = ItemRarity::Epic;
+    def.stackMax = 24;
+    def.throwable = true;
+    def.throwKind = support::ThrowKind::Daisy;
+    def.fuse = 1.2f;
+    def.blastRadius = 400.f;
+    def.blastDamage = 110;
+    def.blastTiles = 12;
+    return def;
+}())
+
 REGISTER_ITEM("moab", [] {
     core::ItemDef def;
     def.id = "moab";

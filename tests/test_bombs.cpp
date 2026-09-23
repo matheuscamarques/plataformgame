@@ -16,21 +16,28 @@ int main() {
             core::ItemRegistry::instance().find("dynamite");
         const core::ItemDef* tnt = core::ItemRegistry::instance().find("tnt");
         const core::ItemDef* c4  = core::ItemRegistry::instance().find("c4");
+        const core::ItemDef* daisy =
+            core::ItemRegistry::instance().find("daisy");
         const core::ItemDef* moab =
             core::ItemRegistry::instance().find("moab");
         assert(dyn && dyn->throwable);
         assert(tnt && tnt->throwable && tnt->throwKind == ThrowKind::Tnt);
         assert(c4 && c4->throwable && c4->throwKind == ThrowKind::C4);
+        assert(daisy && daisy->throwable &&
+               daisy->throwKind == ThrowKind::Daisy);
         assert(moab && moab->throwable && moab->throwKind == ThrowKind::Moab);
         assert(dyn->blastDamage < tnt->blastDamage);
         assert(tnt->blastDamage < c4->blastDamage);
-        assert(c4->blastDamage < moab->blastDamage);
+        assert(c4->blastDamage < daisy->blastDamage);
+        assert(daisy->blastDamage < moab->blastDamage);
         assert(dyn->blastRadius < tnt->blastRadius);
         assert(tnt->blastRadius < c4->blastRadius);
-        assert(c4->blastRadius < moab->blastRadius);
+        assert(c4->blastRadius < daisy->blastRadius);
+        assert(daisy->blastRadius < moab->blastRadius);
         assert(isPlayerBomb(ThrowKind::Dynamite));
         assert(isPlayerBomb(ThrowKind::Tnt));
         assert(isPlayerBomb(ThrowKind::C4));
+        assert(isPlayerBomb(ThrowKind::Daisy));
         assert(isPlayerBomb(ThrowKind::Moab));
         assert(!isPlayerBomb(ThrowKind::Spit));
         assert(!isPlayerBomb(ThrowKind::Barrel));

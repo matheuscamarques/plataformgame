@@ -19,14 +19,16 @@ enum class ThrowKind : uint8_t {
     Barrel,       // barril do anão: rola, detona no fuse (sem quique ainda)
     Tnt,          // escada de bombas: TNT (média)
     C4,           // C4 militar (grande)
-    Moab          // MOAB (colossal)
+    Daisy,        // BLU-82 Daisy Cutter (enorme)
+    Moab          // MOAB (colossal, 1 chunk)
 };
 
 // Bombas do player (fuse + telegraph + glow + luz no grid).
 // Spit/Barrel/Nugget/Rock ficam de fora (comportamento próprio).
 inline bool isPlayerBomb(ThrowKind k) {
     return k == ThrowKind::Dynamite || k == ThrowKind::Tnt ||
-           k == ThrowKind::C4 || k == ThrowKind::Moab;
+           k == ThrowKind::C4 || k == ThrowKind::Daisy ||
+           k == ThrowKind::Moab;
 }
 
 struct Throwable {
