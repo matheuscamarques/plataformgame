@@ -103,13 +103,21 @@ int main() {
         assert(abs(mid.r - (prev.r + cur.r) / 2) <= 1);
         assert(abs(mid.g - (prev.g + cur.g) / 2) <= 1);
         assert(abs(mid.b - (prev.b + cur.b) / 2) <= 1);
-        // Sem salto: 1 tile através da fronteira muda pouco.
+        // Sem salto: 1 tile através da fronteira muda ~|Δ|/30.
         StratumBg below = stratumBgSmooth(1399.f);
         StratumBg above = stratumBgSmooth(1401.f);
-        assert(abs(below.r - above.r) + abs(below.g - above.g) +
-                   abs(below.b - above.b) <=
-               abs(prev.r - cur.r) + abs(prev.g - cur.g) +
-                   abs(prev.b - cur.b));
+        const int step = abs(below.r - above.r) + abs(below.g - above.g) +
+                         abs(below.b - above.b);
+        const int full = abs(prev.r - cur.r) + abs(prev.g - cur.g) +
+                         abs(prev.b - cur.b);
+        assert(step * 10 <= full); // folga 3× sobre o esperado
+        // Direção certa: descendo, aproxima da cor nova (não volta).
+        StratumBg deep = stratumBgSmooth(1430.f);
+        const int dDeep = abs(deep.r - cur.r) + abs(deep.g - cur.g) +
+                          abs(deep.b - cur.b);
+        const int dPrev = abs(deep.r - prev.r) + abs(deep.g - prev.g) +
+                          abs(deep.b - prev.b);
+        assert(dDeep < dPrev);
     }
 
     std::printf("strata test OK\n");

@@ -84,8 +84,9 @@ inline StratumBg lerpBg(StratumBg a, StratumBg b, float t) {
     return {mix(a.r, b.r, t), mix(a.g, b.g, t), mix(a.b, b.b, t)};
 }
 
-// Cor com gradiente: chapada no miolo, interpola ±blend nas fronteiras.
-// Contínua por construção (na fronteira vale a cor de cima dos 2 lados).
+// Cor com gradiente: chapada no miolo, derrete nos 60 tiles ABAIXO da
+// fronteira (one-sided). Contínua por construção: na fronteira o ramo
+// inferior vale a cor de cima, igual ao chapado que termina ali.
 inline StratumBg stratumBgSmooth(float ty) {
     const int tyi = ty < 0.f ? static_cast<int>(ty) - 1 : static_cast<int>(ty);
     const int s = stratumAt(tyi);
@@ -95,13 +96,6 @@ inline StratumBg stratumBgSmooth(float ty) {
         const float d = ty - ty0; // >= 0 dentro do estrato
         if (d >= 0.f && d < kStratumBlend)
             return lerpBg(stratumBg(s - 1), stratumBg(s), d / kStratumBlend);
-    }
-    // Borda superior (ty onde o próximo começa; s=10 não tem).
-    if (s <= 9) {
-        const float ty1 = 200.f + s * 1200.f;
-        const float d = ty1 - ty; // > 0 dentro do estrato
-        if (d > 0.f && d < kStratumBlend)
-            return lerpBg(stratumBg(s), stratumBg(s + 1), 1.f - d / kStratumBlend);
     }
     return stratumBg(s);
 }
