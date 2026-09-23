@@ -183,24 +183,25 @@ void Game::tick() {
             audio_.play(game::keyOf(game::Sfx::PlayerJump));
         p->tick();
 
-        // S6: J (Action::Light) arremessa a bomba do slot ativo da
-        // hotbar (1-5 seleciona; T organiza). A hotbar só mostra
-        // consumíveis/arremessáveis; o índice ativo mapeia p/ o slot
-        // real via realSlot (-1 = vazio). Sem bomba, cai na dinamite
+        // S6: J (Action::Light) usa o slot ativo da hotbar: bomba voa,
+        // consumível com onUse é usado (poção), resto cai na dinamite
         // da pilha (legado). Fora com menu aberto.
         // Cooldown cobre o edge por frame: pressed fica alto em todos os
         // ticks do frame, o 2º tick já encontra cooldown rodando.
         // (throwCooldown é tickado no Player::tick, junto dos outros.)
         if (!uiOpen && input_.pressed(support::Action::Light)) {
-            // Slot primeiro (curto-circuito: legado só se o slot falhar).
+            // Slot primeiro (curto-circuito na ordem bomba -> uso).
             const int real =
                 support::HotbarUI::realSlot(p->inventory, activeHotbarSlot_);
-            const bool thrown = p->tryThrowSlot(*throws_, real) ||
-                                p->tryThrow(*throws_);
-            if (thrown) {
+            const bool thrown = p->tryThrowSlot(*throws_, real);
+            const bool used = !thrown && p->tryUseSlot(real);
+            const bool legacy = !thrown && !used && p->tryThrow(*throws_);
+            if (thrown || legacy) {
                 // SFX arremesso + pavio (saiu da mão).
                 audio_.play(game::keyOf(game::Sfx::ThrowDyn));
                 audio_.play(game::keyOf(game::Sfx::DynFuse));
+            } else if (used) {
+                audio_.play(game::keyOf(game::Sfx::UiConfirm));
             }
         }
 

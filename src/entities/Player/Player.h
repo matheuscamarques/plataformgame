@@ -120,6 +120,10 @@ class Player : public Entity
         // Consome 1 do slot exato; stats vêm do def (fonte única).
         bool tryThrowSlot(support::ThrowSystem &throws, int slot);
 
+        // Usa o item do slot (hotbar ativa): só se tem onUse (poção).
+        // Consome 1. Sem cooldown (igual ao menu Use).
+        bool tryUseSlot(int slot);
+
         // Completa a pilha "dynamite" até 999 (legado generoso).
         // Chamado no ctor e no respawn; coleta soma por cima e o
         // inventário sobrevive à morte. Nunca esvazia o resto.

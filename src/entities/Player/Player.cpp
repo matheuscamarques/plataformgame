@@ -271,6 +271,18 @@ bool Player::tryThrowSlot(support::ThrowSystem &throws, int slot) {
     return true;
 }
 
+bool Player::tryUseSlot(int slot) {
+    if (slot < 0 || slot >= core::Inventory::kCapacity) return false;
+    core::Item& item = inventory.slot(slot);
+    if (item.isEmpty()) return false;
+    const core::ItemDef* def = item.def();
+    if (!def || !def->onUse) return false;
+    def->onUse(*this);
+    if (item.quantity <= 1) item = core::Item{};
+    else --item.quantity;
+    return true;
+}
+
 bool Player::tryThrow(support::ThrowSystem &throws) {    if (!throwCooldown.ready() || inventory.count("dynamite") <= 0)
         return false;
     // Arco fixo na direção do facing; sem mira manual no MVP.

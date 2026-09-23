@@ -79,6 +79,30 @@ int main() {
         assert(!p.tryThrowSlot(ts, 0));
         assert(p.inventory.count("c4") == 4);
     }
+    { // UseSlotPocao (poção no slot: cura + consome 1 do slot exato)
+        Player p;
+        p.hp = 9000;
+        p.inventory = core::Inventory{};
+        p.inventory.add(core::Item{"potion", 10}); // slot 0 cheio
+        p.inventory.add(core::Item{"potion", 2});  // slot 1
+        assert(p.tryUseSlot(0));
+        assert(p.hp == 9030);
+        assert(p.inventory.slot(0).quantity == 9); // slot exato, não o 1
+        assert(p.inventory.slot(1).quantity == 2);
+        assert(!p.tryUseSlot(5)); // vazio
+    }
+    { // UseSlotRejeitaNaoConsumivel (espada/pedra: false, sem gasto)
+        Player p;
+        ThrowSystem ts;
+        (void)ts;
+        p.inventory = core::Inventory{};
+        p.inventory.add(core::Item{"iron_sword", 1});
+        p.inventory.add(core::Item{"stone", 10});
+        assert(!p.tryUseSlot(0));
+        assert(!p.tryUseSlot(1));
+        assert(p.inventory.count("iron_sword") == 1);
+        assert(p.inventory.count("stone") == 10);
+    }
     { // MoabApagaChunk (raio cobre 16x16 tiles = 1 chunk)
         Player p;
         ThrowSystem ts;
