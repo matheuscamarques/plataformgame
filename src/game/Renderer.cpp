@@ -120,13 +120,22 @@ void Game::render()
     // lista global (chunks modified pinned não encarecem o frame).
     float vx0 = camPos.x - 60.0f, vy0 = camPos.y - 60.0f;
     float vx1 = camPos.x + viewW_ + 60.0f, vy1 = camPos.y + viewH_ + 60.0f;
-    // Céu dinâmico do ciclo dia/noite (superfície) ou preto de caverna.
-    // O estrato continua no HUD; o fundo agora é o céu, não o chapado.
+    // Céu dinâmico do ciclo dia/noite (superfície) ou fundo temático
+    // por estrato (subterrâneo: o chapado pré-dia/noite, 9325d6d tirou).
+    // O estrato continua no HUD; o fundo volta a mudar descendo.
     {
         const float playerY  = player.get()->getY();
         const float playerCX = player.get()->getCenterX();
         const float surfY    = getWorld()->surfaceYAt(playerCX);
-        window->clear(lighting_.ambientSky(playerY, surfY));
+        if (playerY < surfY) {
+            window->clear(lighting_.ambientSky(playerY, surfY));
+        } else {
+            const int pty =
+                static_cast<int>(std::floor(playerY / core::kBlockSize));
+            const support::StratumBg bg =
+                support::stratumBg(support::stratumAt(pty));
+            window->clear(sf::Color(bg.r, bg.g, bg.b));
+        }
     }
     // Tiles em batch pré-renderizado (camadas 1+5: 1 sprite/chunk);
     // entidades-tile puladas abaixo (já estão no batch — sem double-draw).
