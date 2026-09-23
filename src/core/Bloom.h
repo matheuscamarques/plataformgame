@@ -46,6 +46,13 @@ public:
     void endScene(sf::RenderWindow& window, float threshold = 0.6f,
                   float intensity = 0.6f) {
         if (!ok_) return;
+        // Resize (tela cheia via WM): recria os buffers no tamanho atual.
+        // Sem isso, update() copia um framebuffer maior que a textura e
+        // o SFML aborta (assert x + w <= m_size).
+        const sf::Vector2u ws = window.getSize();
+        if (ws.x != 0 && ws.y != 0 && ws != sceneTex_.getSize())
+            init(ws.x, ws.y);
+        if (ws.x == 0 || ws.y == 0) return;
         sceneTex_.update(window);
 
         bright_.clear(sf::Color::Black);

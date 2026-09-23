@@ -24,6 +24,10 @@ void Game::pollEvents() {
             // update the view to the new size of the window
             sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
             window->setView(sf::View(visibleArea));
+            // Câmera/HUD/bloom usam viewW_/viewH_: acompanha o resize
+            // (tela cheia via WM), senão tudo desenha no tamanho do boot.
+            viewW_ = static_cast<float>(event.size.width);
+            viewH_ = static_cast<float>(event.size.height);
         }
 
         input_.handleEvent(event);
