@@ -119,6 +119,27 @@ int main() {
                           abs(deep.b - prev.b);
         assert(dDeep < dPrev);
     }
+    { // BgSmoothAllBounds (continuidade nas 10 fronteiras, não só 1400)
+        for (int s = 1; s < STRATUM_COUNT; ++s) {
+            const float ty0 = 200.f + (s - 1) * 1200.f;
+            StratumBg prev = stratumBg(s - 1), cur = stratumBg(s);
+            const int full = abs(prev.r - cur.r) + abs(prev.g - cur.g) +
+                             abs(prev.b - cur.b);
+            // Na fronteira: cor de cima (chega derretido de cima).
+            StratumBg at = stratumBgSmooth(ty0);
+            assert(at.r == prev.r && at.g == prev.g && at.b == prev.b);
+            // 60 depois: chapado novo.
+            StratumBg past = stratumBgSmooth(ty0 + kStratumBlend);
+            assert(past.r == cur.r && past.g == cur.g && past.b == cur.b);
+            // 1 tile através: passo pequeno, nunca pop.
+            StratumBg below = stratumBgSmooth(ty0 - 1.f);
+            StratumBg above = stratumBgSmooth(ty0 + 1.f);
+            const int step = abs(below.r - above.r) +
+                             abs(below.g - above.g) +
+                             abs(below.b - above.b);
+            assert(step * 10 <= (full > 0 ? full : 1));
+        }
+    }
 
     std::printf("strata test OK\n");
     return 0;
