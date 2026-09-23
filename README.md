@@ -30,6 +30,8 @@ The bet: **architecture over tooling**. Adding content should be
 `1 file + 1 macro`, never an edit to a central switch.
 
 ![melee](screenshots/0000_20260921_133754_melee_32.png)
+<img width="661" height="702" alt="image" src="https://github.com/user-attachments/assets/2b3dc1b7-2299-457a-ab60-35f3b5b5765d" />
+<img width="677" height="714" alt="image" src="https://github.com/user-attachments/assets/5de05368-0f2c-4dff-812b-da45e4bc8df1" />
 
 | Cave / hurt | Manual / debug |
 |---|---|
