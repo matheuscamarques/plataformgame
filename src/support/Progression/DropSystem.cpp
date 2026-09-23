@@ -72,6 +72,8 @@ void DropSystem::tick(float dt, GameContext &ctx) {
 
             if (d2 < kCollectRadius * kCollectRadius) {
                 collected_ += o.value;
+                // Souls (F1): XP coletado credita a carteira do player.
+                ctx.player->souls += o.value;
                 // SFX coleta (sem ctx.audio em teste = mudo).
                 if (ctx.audio)
                     ctx.audio->play(game::keyOf(game::Sfx::XpCollect), 0.6f);

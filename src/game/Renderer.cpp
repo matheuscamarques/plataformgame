@@ -761,6 +761,7 @@ void Game::render()
         };
         text("HP " + std::to_string(p->hp) + "/" + std::to_string(p->hpMax), 16.f, 38.f);
         text("TNT:" + std::to_string(p->inventory.count("dynamite")) + " J  K melee", 16.f, 62.f);
+        text("Souls: " + std::to_string(p->souls), 16.f, 158.f);
         text(std::string("Mat: ") + (p->weaponDef()
                                           ? core::materialName(
                                                 p->weaponDef()->material)

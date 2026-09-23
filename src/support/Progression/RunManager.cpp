@@ -7,6 +7,7 @@
 
 #include "RunManager.h"
 
+#include <algorithm>
 #include <cmath>
 
 #include "defines.h"
@@ -27,7 +28,19 @@ void RunManager::tick(float /*dt*/, GameContext &ctx) {
         paused_ = !paused_;
     if (ctx.input && ctx.input->pressed(Action::Restart))
         restart(ctx);
-    if (!dead_ && ctx.player && ctx.player->hp <= 0) dead_ = true;
+    if (!dead_ && ctx.player && ctx.player->hp <= 0) {
+        dead_ = true;
+        // Mancha de souls (F1): carteira cai no cadáver em orbe.
+        // Morrer de novo com mancha ativa perde a antiga (DS).
+        stainSouls_ = ctx.player->souls;
+        if (stainSouls_ > 0) {
+            if (ctx.drops)
+                ctx.drops->spawnXP({ctx.player->getCenterX(),
+                                    ctx.player->getCenterY()},
+                                   stainSouls_);
+            ctx.player->souls = 0;
+        }
+    }
 }
 
 void RunManager::restart(GameContext &ctx) {
@@ -55,6 +68,16 @@ void RunManager::restart(GameContext &ctx) {
     }
     if (ctx.throws) ctx.throws->clear();
     if (ctx.drops) ctx.drops->clear();
+    // Mancha move p/ o respawn com conservação exata: desconta da
+    // carteira (recuperou no pé + R = zera e renasce no spawn) e
+    // re-spawna. R vivo não mexe na carteira (generoso).
+    if (stainSouls_ > 0) {
+        p->souls = std::max(0, p->souls - stainSouls_);
+        if (ctx.drops)
+            ctx.drops->spawnXP({p->getCenterX(), p->getCenterY()},
+                               stainSouls_);
+        stainSouls_ = 0;
+    }
     // Partículas: fora do ctx, somem sozinhas (lifetime curto).
 
     dead_ = false;

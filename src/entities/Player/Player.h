@@ -61,6 +61,11 @@ class Player : public Entity
         int hpMax = 10000;
         core::Cooldown hurtIframes;
 
+        // Carteira de souls (XP coletado). Morte derruba no cadáver
+        // (RunManager); R voluntário mantém; respawn não mexe.
+        int souls = 0;
+        void addSouls(int v) { souls += v; }
+
         // Arma equipada (def do slot RightHand) ou nullptr = soco.
         // Fonte única p/ render, BodySystem e meleeHitbox.
         const core::ItemDef* weaponDef() const;

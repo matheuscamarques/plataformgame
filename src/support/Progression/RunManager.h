@@ -33,6 +33,10 @@ private:
     bool dead_ = false;
     bool paused_ = false;
     StratumManager *stratum_ = nullptr;
+    // Mancha de souls (F1): valor derrubado na morte. Restart move a
+    // mancha p/ o respawn descontando da carteira (conservação exata:
+    // recuperou no pé + R = carteira zera e orbe renasce no spawn).
+    int stainSouls_ = 0;
 };
 
 } // namespace support
