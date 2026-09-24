@@ -19,28 +19,33 @@ inline constexpr int kSwordH = 20;
 inline constexpr int kSwordSwingW = 16;
 inline constexpr int kSwordSwingH = 8;
 inline constexpr int kHelmW = 12;
-inline constexpr int kHelmH = 5;
+inline constexpr int kHelmH = 8;
 inline constexpr int kChestW = 12;
-inline constexpr int kChestH = 8;
+inline constexpr int kChestH = 18;
 inline constexpr int kLegsW = 12;
-inline constexpr int kLegsH = 6;
+inline constexpr int kLegsH = 10;
 
 inline constexpr int kBootsW = 12;
-inline constexpr int kBootsH = 3;
+inline constexpr int kBootsH = 6;
 
 inline const char *const kIronBootsIdle[] = {
     "..WWWWWWWW..",
     "..WwwwwwwW..",
+    "..WwwwwwwW..",
     "..WWWWWWWW..",
+    "..WWWWWWWW..",
+    "............",
 };
 
-inline constexpr int kGloveW = 4;
-inline constexpr int kGloveH = 3;
+inline constexpr int kGloveW = 6;
+inline constexpr int kGloveH = 5;
 
 inline const char *const kIronGlovesIdle[] = {
-    ".WW.",
-    "WWWw",
-    ".wW.",
+    ".WWWW.",
+    "WWWWWW",
+    "WWwWWW",
+    "WWWWWW",
+    ".WWWW.",
 };
 
 inline const char *const kIronSwordIdle[] = {
@@ -124,30 +129,47 @@ inline const char *const kIronSwordSwing[] = {
 };
 
 inline const char *const kIronHelmIdle[] = {
-    "GGGGGGGGGGGG",
-    "GwwwwwwwwwwG",
-    "GwwwwwwwwwwG",
-    "Gw..EE..EEwG",
-    "Gw........wG",
+    "...GGGGGG...",
+    "..GGGGGGGG..",
+    "..GWWWWWWG..",
+    "..GWWWWWWG..",
+    "..GWWWWWWG..",
+    "..GWWWWWWG..",
+    "..GGGGGGGG..",
+    "............",
 };
 
 inline const char *const kIronChestIdle[] = {
-    "wwwwwwwwwwww",
+    ".WWWWWWWWWW.",
+    "WWWWWWWWWWWW",
+    "WWWWWWWWWWWW",
+    "WWWGGGGGGWWW",
+    "WWWGGGGGGWWW",
+    "WWWWWWWWWWWW",
+    "WWWWWWWWWWWW",
+    "WWWWWWWWWWWW",
+    "WWWWWWWWWWWW",
+    "WWWWWWWWWWWW",
+    "WWWWWWWWWWWW",
     "wWWWWWWWWWWw",
     "wWWWWWWWWWWw",
     "wWWGGGGGGWWw",
     "wWWGGGGGGWWw",
     "wWWWWWWWWWWw",
     "wwwwwwwwwwww",
-    ".wwwwwwwwww.",
+    "............",
 };
 
 inline const char *const kIronLegsIdle[] = {
     "..WWWWWWWW..",
     "..WwwwwwwW..",
     "..WwWWWWwW..",
+    "..WwWWWWwW..",
+    "..WwWGGWwW..",
     "..WwWGGWwW..",
     "..WwwwwwwW..",
+    "..WwwwwwwW..",
+    "...WWWWWW...",
     "...WWWWWW...",
 };
 
