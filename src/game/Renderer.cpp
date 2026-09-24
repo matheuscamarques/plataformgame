@@ -512,15 +512,17 @@ void Game::render()
         }
 
         // ── 5. Linha Body↔sprite do player: tripwire de offset. Por
-        // construção é ~zero (mesma fórmula dos 2 lados); se abrir
-        // >2px, alguma conta de desenho divergiu. Vermelho = divergiu.
+        // construção é ~zero (centro vs base - meia-altura do sprite);
+        // se abrir >2px, alguma conta de desenho divergiu. Verde = ok.
+        // (Era hardcoded p/ corpo 50px: com 100px ficava vermelha sempre.)
         {
             Player *pl = player.get();
             const float s =
                 pl->getH() / static_cast<float>(sprites::kPlayerH);
             const sf::Vector2f a{pl->getCenterX(), pl->getCenterY()};
             const sf::Vector2f b{pl->getCenterX(),
-                                 pl->getY() + pl->getH() - 10.f * s};
+                                 pl->getY() + pl->getH() -
+                                     (sprites::kPlayerH * 0.5f) * s};
             const float dx = a.x - b.x, dy = a.y - b.y;
             const bool diverged =
                 (dx * dx + dy * dy) > 4.f; // 2px ao quadrado
@@ -926,29 +928,30 @@ void Game::drawPlayerEquipment() {
     int mBoots = materialOf(core::EquipSlot::Boots);
     if (mBoots < 0) mBoots = mLegs;
 
-    // Peça full-width (12px) centralizada no centro-x da parte âncora.
+    // Peça full-width centralizada no centro-x da parte âncora.
     // Offsets em rows do sprite (nunca world): a âncora segue o Body,
-    // que o BodySystem recalcula por frame via rebuildFromSprite —
-    // o headOffsetRows morreu aqui (valia só p/ PunchUp).
+    // que o BodySystem recalcula por frame via rebuildFromSprite.
     // Origin (0,0) + facing<0 desenha p/ esquerda: x ancora o canto
     // direito (mesma regra de equipSpritePos).
+    // wmult=2: armadura acompanha o corpo 2x (texturas continuam 12px;
+    // pixel 5px vs 2.5px do corpo — documentado, não ideal). Armas ficam
+    // 1x de propósito (hitbox ancorada no registry).
     auto drawFullWidth = [&](const sf::Texture &tex, int texW,
                              support::BodyPartId anchor, float fracY,
-                             float offRows) {
+                             float offRows, float wmult = 2.f) {
         const auto *part = p->body.find(anchor);
         if (!part || part->fromSchema) return; // âncora ausente: não desenhar
         const float cx = part->worldBox.left + part->worldBox.width * 0.5f;
         const float y =
-            part->worldBox.top + part->worldBox.height * fracY + offRows * s;
+            part->worldBox.top + part->worldBox.height * fracY + offRows * s * wmult;
         sf::Sprite spr(tex);
-        spr.setPosition(cx - static_cast<float>(f * texW) * 0.5f * s, y);
-        spr.setScale(s * static_cast<float>(f), s);
+        spr.setPosition(cx - static_cast<float>(f * texW) * 0.5f * s * wmult, y);
+        spr.setScale(s * static_cast<float>(f) * wmult, s * wmult);
         window->draw(spr);
     };
 
-    // Luva centrada na mão; some se o braço está oculto no frame
-    // (fromSchema: walkA/walkB/throw/punch mostram 1 braço só).
-    // Sem slot próprio: segue o elmo; sem elmo, sem luva.
+    // Luva centrada na mão (x2 como a armadura); some se o braço está
+    // oculto no frame. Sem slot próprio: segue o elmo; sem elmo, sem luva.
     auto drawGlove = [&](support::BodyPartId arm, int m) {
         const auto *part = p->body.find(arm);
         if (!part || part->fromSchema) return;
@@ -957,7 +960,7 @@ void Game::drawPlayerEquipment() {
                       static_cast<float>(sprites::kGloveH * 0.5f));
         spr.setPosition(part->worldBox.left + part->worldBox.width * 0.5f,
                         part->worldBox.top + part->worldBox.height * 0.5f);
-        spr.setScale(s * static_cast<float>(f), s);
+        spr.setScale(s * static_cast<float>(f) * 2.f, s * 2.f);
         window->draw(spr);
     };
 
