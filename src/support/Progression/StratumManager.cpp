@@ -14,13 +14,14 @@
 #include "game/SoundBank.h"
 #include "support/GameContext.h"
 #include "world/Stratum.h"
+#include "core/Coords.h"
 
 namespace support {
 
 void StratumManager::tick(float /*dt*/, GameContext &ctx) {
     Player *p = ctx.player;
     if (!p) return;
-    const int ty = static_cast<int>(std::floor(p->getCenterY() / core::kBlockSize));
+    const int ty = core::worldToTile({p->getCenterX(), p->getCenterY()}).y;
     const int s = stratumAt(ty);
     current_ = s;
     if (s > deepest_) {

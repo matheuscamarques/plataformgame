@@ -21,6 +21,7 @@
 #include "support/GameContext.h"
 #include "world/Stratum.h"
 #include "world/World.h"
+#include "core/Coords.h"
 
 namespace support {
 
@@ -61,7 +62,7 @@ void SpawnSystem::tick(float dt, GameContext &ctx) {
     timer_ = 0.f;
 
     if (ctx.enemies->count() >= kGlobalCap) return;
-    const int ty = static_cast<int>(std::floor(py / core::kBlockSize));
+    const int ty = core::worldToTile({px, py}).y;
     const int stratum = stratumAt(ty);
     if (static_cast<std::size_t>(ctx.enemies->count()) >=
         static_cast<std::size_t>(budgetForStratum(stratum)))
@@ -100,8 +101,9 @@ void SpawnSystem::tick(float dt, GameContext &ctx) {
     float sx = px + side * core::randRange(kSpawnMin, kSpawnMax);
     float sy = py + core::randRange(-100.f, 100.f);
     if (ctx.world) {
-        int tx = static_cast<int>(std::floor(sx / core::kBlockSize));
-        int tyy = static_cast<int>(std::floor(sy / core::kBlockSize));
+        const core::TilePos stp = core::worldToTile({sx, sy});
+        int tx = stp.x;
+        int tyy = stp.y;
         const int top = tyy;
         // Desce até achar topo sólido (pés no chão, não dentro da rocha).
         while (tyy * core::kBlockSize < top * core::kBlockSize + kGroundScan) {

@@ -19,6 +19,7 @@
 #include "SlimeAI.h"
 #include "VariantRegistry.h"
 #include "world/Stratum.h"
+#include "core/Coords.h"
 
 namespace support {
 
@@ -77,7 +78,7 @@ std::unique_ptr<Enemy> Factory::spawnEnemy(const std::string &kind,
 
     // Variante por profundidade (dano/hp/skills extras). Slime não tem
     // variantes: forDepth retorna null e nada muda.
-    const int stratum = stratumAt(static_cast<int>(std::floor(y / core::kBlockSize)));
+    const int stratum = stratumAt(core::worldToTile({x, y}).y);
     if (const VariantDef *v = VariantRegistry::instance().forDepth(kind, stratum)) {
         e->variantLevel = v->level;
         e->damageMult = v->damageMult;

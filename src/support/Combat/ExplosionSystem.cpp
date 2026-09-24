@@ -25,6 +25,7 @@
 #include "support/Progression/PatienceSystem.h"
 #include "world/Block.h"
 #include "world/World.h"
+#include "core/Coords.h"
 
 namespace support {
 
@@ -133,8 +134,9 @@ bool ExplosionSystem::applyToTarget(const ExplosionTarget &t,
 void ExplosionSystem::breakTilesInCircle(core::Vec2f center, int tilesRadius, GameContext &ctx) {
     if (!ctx.world) return;
 
-    const int cx = static_cast<int>(std::floor(center.x / core::kBlockSize));
-    const int cy = static_cast<int>(std::floor(center.y / core::kBlockSize));
+    const core::TilePos ctp = core::worldToTile({center.x, center.y});
+    const int cx = ctp.x;
+    const int cy = ctp.y;
     const float r2 = static_cast<float>(tilesRadius * tilesRadius);
 
     // Paciência: 1 call por explosão (não por tile — senão 1 blast =

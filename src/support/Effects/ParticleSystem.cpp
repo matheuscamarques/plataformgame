@@ -13,6 +13,7 @@
 #include "core/Random.h"
 #include "defines.h"
 #include "world/World.h"
+#include "core/Coords.h"
 
 namespace support {
 
@@ -42,8 +43,9 @@ void ParticleSystem::tick(float dt, GameContext &ctx) {
         p.pos += p.vel * dt;
 
         if (p.collides && ctx.world) {
-            int tx = static_cast<int>(p.pos.x / core::kBlockSize);
-            int ty = static_cast<int>(p.pos.y / core::kBlockSize);
+            const core::TilePos ptp = core::worldToTile({p.pos.x, p.pos.y});
+            int tx = ptp.x;
+            int ty = ptp.y;
             if (ctx.world->isSolid(tx, ty)) {
                 p.vel = {0.f, 0.f};
                 p.gravity = 0.f;

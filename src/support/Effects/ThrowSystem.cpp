@@ -25,6 +25,7 @@
 #include "world/LightPropagator.h"
 #include "world/World.h"
 #include "core/VecSfml.h"
+#include "core/Coords.h"
 
 namespace support {
 
@@ -82,8 +83,9 @@ void ThrowSystem::tick(float dt, GameContext &ctx) {
         // Sem raycast (fonte rápida, oclusão irrelevante); re-flood só se
         // tile ou nível mudar. addBlockSource preserva luz maior (player).
         if (ctx.world && isPlayerBomb(t.kind) && t.fuse > 0.f) {
-            const int tx = static_cast<int>(std::floor(t.pos.x / core::kBlockSize));
-            const int ty = static_cast<int>(std::floor(t.pos.y / core::kBlockSize));
+            const core::TilePos ttp = core::worldToTile({t.pos.x, t.pos.y});
+            const int tx = ttp.x;
+            const int ty = ttp.y;
             const uint8_t lvl = tntLightLevel(t.fuse);
             if (tx != t.lastLightTileX || ty != t.lastLightTileY ||
                 lvl != t.lastLightLevel) {
@@ -175,8 +177,9 @@ void ThrowSystem::tick(float dt, GameContext &ctx) {
 void ThrowSystem::handleTileCollision(Throwable &t, GameContext &ctx) {
     if (!ctx.world) return;
 
-    const int tx = static_cast<int>(std::floor(t.pos.x / core::kBlockSize));
-    const int ty = static_cast<int>(std::floor(t.pos.y / core::kBlockSize));
+    const core::TilePos ttp = core::worldToTile({t.pos.x, t.pos.y});
+    const int tx = ttp.x;
+    const int ty = ttp.y;
     // Query via backend (Fase 2): mesma pergunta ao World, pela interface.
     const physics::Physics2D phys(*ctx.world);
     if (!phys.isSolidTile(tx, ty)) return;

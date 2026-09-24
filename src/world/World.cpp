@@ -16,6 +16,7 @@
 #include "ChunkLoader.h"
 #include "Generation.h"
 #include "LightPropagator.h"
+#include "core/Coords.h"
 
 namespace support {
 
@@ -59,7 +60,7 @@ bool World::isSolid(int worldTileX, int worldTileY) const {
 }
 
 float World::surfaceYAt(float worldX) const {
-    const int tx = static_cast<int>(std::floor(worldX / core::kBlockSize));
+    const int tx = core::worldToTile({worldX, 0.f}).x;
     return static_cast<float>(support::surfaceHeight(tx, getSeed()))
          * core::kBlockSize;
 }

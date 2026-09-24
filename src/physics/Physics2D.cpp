@@ -12,15 +12,13 @@
 
 #include "core/Config.h"
 #include "world/World.h"
+#include "core/Coords.h"
 
 namespace physics {
 
 namespace {
 
-int worldToTile(float w) {
-    return static_cast<int>(
-        std::floor(w / static_cast<float>(core::kBlockSize)));
-}
+// Conversão centralizada (Fase 4): sem floor local.
 
 } // namespace
 
@@ -31,10 +29,9 @@ bool Physics2D::isSolidTile(int tx, int ty) const {
 }
 
 bool Physics2D::overlapsSolid(core::Vec2f c, core::Vec2f h) const {
-    const int x0 = worldToTile(c.x - h.x);
-    const int x1 = worldToTile(c.x + h.x);
-    const int y0 = worldToTile(c.y - h.y);
-    const int y1 = worldToTile(c.y + h.y);
+    const core::TilePos t0 = core::worldToTile({c.x - h.x, c.y - h.y});
+    const core::TilePos t1 = core::worldToTile({c.x + h.x, c.y + h.y});
+    const int x0 = t0.x, x1 = t1.x, y0 = t0.y, y1 = t1.y;
     for (int ty = y0; ty <= y1; ++ty)
         for (int tx = x0; tx <= x1; ++tx)
             if (world_.isSolid(tx, ty)) return true;
@@ -123,8 +120,9 @@ RaycastHit Physics2D::raycast(core::Vec2f a, core::Vec2f b) const {
     // DDA de Amanatides & Woo em coords de tile.
     const float dx = (b.x - a.x) / total;
     const float dy = (b.y - a.y) / total;
-    int tx = worldToTile(a.x);
-    int ty = worldToTile(a.y);
+    const core::TilePos atp = core::worldToTile({a.x, a.y});
+    int tx = atp.x;
+    int ty = atp.y;
     const int stepX = (dx > 0.f) ? 1 : -1;
     const int stepY = (dy > 0.f) ? 1 : -1;
     const float bs = static_cast<float>(core::kBlockSize);

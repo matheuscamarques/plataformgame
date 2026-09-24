@@ -37,6 +37,7 @@
 #include "support/GameContext.h"
 #include "support/Progression/DropSystem.h"
 #include "support/Progression/StratumManager.h"
+#include "core/Coords.h"
 
 // App: ciclo de vida (ctor/start/run/tick). Render em Renderer.cpp,
 // eventos em Input.cpp, boot em Bootstrapper.cpp.
@@ -263,8 +264,9 @@ void Game::tick() {
         }
 
         // Mundo infinito: carrega/descarrega chunks em torno do tile do player.
-        int playerTileX = static_cast<int>(std::floor(p->getX() / core::kBlockSize));
-        int playerTileY = static_cast<int>(std::floor(p->getY() / core::kBlockSize));
+        const core::TilePos ptp = core::worldToTile({p->getX(), p->getY()});
+        int playerTileX = ptp.x;
+        int playerTileY = ptp.y;
         getWorld()->update(playerTileX, playerTileY);
 
         // Consulta o hash ao redor do player (1 tile de margem).
@@ -387,8 +389,9 @@ void Game::tick() {
     // consome o dirty depois do tick: sem loop (re-add → dirty →
     // textura → limpo → pula até mover/relightar de novo).
     if (!frozen) {
-        const int ptx = static_cast<int>(player->getX() / core::kBlockSize);
-        const int pty = static_cast<int>(player->getY() / core::kBlockSize);
+        const core::TilePos pptp = core::worldToTile({player->getX(), player->getY()});
+        const int ptx = pptp.x;
+        const int pty = pptp.y;
         const support::ChunkCoord cc = support::chunkCoordFromWorld(
             ptx, pty, support::Chunk::W);
         support::Chunk *pc = getWorld()->findChunk(cc.x, cc.y);

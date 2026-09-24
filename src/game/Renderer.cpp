@@ -41,6 +41,7 @@
 #include "support/Enemies/SlimeAI.h"
 #include "support/Progression/DropSystem.h"
 #include "support/UI/ItemIcon.h"
+#include "core/Coords.h"
 
 // Renderer: tudo que desenha (render + draws + helpers de char-view).
 
@@ -399,8 +400,9 @@ void Game::render()
         // Máscara do raycast (canal F7): amarelo = raio alcançou.
         // Parede cortando o amarelo ao meio = oclusão funcionando.
         if (overlay_.lightMask()) {
-            const int ptx = static_cast<int>(p->getX() / core::kBlockSize);
-            const int pty = static_cast<int>(p->getY() / core::kBlockSize);
+            const core::TilePos rptp = core::worldToTile({p->getX(), p->getY()});
+            const int ptx = rptp.x;
+            const int pty = rptp.y;
             const support::ChunkCoord cc = support::chunkCoordFromWorld(
                 ptx, pty, support::Chunk::W);
             if (const support::Chunk *c = getWorld()->findChunk(cc.x, cc.y)) {
@@ -843,8 +845,7 @@ void Game::render()
                                                     p->weaponDef()->material)
                                               : "--"),
                  16.f, 110.f);
-            const int pty =
-                static_cast<int>(std::floor(p->getY() / core::kBlockSize));
+            const int pty = core::worldToTile({p->getX(), p->getY()}).y;
             text(std::string(support::stratumName(support::stratumAt(pty))) +
                      "  y" + std::to_string(pty),
                  16.f, 86.f);

@@ -20,6 +20,7 @@
 #include "support/Effects/ThrowSystem.h"
 #include "world/Stratum.h"
 #include "world/World.h"
+#include "core/Coords.h"
 
 namespace support {
 
@@ -50,8 +51,9 @@ void RunManager::restart(GameContext &ctx) {
     float x = p->getX();
     float y = stratum_ ? stratum_->respawnPoint(x).y : 0.f;
     if (ctx.world) {
-        int tx = static_cast<int>(std::floor(p->getCenterX() / core::kBlockSize));
-        int ty = static_cast<int>(std::floor(y / core::kBlockSize));
+        const core::TilePos tp = core::worldToTile({p->getCenterX(), y});
+        int tx = tp.x;
+        int ty = tp.y;
         int guard = 0;
         // 2 tiles livres (corpo 50px): cabeça e pés fora da rocha.
         while (guard++ < 400 &&

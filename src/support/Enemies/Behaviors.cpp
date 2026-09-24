@@ -20,6 +20,7 @@
 #include "support/Effects/ThrowSystem.h"
 #include "world/World.h"
 #include "core/Vec.h"
+#include "core/Coords.h"
 
 // Slime (trash) + anão básico (elite). Terceiro inimigo = append aqui
 // + 1 arquivo Behavior. Zero edição em Factory/SpawnSystem.
@@ -291,15 +292,16 @@ REGISTER_SKILL("dwarf_dig", [] {
                               : 1.f;
         const float nx = self.body.getCenterX() + dir * 128.f;
         const float ny = self.body.getCenterY();
-        const int ntx = static_cast<int>(nx / core::kBlockSize);
-        const int nty = static_cast<int>(ny / core::kBlockSize);
+        const core::TilePos ntp = core::worldToTile({nx, ny});
+        const int ntx = ntp.x;
+        const int nty = ntp.y;
         auto break3x3 = [&](int cx, int cy) {
             for (int dy = -1; dy <= 1; ++dy)
                 for (int dx = -1; dx <= 1; ++dx)
                     ctx.world->breakTile(cx + dx, cy + dy);
         };
-        break3x3(static_cast<int>(self.body.getCenterX() / core::kBlockSize),
-                 static_cast<int>(self.body.getCenterY() / core::kBlockSize));
+        break3x3(core::worldToTile({self.body.getCenterX(), self.body.getCenterY()}).x,
+                 core::worldToTile({self.body.getCenterX(), self.body.getCenterY()}).y);
         // SFX escavação do anão (1 por evento, não por tile).
         if (ctx.audio) ctx.audio->play(game::keyOf(game::Sfx::TileBreak), 0.7f);
         if (!ctx.world->isSolid(ntx, nty)) {
@@ -330,10 +332,9 @@ REGISTER_SKILL("dwarf_collapse", [] {
                               ? -1.f
                               : 1.f;
         const float cx = self.body.getCenterX();
-        const int ty = static_cast<int>(self.body.getCenterY() / core::kBlockSize);
+        const int ty = core::worldToTile({self.body.getCenterX(), self.body.getCenterY()}).y;
         for (int i = 1; i <= 6; ++i) {
-            const int tx = static_cast<int>(
-                (cx + dir * i * core::kBlockSize) / core::kBlockSize);
+            const int tx = core::worldToTile({cx + dir * i * core::kBlockSize, self.body.getCenterY()}).x;
             for (int dy = -2; dy <= 2; ++dy) ctx.world->breakTile(tx, ty + dy);
         }
         // SFX colapso (1 por evento, não por tile).

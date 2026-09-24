@@ -16,6 +16,7 @@
 #include "support/Effects/ParticleSystem.h"
 #include "world/World.h"
 #include "core/Vec.h"
+#include "core/Coords.h"
 
 namespace support {
 
@@ -33,8 +34,9 @@ void DeathSystem::tick(float /*dt*/, GameContext &ctx) {
             const EnemyArchetype *arch =
                 ArchetypeRegistry::instance().find(e.archetypeId);
             if (!arch || arch->drops.entries.empty()) return;
-            const int tx = static_cast<int>(e.body.getCenterX() / core::kBlockSize);
-            const int ty = static_cast<int>(e.body.getCenterY() / core::kBlockSize);
+            const core::TilePos dtp = core::worldToTile({e.body.getCenterX(), e.body.getCenterY()});
+            const int tx = dtp.x;
+            const int ty = dtp.y;
             for (const auto& [id, qty] :
                  core::rollDrops(arch->drops, e.variantLevel,
                                  core::dropSalt(tx, ty, seed))) {
@@ -60,7 +62,7 @@ void DeathSystem::tick(float /*dt*/, GameContext &ctx) {
                     ArchetypeRegistry::instance().find(e.archetypeId))
                 xp = arch->xp;
         }
-        drops_->spawnXP(core::toSf(pos), xp);
+        drops_->spawnXP(pos, xp);
     }, &ctx);
 }
 

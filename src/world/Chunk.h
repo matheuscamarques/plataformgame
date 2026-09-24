@@ -16,6 +16,7 @@
 
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
+#include "core/Coords.h"
 #include <SFML/Graphics/RenderTexture.hpp>
 
 #include "defines.h"
@@ -123,9 +124,9 @@ struct Chunk {
         int n = 0;
         for (auto it = entities.begin(); it != entities.end();) {
             Entity *e = it->get();
-            const int ex = static_cast<int>(e->getX() / core::kBlockSize);
-            const int ey = static_cast<int>(e->getY() / core::kBlockSize);
-            if (ex != worldTileX || ey != worldTileY) {
+            const core::TilePos etp =
+                core::worldToTile({e->getX(), e->getY()});
+            if (etp.x != worldTileX || etp.y != worldTileY) {
                 ++it;
                 continue;
             }
