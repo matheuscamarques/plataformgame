@@ -12,6 +12,7 @@
 
 #include "assets/Sprites/PlayerSprites.h"
 #include "assets/Sprites/EnemySprites.h"
+#include "assets/SpriteFrameRegistry.h"
 
 // Sanity de palette: 1 char = 1 parte (S ambíguo morreu aqui).
 // Mão (H) e rosto (F) nunca se intersectam no mesmo frame.
@@ -59,8 +60,9 @@ int main() {
         assert(noDuplicateChars(kSlimePal, kSlimePalCount));
     }
     { // PunchHandNotOverFace (o bug original: H e F separados)
-        auto hand = bboxForChar(kPlayerPunch, kPlayerH, 'H');
-        auto face = bboxForChar(kPlayerPunch, kPlayerH, 'F');
+        auto punch = assets::frameData(support::SpriteFrameId::PlayerPunch);
+        auto hand = bboxForChar(punch.rows, kPlayerH, 'H');
+        auto face = bboxForChar(punch.rows, kPlayerH, 'F');
         assert(hand.valid && face.valid);
         assert(separated(hand, face));
     }
@@ -69,12 +71,20 @@ int main() {
         // rosto (H/G rows 0-6, F 4-6) mas nunca as colunas (H/G 1/10, F 3-8).
         // Faixa-Y rejeitaria; disjunção-X por row pega o bug real
         // (mão-sobre-rosto = H/G dentro de [fMin,fMax]).
-        const char *const *frames[] = {
-            kPlayerIdle, kPlayerWalkA, kPlayerWalkB, kPlayerJump,
-            kPlayerThrow, kPlayerPunch, kPlayerPunchUp, kPlayerPunchDown,
-            kPlayerHurt, kPlayerDeath,
+        const support::SpriteFrameId ids[] = {
+            support::SpriteFrameId::PlayerIdle,
+            support::SpriteFrameId::PlayerWalkA,
+            support::SpriteFrameId::PlayerWalkB,
+            support::SpriteFrameId::PlayerJump,
+            support::SpriteFrameId::PlayerThrow,
+            support::SpriteFrameId::PlayerPunch,
+            support::SpriteFrameId::PlayerPunchUp,
+            support::SpriteFrameId::PlayerPunchDown,
+            support::SpriteFrameId::PlayerHurt,
+            support::SpriteFrameId::PlayerDeath,
         };
-        for (auto *f : frames) {
+        for (auto id : ids) {
+            const char* const* f = assets::frameData(id).rows;
             for (int y = 0; y < kPlayerH; ++y) {
                 int fMin = kPlayerW, fMax = -1;
                 for (int x = 0; x < kPlayerW; ++x)
@@ -93,10 +103,12 @@ int main() {
     }
     { // LeftAndRightHandsHaveDistinctChars
         bool hasH = false, hasG = false;
+        const char* const* idle =
+            assets::frameData(support::SpriteFrameId::PlayerIdle).rows;
         for (int y = 0; y < kPlayerH; ++y) {
             for (int x = 0; x < kPlayerW; ++x) {
-                if (kPlayerIdle[y][x] == 'H') hasH = true;
-                if (kPlayerIdle[y][x] == 'G') hasG = true;
+                if (idle[y][x] == 'H') hasH = true;
+                if (idle[y][x] == 'G') hasG = true;
             }
         }
         assert(hasH);
@@ -104,10 +116,12 @@ int main() {
     }
     { // LegLeftRightHaveDistinctChars
         bool hasB = false, hasL = false;
+        const char* const* idle =
+            assets::frameData(support::SpriteFrameId::PlayerIdle).rows;
         for (int y = 0; y < kPlayerH; ++y) {
             for (int x = 0; x < kPlayerW; ++x) {
-                if (kPlayerIdle[y][x] == 'B') hasB = true;
-                if (kPlayerIdle[y][x] == 'L') hasL = true;
+                if (idle[y][x] == 'B') hasB = true;
+                if (idle[y][x] == 'L') hasL = true;
             }
         }
         assert(hasB);

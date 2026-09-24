@@ -38,9 +38,6 @@ class Player : public Entity
         int walkFrame = 0; // 0..3 (sprite walk); 0 parado
         float walkTimer = 0.f;
         float throwAnimT = 0.f; // >0 = frame throw (0.4s)
-        // Frame do melee atual (arma equipada). nullptr = soco.
-        // Arma futura = 1 linha ao equipar; pick/render não mudam.
-        const sf::Texture *meleeTex = nullptr;
         static constexpr float kThrowAnimDur = 0.40f;
 
         support::Body body; // hitboxes por parte (rebuild via BodySystem)

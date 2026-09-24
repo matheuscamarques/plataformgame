@@ -9,11 +9,17 @@
 #include <cstdio>
 #include <cstring>
 #include "assets/PlayerSprite.h"
+#include "assets/SpriteFrameRegistry.h"
 // ASCII art: widths exatas (linha errada = sprite deslocada), telegraphs
 // exclusivos e prioridade de pick. build() NÃO é chamado (textura exige
 // contexto GL, sem teste headless — compara endereços em SpriteSet vazio).
+// Fase E3: monoliticos mortos; rows vêm de frameData (cache composto).
 int main() {
     using namespace sprites;
+    using support::SpriteFrameId;
+    auto prow = [](support::SpriteFrameId id) {
+        return assets::frameData(id).rows;
+    };
     auto has = [](const char *const *f, int h, char c) {
         for (int y = 0; y < h; ++y) {
             if (std::strchr(f[y], c)) return true;
@@ -22,13 +28,15 @@ int main() {
     };
 
     { // PlayerWidths (12x40, 10 frames)
-        const char *const *frames[] = {
-            kPlayerIdle, kPlayerWalkA, kPlayerWalkB,
-            kPlayerJump, kPlayerThrow, kPlayerPunch,
-            kPlayerPunchUp, kPlayerPunchDown,
-            kPlayerHurt, kPlayerDeath
-        };
-        for (auto f : frames) {
+        using support::SpriteFrameId;
+        const support::SpriteFrameId ids[] = {
+            SpriteFrameId::PlayerIdle, SpriteFrameId::PlayerWalkA,
+            SpriteFrameId::PlayerWalkB, SpriteFrameId::PlayerJump,
+            SpriteFrameId::PlayerThrow, SpriteFrameId::PlayerPunch,
+            SpriteFrameId::PlayerPunchUp, SpriteFrameId::PlayerPunchDown,
+            SpriteFrameId::PlayerHurt, SpriteFrameId::PlayerDeath};
+        for (auto id : ids) {
+            const char* const* f = prow(id);
             for (int y = 0; y < kPlayerH; ++y) {
                 assert(std::strlen(f[y]) == static_cast<std::size_t>(kPlayerW));
             }
@@ -53,31 +61,35 @@ int main() {
         }
     }
     { // PalettesNonEmpty (toda sprite tem pixel visível, não é vazio)
+        using support::SpriteFrameId;
         assert(kPlayerPalCount == 12u && kSlimePalCount == 5u && kDwarfPalCount == 11u);
-        assert(has(kPlayerIdle, kPlayerH, 'F'));
-        assert(has(kPlayerJump, kPlayerH, 'H'));
-        assert(has(kPlayerThrow, kPlayerH, 'T'));
-        assert(has(kPlayerPunch, kPlayerH, 'H'));
+        assert(has(prow(SpriteFrameId::PlayerIdle), kPlayerH, 'F'));
+        assert(has(prow(SpriteFrameId::PlayerJump), kPlayerH, 'H'));
+        assert(has(prow(SpriteFrameId::PlayerThrow), kPlayerH, 'T'));
+        assert(has(prow(SpriteFrameId::PlayerPunch), kPlayerH, 'H'));
         assert(has(kSlimeIdle, kSlimeH, 'G'));
         assert(has(kDwarfIdle, kDwarfH, 'R'));
         assert(has(kDwarfThrow, kDwarfH, 'D'));
         assert(has(kDwarfMelee, kDwarfH, 'W'));
     }
     { // OnlyThrowHasTNT (telegraph exclusivo; soco não tem arma)
-        assert(has(kPlayerThrow, kPlayerH, 'T'));
-        assert(!has(kPlayerIdle, kPlayerH, 'T'));
-        assert(!has(kPlayerPunch, kPlayerH, 'T'));
-        assert(!has(kPlayerJump, kPlayerH, 'T'));
-        assert(!has(kPlayerThrow, kPlayerH, 'W'));
-        assert(!has(kPlayerPunch, kPlayerH, 'W'));
+        using support::SpriteFrameId;
+        assert(has(prow(SpriteFrameId::PlayerThrow), kPlayerH, 'T'));
+        assert(!has(prow(SpriteFrameId::PlayerIdle), kPlayerH, 'T'));
+        assert(!has(prow(SpriteFrameId::PlayerPunch), kPlayerH, 'T'));
+        assert(!has(prow(SpriteFrameId::PlayerJump), kPlayerH, 'T'));
+        assert(!has(prow(SpriteFrameId::PlayerThrow), kPlayerH, 'W'));
+        assert(!has(prow(SpriteFrameId::PlayerPunch), kPlayerH, 'W'));
     }
     { // WalkFramesDifferInArms (braços em lados opostos; row 8→16 no 40)
-        assert(kPlayerWalkA[16][1] == 'G');
-        assert(kPlayerWalkA[16][10] == '.');
-        assert(kPlayerWalkB[16][1] == '.');
-        assert(kPlayerWalkB[16][10] == 'H');
+        using support::SpriteFrameId;
+        assert(prow(SpriteFrameId::PlayerWalkA)[16][1] == 'G');
+        assert(prow(SpriteFrameId::PlayerWalkA)[16][10] == '.');
+        assert(prow(SpriteFrameId::PlayerWalkB)[16][1] == '.');
+        assert(prow(SpriteFrameId::PlayerWalkB)[16][10] == 'H');
     }
     { // PunchBodyAlignsWithIdle (cabeça na mesma row: sem crouch)
+        using support::SpriteFrameId;
         auto firstRowWith = [](const char *const *f, int h, char c) {
             for (int y = 0; y < h; ++y) {
                 if (std::strchr(f[y], c)) return y;
@@ -85,14 +97,15 @@ int main() {
             return -1;
         };
         auto firstK = [&](const char *const *f) { return firstRowWith(f, kPlayerH, 'K'); };
-        assert(firstK(kPlayerPunch) == firstK(kPlayerIdle));
+        assert(firstK(prow(SpriteFrameId::PlayerPunch)) == firstK(prow(SpriteFrameId::PlayerIdle)));
     }
     { // PunchHasExtendedFist (≥2 'H' nas cols 10-11 em alguma row)
+        const char* const* punch = prow(SpriteFrameId::PlayerPunch);
         int maxS = 0;
         for (int y = 0; y < kPlayerH; ++y) {
             int cnt = 0;
             for (int x = 10; x <= 11; ++x) {
-                if (kPlayerPunch[y][x] == 'H') ++cnt;
+                if (punch[y][x] == 'H') ++cnt;
             }
             if (cnt > maxS) maxS = cnt;
         }
@@ -106,13 +119,13 @@ int main() {
             return -1;
         };
         auto firstK = [&](const char *const *f) { return firstRowWith(f, kPlayerH, 'K'); };
-        assert(firstK(kPlayerPunch) == firstK(kPlayerIdle));
-        assert(firstK(kPlayerThrow) == firstK(kPlayerIdle));
+        assert(firstK(prow(SpriteFrameId::PlayerPunch)) == firstK(prow(SpriteFrameId::PlayerIdle)));
+        assert(firstK(prow(SpriteFrameId::PlayerThrow)) == firstK(prow(SpriteFrameId::PlayerIdle)));
         auto firstC = [&](const char *const *f) { return firstRowWith(f, kDwarfH, 'C'); };
         assert(firstC(kDwarfThrow) == firstC(kDwarfIdle));
     }
     { // WalkLegsDiffer (B abre as pernas)
-        assert(std::strcmp(kPlayerWalkA[15], kPlayerWalkB[15]) != 0);
+        assert(std::strcmp(prow(SpriteFrameId::PlayerWalkA)[15], prow(SpriteFrameId::PlayerWalkB)[15]) != 0);
     }
     { // ResolvePriority (hurt > melee > throw > jump > walk > idle)
         using support::SpriteFrameId;
@@ -149,53 +162,43 @@ int main() {
         assert(R(AimDir::SW) == SpriteFrameId::PlayerPunchDown);
     }
     { // PunchUpAlignsLegs (pernas ancoradas; cabeça/torso +4 rows no 40)
+        using support::SpriteFrameId;
         auto firstRowWith = [](const char *const *f, char c) {
             for (int y = 0; y < kPlayerH; ++y) {
                 if (std::strchr(f[y], c)) return y;
             }
             return -1;
         };
-        assert(firstRowWith(kPlayerPunchUp, 'B')
-               == firstRowWith(kPlayerIdle, 'B'));
-        assert(firstRowWith(kPlayerPunchUp, 'K')
-               == firstRowWith(kPlayerIdle, 'K') + 4);
-        assert(firstRowWith(kPlayerPunchUp, 'C')
-               == firstRowWith(kPlayerIdle, 'C') + 4);
+        assert(firstRowWith(prow(SpriteFrameId::PlayerPunchUp), 'B')
+               == firstRowWith(prow(SpriteFrameId::PlayerIdle), 'B'));
+        assert(firstRowWith(prow(SpriteFrameId::PlayerPunchUp), 'K')
+               == firstRowWith(prow(SpriteFrameId::PlayerIdle), 'K') + 4);
+        assert(firstRowWith(prow(SpriteFrameId::PlayerPunchUp), 'C')
+               == firstRowWith(prow(SpriteFrameId::PlayerIdle), 'C') + 4);
     }
     { // PunchDownFullyAligned (cabeça/torso/botas nas rows do idle)
+        using support::SpriteFrameId;
         auto firstRowWith = [](const char *const *f, char c) {
             for (int y = 0; y < kPlayerH; ++y) {
                 if (std::strchr(f[y], c)) return y;
             }
             return -1;
         };
-        assert(firstRowWith(kPlayerPunchDown, 'K')
-               == firstRowWith(kPlayerIdle, 'K'));
-        assert(firstRowWith(kPlayerPunchDown, 'C')
-               == firstRowWith(kPlayerIdle, 'C'));
-        assert(firstRowWith(kPlayerPunchDown, 'B')
-               == firstRowWith(kPlayerIdle, 'B'));
+        assert(firstRowWith(prow(SpriteFrameId::PlayerPunchDown), 'K')
+               == firstRowWith(prow(SpriteFrameId::PlayerIdle), 'K'));
+        assert(firstRowWith(prow(SpriteFrameId::PlayerPunchDown), 'C')
+               == firstRowWith(prow(SpriteFrameId::PlayerIdle), 'C'));
+        assert(firstRowWith(prow(SpriteFrameId::PlayerPunchDown), 'B')
+               == firstRowWith(prow(SpriteFrameId::PlayerIdle), 'B'));
     }
-    { // TextureForFrameMapsEveryId (todo id resolve p/ textura existente)
+    { // TextureForFrameMapsEveryId (inimigos resolvem; default existe)
         SpriteSet sp{};
-        const sf::Texture *fake =
-            reinterpret_cast<const sf::Texture *>(0x1234);
-        assert(game::textureForFrame(support::SpriteFrameId::PlayerIdle, sp)
-               == &sp.playerIdle);
         assert(game::textureForFrame(support::SpriteFrameId::DwarfThrow, sp)
                == &sp.dwarfThrow);
         assert(game::textureForFrame(support::SpriteFrameId::SlimeSquash, sp)
                == &sp.slimeSquash);
-        assert(game::textureForFrame(support::SpriteFrameId::PlayerPunch, sp, fake)
-               == fake); // seam de arma preservado
-        assert(game::textureForFrame(support::SpriteFrameId::PlayerPunch, sp)
-               == &sp.playerPunch); // fallback soco
-        assert(game::textureForFrame(support::SpriteFrameId::PlayerPunchUp,
-                                     sp) == &sp.playerPunchUp);
-        assert(game::textureForFrame(support::SpriteFrameId::PlayerPunchDown,
-                                     sp) == &sp.playerPunchDown);
         assert(game::textureForFrame(support::SpriteFrameId::None, sp)
-               == &sp.playerIdle);
+               == &sp.slimeIdle);
     }
 
     std::printf("sprites test OK\n");

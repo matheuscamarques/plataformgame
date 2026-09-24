@@ -55,21 +55,11 @@ inline support::SpriteFrameId resolvePlayerSprite(bool onGround, float vx,
 }
 
 inline const sf::Texture *textureForFrame(support::SpriteFrameId id,
-                                          const sprites::SpriteSet &sp,
-                                          const sf::Texture *meleeTex = nullptr) {
+                                          const sprites::SpriteSet &sp) {
     using support::SpriteFrameId;
+    // Fase E2: só inimigos têm textura única (player desenha partes).
+    // meleeTex morreu com os monolíticos (App não assigna mais).
     switch (id) {
-        case SpriteFrameId::PlayerIdle: return &sp.playerIdle;
-        case SpriteFrameId::PlayerWalkA: return &sp.playerWalkA;
-        case SpriteFrameId::PlayerWalkB: return &sp.playerWalkB;
-        case SpriteFrameId::PlayerJump: return &sp.playerJump;
-        case SpriteFrameId::PlayerThrow: return &sp.playerThrow;
-        case SpriteFrameId::PlayerPunch:
-            return meleeTex ? meleeTex : &sp.playerPunch;
-        case SpriteFrameId::PlayerPunchUp: return &sp.playerPunchUp;
-        case SpriteFrameId::PlayerPunchDown: return &sp.playerPunchDown;
-        case SpriteFrameId::PlayerHurt: return &sp.playerHurt;
-        case SpriteFrameId::PlayerDeath: return &sp.playerDeath;
         case SpriteFrameId::SlimeIdle: return &sp.slimeIdle;
         case SpriteFrameId::SlimeSquash: return &sp.slimeSquash;
         case SpriteFrameId::DwarfIdle: return &sp.dwarfIdle;
@@ -79,7 +69,7 @@ inline const sf::Texture *textureForFrame(support::SpriteFrameId id,
         case SpriteFrameId::DwarfMelee: return &sp.dwarfMelee;
         case SpriteFrameId::None:
         case SpriteFrameId::COUNT:
-        default: return &sp.playerIdle;
+        default: return &sp.slimeIdle;
     }
 }
 

@@ -1,7 +1,7 @@
 /**
  * @file src/assets/EquipmentLayout.h
  * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
- * @brief Calcula posição de equipamento sobre o sprite 12x20 do jogador.
+ * @brief Calcula posição de equipamento sobre o sprite 12x40 do jogador.
  * @details Função inline pura equipSpritePos soma offset escalado ao canto do sprite e espelha em X quando facing negativo, usada pelo Renderer ao desenhar arma e armadura.
  */
 

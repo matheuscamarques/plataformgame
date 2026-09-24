@@ -122,8 +122,11 @@ int main() {
         auto schema = makeSchema();
         Body punch;
         punch.attach(&schema);
+        const auto pf =
+            assets::frameData(SpriteFrameId::PlayerPunch);
         punch.rebuildFromSprite({0.f, 0.f}, {30.f, 50.f},
-                                sprites::kPlayerPunch, sprites::kPlayerW,
+                                pf.rows,
+                                sprites::kPlayerW,
                                 sprites::kPlayerH, sprites::kPlayerPal,
                                 sprites::kPlayerPalCount, 1);
         assert(punch.find(BodyPartId::ArmR) != nullptr);

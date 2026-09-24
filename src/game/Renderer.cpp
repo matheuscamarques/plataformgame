@@ -889,35 +889,22 @@ void Game::drawPlayerSprite() {
     Player *p = player.get();
     // Escala p/ altura da entidade (100px), aspecto preservado.
     const float s = p->getH() / static_cast<float>(sprites::kPlayerH);
-    // Fase D: 3 partes (pixel-idêntico ao monolítico: mesma origem total
-    // 40, offsets derivados das partes). meleeTex custom (arma) ainda usa
-    // o caminho monolítico abaixo.
-    if (!p->meleeTex || p->meleeTex == &sprites_.playerPunch) {
-        const auto pose = game::poseForFrameId(p->currentFrameId);
-        const auto& pp =
-            sprites_.playerParts[static_cast<int>(pose)];
-        const assets::Part* parts = sprites::poseParts(pose);
-        const sf::Texture* texs[3] = {&pp.head, &pp.torso, &pp.legs};
-        for (int i = 0; i < 3; ++i) {
-            sf::Sprite spr;
-            spr.setTexture(*texs[i]);
-            spr.setOrigin(sprites::kPlayerW * 0.5f,
-                          static_cast<float>(sprites::kPlayerH -
-                                             parts[i].offY));
-            spr.setPosition(p->getCenterX(), p->getY() + p->getH());
-            spr.setScale(static_cast<float>(p->facing) * s, s);
-            window->draw(spr);
-        }
-        return;
+    // Fase E2: só partes (pixel-idêntico ao monolítico morto).
+    const auto pose = game::poseForFrameId(p->currentFrameId);
+    const auto& pp =
+        sprites_.playerParts[static_cast<int>(pose)];
+    const assets::Part* parts = sprites::poseParts(pose);
+    const sf::Texture* texs[3] = {&pp.head, &pp.torso, &pp.legs};
+    for (int i = 0; i < 3; ++i) {
+        sf::Sprite spr;
+        spr.setTexture(*texs[i]);
+        spr.setOrigin(sprites::kPlayerW * 0.5f,
+                      static_cast<float>(sprites::kPlayerH -
+                                         parts[i].offY));
+        spr.setPosition(p->getCenterX(), p->getY() + p->getH());
+        spr.setScale(static_cast<float>(p->facing) * s, s);
+        window->draw(spr);
     }
-    const sf::Texture *tex =
-        game::textureForFrame(p->currentFrameId, sprites_, p->meleeTex);
-    sf::Sprite spr;
-    spr.setTexture(*tex);
-    spr.setOrigin(sprites::kPlayerW * 0.5f, static_cast<float>(sprites::kPlayerH));
-    spr.setPosition(p->getCenterX(), p->getY() + p->getH());
-    spr.setScale(static_cast<float>(p->facing) * s, s);
-    window->draw(spr);
 }
 
 void Game::drawPlayerEquipment() {

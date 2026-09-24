@@ -87,7 +87,6 @@ void Game::run()
     if (!spritesBuilt_) {
         sprites_ = sprites::build();
         spritesBuilt_ = true;
-        player->meleeTex = &sprites_.playerPunch; // default = soco
     }
     // Música 1x: síntese em RAM (~250ms, ~5MB p/ 6 tracks). Zero arquivo.
     if (!musicBuilt_) {

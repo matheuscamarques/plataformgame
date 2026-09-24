@@ -22,19 +22,18 @@ int main() {
     struct Case {
         const assets::Part* parts;
         std::size_t count;
-        const char* const* ref;
     };
     const Case cases[] = {
-        {kPlayerIdleParts, 3, kPlayerIdle},
-        {kPlayerWalkAParts, 3, kPlayerWalkA},
-        {kPlayerWalkBParts, 3, kPlayerWalkB},
-        {kPlayerJumpParts, 3, kPlayerJump},
-        {kPlayerThrowParts, 3, kPlayerThrow},
-        {kPlayerPunchParts, 3, kPlayerPunch},
-        {kPlayerPunchUpParts, 3, kPlayerPunchUp},
-        {kPlayerPunchDownParts, 3, kPlayerPunchDown},
-        {kPlayerHurtParts, 3, kPlayerHurt},
-        {kPlayerDeathParts, 3, kPlayerDeath},
+        {kPlayerIdleParts, 3},
+        {kPlayerWalkAParts, 3},
+        {kPlayerWalkBParts, 3},
+        {kPlayerJumpParts, 3},
+        {kPlayerThrowParts, 3},
+        {kPlayerPunchParts, 3},
+        {kPlayerPunchUpParts, 3},
+        {kPlayerPunchDownParts, 3},
+        {kPlayerHurtParts, 3},
+        {kPlayerDeathParts, 3},
     };
 
     { // PartitionCoversFrame (12+16+12=40, largura 12, offsets empilham)
@@ -51,15 +50,56 @@ int main() {
             assert(total == 40 && y == 40);
         }
     }
-    { // ComposeEqualsMonolithic (byte a byte, 10 frames)
-        for (const auto& c : cases) {
-            const std::vector<std::string> got =
-                assets::compose(c.parts, c.count, 12, 40);
-            assert(got.size() == 40u);
-            for (int row = 0; row < 40; ++row) {
-                assert(got[row] == c.ref[row]);
-            }
-        }
+    { // GoldenIdle (compose do idle == snapshot; trava o algoritmo)
+        // Snapshot do monolítico deletado na Fase E3: se compose mudar,
+        // quebra aqui (as outras poses têm cobertura estrutural acima).
+        static const char* const kGoldenIdle[40] = {
+            "....KKKK....",
+            "....KKKK....",
+            "..KKKKKKKK..",
+            "..KKKKKKKK..",
+            "..KFFFFFFK..",
+            "..KFFFFFFK..",
+            "..KFEFFEFK..",
+            "..KFEFFEFK..",
+            "..KFFFFFFK..",
+            "..KFFFFFFK..",
+            "...FFFFFF...",
+            "...FFFFFF...",
+            "..CCCCCCCC..",
+            "..CCCCCCCC..",
+            ".GCCCCCCCCH.",
+            ".GCCCCCCCCH.",
+            ".GCCCCCCCCH.",
+            ".GCCCCCCCCH.",
+            ".GCCCCCCCCH.",
+            ".GCCCCCCCCH.",
+            "..CCCCCCCC..",
+            "..CCCCCCCC..",
+            "..CCCCCCCC..",
+            "..CCCCCCCC..",
+            "..CCCCCCCC..",
+            "..CCCCCCCC..",
+            "...CCCCCC...",
+            "...CCCCCC...",
+            "...CC..CC...",
+            "...CC..CC...",
+            "...CC..CC...",
+            "...CC..CC...",
+            "...LL..BB...",
+            "...LL..BB...",
+            "...LL..BB...",
+            "...LL..BB...",
+            "...LL..BB...",
+            "...LL..BB...",
+            "............",
+            "............",
+        };
+        const std::vector<std::string> got =
+            assets::compose(kPlayerIdleParts, 3, 12, 40);
+        assert(got.size() == 40u);
+        for (int row = 0; row < 40; ++row)
+            assert(got[row] == kGoldenIdle[row]);
     }
     { // ClipOutOfBounds (parte fora do buffer: recorta sem crash)
         const assets::Part hang[] = {{kPlayerIdleHead, 12, 12, 0, 36}};
@@ -82,27 +122,17 @@ int main() {
         // Fora da faixa: fallback idle (nunca nullptr).
         assert(poseParts(static_cast<PlayerPose>(99)) == kPlayerIdleParts);
     }
-    { // RegistryServesComposed (frameData == monolítico, pré-Fase E3)
-        const struct {
-            support::SpriteFrameId id;
-            const char* const* ref;
-        } cases[] = {
-            {support::SpriteFrameId::PlayerIdle, kPlayerIdle},
-            {support::SpriteFrameId::PlayerWalkA, kPlayerWalkA},
-            {support::SpriteFrameId::PlayerWalkB, kPlayerWalkB},
-            {support::SpriteFrameId::PlayerJump, kPlayerJump},
-            {support::SpriteFrameId::PlayerThrow, kPlayerThrow},
-            {support::SpriteFrameId::PlayerPunch, kPlayerPunch},
-            {support::SpriteFrameId::PlayerPunchUp, kPlayerPunchUp},
-            {support::SpriteFrameId::PlayerPunchDown, kPlayerPunchDown},
-            {support::SpriteFrameId::PlayerHurt, kPlayerHurt},
-            {support::SpriteFrameId::PlayerDeath, kPlayerDeath},
-        };
-        for (const auto& c : cases) {
-            const auto f = assets::frameData(c.id);
+    { // RegistryServesComposed (frameData == compose, sem monolíticos)
+        for (int i = 0; i < 10; ++i) {
+            const auto id =
+                static_cast<support::SpriteFrameId>(static_cast<int>(support::SpriteFrameId::PlayerIdle) + i);
+            const auto f = assets::frameData(id);
             assert(f.rows != nullptr && f.w == 12 && f.h == 40);
+            const assets::Part* pp = poseParts(static_cast<PlayerPose>(i));
+            const std::vector<std::string> composed =
+                assets::compose(pp, 3, 12, 40);
             for (int row = 0; row < 40; ++row)
-                assert(std::string(f.rows[row]) == c.ref[row]);
+                assert(std::string(f.rows[row]) == composed[row]);
         }
     }
 
