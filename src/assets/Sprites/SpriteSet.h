@@ -22,12 +22,14 @@
 
 namespace sprites {
 struct SpriteSet {
-    // Partes do player (fonte única): 10 poses × head/torso/legs/feet.
+    // Partes do player (fonte única): 10 poses × head/torso/legs/feet/arms.
+    // Arms = overlay transparente (só pele G/H) sobre o torso.
     struct PlayerPartsTex {
         sf::Texture head;
         sf::Texture torso;
         sf::Texture legs;
         sf::Texture feet;
+        sf::Texture arms;
     };
     PlayerPartsTex playerParts[kPlayerPoseCount];
     sf::Texture slimeIdle;
@@ -68,6 +70,8 @@ inline SpriteSet build() {
             pp[2].rows, pp[2].w, pp[2].h, kPlayerPal, kPlayerPalCount);
         s.playerParts[i].feet = core::makeSprite(
             pp[3].rows, pp[3].w, pp[3].h, kPlayerPal, kPlayerPalCount);
+        s.playerParts[i].arms = core::makeSprite(
+            pp[4].rows, pp[4].w, pp[4].h, kPlayerPal, kPlayerPalCount);
     }
     s.slimeIdle = core::makeSprite(kSlimeIdle, kSlimeW, kSlimeH,
                                    kSlimePal, kSlimePalCount);

@@ -899,8 +899,12 @@ void Game::drawPlayerSprite() {
     const core::Item& boots = p->equipment.get(core::EquipSlot::Boots);
     const core::ItemDef* bootsDef =
         boots.isEmpty() ? nullptr : boots.def();
-    const sf::Texture* texs[4] = {&pp.head, &pp.torso, &pp.legs, &pp.feet};
-    for (int i = 0; i < 4; ++i) {
+    const sf::Texture* texs[5] = {&pp.head, &pp.torso, &pp.arms, &pp.legs,
+                                  &pp.feet};
+    // Ordem: torso antes dos braços (overlay transparente de pele G/H).
+    const int order[5] = {0, 1, 4, 2, 3};
+    for (int k = 0; k < 5; ++k) {
+        const int i = order[k];
         // Feet com botas: pula o pé base (a bota entra abaixo).
         if (i == 3 && bootsDef) continue;
         sf::Sprite spr;

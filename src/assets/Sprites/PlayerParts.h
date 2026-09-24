@@ -67,11 +67,31 @@ inline const char* const kPlayerIdleFeet[] = {
 
 
 // Idle: Head(0,0) Torso(0,12) Legs(0,28) — 12+16+12=40.
+inline const char* const kPlayerIdleArms[] = {
+    "............",
+    "............",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
 inline constexpr assets::Part kPlayerIdleParts[] = {
     { kPlayerIdleHead, 12, 12, 0, 0 },
     { kPlayerIdleTorso, 12, 16, 0, 12 },
     { kPlayerIdleLegs, 12, 6, 0, 28 },
     { kPlayerIdleFeet, 12, 6, 0, 34 },
+    { kPlayerIdleArms, 12, 16, 0, 12 },
 };
 
 inline const char* const kPlayerWalkAHead[] = {
@@ -128,11 +148,31 @@ inline const char* const kPlayerWalkAFeet[] = {
 
 
 // WalkA: Head(0,0) Torso(0,12) Legs(0,28) — 12+16+12=40.
+inline const char* const kPlayerWalkAArms[] = {
+    "............",
+    "............",
+    ".G..........",
+    ".G..........",
+    ".G..........",
+    ".G..........",
+    ".G..........",
+    ".G..........",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
 inline constexpr assets::Part kPlayerWalkAParts[] = {
     { kPlayerWalkAHead, 12, 12, 0, 0 },
     { kPlayerWalkATorso, 12, 16, 0, 12 },
     { kPlayerWalkALegs, 12, 6, 0, 28 },
     { kPlayerWalkAFeet, 12, 6, 0, 34 },
+    { kPlayerWalkAArms, 12, 16, 0, 12 },
 };
 
 inline const char* const kPlayerWalkBHead[] = {
@@ -189,11 +229,31 @@ inline const char* const kPlayerWalkBFeet[] = {
 
 
 // WalkB: Head(0,0) Torso(0,12) Legs(0,28) — 12+16+12=40.
+inline const char* const kPlayerWalkBArms[] = {
+    "............",
+    "............",
+    "..........H.",
+    "..........H.",
+    "..........H.",
+    "..........H.",
+    "..........H.",
+    "..........H.",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
 inline constexpr assets::Part kPlayerWalkBParts[] = {
     { kPlayerWalkBHead, 12, 12, 0, 0 },
     { kPlayerWalkBTorso, 12, 16, 0, 12 },
     { kPlayerWalkBLegs, 12, 6, 0, 28 },
     { kPlayerWalkBFeet, 12, 6, 0, 34 },
+    { kPlayerWalkBArms, 12, 16, 0, 12 },
 };
 
 inline const char* const kPlayerJumpHead[] = {
@@ -250,11 +310,31 @@ inline const char* const kPlayerJumpFeet[] = {
 
 
 // Jump: Head(0,0) Torso(0,12) Legs(0,28) — 12+16+12=40.
+inline const char* const kPlayerJumpArms[] = {
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
 inline constexpr assets::Part kPlayerJumpParts[] = {
     { kPlayerJumpHead, 12, 12, 0, 0 },
     { kPlayerJumpTorso, 12, 16, 0, 12 },
     { kPlayerJumpLegs, 12, 6, 0, 28 },
     { kPlayerJumpFeet, 12, 6, 0, 34 },
+    { kPlayerJumpArms, 12, 16, 0, 12 },
 };
 
 inline const char* const kPlayerThrowHead[] = {
@@ -311,11 +391,31 @@ inline const char* const kPlayerThrowFeet[] = {
 
 
 // Throw: Head(0,0) Torso(0,12) Legs(0,28) — 12+16+12=40.
+inline const char* const kPlayerThrowArms[] = {
+    "............",
+    "............",
+    ".G..........",
+    ".G..........",
+    ".G..........",
+    ".G..........",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
 inline constexpr assets::Part kPlayerThrowParts[] = {
     { kPlayerThrowHead, 12, 12, 0, 0 },
     { kPlayerThrowTorso, 12, 16, 0, 12 },
     { kPlayerThrowLegs, 12, 6, 0, 28 },
     { kPlayerThrowFeet, 12, 6, 0, 34 },
+    { kPlayerThrowArms, 12, 16, 0, 12 },
 };
 
 inline const char* const kPlayerPunchHead[] = {
@@ -372,11 +472,31 @@ inline const char* const kPlayerPunchFeet[] = {
 
 
 // Punch: Head(0,0) Torso(0,12) Legs(0,28) — 12+16+12=40.
+inline const char* const kPlayerPunchArms[] = {
+    "............",
+    "............",
+    "..........H.",
+    "..........H.",
+    "..........HH",
+    "..........HH",
+    "..........H.",
+    "..........H.",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
 inline constexpr assets::Part kPlayerPunchParts[] = {
     { kPlayerPunchHead, 12, 12, 0, 0 },
     { kPlayerPunchTorso, 12, 16, 0, 12 },
     { kPlayerPunchLegs, 12, 6, 0, 28 },
     { kPlayerPunchFeet, 12, 6, 0, 34 },
+    { kPlayerPunchArms, 12, 16, 0, 12 },
 };
 
 inline const char* const kPlayerPunchUpHead[] = {
@@ -433,11 +553,31 @@ inline const char* const kPlayerPunchUpFeet[] = {
 
 
 // PunchUp: Head(0,0) Torso(0,12) Legs(0,28) — 12+16+12=40.
+inline const char* const kPlayerPunchUpArms[] = {
+    ".G........H.",
+    ".G........H.",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
 inline constexpr assets::Part kPlayerPunchUpParts[] = {
     { kPlayerPunchUpHead, 12, 12, 0, 0 },
     { kPlayerPunchUpTorso, 12, 16, 0, 12 },
     { kPlayerPunchUpLegs, 12, 6, 0, 28 },
     { kPlayerPunchUpFeet, 12, 6, 0, 34 },
+    { kPlayerPunchUpArms, 12, 16, 0, 12 },
 };
 
 inline const char* const kPlayerPunchDownHead[] = {
@@ -494,11 +634,31 @@ inline const char* const kPlayerPunchDownFeet[] = {
 
 
 // PunchDown: Head(0,0) Torso(0,12) Legs(0,28) — 12+16+12=40.
+inline const char* const kPlayerPunchDownArms[] = {
+    "............",
+    "............",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    "..G......H..",
+    "..G......H..",
+    "..G......H..",
+    "..G......H..",
+    "............",
+    "............",
+};
+
 inline constexpr assets::Part kPlayerPunchDownParts[] = {
     { kPlayerPunchDownHead, 12, 12, 0, 0 },
     { kPlayerPunchDownTorso, 12, 16, 0, 12 },
     { kPlayerPunchDownLegs, 12, 6, 0, 28 },
     { kPlayerPunchDownFeet, 12, 6, 0, 34 },
+    { kPlayerPunchDownArms, 12, 16, 0, 12 },
 };
 
 inline const char* const kPlayerHurtHead[] = {
@@ -555,11 +715,31 @@ inline const char* const kPlayerHurtFeet[] = {
 
 
 // Hurt: Head(0,0) Torso(0,12) Legs(0,28) — 12+16+12=40.
+inline const char* const kPlayerHurtArms[] = {
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
 inline constexpr assets::Part kPlayerHurtParts[] = {
     { kPlayerHurtHead, 12, 12, 0, 0 },
     { kPlayerHurtTorso, 12, 16, 0, 12 },
     { kPlayerHurtLegs, 12, 6, 0, 28 },
     { kPlayerHurtFeet, 12, 6, 0, 34 },
+    { kPlayerHurtArms, 12, 16, 0, 12 },
 };
 
 inline const char* const kPlayerDeathHead[] = {
@@ -616,11 +796,31 @@ inline const char* const kPlayerDeathFeet[] = {
 
 
 // Death: Head(0,0) Torso(0,12) Legs(0,28) — 12+16+12=40.
+inline const char* const kPlayerDeathArms[] = {
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    ".G........H.",
+    ".G........H.",
+    "............",
+    "............",
+};
+
 inline constexpr assets::Part kPlayerDeathParts[] = {
     { kPlayerDeathHead, 12, 12, 0, 0 },
     { kPlayerDeathTorso, 12, 16, 0, 12 },
     { kPlayerDeathLegs, 12, 6, 0, 28 },
     { kPlayerDeathFeet, 12, 6, 0, 34 },
+    { kPlayerDeathArms, 12, 16, 0, 12 },
 };
 
 // Poses na ordem dos frames (espelha textureForFrame do Renderer).
