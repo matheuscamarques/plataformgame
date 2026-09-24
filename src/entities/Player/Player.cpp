@@ -457,6 +457,24 @@ sf::FloatRect Player::meleeHitbox() {
 int Player::meleeDamage() const {
     int dmg = kLight[meleeCombo].damage;
     if (const core::ItemDef* off = offHandDef()) dmg += off->damage;
+    if (const core::ItemDef* wdef = weaponDef()) {
+        // Scaling DS: dano base × Σ letra×fator. Base 10 = zero bônus
+        // (seed intacto); soft cap 40. Sem req = metade de tudo.
+        const float bonus =
+            wdef->damage *
+            (core::scaleMult(wdef->strScale) *
+                 core::scaleFactor(attrs.get(core::Attr::Strength)) +
+             core::scaleMult(wdef->dexScale) *
+                 core::scaleFactor(attrs.get(core::Attr::Dexterity)) +
+             core::scaleMult(wdef->intScale) *
+                 core::scaleFactor(attrs.get(core::Attr::Intelligence)) +
+             core::scaleMult(wdef->faiScale) *
+                 core::scaleFactor(attrs.get(core::Attr::Faith)));
+        dmg += static_cast<int>(bonus);
+        if (attrs.get(core::Attr::Strength) < wdef->strReq ||
+            attrs.get(core::Attr::Dexterity) < wdef->dexReq)
+            dmg /= 2;
+    }
     return dmg;
 }
 

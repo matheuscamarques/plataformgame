@@ -64,6 +64,20 @@ int main() {
         assert(Attributes::maxLoad(10) == 60.f);
         assert(Attributes::maxLoad(20) == 80.f);
     }
+    { // ScaleMath (tabela S-E; fator 0 na base, 1.0 aos 40)
+        assert(scaleMult(ScaleGrade::S) == 1.0f);
+        assert(scaleMult(ScaleGrade::A) == 0.8f);
+        assert(scaleMult(ScaleGrade::B) == 0.6f);
+        assert(scaleMult(ScaleGrade::C) == 0.4f);
+        assert(scaleMult(ScaleGrade::D) == 0.2f);
+        assert(scaleMult(ScaleGrade::E) == 0.1f);
+        assert(scaleMult(ScaleGrade::None) == 0.f);
+        assert(scaleFactor(10) == 0.f); // seed não muda dano
+        assert(scaleFactor(40) == 1.0f);
+        assert(scaleFactor(25) == 0.5f);
+        assert(scaleFactor(1) == 0.f); // clamp, sem negativo
+        assert(scaleLetter(ScaleGrade::B) == 'B' && scaleLetter(ScaleGrade::None) == '-');
+    }
 
     std::printf("attributes test OK\n");
     return 0;

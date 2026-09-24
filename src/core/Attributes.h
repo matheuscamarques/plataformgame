@@ -36,6 +36,43 @@ inline const char* attrName(Attr a) {
     }
 }
 
+// Bônus de arma por atributo, letra S (melhor) a E (pior).
+// Multiplicadores DS adaptados; "-" (None) = sem bônus.
+enum class ScaleGrade : uint8_t { None, E, D, C, B, A, S };
+
+inline float scaleMult(ScaleGrade s) {
+    switch (s) {
+        case ScaleGrade::S: return 1.0f;
+        case ScaleGrade::A: return 0.8f;
+        case ScaleGrade::B: return 0.6f;
+        case ScaleGrade::C: return 0.4f;
+        case ScaleGrade::D: return 0.2f;
+        case ScaleGrade::E: return 0.1f;
+        default:       return 0.f;
+    }
+}
+
+inline char scaleLetter(ScaleGrade s) {
+    switch (s) {
+        case ScaleGrade::S: return 'S';
+        case ScaleGrade::A: return 'A';
+        case ScaleGrade::B: return 'B';
+        case ScaleGrade::C: return 'C';
+        case ScaleGrade::D: return 'D';
+        case ScaleGrade::E: return 'E';
+        default:       return '-';
+    }
+}
+
+// Fator do atributo no scaling: 0 na base 10, 1.0 aos 40 (soft cap;
+// além, +0.25/ponto). Base 10 contribui zero = seed não muda dano.
+inline float scaleFactor(int attr) {
+    const float eff =
+        attr <= 40 ? static_cast<float>(attr) : 40.f + (attr - 40) * 0.25f;
+    const float f = (eff - 10.f) / 30.f;
+    return f < 0.f ? 0.f : f;
+}
+
 struct Attributes {
     static constexpr int kBase = 10;
     static constexpr int kMax = 99;

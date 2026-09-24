@@ -15,6 +15,7 @@
 #include "core/sprite_from_ascii.h"
 #include "core/EquipSlot.h"
 #include "core/Material.h"
+#include "core/Attributes.h"
 #include "support/Effects/Throwable.h"
 
 class Player;
@@ -54,6 +55,13 @@ struct ItemDef {
     int         defense   = 0;   // armadura: idem
     EquipSlot   equipSlot = EquipSlot::None; // None = não equipável
     MaterialId  material  = MaterialId::Iron; // cor da peça no render
+    // Scaling DS (F6): bônus por atributo + requisitos. Sem req = -50%.
+    ScaleGrade  strScale = ScaleGrade::None;
+    ScaleGrade  dexScale = ScaleGrade::None;
+    ScaleGrade  intScale = ScaleGrade::None;
+    ScaleGrade  faiScale = ScaleGrade::None;
+    int         strReq = 0;
+    int         dexReq = 0;
     // Bomba arremessável (J joga o slot ativo da hotbar): stats vão
     // direto p/ o Throwable (fonte única, sem switch por id).
     bool                 throwable   = false;

@@ -957,6 +957,27 @@ void InventoryUI::renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
     if (def->damage > 0)
         line("DMG: " + std::to_string(def->damage), 14,
              sf::Color(255, 200, 100));
+    if (def->type == core::ItemType::Weapon) {
+        // Letras de scaling (só as que existem) + requisitos.
+        std::string esc;
+            const auto tag = [&](core::ScaleGrade s, const char* abbr) {
+            if (s == core::ScaleGrade::None) return;
+            if (!esc.empty()) esc += " / ";
+            esc += core::scaleLetter(s);
+            esc += ' ';
+            esc += abbr;
+        };
+        tag(def->strScale, "FOR");
+        tag(def->dexScale, "DES");
+        tag(def->intScale, "INT");
+        tag(def->faiScale, "FÉ");
+        if (!esc.empty())
+            line("Escala: " + esc, 12, sf::Color(200, 180, 120));
+        if (def->strReq > 0 || def->dexReq > 0)
+            line("Req: " + std::to_string(def->strReq) + " FOR " +
+                     std::to_string(def->dexReq) + " DES",
+                 12, sf::Color(170, 170, 180));
+    }
     if (def->defense > 0)
         line("DEF: " + std::to_string(def->defense), 14,
              sf::Color(120, 180, 255));

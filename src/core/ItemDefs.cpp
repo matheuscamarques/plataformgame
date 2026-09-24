@@ -522,6 +522,10 @@ REGISTER_ITEM("iron_sword", [] {
     def.spritePalCount = kItemSwordPalCount;
     def.name = "Espada de Ferro";
     def.weight = 6.f;
+    def.strScale = core::ScaleGrade::D;
+    def.dexScale = core::ScaleGrade::B;
+    def.strReq = 5;
+    def.dexReq = 8;
     def.type = ItemType::Weapon;
     def.rarity = ItemRarity::Common;
     def.stackMax = 1;
@@ -542,6 +546,9 @@ REGISTER_ITEM("iron_axe", [] {
     def.spritePalCount = kItemAxePalCount;
     def.name = "Machado de Ferro";
     def.weight = 8.f;
+    def.strScale = core::ScaleGrade::B;
+    def.strReq = 9;
+    def.dexReq = 5;
     def.type = ItemType::Weapon;
     def.rarity = ItemRarity::Uncommon;
     def.stackMax = 1;
@@ -683,6 +690,10 @@ REGISTER_ITEM("gold_sword", [] {
     def.spritePalCount = kItemGoldSwordPalCount;
     def.name = "Espada de Ouro";
     def.weight = 8.f;
+    def.strScale = core::ScaleGrade::D;
+    def.dexScale = core::ScaleGrade::B;
+    def.strReq = 5;
+    def.dexReq = 8;
     def.type = ItemType::Weapon;
     def.rarity = ItemRarity::Rare;
     def.stackMax = 1;
@@ -703,6 +714,9 @@ REGISTER_ITEM("gold_axe", [] {
     def.spritePalCount = kItemGoldAxePalCount;
     def.name = "Machado de Ouro";
     def.weight = 10.f;
+    def.strScale = core::ScaleGrade::B;
+    def.strReq = 9;
+    def.dexReq = 5;
     def.type = ItemType::Weapon;
     def.rarity = ItemRarity::Rare;
     def.stackMax = 1;
@@ -783,6 +797,10 @@ REGISTER_ITEM("diamond_sword", [] {
     def.spritePalCount = kItemDiamondSwordPalCount;
     def.name = "Espada de Diamante";
     def.weight = 4.f;
+    def.strScale = core::ScaleGrade::D;
+    def.dexScale = core::ScaleGrade::B;
+    def.strReq = 5;
+    def.dexReq = 8;
     def.type = ItemType::Weapon;
     def.rarity = ItemRarity::Epic;
     def.stackMax = 1;
@@ -803,6 +821,9 @@ REGISTER_ITEM("diamond_axe", [] {
     def.spritePalCount = kItemDiamondAxePalCount;
     def.name = "Machado de Diamante";
     def.weight = 6.f;
+    def.strScale = core::ScaleGrade::B;
+    def.strReq = 12; // pesado: sem req cai metade (testa penalidade)
+    def.dexReq = 5;
     def.type = ItemType::Weapon;
     def.rarity = ItemRarity::Epic;
     def.stackMax = 1;
@@ -883,6 +904,10 @@ REGISTER_ITEM("leather_sword", [] {
     def.spritePalCount = kItemLeatherSwordPalCount;
     def.name = "Espada de Couro";
     def.weight = 3.f;
+    def.strScale = core::ScaleGrade::D;
+    def.dexScale = core::ScaleGrade::B;
+    def.strReq = 5;
+    def.dexReq = 8;
     def.type = ItemType::Weapon;
     def.rarity = ItemRarity::Common;
     def.stackMax = 1;
@@ -903,6 +928,9 @@ REGISTER_ITEM("leather_axe", [] {
     def.spritePalCount = kItemLeatherAxePalCount;
     def.name = "Machado de Couro";
     def.weight = 4.f;
+    def.strScale = core::ScaleGrade::B;
+    def.strReq = 9;
+    def.dexReq = 5;
     def.type = ItemType::Weapon;
     def.rarity = ItemRarity::Common;
     def.stackMax = 1;

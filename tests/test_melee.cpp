@@ -126,6 +126,27 @@ int main() {
         assert(p.hurt(9990) && p.hp == 0);
         assert(!p.hurt(10)); // já em 0, sem efeito
     }
+    { // ScalingStrDex (espada ferro: D FOR + B DES; base 8 intacta)
+        Player p; // seed: espada, STR/DEX 10 → bônus 0
+        assert(p.meleeDamage() == 8);
+        int souls = 1000000000;
+        for (int i = 0; i < 30; ++i)
+            assert(p.attrs.buy(core::Attr::Strength, souls));
+        assert(p.meleeDamage() == 8 + 2); // 12×0.2×1.0
+        for (int i = 0; i < 30; ++i)
+            assert(p.attrs.buy(core::Attr::Dexterity, souls));
+        assert(p.meleeDamage() == 8 + 2 + 7); // +12×0.6×1.0
+    }
+    { // ReqPenalty (machado diamante pede 12 FOR: metade sem, cheio com)
+        Player p;
+        p.equipment.unequip(core::EquipSlot::RightHand);
+        assert(p.equipment.equip(core::Item{"diamond_axe", 1}));
+        assert(p.meleeDamage() == 4); // (8 + 0) / 2
+        int souls = 1000000000;
+        assert(p.attrs.buy(core::Attr::Strength, souls));
+        assert(p.attrs.buy(core::Attr::Strength, souls)); // FOR 12
+        assert(p.meleeDamage() == 8 + 1); // +30×0.8×(2/30)
+    }
 
     std::printf("melee test OK\n");
     return 0;
