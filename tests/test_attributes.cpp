@@ -57,9 +57,10 @@ int main() {
         int prev = Attributes::maxHP(1);
         for (int v = 2; v <= 99; ++v) {
             const int h = Attributes::maxHP(v);
-            assert(h > prev);
+            assert(h >= prev); // soft cap achata (degrau 0.5 vira 0 aqui)
             prev = h;
         }
+        assert(Attributes::maxHP(99) > Attributes::maxHP(40)); // cresce
         assert(Attributes::maxStamina(10) == 150);
         assert(Attributes::maxLoad(10) == 60.f);
         assert(Attributes::maxLoad(20) == 80.f);

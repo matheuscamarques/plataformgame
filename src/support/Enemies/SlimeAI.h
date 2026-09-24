@@ -9,6 +9,7 @@
 
 #include "entities/Entity.hpp"
 #include "Behavior.h"
+#include "Pathfinder.h"
 
 namespace support {
 
@@ -33,6 +34,10 @@ private:
     int hopCooldown_ = 0;
     float lastX_ = 0.0f;
     bool hasLast_ = false;
+    // Rota cacheada (recalculada a cada 12 ticks no chase).
+    int repathCooldown_ = 0;
+    PathStep cachedStep_;
+    bool hasCached_ = false;
 };
 
 } // namespace support

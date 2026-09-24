@@ -33,6 +33,8 @@ constexpr float kMeleeRecover = 0.40f;
 constexpr float kPatrolSpeed = 2.0f;
 constexpr float kApproachSpeed = 2.5f;
 constexpr float kRetreatSpeed = 3.0f;
+constexpr float kHopVy = -32.0f;   // pula degrau travado
+constexpr int kHopCooldown = 60;   // ticks entre tentativas
 
 float dist(sf::Vector2f a, sf::Vector2f b) {
     const float dx = a.x - b.x, dy = a.y - b.y;
@@ -120,6 +122,11 @@ void DwarfAI::tickPatrol(Enemy &e, float /*dt*/, GameContext & /*ctx*/) {
     const float dx = e.body.getCenterX() - home_.x;
     if (dx > cfg_.homeRadius) patrolDir_ = -1;
     else if (dx < -cfg_.homeRadius) patrolDir_ = 1;
+    // Travou na parede? Vira (igual slime) em vez de empurrar rocha.
+    if (hasLast_ && std::fabs(e.body.getX() - lastX_) < 0.5f)
+        patrolDir_ = -patrolDir_;
+    lastX_ = e.body.getX();
+    hasLast_ = true;
     e.body.setVx(static_cast<float>(patrolDir_) * kPatrolSpeed);
     e.body.facing = patrolDir_;
 }
@@ -149,6 +156,15 @@ void DwarfAI::tickCombat(Enemy &e, float /*dt*/, GameContext &ctx) {
             if (!chosen) {
                 const float dir = (pp.x < c.x) ? -1.f : 1.f;
                 e.body.setVx(dir * kApproachSpeed);
+                // Degrau à frente e no chão? Pula (pathfinder de bolso).
+                if (hasLast_ &&
+                    std::fabs(e.body.getX() - lastX_) < 0.5f && grounded &&
+                    hopCooldown_-- <= 0) {
+                    e.body.setVy(kHopVy);
+                    hopCooldown_ = kHopCooldown;
+                }
+                lastX_ = e.body.getX();
+                hasLast_ = true;
             } else if (chosen->isMelee) {
                 pendingSkill_ = chosen->id;
                 changeState(DwarfState::Melee, chosen->telegraph);

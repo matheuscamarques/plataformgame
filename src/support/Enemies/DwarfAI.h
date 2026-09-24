@@ -49,6 +49,7 @@ public:
     core::EntityKind kind() const override { return core::EntityKind::Dwarf; }
     void onTick(Enemy &e, float dt, GameContext &ctx) override;
     void onTakeHit(Enemy &e, int applied, GameContext &ctx) override;
+    void setGrounded(bool g) override { grounded = g; }
 
     // Observabilidade de teste (não API de gameplay).
     DwarfState state() const { return state_; }
@@ -62,6 +63,13 @@ private:
     sf::Vector2f home_{0.f, 0.f};
     bool homed_ = false;
     int patrolDir_ = 1;
+
+    bool grounded = false;
+    // Anti-travamento (espelho do slime): parado contra parede pula
+    // degrau (approach) ou vira (patrulha), com cooldown entre pulos.
+    float lastX_ = 0.0f;
+    bool hasLast_ = false;
+    int hopCooldown_ = 0;
 
     core::Cooldown stateTimer_;
     // Skill escolhida no Recover, executada no fim do windup.

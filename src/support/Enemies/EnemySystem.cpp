@@ -72,6 +72,48 @@ void EnemySystem::tick(float dt, GameContext &ctx) {
         if (s->ai) s->ai->onTick(*s, dt, ctx);
         physics(*s, ctx);
     }
+    separate();
+}
+
+void EnemySystem::separate() {
+    // Inimigos não se atravessam: empurra posicional em pares pelo
+    // menor eixo (metade p/ cada). Respeita knockbackLock (impulso),
+    // mortos e marcados (removeDead cuida). Física do próximo tick
+    // resolve parede (sem grudar em rocha).
+    for (std::size_t i = 0; i < slimes_.size(); ++i) {
+        for (std::size_t j = i + 1; j < slimes_.size(); ++j) {
+            Enemy &a = *slimes_[i];
+            Enemy &b = *slimes_[j];
+            if (a.resources.isDead() || b.resources.isDead()) continue;
+            if (a.destroyPending || b.destroyPending) continue;
+            if (a.knockbackLock.running() || b.knockbackLock.running())
+                continue;
+            const float l = std::max(a.body.getX(), b.body.getX());
+            const float r = std::min(a.body.getX() + a.body.getW(),
+                                     b.body.getX() + b.body.getW());
+            const float t = std::max(a.body.getY(), b.body.getY());
+            const float bo = std::min(a.body.getY() + a.body.getH(),
+                                      b.body.getY() + b.body.getH());
+            const float ox = r - l;
+            const float oy = bo - t;
+            if (ox <= 0.f || oy <= 0.f) continue;
+            if (ox < oy) {
+                float s = (a.body.getCenterX() < b.body.getCenterX())
+                              ? -1.f
+                              : 1.f;
+                if (a.body.getCenterX() == b.body.getCenterX()) s = -1.f;
+                a.body.setX(a.body.getX() + s * ox * 0.5f);
+                b.body.setX(b.body.getX() - s * ox * 0.5f);
+            } else {
+                float s = (a.body.getCenterY() < b.body.getCenterY())
+                              ? -1.f
+                              : 1.f;
+                if (a.body.getCenterY() == b.body.getCenterY()) s = -1.f;
+                a.body.setY(a.body.getY() + s * oy * 0.5f);
+                b.body.setY(b.body.getY() - s * oy * 0.5f);
+            }
+        }
+    }
 }
 
 void EnemySystem::physics(Enemy &s, GameContext &ctx) {

@@ -91,6 +91,10 @@ public:
     int priority() const override { return 150; }
     void tick(float dt, GameContext &ctx) override;
 
+    // Empurra pares sobrepostos p/ fora (meio a meio, menor eixo).
+    // Headless-testável; tick chama no fim (após física de todos).
+    void separate();
+
     // kind desconhecido = ignorado (Factory retorna null).
     // ctx repassado à Factory p/ onSpawn (SpawnSystem passa o seu).
     void spawn(const std::string &kind, float x, float y,

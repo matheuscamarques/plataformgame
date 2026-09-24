@@ -162,7 +162,7 @@ int main() {
         assert(p.attrs.get(core::Attr::Vitality) == 11);
         assert(p.attrs.level() == 2);
         assert(p.souls == 100000 - cost);
-        assert(p.hpMax == 10200); // refreshDerived no buy
+        assert(p.hpMax == 102); // refreshDerived no buy (80+11*2)
     }
     { // LevelUpBrokeNoOp (sem souls: nada muda, feedback avisa)
         InventoryUI ui;

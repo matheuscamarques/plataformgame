@@ -8,12 +8,15 @@
 #include "SlimeAI.h"
 #include "BehaviorRegistry.h"
 #include "support/Enemies/EnemySystem.h"
+#include "support/Enemies/Pathfinder.h"
 #include "support/GameContext.h"
 #include "support/Skills/SkillSystem.h"
 
 #include <cmath>
 
+#include "core/Config.h"
 #include "entities/Player/Player.h"
+#include "world/World.h"
 
 namespace support {
 
@@ -48,8 +51,33 @@ void SlimeAI::onTick(Enemy &e, float dt, GameContext &ctx) {
 
     float speed = chase ? CHASE_SPEED : PATROL_SPEED;
     if (chase) {
-        dir_ = (dx >= 0.0f) ? 1.0f : -1.0f;
+        dir_ = (dx >= 0.0f) ? 1.0f : -1.0f; // fallback guloso
+        // Pathfinder: contorna parede (recalcula a cada 12 ticks).
+        // Sem mundo ou sem rota, o guloso acima continua valendo.
+        if (ctx.world && repathCooldown_-- <= 0) {
+            repathCooldown_ = 12;
+            const float bs = static_cast<float>(core::kBlockSize);
+            const int stx = static_cast<int>(
+                std::floor(e.body.getCenterX() / bs));
+            const int sty = static_cast<int>(
+                std::floor(e.body.getCenterY() / bs));
+            const int ptx = static_cast<int>(
+                std::floor(p->getCenterX() / bs));
+            const int pty = static_cast<int>(
+                std::floor(p->getCenterY() / bs));
+            cachedStep_ = findStep(
+                [&](int tx, int ty) { return ctx.world->isSolid(tx, ty); },
+                stx, sty, ptx, pty, 20);
+            hasCached_ = true;
+        }
+        if (hasCached_ && cachedStep_.found) {
+            if (cachedStep_.dx != 0)
+                dir_ = (cachedStep_.dx > 0) ? 1.0f : -1.0f;
+            // Rota manda subir e estou no chão? Pula (escalada).
+            if (cachedStep_.dy < 0 && grounded) hopCooldown_ = 0;
+        }
     } else {
+        hasCached_ = false; // patrulha: sem rota
         flipTimer_++;
         if (flipTimer_ >= FLIP_TICKS) {
             flipTimer_ = 0;
