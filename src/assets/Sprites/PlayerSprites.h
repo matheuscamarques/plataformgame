@@ -1,7 +1,7 @@
 /**
  * @file src/assets/Sprites/PlayerSprites.h
  * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
- * @brief Define sprites ASCII e paleta do jogador 12x20.
+ * @brief Define sprites ASCII e paleta do jogador 12x40.
  * @details Contém largura, altura, paleta com partes do corpo e frames idle, walk, jump, throw, punch, hurt e death, usados por SpriteSet e testes de largura.
  */
 
@@ -11,11 +11,12 @@
 
 namespace sprites {
 
-// Player 12x20, slime 14x12, dwarf 14x18. Top compartilhado via macros;
-// teste trava widths (linha errada = sprite deslocada).
+// Player 12x40 (stretch 2x vertical do 12x20; slime 14x12, dwarf 14x18).
+// Top compartilhado via macros; teste trava widths (linha errada =
+// sprite deslocada).
 
 inline constexpr int kPlayerW = 12;
-inline constexpr int kPlayerH = 20;
+inline constexpr int kPlayerH = 40;
 
 inline const core::PaletteEntry kPlayerPal[] = {
     {'.', {0, 0, 0, 0}, core::BodyPartId::None},
@@ -35,79 +36,146 @@ inline constexpr std::size_t kPlayerPalCount = 12;
 
 inline const char *const kPlayerIdle[] = {
     "....KKKK....",
+    "....KKKK....",
+    "..KKKKKKKK..",
     "..KKKKKKKK..",
     "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
     "..KFEFFEFK..",
     "..KFFFFFFK..",
+    "..KFFFFFFK..",
     "...FFFFFF...",
+    "...FFFFFF...",
+    "..CCCCCCCC..",
     "..CCCCCCCC..",
     ".GCCCCCCCCH.",
     ".GCCCCCCCCH.",
     ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "...CCCCCC...",
+    "...CCCCCC...",
+    "...CC..CC...",
+    "...CC..CC...",
     "...CC..CC...",
     "...CC..CC...",
     "...LL..BB...",
     "...LL..BB...",
     "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "............",
     "............",
 };
 
 inline const char *const kPlayerWalkA[] = {
     "....KKKK....",
+    "....KKKK....",
+    "..KKKKKKKK..",
     "..KKKKKKKK..",
     "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
     "..KFEFFEFK..",
     "..KFFFFFFK..",
+    "..KFFFFFFK..",
     "...FFFFFF...",
+    "...FFFFFF...",
+    "..CCCCCCCC..",
     "..CCCCCCCC..",
     ".GCCCCCCCC..",
     ".GCCCCCCCC..",
     ".GCCCCCCCC..",
+    ".GCCCCCCCC..",
+    ".GCCCCCCCC..",
+    ".GCCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "...CCCCCC...",
+    "...CCCCCC...",
+    "...CC..CC...",
+    "...CC..CC...",
     "...CC..CC...",
     "...CC..CC...",
     "...LL..BB...",
     "...LL..BB...",
     "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "............",
     "............",
 };
 
 inline const char *const kPlayerWalkB[] = {
     "....KKKK....",
+    "....KKKK....",
+    "..KKKKKKKK..",
     "..KKKKKKKK..",
     "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
     "..KFEFFEFK..",
     "..KFFFFFFK..",
+    "..KFFFFFFK..",
     "...FFFFFF...",
+    "...FFFFFF...",
+    "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCCH.",
     "..CCCCCCCCH.",
     "..CCCCCCCCH.",
+    "..CCCCCCCCH.",
+    "..CCCCCCCCH.",
+    "..CCCCCCCCH.",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "...CCCCCC...",
+    "...CCCCCC...",
     "..CC....CC..",
     "..CC....CC..",
+    "..CC....CC..",
+    "..CC....CC..",
+    ".LL......BB.",
+    ".LL......BB.",
+    ".LL......BB.",
     ".LL......BB.",
     ".LL......BB.",
     ".LL......BB.",
     "............",
+    "............",
 };
 inline const char *const kPlayerJump[] = {
     ".G........H.",
+    ".G........H.",
+    ".G.KKKKKK.H.",
     ".G.KKKKKK.H.",
     ".GKKKKKKKKH.",
+    ".GKKKKKKKKH.",
+    "..KFFFFFFK..",
     "..KFFFFFFK..",
     "..KFEFFEFK..",
+    "..KFEFFEFK..",
     "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "...FFFFFF...",
     "...FFFFFF...",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
@@ -115,9 +183,22 @@ inline const char *const kPlayerJump[] = {
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
     "...CCCCCC...",
     "...CC..CC...",
+    "...CC..CC...",
     "..LL....BB..",
+    "..LL....BB..",
+    "............",
+    "............",
+    "............",
+    "............",
     "............",
     "............",
     "............",
@@ -126,22 +207,42 @@ inline const char *const kPlayerJump[] = {
 
 inline const char *const kPlayerThrow[] = {
     "....KKKK..TT",
+    "....KKKK..TT",
+    "..KKKKKKKKtT",
     "..KKKKKKKKtT",
     "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
     "..KFEFFEFK..",
     "..KFFFFFFK..",
+    "..KFFFFFFK..",
     "...FFFFFF...",
+    "...FFFFFF...",
+    "..CCCCCCCC..",
     "..CCCCCCCC..",
     ".GCCCCCCCC..",
     ".GCCCCCCCC..",
+    ".GCCCCCCCC..",
+    ".GCCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "...CCCCCC...",
+    "...CCCCCC...",
+    "...CC..CC...",
+    "...CC..CC...",
     "...CC..CC...",
     "...CC..CC...",
     "...LL..BB...",
     "...LL..BB...",
     "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "............",
+    "............",
+    "............",
     "............",
     "............",
     "............",
@@ -149,80 +250,63 @@ inline const char *const kPlayerThrow[] = {
 
 inline const char *const kPlayerPunch[] = {
     "....KKKK....",
+    "....KKKK....",
+    "..KKKKKKKK..",
     "..KKKKKKKK..",
     "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
     "..KFEFFEFK..",
     "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "...FFFFFF...",
     "...FFFFFF...",
     "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCCH.",
     "..CCCCCCCCH.",
     "..CCCCCCCCHH",
+    "..CCCCCCCCHH",
     "..CCCCCCCCH.",
+    "..CCCCCCCCH.",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "...CCCCCC...",
+    "...CCCCCC...",
     "...CC..CC...",
     "...CC..CC...",
+    "...CC..CC...",
+    "...CC..CC...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
     "...LL..BB...",
     "...LL..BB...",
     "...LL..BB...",
     "............",
+    "............",
 };
 
 inline const char *const kPlayerPunchUp[] = {
-    ".GG......HH.",     // 0  mãos nas laterais
-    ".GG......HH.",     // 1
-    ".G..KKKK..H.",     // 2  cabeça + braços nas laterais
-    ".GKKKKKKKKH.",     // 3
-    ".GKFFFFFFKH.",     // 4
-    ".GKFEFFEFKH.",     // 5
-    ".GKFFFFFFKH.",     // 6
-    "...FFFFFF...",     // 7  queixo (braços terminam em 6)
-    "..CCCCCCCC..",     // 8  torso (+2 vs idle)
-    "..CCCCCCCC..",     // 9
-    "..CCCCCCCC..",     // 10
-    "..CCCCCCCC..",     // 11
-    "..CCCCCCCC..",     // 12
-    "...CCCCCC...",     // 13
-    "...CC..CC...",     // 14 pernas (mesma row)
-    "...CC..CC...",     // 15
-    "...LL..BB...",     // 16 botas (mesma row)
-    "...LL..BB...",     // 17
-    "...LL..BB...",     // 18
-    "............",     // 19
-};
-
-inline const char *const kPlayerPunchDown[] = {
-    "....KKKK....",     // 0  cabeça (igual idle)
-    "..KKKKKKKK..",     // 1
-    "..KFFFFFFK..",     // 2
-    "..KFEFFEFK..",     // 3
-    "..KFFFFFFK..",     // 4
-    "...FFFFFF...",     // 5
-    "..CCCCCCCC..",     // 6  ombros (igual idle)
-    ".GCCCCCCCCH.",     // 7  braços descem
-    ".GCCCCCCCCH.",     // 8
-    ".GCCCCCCCCH.",     // 9
-    ".GCCCCCCCCH.",     // 10
-    "..GCCCCCCH..",     // 11 estreitando
-    "..GCCCCCCH..",     // 12
-    "...CCCCCC...",     // 13 cintura (igual idle)
-    "...CC..CC...",     // 14 PERNAS (igual idle)
-    "...CC..CC...",     // 15
-    "...LL..BB...",     // 16
-    "...LL..BB...",     // 17
-    "...LL..BB...",     // 18
-    "............",     // 19
-};
-
-inline const char *const kPlayerHurt[] = {
-    ".G........H.",
-    ".G.KKKKKK.H.",
+    ".GG......HH.",
+    ".GG......HH.",
+    ".GG......HH.",
+    ".GG......HH.",
+    ".G..KKKK..H.",
+    ".G..KKKK..H.",
     ".GKKKKKKKKH.",
-    "..KFFFFFFK..",
-    "..KFEFFEFK..",
-    "..KFFFFFFK..",
+    ".GKKKKKKKKH.",
+    ".GKFFFFFFKH.",
+    ".GKFFFFFFKH.",
+    ".GKFEFFEFKH.",
+    ".GKFEFFEFKH.",
+    ".GKFFFFFFKH.",
+    ".GKFFFFFFKH.",
+    "...FFFFFF...",
     "...FFFFFF...",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
@@ -230,10 +314,107 @@ inline const char *const kPlayerHurt[] = {
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
     "...CCCCCC...",
     "...CC..CC...",
+    "...CC..CC...",
+    "...CC..CC...",
+    "...CC..CC...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "............",
+    "............",
+};
+
+inline const char *const kPlayerPunchDown[] = {
+    "....KKKK....",
+    "....KKKK....",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "...FFFFFF...",
+    "...FFFFFF...",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    "..GCCCCCCH..",
+    "..GCCCCCCH..",
+    "..GCCCCCCH..",
+    "..GCCCCCCH..",
+    "...CCCCCC...",
+    "...CCCCCC...",
+    "...CC..CC...",
+    "...CC..CC...",
+    "...CC..CC...",
+    "...CC..CC...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "............",
+    "............",
+};
+
+inline const char *const kPlayerHurt[] = {
+    ".G........H.",
+    ".G........H.",
+    ".G.KKKKKK.H.",
+    ".G.KKKKKK.H.",
+    ".GKKKKKKKKH.",
+    ".GKKKKKKKKH.",
+    "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "...FFFFFF...",
+    "...FFFFFF...",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CCCCCC...",
+    "...CC..CC...",
+    "...CC..CC...",
+    "..CC....CC..",
     "..CC....CC..",
     "..LL....BB..",
+    "..LL....BB..",
+    "............",
+    "............",
+    "............",
     "............",
     "............",
     "............",
@@ -246,19 +427,39 @@ inline const char *const kPlayerDeath[] = {
     "............",
     "............",
     "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "....KKKK....",
     "....KKKK....",
     "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
     "..KFEFFEFK..",
     "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
     "..CCCCCCCC..",
     "..CCCCCCCC..",
     ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
     "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
     "...CCCCCC...",
     "..CC....CC..",
     "..CC....CC..",
+    "..CC....CC..",
+    "..CC....CC..",
+    ".LL......BB.",
     ".LL......BB.",
     "LL........BB",
+    "LL........BB",
+    "............",
     "............",
 };
 

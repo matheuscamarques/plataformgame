@@ -21,7 +21,7 @@ int main() {
         return false;
     };
 
-    { // PlayerWidths (12x20, 10 frames)
+    { // PlayerWidths (12x40, 10 frames)
         const char *const *frames[] = {
             kPlayerIdle, kPlayerWalkA, kPlayerWalkB,
             kPlayerJump, kPlayerThrow, kPlayerPunch,
@@ -71,11 +71,11 @@ int main() {
         assert(!has(kPlayerThrow, kPlayerH, 'W'));
         assert(!has(kPlayerPunch, kPlayerH, 'W'));
     }
-    { // WalkFramesDifferInArms (braços em lados opostos)
-        assert(kPlayerWalkA[8][1] == 'G');
-        assert(kPlayerWalkA[8][10] == '.');
-        assert(kPlayerWalkB[8][1] == '.');
-        assert(kPlayerWalkB[8][10] == 'H');
+    { // WalkFramesDifferInArms (braços em lados opostos; row 8→16 no 40)
+        assert(kPlayerWalkA[16][1] == 'G');
+        assert(kPlayerWalkA[16][10] == '.');
+        assert(kPlayerWalkB[16][1] == '.');
+        assert(kPlayerWalkB[16][10] == 'H');
     }
     { // PunchBodyAlignsWithIdle (cabeça na mesma row: sem crouch)
         auto firstRowWith = [](const char *const *f, int h, char c) {
@@ -148,7 +148,7 @@ int main() {
         assert(R(AimDir::SE) == SpriteFrameId::PlayerPunchDown);
         assert(R(AimDir::SW) == SpriteFrameId::PlayerPunchDown);
     }
-    { // PunchUpAlignsLegs (pernas ancoradas; cabeça/torso +2 rows)
+    { // PunchUpAlignsLegs (pernas ancoradas; cabeça/torso +4 rows no 40)
         auto firstRowWith = [](const char *const *f, char c) {
             for (int y = 0; y < kPlayerH; ++y) {
                 if (std::strchr(f[y], c)) return y;
@@ -158,9 +158,9 @@ int main() {
         assert(firstRowWith(kPlayerPunchUp, 'B')
                == firstRowWith(kPlayerIdle, 'B'));
         assert(firstRowWith(kPlayerPunchUp, 'K')
-               == firstRowWith(kPlayerIdle, 'K') + 2);
+               == firstRowWith(kPlayerIdle, 'K') + 4);
         assert(firstRowWith(kPlayerPunchUp, 'C')
-               == firstRowWith(kPlayerIdle, 'C') + 2);
+               == firstRowWith(kPlayerIdle, 'C') + 4);
     }
     { // PunchDownFullyAligned (cabeça/torso/botas nas rows do idle)
         auto firstRowWith = [](const char *const *f, char c) {
