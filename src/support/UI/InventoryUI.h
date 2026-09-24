@@ -18,6 +18,7 @@
 
 #include "core/Inventory.h"
 #include "core/Equipment.h"
+#include "core/Vec.h"
 
 namespace support {
 
@@ -216,9 +217,9 @@ private:
     void cycleMainTab(int delta);      // troca + cursor 0
     void cycleSubTab(int delta);       // troca + cursor 0
 
-    sf::Vector2f gridOrigin(float sw, float sh) const;
-    sf::Vector2f slotPos(int index, float sw, float sh) const;
-    sf::Vector2f detailOrigin(float sw, float sh) const;
+    core::Vec2f gridOrigin(float sw, float sh) const;
+    core::Vec2f slotPos(int index, float sw, float sh) const;
+    core::Vec2f detailOrigin(float sw, float sh) const;
     static constexpr float kDetailW = 270.f;
 
     void renderMainTabs(sf::RenderTarget& t, float sw, const sf::Font& f) const;

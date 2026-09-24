@@ -9,6 +9,7 @@
 #include "world/Chunk.h"
 #include "core/Config.h"
 #include "core/EntityKind.h"
+#include "core/VecSfml.h"
 
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
@@ -31,13 +32,13 @@ void TileRenderer::rebuild(Chunk& c) {
     for (const auto& slot : c.entities) {
         Entity* e = slot.get();
         if (!e || !isTileKind(e->getName())) continue;
-        const sf::Vector2f wp = e->getPosition();
-        const sf::Vector2f p{wp.x - ox, wp.y - oy};
-        const sf::Vector2f s = e->getSize();
+        const core::Vec2f wp = core::fromSf(e->getPosition());
+        const core::Vec2f p{wp.x - ox, wp.y - oy};
+        const core::Vec2f s = core::fromSf(e->getSize());
         const sf::Color col = e->getFillColor();
-        c.tileVerts.append(sf::Vertex(p, col));
-        c.tileVerts.append(sf::Vertex({p.x + s.x, p.y}, col));
-        c.tileVerts.append(sf::Vertex({p.x + s.x, p.y + s.y}, col));
+        c.tileVerts.append(sf::Vertex(core::toSf(p), col));
+        c.tileVerts.append(sf::Vertex(core::toSf(core::Vec2f{p.x + s.x, p.y}), col));
+        c.tileVerts.append(sf::Vertex(core::toSf(core::Vec2f{p.x + s.x, p.y + s.y}), col));
         c.tileVerts.append(sf::Vertex({p.x, p.y + s.y}, col));
     }
     c.tileDirty = false;

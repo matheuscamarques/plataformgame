@@ -1,3 +1,4 @@
+#include "core/Vec.h"
 /**
  * @file src/support/Debug/ScreenshotSystem.h
  * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
@@ -38,7 +39,7 @@ public:
     // a worldView armazenada (a view ativa na captura é a default do
     // HUD — converter nela descentra o recorte). CPU-side: testável
     // headless via cropZoom.
-    void setFocus(sf::Vector2f worldCenter) {
+    void setFocus(core::Vec2f worldCenter) {
         focus_ = worldCenter;
         hasFocus_ = true;
     }
@@ -52,7 +53,7 @@ public:
 
     // Recorte size×size centrado no foco + zoom nearest-neighbor.
     // Estático p/ teste headless (sf::Image é CPU, sem GL).
-    static sf::Image cropZoom(const sf::Image &src, sf::Vector2f focusPx);
+    static sf::Image cropZoom(const sf::Image &src, core::Vec2i focusPx);
 
     // Manual: sempre grava. Sem janela, retorna false.
     bool capture(const std::string &tag);
@@ -60,7 +61,7 @@ public:
     // Auto melee: só grava com flag ligada; dedup por swing.
     void maybeCaptureMelee(int swingId);
     // Auto hurt: só grava com flag ligada (i-frame já deduplica).
-    void notifyHurt(sf::Vector2f worldCenter);
+    void notifyHurt(core::Vec2f worldCenter);
 
 private:
     sf::RenderWindow *window_ = nullptr;
@@ -72,7 +73,7 @@ private:
 
     int counter_ = 0;
 
-    sf::Vector2f focus_{0.f, 0.f};
+    core::Vec2f focus_{0.f, 0.f};
     bool hasFocus_ = false;
     sf::View worldView_;
     bool hasWorldView_ = false;

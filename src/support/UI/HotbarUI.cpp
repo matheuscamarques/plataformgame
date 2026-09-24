@@ -50,11 +50,11 @@ void HotbarUI::render(sf::RenderTarget& target, const core::Inventory& inv,
                        const sf::Font& font) const {
     const std::vector<int> slots = filteredSlots(inv);
     for (int i = 0; i < kSlots; ++i) {
-        const sf::Vector2f p = slotPos(i, screenW, screenH);
+        const core::Vec2f p = slotPos(i, screenW, screenH);
         const bool active = (i == activeSlot);
 
         sf::RectangleShape bg({kSlotSize, kSlotSize});
-        bg.setPosition(p);
+        bg.setPosition(p.x, p.y);
         bg.setFillColor(active ? sf::Color(60, 60, 70, 220)
                                : sf::Color(30, 30, 40, 180));
         bg.setOutlineColor(active ? sf::Color(255, 220, 100)

@@ -50,7 +50,7 @@ XPOrb *DropSystem::spawnXP(core::Vec2f pos, int value) {
 void DropSystem::tick(float dt, GameContext &ctx) {
     // Player pode ser nulo (testes de expiração): envelhece igual,
     // só pula magnetismo/coleta.
-    sf::Vector2f playerPos{0.f, 0.f};
+    core::Vec2f playerPos{0.f, 0.f};
     const bool hasPlayer = (ctx.player != nullptr);
     if (hasPlayer) {
         playerPos = {ctx.player->getCenterX(), ctx.player->getCenterY()};

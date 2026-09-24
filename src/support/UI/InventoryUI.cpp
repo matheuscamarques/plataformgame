@@ -602,7 +602,7 @@ void InventoryUI::handleConfirmDrop(const InputMap& input) {
 
 // ─── Layout ──────────────────────────────────────────────────
 
-sf::Vector2f InventoryUI::gridOrigin(float sw, float sh) const {
+core::Vec2f InventoryUI::gridOrigin(float sw, float sh) const {
     const float gw = kCols * kSlotSize + (kCols - 1) * kPad;
     const float gh = kRows * kSlotSize + (kRows - 1) * kPad;
     // Bloco grid + vão + painel centralizado, com respiro mínimo de 24px
@@ -615,15 +615,15 @@ sf::Vector2f InventoryUI::gridOrigin(float sw, float sh) const {
     return {std::max((sw - totalW) * 0.5f, 24.f), 110.f + slide};
 }
 
-sf::Vector2f InventoryUI::slotPos(int i, float sw, float sh) const {
+core::Vec2f InventoryUI::slotPos(int i, float sw, float sh) const {
     const int col = i % kCols;
     const int row = i / kCols;
-    const sf::Vector2f o = gridOrigin(sw, sh);
+    const core::Vec2f o = gridOrigin(sw, sh);
     return {o.x + col * (kSlotSize + kPad), o.y + row * (kSlotSize + kPad)};
 }
 
-sf::Vector2f InventoryUI::detailOrigin(float sw, float sh) const {
-    const sf::Vector2f o = gridOrigin(sw, sh);
+core::Vec2f InventoryUI::detailOrigin(float sw, float sh) const {
+    const core::Vec2f o = gridOrigin(sw, sh);
     const float gw = kCols * kSlotSize + (kCols - 1) * kPad;
     return {o.x + gw + 16.f, 110.f};
 }
@@ -734,17 +734,17 @@ void InventoryUI::renderGrid(sf::RenderTarget& t, float sw, float sh,
                                              : "Nenhum item nesta categoria");
         msg.setCharacterSize(14);
         msg.setFillColor(sf::Color(150, 150, 150));
-        const sf::Vector2f o = gridOrigin(sw, sh);
+        const core::Vec2f o = gridOrigin(sw, sh);
         msg.setPosition(o.x + 40.f, o.y + 120.f);
         t.draw(msg);
     }
 
     for (int i = 0; i < kSlots; ++i) {
-        const sf::Vector2f p = slotPos(i, sw, sh);
+        const core::Vec2f p = slotPos(i, sw, sh);
         const bool sel = (i == cursor_);
 
         sf::RectangleShape bg({kSlotSize, kSlotSize});
-        bg.setPosition(p);
+        bg.setPosition(p.x, p.y);
         bg.setFillColor(sel ? sf::Color(70, 70, 90, 240)
                             : sf::Color(40, 40, 50, 220));
         bg.setOutlineColor(sel ? sf::Color(255, 220, 100)
@@ -757,7 +757,7 @@ void InventoryUI::renderGrid(sf::RenderTarget& t, float sw, float sh,
             const float age = core::Time::elapsed() - flashTime_;
             if (age >= 0.f && age < 0.4f) {
                 sf::RectangleShape fl({kSlotSize, kSlotSize});
-                fl.setPosition(p);
+                fl.setPosition(p.x, p.y);
                 fl.setFillColor(sf::Color::Transparent);
                 fl.setOutlineColor(sf::Color(
                     255, 220, 100,
@@ -807,13 +807,13 @@ void InventoryUI::renderEquipTab(sf::RenderTarget& t, float sw, float sh,
     // Tudo derivado de kEquipSlotSize/kEquipPad.
     const float ss = kEquipSlotSize;
     const float step = ss + kEquipPad; // 120
-    const sf::Vector2f o = gridOrigin(sw, sh);
+    const core::Vec2f o = gridOrigin(sw, sh);
     const float gw = kCols * kSlotSize + (kCols - 1) * kPad;
     const float cx = o.x + gw * 0.5f;
     const float cy = o.y + 150.f; // centro do bloco
     const float x0 = cx - (ss + kEquipPad + ss) * 0.5f;
     const float topR = cy - (5 * ss + 4 * kEquipPad) * 0.5f;
-    const sf::Vector2f pos[7] = {
+    const core::Vec2f pos[7] = {
         {x0, topR},               // RightHand (Arms)
         {x0, topR + step},        // LeftHand (Arms)
         {x0 + step, topR},        // Head
@@ -836,7 +836,7 @@ void InventoryUI::renderEquipTab(sf::RenderTarget& t, float sw, float sh,
     for (int i = 0; i < 7; ++i) {
         const bool sel = (i == equipCursor_);
         sf::RectangleShape bg({ss, ss});
-        bg.setPosition(pos[i]);
+        bg.setPosition(pos[i].x, pos[i].y);
         bg.setFillColor(sel ? sf::Color(70, 70, 90, 240)
                             : sf::Color(40, 40, 50, 220));
         bg.setOutlineColor(sel ? sf::Color(255, 220, 100)
@@ -848,7 +848,7 @@ void InventoryUI::renderEquipTab(sf::RenderTarget& t, float sw, float sh,
             const float age = core::Time::elapsed() - flashTime_;
             if (age >= 0.f && age < 0.4f) {
                 sf::RectangleShape fl({ss, ss});
-                fl.setPosition(pos[i]);
+                fl.setPosition(pos[i].x, pos[i].y);
                 fl.setFillColor(sf::Color::Transparent);
                 fl.setOutlineColor(sf::Color(
                     255, 220, 100,
@@ -887,11 +887,11 @@ void InventoryUI::renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
     // Painel só existe em Inventory/Equipment.
     if (mainTab_ != MainTab::Inventory && mainTab_ != MainTab::Equipment)
         return;
-    const sf::Vector2f dp = detailOrigin(sw, sh);
+    const core::Vec2f dp = detailOrigin(sw, sh);
     const float ph = std::max(220.f, sh - dp.y - 60.f);
 
     sf::RectangleShape bg({kDetailW, ph});
-    bg.setPosition(dp);
+    bg.setPosition(dp.x, dp.y);
     bg.setFillColor(sf::Color(15, 15, 25, 230));
     bg.setOutlineColor(sf::Color(90, 90, 110));
     bg.setOutlineThickness(1.f);

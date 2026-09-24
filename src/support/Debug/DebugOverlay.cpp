@@ -25,7 +25,7 @@ void DebugOverlay::render(sf::RenderWindow &window, const sf::Font &font,
     float qw = player.getW() + core::kBlockSize * 2;
     float qh = player.getH() + core::kBlockSize * 2;
 
-    sf::RectangleShape queryRect(sf::Vector2f(qw, qh));
+    sf::RectangleShape queryRect({qw, qh});
     queryRect.setPosition(qx, qy);
     queryRect.setFillColor(sf::Color(0, 255, 0, 30));
     queryRect.setOutlineColor(sf::Color::Green);
@@ -39,7 +39,7 @@ void DebugOverlay::render(sf::RenderWindow &window, const sf::Font &font,
         float cx = cell.first * cs;
         float cy = cell.second * cs;
 
-        sf::RectangleShape cellRect(sf::Vector2f(cs, cs));
+        sf::RectangleShape cellRect({cs, cs});
         cellRect.setPosition(cx, cy);
         cellRect.setFillColor(sf::Color::Transparent);
         cellRect.setOutlineColor(sf::Color(64, 128, 255));

@@ -17,6 +17,7 @@
 #include <SFML/Graphics/Texture.hpp>
 
 #include "core/Log.h"
+#include "core/VecSfml.h"
 
 namespace support {
 
@@ -42,7 +43,7 @@ std::string timestamp() {
 // Recorte size×size centrado em focus (clampado no framebuffer),
 // ampliado zoom× com nearest-neighbor (pixel-art sem blur).
 sf::Image ScreenshotSystem::cropZoom(const sf::Image &src,
-                                     sf::Vector2f focusPx) {
+                                     core::Vec2i focusPx) {
     const sf::Vector2u size = src.getSize();
     if (size.x == 0 || size.y == 0) return src;
     constexpr unsigned S = ScreenshotSystem::kFocusSize;
@@ -94,10 +95,10 @@ bool ScreenshotSystem::capture(const std::string &tag) {
     // ativa aqui é a default do HUD). Sem worldView, usa a atual.
     if (hasFocus_) {
         const sf::Vector2i px = hasWorldView_
-                                    ? window_->mapCoordsToPixel(focus_,
+                                    ? window_->mapCoordsToPixel(core::toSf(focus_),
                                                                 worldView_)
-                                    : window_->mapCoordsToPixel(focus_);
-        img = cropZoom(img, sf::Vector2f(px));
+                                    : window_->mapCoordsToPixel(core::toSf(focus_));
+        img = cropZoom(img, core::Vec2i(px.x, px.y));
     }
 
     std::ostringstream name;
@@ -116,7 +117,7 @@ void ScreenshotSystem::maybeCaptureMelee(int swingId) {
     capture("melee_" + std::to_string(swingId));
 }
 
-void ScreenshotSystem::notifyHurt(sf::Vector2f worldCenter) {
+void ScreenshotSystem::notifyHurt(core::Vec2f worldCenter) {
     if (!autoHurt_) return;
     setFocus(worldCenter);
     capture("hurt_" + std::to_string(counter_));

@@ -10,14 +10,15 @@
 //
 
 #include "component.h"
+#include "core/VecSfml.h"
 
 Component::Component() : sf::RectangleShape(), sf::FloatRect()
 {
 }
 
 Component::Component(int name,float x, float y, float w, float h) :
-sf::RectangleShape(sf::Vector2f(w, h)),
-sf::FloatRect(sf::Vector2f(x, y), sf::Vector2f(w, h)) {
+sf::RectangleShape(core::toSf(core::Vec2f(w, h))),
+sf::FloatRect(core::toSf(core::Vec2f(x, y)), core::toSf(core::Vec2f(w, h))) {
     setPosition(x, y);
     left = x;
     top  = y;

@@ -15,6 +15,7 @@
 #include <SFML/Graphics/Text.hpp>
 
 #include "core/Inventory.h"
+#include "core/Vec.h"
 
 namespace support {
 
@@ -47,7 +48,7 @@ public:
                 const sf::Font& font) const;
 
 private:
-    sf::Vector2f slotPos(int i, float screenW, float screenH) const {
+    core::Vec2f slotPos(int i, float screenW, float screenH) const {
         const float totalW = kSlots * kSlotSize + (kSlots - 1) * kPad;
         const float x0 = (screenW - totalW) * 0.5f;
         const float y0 = screenH - kSlotSize - 16.f;

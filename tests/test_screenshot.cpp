@@ -55,7 +55,7 @@ int main() {
         src.create(800, 800, sf::Color::Black);
         src.setPixel(400, 300, sf::Color::Red);
         const sf::Image out =
-            ScreenshotSystem::cropZoom(src, {400.f, 300.f});
+            ScreenshotSystem::cropZoom(src, {400, 300});
         assert(out.getSize().x == ScreenshotSystem::kFocusSize *
                                      ScreenshotSystem::kFocusZoom);
         assert(out.getSize().y == ScreenshotSystem::kFocusSize *
@@ -71,7 +71,7 @@ int main() {
         sf::Image src;
         src.create(800, 800, sf::Color::Green);
         const sf::Image out =
-            ScreenshotSystem::cropZoom(src, {0.f, 0.f});
+            ScreenshotSystem::cropZoom(src, {0, 0});
         assert(out.getSize().x == 720u);
         assert(out.getPixel(0, 0) == sf::Color::Green);
         assert(out.getPixel(719, 719) == sf::Color::Green);
