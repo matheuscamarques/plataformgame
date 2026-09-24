@@ -748,6 +748,21 @@ void Game::render()
         hpFg.setFillColor(sf::Color(200, 30, 30));
         window->draw(hpFg);
 
+        // Estamina (F3: barra verde; F5 drena em swing/roll/run).
+        const float stRatio = p->staminaMax > 0.f
+                                  ? static_cast<float>(p->stamina) /
+                                        static_cast<float>(p->staminaMax)
+                                  : 0.f;
+        sf::RectangleShape stBg(sf::Vector2f(204.f, 8.f));
+        stBg.setPosition(16.f, 38.f);
+        stBg.setFillColor(sf::Color(0, 40, 0));
+        window->draw(stBg);
+        sf::RectangleShape stFg(
+            sf::Vector2f(200.f * std::min(1.f, std::max(0.f, stRatio)), 5.f));
+        stFg.setPosition(18.f, 39.5f);
+        stFg.setFillColor(sf::Color(80, 200, 80));
+        window->draw(stFg);
+
         auto text = [&](const std::string &s, float x, float y, int size = 18) {
             sf::Text t;
             t.setFont(font);
@@ -759,7 +774,7 @@ void Game::render()
             t.setPosition(x, y);
             window->draw(t);
         };
-        text("HP " + std::to_string(p->hp) + "/" + std::to_string(p->hpMax), 16.f, 38.f);
+        text("HP " + std::to_string(p->hp) + "/" + std::to_string(p->hpMax), 16.f, 48.f);
         text("TNT:" + std::to_string(p->inventory.count("dynamite")) + " J  K melee", 16.f, 62.f);
         text("Souls: " + std::to_string(p->souls), 16.f, 158.f);
         text(std::string("Mat: ") + (p->weaponDef()

@@ -12,9 +12,10 @@
 
 namespace core {
 
-// Carga máxima equipada (DS: mochila não pesa, armadura sim).
+// Carga base equipada (DS: mochila não pesa, armadura sim).
 // >50% = pesada (sem correr); equipar nunca é recusado.
-inline constexpr float kMaxEquipLoad = 60.f;
+// END move o teto via Attributes::maxLoad (base = END 10).
+inline constexpr float kBaseEquipLoad = 60.f;
 
 // Equipamento do player: 4 slots fixos (Dark Souls, sem Tetris).
 // Puro (sem SFML, sem Player): headless-safe. O slot natural vem do

@@ -14,6 +14,7 @@
 #include "support/Combat/AimDir.h"
 #include "support/Combat/Body.h"
 #include "support/Combat/SpriteFrame.h"
+#include "core/Attributes.h"
 #include "core/Cooldown.h"
 #include "core/Equipment.h"
 #include "core/Inventory.h"
@@ -61,6 +62,13 @@ class Player : public Entity
         int hpMax = 10000;
         core::Cooldown hurtIframes;
 
+        // Atributos DS (F2+): dirigem hpMax/stamina/carga (refreshDerived).
+        core::Attributes attrs;
+
+        // Estamina (F3: teto + regen; F5: consumo em swing/roll/run).
+        float stamina = 150.f;
+        float staminaMax = 150.f;
+
         // Carteira de souls (XP coletado). Morte derruba no cadáver
         // (RunManager); R voluntário mantém; respawn não mexe.
         int souls = 0;
@@ -75,9 +83,17 @@ class Player : public Entity
 
         // Carga equipada (mochila não pesa). Pesada = sem correr.
         float equipLoad() const { return equipment.weight(); }
-        bool heavilyLoaded() const {
-            return equipLoad() > core::kMaxEquipLoad * 0.5f;
+        float maxEquipLoad() const {
+            return core::Attributes::maxLoad(
+                attrs.get(core::Attr::Endurance));
         }
+        bool heavilyLoaded() const {
+            return equipLoad() > maxEquipLoad() * 0.5f;
+        }
+
+        // Recalcula hpMax/staminaMax/carga dos atributos (ctor, respawn,
+        // pós-compra). Não mexe em hp/stamina atuais (só tetos).
+        void refreshDerived();
 
         // Melee light 3-hit. Estado avançado pelo MeleeSystem (tem dt).
         MeleePhase meleePhase = MeleePhase::Idle;

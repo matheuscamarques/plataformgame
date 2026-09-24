@@ -36,6 +36,8 @@ Entity(core::kIdPlayer,0,0,30,50) // AABB derivado do sprite 12x20 a 2.5x
     equipment.equip(core::Item{"iron_chest", 1});
     equipment.equip(core::Item{"iron_legs", 1});
     equipment.equip(core::Item{"iron_boots", 1});
+    refreshDerived(); // hpMax/stamina/carga dos attrs base (10)
+    stamina = staminaMax;
     //this->setGravity(9.8f);
 }
 
@@ -216,6 +218,10 @@ void Player::tick() {
     this->left = getX();
     this->top = getY();
     this->setPosition(getX(), getY());
+
+    // Regen de estamina: 30/s (F5 drena em swing/roll/run).
+    if (stamina < staminaMax)
+        stamina = std::min(staminaMax, stamina + 1.f);
 }
 
 void Player::topUpDynamite() {
@@ -294,6 +300,14 @@ bool Player::tryThrow(support::ThrowSystem &throws) {    if (!throwCooldown.read
     return true;
 }
 
+void Player::refreshDerived() {
+    hpMax = core::Attributes::maxHP(attrs.get(core::Attr::Vitality));
+    staminaMax = static_cast<float>(
+        core::Attributes::maxStamina(attrs.get(core::Attr::Endurance)));
+    if (hp > hpMax) hp = hpMax;
+    if (stamina > staminaMax) stamina = staminaMax;
+}
+
 const core::ItemDef* Player::weaponDef() const {
     const core::Item& w = equipment.get(core::EquipSlot::RightHand);
     return w.isEmpty() ? nullptr : w.def();
@@ -322,6 +336,8 @@ void Player::respawn(float x, float y) {
     throwCooldown.reset();
     topUpDynamite();
     topUpStarterKit();
+    refreshDerived();
+    stamina = staminaMax; // respawn renova tudo (DS)
     meleePhase = MeleePhase::Idle;
     meleeCombo = 0;
     meleeTimer = 0.f;

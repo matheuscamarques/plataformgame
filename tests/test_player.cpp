@@ -26,6 +26,28 @@ int main() {
         for (int i = 0; i < 20; ++i) p.tick();
         assert(p.throwCooldown.ready());
     }
+    { // DerivedFromAttributes (seed VIT/END 10: 10000/150/60)
+        Player p;
+        assert(p.hpMax == 10000);
+        assert(p.staminaMax == 150.f && p.stamina == 150.f);
+        assert(p.maxEquipLoad() == 60.f);
+        assert(!p.heavilyLoaded()); // set ferro 28 <= 30
+        int souls = 1000000;
+        assert(p.attrs.buy(core::Attr::Vitality, souls));
+        assert(p.attrs.buy(core::Attr::Endurance, souls));
+        p.refreshDerived();
+        assert(p.hpMax == 10200 && p.staminaMax == 155.f);
+        assert(p.maxEquipLoad() == 62.f);
+    }
+    { // StaminaRegen (1/tick até o teto)
+        Player p;
+        p.stamina = 100.f;
+        p.tick();
+        assert(p.stamina == 101.f);
+        p.stamina = 149.5f;
+        p.tick();
+        assert(p.stamina == 150.f); // trava no teto, sem passar
+    }
 
     std::printf("player test OK\n");
     return 0;

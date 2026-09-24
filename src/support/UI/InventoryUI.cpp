@@ -1009,9 +1009,10 @@ void InventoryUI::renderStatusTab(sf::RenderTarget& t, float sw, float sh,
          sf::Color(240, 220, 140), y);
     if (player_) {
         const float load = player_->equipLoad();
+        const float maxLoad = player_->maxEquipLoad();
         const bool heavy = player_->heavilyLoaded();
         line("Carga: " + std::to_string(static_cast<int>(load)) + "/" +
-                 std::to_string(static_cast<int>(core::kMaxEquipLoad)) +
+                 std::to_string(static_cast<int>(maxLoad)) +
                  (heavy ? " (pesada: sem correr)" : " (leve)"),
              14,
              heavy ? sf::Color(240, 120, 120) : sf::Color(170, 170, 180), y);

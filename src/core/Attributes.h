@@ -73,6 +73,21 @@ struct Attributes {
         return true;
     }
 
+    // Derivados (F3): VIT 10 = 10000 (compatível com o jogo atual).
+    static int maxHP(int vit) {
+        if (vit < 1) vit = 1;
+        if (vit <= 40) return 8000 + vit * 200;
+        return 8000 + 40 * 200 + (vit - 40) * 50; // soft cap 40
+    }
+    static int maxStamina(int end) {
+        if (end < 1) end = 1;
+        return 100 + end * 5;
+    }
+    static float maxLoad(int end) {
+        if (end < 1) end = 1;
+        return 60.f + (end - kBase) * 2.f; // END 10 = 60 (atual)
+    }
+
 private:
     std::array<int, kAttrCount> v_{kBase, kBase, kBase, kBase,
                                    kBase, kBase, kBase, kBase};

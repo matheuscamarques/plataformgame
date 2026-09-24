@@ -49,6 +49,21 @@ int main() {
             assert(n != nullptr && n[0] != '?' && n[0] != '\0');
         }
     }
+    { // DerivedFormulas (VIT10 = 10000; soft cap 40; END10 = 150/60)
+        assert(Attributes::maxHP(10) == 10000);
+        assert(Attributes::maxHP(40) == 16000);
+        assert(Attributes::maxHP(41) - Attributes::maxHP(40) == 50);
+        assert(Attributes::maxHP(1) == 8200);
+        int prev = Attributes::maxHP(1);
+        for (int v = 2; v <= 99; ++v) {
+            const int h = Attributes::maxHP(v);
+            assert(h > prev);
+            prev = h;
+        }
+        assert(Attributes::maxStamina(10) == 150);
+        assert(Attributes::maxLoad(10) == 60.f);
+        assert(Attributes::maxLoad(20) == 80.f);
+    }
 
     std::printf("attributes test OK\n");
     return 0;
