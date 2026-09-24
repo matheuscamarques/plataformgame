@@ -12,6 +12,7 @@
 #include "core/sprite_from_ascii.h"
 
 #include "assets/Sprites/PlayerSprites.h"
+#include "assets/Sprites/PlayerParts.h"
 #include "assets/Sprites/EnemySprites.h"
 #include "assets/Sprites/EquipSprites.h"
 #include "assets/Sprites/ThrowableSprites.h"
@@ -50,6 +51,16 @@ struct SpriteSet {
 
     // Throwables — 1 textura por frame (fresh/burning/critical), sem material.
     sf::Texture tnt[3];
+
+    // Partes do player (Fase C): 10 poses × {head 12x12, torso 12x16,
+    // legs 12x12}. Renderer ainda usa os frames acima (fallback); Fase D
+    // desenha estas. Mesma paleta, mesma arte.
+    struct PlayerPartsTex {
+        sf::Texture head;
+        sf::Texture torso;
+        sf::Texture legs;
+    };
+    PlayerPartsTex playerParts[kPlayerPoseCount];
 };
 
 // Roda 1x no boot (precisa de contexto GL — nunca em teste headless).
@@ -107,6 +118,16 @@ inline SpriteSet build() {
     s.tnt[0] = core::makeSprite(kTntFresh, kTntW, kTntH, kTntPal, kTntPalCount);
     s.tnt[1] = core::makeSprite(kTntBurning, kTntW, kTntH, kTntPal, kTntPalCount);
     s.tnt[2] = core::makeSprite(kTntCritical, kTntW, kTntH, kTntPal, kTntPalCount);
+    // Partes: mesma arte dos frames, fatiada (compose() prova igualdade).
+    for (int i = 0; i < kPlayerPoseCount; ++i) {
+        const assets::Part* pp = poseParts(static_cast<PlayerPose>(i));
+        s.playerParts[i].head = core::makeSprite(
+            pp[0].rows, pp[0].w, pp[0].h, kPlayerPal, kPlayerPalCount);
+        s.playerParts[i].torso = core::makeSprite(
+            pp[1].rows, pp[1].w, pp[1].h, kPlayerPal, kPlayerPalCount);
+        s.playerParts[i].legs = core::makeSprite(
+            pp[2].rows, pp[2].w, pp[2].h, kPlayerPal, kPlayerPalCount);
+    }
     return s;
 }
 

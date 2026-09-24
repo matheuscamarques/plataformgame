@@ -67,6 +67,20 @@ int main() {
         for (int row = 0; row < 36; ++row) assert(got[row] == "............");
         assert(got[36] == kPlayerIdleHead[0]);
     }
+    { // PosesCoverAllFrames (10 poses × 3 partes com dims certas)
+        assert(kPlayerPoseCount == 10);
+        for (int i = 0; i < kPlayerPoseCount; ++i) {
+            const assets::Part* pp =
+                poseParts(static_cast<PlayerPose>(i));
+            assert(pp != nullptr);
+            assert(pp[0].w == 12 && pp[0].h == 12); // head
+            assert(pp[1].w == 12 && pp[1].h == 16); // torso
+            assert(pp[2].w == 12 && pp[2].h == 12); // legs
+            assert(pp[0].rows && pp[1].rows && pp[2].rows);
+        }
+        // Fora da faixa: fallback idle (nunca nullptr).
+        assert(poseParts(static_cast<PlayerPose>(99)) == kPlayerIdleParts);
+    }
 
     std::printf("sprite compose test OK\n");
     return 0;

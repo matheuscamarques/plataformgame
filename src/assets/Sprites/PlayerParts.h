@@ -573,4 +573,29 @@ inline constexpr assets::Part kPlayerDeathParts[] = {
     { kPlayerDeathLegs, 12, 12, 0, 28 },
 };
 
+// Poses na ordem dos frames (espelha textureForFrame do Renderer).
+enum class PlayerPose : uint8_t {
+    Idle, WalkA, WalkB, Jump, Throw,
+    Punch, PunchUp, PunchDown, Hurt, Death,
+    COUNT
+};
+
+inline constexpr int kPlayerPoseCount = 10;
+
+inline const assets::Part* poseParts(PlayerPose p) {
+    switch (p) {
+        case PlayerPose::Idle:      return kPlayerIdleParts;
+        case PlayerPose::WalkA:     return kPlayerWalkAParts;
+        case PlayerPose::WalkB:     return kPlayerWalkBParts;
+        case PlayerPose::Jump:      return kPlayerJumpParts;
+        case PlayerPose::Throw:     return kPlayerThrowParts;
+        case PlayerPose::Punch:     return kPlayerPunchParts;
+        case PlayerPose::PunchUp:   return kPlayerPunchUpParts;
+        case PlayerPose::PunchDown: return kPlayerPunchDownParts;
+        case PlayerPose::Hurt:      return kPlayerHurtParts;
+        case PlayerPose::Death:     return kPlayerDeathParts;
+        default:                    return kPlayerIdleParts;
+    }
+}
+
 } // namespace sprites
