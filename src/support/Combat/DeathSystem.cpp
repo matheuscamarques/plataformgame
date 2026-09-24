@@ -40,6 +40,12 @@ void DeathSystem::tick(float /*dt*/, GameContext &ctx) {
                 drops_->spawnItem(id, qty,
                                   {e.body.getCenterX(), e.body.getCenterY()});
             }
+            // Equipamento vestido cai (100%: o que veste, dropa).
+            e.equipment.forEach([&](core::EquipSlot, const core::Item& it) {
+                if (it.isEmpty()) return;
+                drops_->spawnItem(it.defId, it.quantity,
+                                  {e.body.getCenterX(), e.body.getCenterY()});
+            });
         });
     }
     ctx.enemies->removeDead([&](Enemy &e) {
