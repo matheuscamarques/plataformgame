@@ -932,26 +932,24 @@ void Game::drawPlayerEquipment() {
     // Offsets em rows do sprite (nunca world): a âncora segue o Body,
     // que o BodySystem recalcula por frame via rebuildFromSprite.
     // Origin (0,0) + facing<0 desenha p/ esquerda: x ancora o canto
-    // direito (mesma regra de equipSpritePos).
-    // wmult=2: armadura acompanha o corpo 2x (texturas continuam 12px;
-    // pixel 5px vs 2.5px do corpo — documentado, não ideal). Armas ficam
-    // 1x de propósito (hitbox ancorada no registry).
+    // direito (mesma regra de equipSpritePos). Arte 2x (24px), draw 1x:
+    // mesma densidade do corpo.
     auto drawFullWidth = [&](const sf::Texture &tex, int texW,
                              support::BodyPartId anchor, float fracY,
-                             float offRows, float wmult = 2.f) {
+                             float offRows) {
         const auto *part = p->body.find(anchor);
         if (!part || part->fromSchema) return; // âncora ausente: não desenhar
         const float cx = part->worldBox.left + part->worldBox.width * 0.5f;
         const float y =
-            part->worldBox.top + part->worldBox.height * fracY + offRows * s * wmult;
+            part->worldBox.top + part->worldBox.height * fracY + offRows * s;
         sf::Sprite spr(tex);
-        spr.setPosition(cx - static_cast<float>(f * texW) * 0.5f * s * wmult, y);
-        spr.setScale(s * static_cast<float>(f) * wmult, s * wmult);
+        spr.setPosition(cx - static_cast<float>(f * texW) * 0.5f * s, y);
+        spr.setScale(s * static_cast<float>(f), s);
         window->draw(spr);
     };
 
-    // Luva centrada na mão (x2 como a armadura); some se o braço está
-    // oculto no frame. Sem slot próprio: segue o elmo; sem elmo, sem luva.
+    // Luva centrada na mão; some se o braço está oculto no frame.
+    // Sem slot próprio: segue o elmo; sem elmo, sem luva.
     auto drawGlove = [&](support::BodyPartId arm, int m) {
         const auto *part = p->body.find(arm);
         if (!part || part->fromSchema) return;
@@ -960,27 +958,26 @@ void Game::drawPlayerEquipment() {
                       static_cast<float>(sprites::kGloveH * 0.5f));
         spr.setPosition(part->worldBox.left + part->worldBox.width * 0.5f,
                         part->worldBox.top + part->worldBox.height * 0.5f);
-        spr.setScale(s * static_cast<float>(f) * 2.f, s * 2.f);
+        spr.setScale(s * static_cast<float>(f), s);
         window->draw(spr);
     };
 
-    // Elmo 12x5: topo 2 rows acima do topo da cabeça (idle: rows 0-4).
+    // Elmo 24x10: topo 4 rows acima do topo da cabeça.
     if (mHelm >= 0)
         drawFullWidth(sprites_.helm[mHelm], sprites::kHelmW,
-                      support::BodyPartId::Head, 0.f, -2.f);
-    // Peitoral 12x8: topo no topo do torso (idle: rows 6-13).
+                      support::BodyPartId::Head, 0.f, -4.f);
+    // Peitoral 24x16: topo no topo do torso.
     if (mChest >= 0)
         drawFullWidth(sprites_.chest[mChest], sprites::kChestW,
                       support::BodyPartId::Torso, 0.f, 0.f);
-    // Perneiras 12x6: topo 2 rows acima da base do torso (idle: rows
-    // 14-19, sobrepõe a coxa sob a túnica, como no layout antigo).
+    // Perneiras 24x12: topo 4 rows acima da base do torso.
     if (mLegs >= 0)
         drawFullWidth(sprites_.legs[mLegs], sprites::kLegsW,
-                      support::BodyPartId::Torso, 1.f, -2.f);
-    // Botas 12x3: topo 1 row abaixo da base do torso (idle: rows 17-19).
+                      support::BodyPartId::Torso, 1.f, -4.f);
+    // Botas 24x6: topo 2 rows abaixo da base do torso.
     if (mBoots >= 0)
         drawFullWidth(sprites_.boots[mBoots], sprites::kBootsW,
-                      support::BodyPartId::Torso, 1.f, 1.f);
+                      support::BodyPartId::Torso, 1.f, 2.f);
 
     if (mHelm >= 0) {
         drawGlove(support::BodyPartId::ArmL, mHelm);
