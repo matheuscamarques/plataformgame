@@ -235,8 +235,16 @@ void Game::render()
     }
 
     // Throwables visíveis: bomba do player tem telegraph + núcleo por
-    // tier; outros kinds continuam no círculo dourado.
+    // tier; Bolt (magia) é ponto ciano; outros kinds, círculo dourado.
     throws_->forEachActive([&](const support::Throwable &t) {
+        if (t.kind == support::ThrowKind::Bolt) {
+            sf::CircleShape c(3.f);
+            c.setOrigin(3.f, 3.f);
+            c.setPosition(t.pos);
+            c.setFillColor(sf::Color(120, 220, 255));
+            window->draw(c);
+            return;
+        }
         if (!support::isPlayerBomb(t.kind)) {
             sf::CircleShape c(3.f);
             c.setOrigin(3.f, 3.f);
@@ -798,6 +806,26 @@ void Game::render()
         text("HP " + std::to_string(p->hp) + "/" + std::to_string(p->hpMax), 16.f, 48.f);
         text("TNT:" + std::to_string(p->inventory.count("dynamite")) + " J  K melee", 16.f, 62.f);
         text("Souls: " + std::to_string(p->souls), 16.f, 158.f);
+        // FP (F8b): barra azul no canto superior direito.
+        {
+            const float fx = viewW_ - 140.f;
+            const float fr = p->fpMax > 0.f
+                                 ? static_cast<float>(p->fp) /
+                                       static_cast<float>(p->fpMax)
+                                 : 0.f;
+            sf::RectangleShape fBg(sf::Vector2f(124.f, 10.f));
+            fBg.setPosition(fx, 16.f);
+            fBg.setFillColor(sf::Color(0, 0, 40));
+            window->draw(fBg);
+            sf::RectangleShape fFg(sf::Vector2f(
+                120.f * std::min(1.f, std::max(0.f, fr)), 6.f));
+            fFg.setPosition(fx + 2.f, 18.f);
+            fFg.setFillColor(sf::Color(100, 160, 255));
+            window->draw(fFg);
+            text("FP " + std::to_string(static_cast<int>(p->fp)) + "/" +
+                     std::to_string(static_cast<int>(p->fpMax)),
+                 fx, 28.f, 11);
+        }
         text(std::string("Mat: ") + (p->weaponDef()
                                           ? core::materialName(
                                                 p->weaponDef()->material)

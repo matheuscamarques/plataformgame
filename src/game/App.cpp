@@ -204,6 +204,11 @@ void Game::tick() {
                 audio_.play(game::keyOf(game::Sfx::UiConfirm));
             }
         }
+        // G: conjura a magia sintonizada (F8b). Cooldown barra repetição.
+        if (!uiOpen && input_.pressed(support::Action::Cast)) {
+            if (p->castAttuned(*throws_))
+                audio_.play(game::keyOf(game::Sfx::MeleeSwing));
+        }
 
         // 1-5: slot ativo da hotbar (fase 4a; sem consumo — edge por frame).
         // Fora quando o grid está aberto (navegação é do grid).
@@ -251,6 +256,8 @@ void Game::tick() {
             // K (Heavy) o MeleeSystem lê via ctx — consome aqui p/ o
             // player não golpear navegando no menu.
             if (input_.pressed(A::Heavy)) input_.consume(A::Heavy);
+            // G (Cast) só vale fora do menu.
+            if (input_.pressed(A::Cast)) input_.consume(A::Cast);
             // F em Sair (aba System): fecha a janela, sai do loop.
             if (inventoryUI_.consumeQuitRequest()) window->close();
         }

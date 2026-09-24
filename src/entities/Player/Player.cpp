@@ -312,6 +312,41 @@ bool Player::tryUseSlot(int slot) {
     return true;
 }
 
+bool Player::castAttuned(support::ThrowSystem &throws) {
+    if (!throwCooldown.ready()) return false;
+    if (attuned.empty()) return false;
+    const core::ItemDef* def =
+        core::ItemRegistry::instance().find(attuned[0]);
+    if (!def || def->type != core::ItemType::Spell) return false;
+    const int inte = attrs.get(core::Attr::Intelligence);
+    const int fai = attrs.get(core::Attr::Faith);
+    if (inte < def->intReq || fai < def->faiReq) return false;
+    if (def->spellKind == core::SpellKind::Arrow) {
+        if (fp < kArrowCost) return false;
+        sf::Vector2f vel{500.f * static_cast<float>(facing), -80.f};
+        support::Throwable* t = throws.throwItem(
+            {getCenterX(), getCenterY()}, vel, support::ThrowKind::Bolt);
+        if (!t) return false;
+        t->fuse = -1.f; // sem fuse: impacto + expira (igual spit)
+        t->damage =
+            static_cast<int>(kArrowBase + kArrowBase * core::scaleFactor(inte));
+        t->radius = 0.f;
+        t->tilesRadius = 0;
+        fp -= kArrowCost;
+        throwCooldown.trigger();
+        throwAnimT = kThrowAnimDur;
+        return true;
+    }
+    if (def->spellKind == core::SpellKind::Heal) {
+        if (fp < kHealCost) return false;
+        hp = std::min(hpMax, hp + static_cast<int>(kHealBase + fai * 2));
+        fp -= kHealCost;
+        throwCooldown.trigger();
+        return true;
+    }
+    return false;
+}
+
 bool Player::tryThrow(support::ThrowSystem &throws) {    if (!throwCooldown.ready() || inventory.count("dynamite") <= 0)
         return false;
     // Arco fixo na direção do facing; sem mira manual no MVP.

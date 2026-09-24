@@ -16,6 +16,7 @@ namespace {
 
 using core::ItemRarity;
 using core::ItemType;
+using core::SpellKind;
 
 void heal30(Player& p) {
     p.hp = std::min(p.hpMax, p.hp + 30);
@@ -610,6 +611,7 @@ REGISTER_ITEM("soul_arrow", [] {
     def.rarity = ItemRarity::Uncommon;
     def.stackMax = 1;
     def.intReq = 12;
+    def.spellKind = SpellKind::Arrow;
     return def;
 }())
 
@@ -627,6 +629,7 @@ REGISTER_ITEM("heal_light", [] {
     def.rarity = ItemRarity::Uncommon;
     def.stackMax = 1;
     def.faiReq = 12;
+    def.spellKind = SpellKind::Heal;
     return def;
 }())
 

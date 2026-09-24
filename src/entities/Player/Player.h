@@ -185,6 +185,14 @@ class Player : public Entity
         // Consome 1. Sem cooldown (igual ao menu Use).
         bool tryUseSlot(int slot);
 
+        // Conjura a 1ª magia sintonizada (G): Arrow vira Bolt, Heal cura.
+        // Custa FP + cooldown de arremesso; req INT/FÉ do def.
+        static constexpr float kArrowCost = 25.f;
+        static constexpr float kHealCost = 40.f;
+        static constexpr float kArrowBase = 30.f;
+        static constexpr float kHealBase = 50.f;
+        bool castAttuned(support::ThrowSystem &throws);
+
         // Completa a pilha "dynamite" até 999 (legado generoso).
         // Chamado no ctor e no respawn; coleta soma por cima e o
         // inventário sobrevive à morte. Nunca esvazia o resto.

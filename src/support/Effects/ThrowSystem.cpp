@@ -132,6 +132,25 @@ void ThrowSystem::tick(float dt, GameContext &ctx) {
                 return;
             }
         }
+        // Bolt (magia do player, F8b): espelho do spit contra inimigos.
+        if (t.kind == ThrowKind::Bolt && ctx.enemies) {
+            bool hit = false;
+            ctx.enemies->forEach([&](Enemy &s) {
+                if (hit || s.resources.isDead()) return;
+                if (t.pos.x >= s.body.getX() &&
+                    t.pos.x <= s.body.getX() + s.body.getW() &&
+                    t.pos.y >= s.body.getY() &&
+                    t.pos.y <= s.body.getY() + s.body.getH()) {
+                    s.resources.takeDamage(t.damage);
+                    if (particles_) particles_->spawnHitSpark(t.pos);
+                    hit = true;
+                }
+            });
+            if (hit) {
+                pool_.release(&t);
+                return;
+            }
+        }
         if (t.fuse <= 0.f && t.resting) {
             if (particles_) particles_->spawnHitSpark(t.pos); // poof
             pool_.release(&t);

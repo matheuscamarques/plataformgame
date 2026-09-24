@@ -33,6 +33,9 @@ enum class ItemType : uint8_t {
     Quest,      // missão — idem
 };
 
+// Comportamento de conjuração (F8b). None = não conjurável.
+enum class SpellKind : uint8_t { None, Arrow, Heal };
+
 enum class ItemRarity : uint8_t {
     Common,
     Uncommon,
@@ -65,6 +68,7 @@ struct ItemDef {
     int         dexReq = 0;
     int         intReq = 0; // magia (F8): INT mínima p/ sintonizar/conjurar
     int         faiReq = 0; // idem FÉ
+    SpellKind   spellKind = SpellKind::None; // Arrow/Heal (F8b)
     // Bomba arremessável (J joga o slot ativo da hotbar): stats vão
     // direto p/ o Throwable (fonte única, sem switch por id).
     bool                 throwable   = false;

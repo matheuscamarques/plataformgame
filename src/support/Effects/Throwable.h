@@ -20,7 +20,8 @@ enum class ThrowKind : uint8_t {
     Tnt,          // escada de bombas: TNT (média)
     C4,           // C4 militar (grande)
     Daisy,        // BLU-82 Daisy Cutter (enorme)
-    Moab          // MOAB (colossal, 1 chunk)
+    Moab,         // MOAB (colossal, 1 chunk)
+    Bolt          // magia do player (F8b): linear, dano no impacto
 };
 
 // Bombas do player (fuse + telegraph + glow + luz no grid).
