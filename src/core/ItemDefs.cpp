@@ -1363,6 +1363,45 @@ REGISTER_ITEM("iron_boots", [] {
     return def;
 }())
 
+// ---- Luvas (slot Gloves): par de manoplas, ícone 8x8 próprio ----
+inline const char* const kItemGlovesSprite[] = {
+    "........",
+    ".SS.SS..",
+    ".SS.SS..",
+    ".SSSSS..",
+    ".SSSSS..",
+    "..SS....",
+    "........",
+    "........",
+};
+
+inline const core::PaletteEntry kItemIronGlovesPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {150, 155, 165}},
+    {'s', {105, 110, 120}},
+};
+inline constexpr std::size_t kItemIronGlovesPalCount = 3;
+
+REGISTER_ITEM("iron_gloves", [] {
+    core::ItemDef def;
+    def.id = "iron_gloves";
+    def.description = "Manoplas de ferro. Protegem punhos e dedos.";
+    def.spriteRows = kItemGlovesSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemIronGlovesPal;
+    def.spritePalCount = kItemIronGlovesPalCount;
+    def.name = "Manoplas de Ferro";
+    def.weight = 2.f;
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Common;
+    def.stackMax = 1;
+    def.defense = 2;
+    def.equipSlot = core::EquipSlot::Gloves;
+    def.material = core::MaterialId::Iron;
+    return def;
+}())
+
 REGISTER_ITEM("leather_boots", [] {
     core::ItemDef def;
     def.id = "leather_boots";

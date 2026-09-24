@@ -36,6 +36,7 @@ Entity(core::kIdPlayer,0,0,60,100) // AABB 2 blocos (sprite 12x40 a 2.5x)
     equipment.equip(core::Item{"iron_chest", 1});
     equipment.equip(core::Item{"iron_legs", 1});
     equipment.equip(core::Item{"iron_boots", 1});
+    equipment.equip(core::Item{"iron_gloves", 1});
     refreshDerived(); // hpMax/stamina/carga dos attrs base (10)
     stamina = staminaMax;
     //this->setGravity(9.8f);

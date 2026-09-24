@@ -944,6 +944,8 @@ void Game::drawPlayerEquipment() {
     const int mHelm = materialOf(core::EquipSlot::Head);
     const int mChest = materialOf(core::EquipSlot::Chest);
     const int mLegs = materialOf(core::EquipSlot::Legs);
+    // Luva própria (slot Gloves); sem ela, mãos mostram a pele.
+    const int mGloves = materialOf(core::EquipSlot::Gloves);
     // Botas: ver drawPlayerSprite — substituem o feet (não há overlay aqui).
 
     // Peça full-width centralizada no centro-x da parte âncora.
@@ -966,8 +968,8 @@ void Game::drawPlayerEquipment() {
         window->draw(spr);
     };
 
-    // Luva centrada na mão; some se o braço está oculto no frame.
-    // Sem slot próprio: segue o elmo; sem elmo, sem luva.
+    // Luva centrada na mão; some sem Gloves (mão mostra a pele).
+    // Sem slot próprio antes: seguia o elmo; agora lê o slot Gloves.
     auto drawGlove = [&](support::BodyPartId arm, int m) {
         const auto *part = p->body.find(arm);
         if (!part || part->fromSchema) return;
@@ -993,9 +995,9 @@ void Game::drawPlayerEquipment() {
         drawFullWidth(sprites_.legs[mLegs], sprites::kLegsW,
                       support::BodyPartId::Torso, 1.f, -2.f);
 
-    if (mHelm >= 0) {
-        drawGlove(support::BodyPartId::ArmL, mHelm);
-        drawGlove(support::BodyPartId::ArmR, mHelm);
+    if (mGloves >= 0) {
+        drawGlove(support::BodyPartId::ArmL, mGloves);
+        drawGlove(support::BodyPartId::ArmR, mGloves);
     }
 }
 

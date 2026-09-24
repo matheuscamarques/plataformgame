@@ -10,6 +10,9 @@
 #include <cstring>
 
 #include "assets/Sprites/EquipSprites.h"
+#include "core/Equipment.h"
+#include "core/Item.h"
+#include "core/ItemDef.h"
 #include "support/Combat/Body.h"
 
 using namespace support;
@@ -38,6 +41,29 @@ int main() {
         assert(h2 != nullptr);
         assert(h2->worldBox.left - x1 > 99.f &&
                h2->worldBox.left - x1 < 101.f);
+    }
+
+    { // GlovesSlot (iron_gloves equipa no slot próprio, pesa, desequipa)
+        assert(core::ItemRegistry::instance().has("iron_gloves"));
+        const core::ItemDef* d =
+            core::ItemRegistry::instance().find("iron_gloves");
+        assert(d != nullptr && d->equipSlot == core::EquipSlot::Gloves);
+        assert(d->defense == 2);
+        assert(std::string(core::equipSlotName(core::EquipSlot::Gloves)) ==
+               "Gloves");
+        assert(core::equipDisplaySlot(6) == core::EquipSlot::Gloves);
+        assert(core::equipDisplaySlot(7) == core::EquipSlot::None);
+        core::Equipment eq;
+        assert(eq.isEmpty());
+        assert(eq.equip(core::Item{"iron_gloves", 1}));
+        assert(eq.isOccupied(core::EquipSlot::Gloves));
+        assert(eq.weight() == d->weight);
+        // Slot errado recusa: luva na cabeça não entra.
+        assert(!eq.equipTo(core::EquipSlot::Head,
+                           core::Item{"iron_gloves", 1}));
+        const core::Item back = eq.unequip(core::EquipSlot::Gloves);
+        assert(back.defId == "iron_gloves" && back.quantity == 1);
+        assert(eq.isEmpty());
     }
 
     std::printf("equipment test OK\n");

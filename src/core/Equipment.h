@@ -17,7 +17,7 @@ namespace core {
 // END move o teto via Attributes::maxLoad (base = END 10).
 inline constexpr float kBaseEquipLoad = 60.f;
 
-// Equipamento do player: 4 slots fixos (Dark Souls, sem Tetris).
+// Equipamento do player: slots fixos (Dark Souls, sem Tetris).
 // Puro (sem SFML, sem Player): headless-safe. O slot natural vem do
 // def->equipSlot; equip() troca e devolve o antigo via outOld.
 class Equipment {

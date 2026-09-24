@@ -117,7 +117,8 @@ InventoryUI::StatusInfo InventoryUI::status() const {
     if (equipment_) {
         static const core::EquipSlot armor[] = {
             core::EquipSlot::Head, core::EquipSlot::Chest,
-            core::EquipSlot::Legs, core::EquipSlot::Boots};
+            core::EquipSlot::Legs, core::EquipSlot::Boots,
+            core::EquipSlot::Gloves};
         for (auto s : armor) {
             const core::Item& it = equipment_->get(s);
             if (it.isEmpty()) continue;
@@ -489,11 +490,11 @@ void InventoryUI::handleBrowse(const InputMap& input) {
 
     if (mainTab_ == MainTab::Equipment) {
         if (input.pressed(Action::Up) || input.pressed(Action::Left)) {
-            equipCursor_ = (equipCursor_ + 5) % 6;
+            equipCursor_ = (equipCursor_ + 6) % 7;
             playUi(static_cast<int>(game::Sfx::UiMove));
         }
         if (input.pressed(Action::Down) || input.pressed(Action::Right)) {
-            equipCursor_ = (equipCursor_ + 1) % 6;
+            equipCursor_ = (equipCursor_ + 1) % 7;
             playUi(static_cast<int>(game::Sfx::UiMove));
         }
         if (input.pressed(Action::Interact)) openActionMenu();
@@ -811,14 +812,15 @@ void InventoryUI::renderEquipTab(sf::RenderTarget& t, float sw, float sh,
     const float cx = o.x + gw * 0.5f;
     const float cy = o.y + 150.f; // centro do bloco
     const float x0 = cx - (ss + kEquipPad + ss) * 0.5f;
-    const float topR = cy - (4 * ss + 3 * kEquipPad) * 0.5f;
-    const sf::Vector2f pos[6] = {
+    const float topR = cy - (5 * ss + 4 * kEquipPad) * 0.5f;
+    const sf::Vector2f pos[7] = {
         {x0, topR},               // RightHand (Arms)
         {x0, topR + step},        // LeftHand (Arms)
         {x0 + step, topR},        // Head
         {x0 + step, topR + step}, // Chest
         {x0 + step, topR + 2 * step}, // Legs
         {x0 + step, topR + 3 * step}, // Boots
+        {x0 + step, topR + 4 * step}, // Gloves
     };
     auto header = [&](const std::string& s, float x, float y) {
         sf::Text h;
@@ -831,7 +833,7 @@ void InventoryUI::renderEquipTab(sf::RenderTarget& t, float sw, float sh,
     };
     header("Arms", x0, topR - 22.f);
     header("Armor", x0 + step, topR - 22.f);
-    for (int i = 0; i < 6; ++i) {
+    for (int i = 0; i < 7; ++i) {
         const bool sel = (i == equipCursor_);
         sf::RectangleShape bg({ss, ss});
         bg.setPosition(pos[i]);

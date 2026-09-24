@@ -123,14 +123,14 @@ int main() {
     }
     { // StatusTab (HP/arma/DEF/ouro do player; zeros sem player)
         InventoryUI ui;
-        Player p; // seed ferro: espada 12, defesas 4+6+4+3
+        Player p; // seed ferro: espada 12, defesas 4+6+4+3+2 (luvas)
         ui.setPlayer(&p);
         ui.setEquipment(&p.equipment);
         ui.setInventory(&p.inventory);
         const auto st = ui.status();
         assert(st.hp == 100 && st.hpMax == 100);
         assert(st.weaponName == "Espada de Ferro" && st.damage == 12);
-        assert(st.defense == 4 + 6 + 4 + 3);
+        assert(st.defense == 4 + 6 + 4 + 3 + 2);
         assert(st.gold == 0);
         InventoryUI bare;
         const auto z = bare.status();
@@ -624,8 +624,8 @@ int main() {
         assert(bare.weight() == 0.f);
     }
     { // HeavilyLoaded (seed ferro corre; ouro não)
-        Player seed; // set ferro: 28/60 = leve
-        assert(seed.equipLoad() == 28.f);
+        Player seed; // set ferro: 30/60 = leve (luvas +2)
+        assert(seed.equipLoad() == 30.f);
         assert(!seed.heavilyLoaded());
         Player heavy;
         heavy.equipment = core::Equipment{};
@@ -646,6 +646,8 @@ int main() {
                "iron_chest");
         assert(p.equipment.get(core::EquipSlot::Legs).defId == "iron_legs");
         assert(p.equipment.get(core::EquipSlot::Boots).defId == "iron_boots");
+        assert(p.equipment.get(core::EquipSlot::Gloves).defId ==
+               "iron_gloves");
     }
     { // StarterKit (1 pilha cheia de cada item do registry)
         Player p;
@@ -679,6 +681,7 @@ int main() {
         assert(p.inventory.count("diamond_chest") == 1);
         assert(p.inventory.count("diamond_legs") == 1);
         assert(p.inventory.count("iron_boots") == 1);
+        assert(p.inventory.count("iron_gloves") == 1);
         assert(p.inventory.count("leather_boots") == 1);
         assert(p.inventory.count("gold_boots") == 1);
         assert(p.inventory.count("diamond_boots") == 1);
@@ -695,7 +698,7 @@ int main() {
         assert(p.inventory.count("soul_arrow") == 1);
         assert(p.inventory.count("heal_light") == 1);
         // Kit inteiro: 42 defs em 1 slot cada + dinamite 999 em 1 só.
-        assert(p.inventory.usedSlots() == 43);
+        assert(p.inventory.usedSlots() == 44);
     }
     { // EquipViaMenu (F→Equip: direita livre, esq, depois troca)
         InventoryUI ui;
@@ -763,7 +766,7 @@ int main() {
         assert(eq.get(core::EquipSlot::RightHand).defId == "iron_sword");
         assert(inv.count("stone") == 80 * 99);
     }
-    { // EquipTabSixSlots (Down circula 0..5, Boots=5)
+    { // EquipTabSevenSlots (Down circula 0..6, Gloves=6)
         InventoryUI ui;
         core::Inventory inv;
         core::Equipment eq;
@@ -772,12 +775,14 @@ int main() {
         ui.setEquipment(&eq);
         ui.open();
         ui.setMainTab(InventoryUI::MainTab::Equipment);
-        for (int i = 0; i < 5; ++i) {
+        for (int i = 0; i < 6; ++i) {
             press(in, sf::Keyboard::Down);
             ui.handleInput(in);
             release(in, sf::Keyboard::Down);
         }
-        assert(ui.equipCursor() == 5);
+        assert(ui.equipCursor() == 6);
+        assert(core::equipDisplaySlot(ui.equipCursor()) ==
+               core::EquipSlot::Gloves);
         press(in, sf::Keyboard::Down);
         ui.handleInput(in);
         release(in, sf::Keyboard::Down);

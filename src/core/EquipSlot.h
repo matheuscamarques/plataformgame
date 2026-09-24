@@ -21,6 +21,7 @@ enum class EquipSlot : uint8_t {
     Chest,
     Legs,
     Boots,
+    Gloves, // luva própria (antes seguia o elmo no Renderer)
     COUNT
 };
 
@@ -34,6 +35,7 @@ inline const char* equipSlotName(EquipSlot s) {
         case EquipSlot::Chest:     return "Chest";
         case EquipSlot::Legs:      return "Legs";
         case EquipSlot::Boots:     return "Boots";
+        case EquipSlot::Gloves:    return "Gloves";
         default:                   return "";
     }
 }
@@ -42,8 +44,9 @@ inline const char* equipSlotName(EquipSlot s) {
 inline EquipSlot equipDisplaySlot(int i) {
     static constexpr EquipSlot kOrder[] = {
         EquipSlot::RightHand, EquipSlot::LeftHand, EquipSlot::Head,
-        EquipSlot::Chest, EquipSlot::Legs, EquipSlot::Boots};
-    if (i < 0 || i >= 6) return EquipSlot::None;
+        EquipSlot::Chest, EquipSlot::Legs, EquipSlot::Boots,
+        EquipSlot::Gloves};
+    if (i < 0 || i >= 7) return EquipSlot::None;
     return kOrder[i];
 }
 
