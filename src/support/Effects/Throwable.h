@@ -11,20 +11,12 @@
 #include <SFML/System/Vector2.hpp>
 #include <cstdint>
 
+#include "core/ThrowKind.h"
+
 namespace support {
 
-enum class ThrowKind : uint8_t {
-    Dynamite,
-    GoldNugget,   // stub — passivo futuro
-    Rock,         // stub — variação futura
-    Spit,         // projétil de slime: linear, sem fuse, dano no impacto
-    Barrel,       // barril do anão: rola, detona no fuse (sem quique ainda)
-    Tnt,          // escada de bombas: TNT (média)
-    C4,           // C4 militar (grande)
-    Daisy,        // BLU-82 Daisy Cutter (enorme)
-    Moab,         // MOAB (colossal, 1 chunk)
-    Bolt          // magia do player (F8b): linear, dano no impacto
-};
+// Alias: o enum mora em core (ItemDef não pode incluir support).
+using ThrowKind = core::ThrowKind;
 
 // Bombas do player (fuse + telegraph + glow + luz no grid).
 // Spit/Barrel/Nugget/Rock ficam de fora (comportamento próprio).

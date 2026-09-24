@@ -16,7 +16,7 @@
 #include "core/EquipSlot.h"
 #include "core/Material.h"
 #include "core/Attributes.h"
-#include "support/Effects/Throwable.h"
+#include "core/ThrowKind.h"
 
 class Player;
 
@@ -72,7 +72,7 @@ struct ItemDef {
     // Bomba arremessável (J joga o slot ativo da hotbar): stats vão
     // direto p/ o Throwable (fonte única, sem switch por id).
     bool                 throwable   = false;
-    support::ThrowKind   throwKind   = support::ThrowKind::Dynamite;
+    core::ThrowKind      throwKind   = core::ThrowKind::Dynamite;
     float                fuse        = 1.0f;
     float                blastRadius = 0.f; // px (0 = sem explosão)
     int                  blastDamage = 0;

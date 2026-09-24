@@ -395,7 +395,7 @@ REGISTER_ITEM("dynamite", [] {
     def.rarity = ItemRarity::Common;
     def.stackMax = 999; // pilha única: 999 em 1 slot (kit cabe em 40)
     def.throwable = true; // J joga (legado); stats = padrão do Throwable
-    def.throwKind = support::ThrowKind::Dynamite;
+    def.throwKind = core::ThrowKind::Dynamite;
     def.fuse = 1.0f;
     def.blastRadius = 40.f;
     def.blastDamage = 25;
@@ -1213,7 +1213,7 @@ REGISTER_ITEM("tnt", [] {
     def.rarity = ItemRarity::Uncommon;
     def.stackMax = 999;
     def.throwable = true;
-    def.throwKind = support::ThrowKind::Tnt;
+    def.throwKind = core::ThrowKind::Tnt;
     def.fuse = 1.0f;
     def.blastRadius = 70.f;
     def.blastDamage = 45;
@@ -1235,7 +1235,7 @@ REGISTER_ITEM("c4", [] {
     def.rarity = ItemRarity::Rare;
     def.stackMax = 999;
     def.throwable = true;
-    def.throwKind = support::ThrowKind::C4;
+    def.throwKind = core::ThrowKind::C4;
     def.fuse = 0.8f;
     def.blastRadius = 110.f;
     def.blastDamage = 80;
@@ -1276,7 +1276,7 @@ REGISTER_ITEM("daisy", [] {
     def.rarity = ItemRarity::Epic;
     def.stackMax = 999;
     def.throwable = true;
-    def.throwKind = support::ThrowKind::Daisy;
+    def.throwKind = core::ThrowKind::Daisy;
     def.fuse = 1.2f;
     def.blastRadius = 400.f;
     def.blastDamage = 110;
@@ -1298,7 +1298,7 @@ REGISTER_ITEM("moab", [] {
     def.rarity = ItemRarity::Epic;
     def.stackMax = 999;
     def.throwable = true;
-    def.throwKind = support::ThrowKind::Moab;
+    def.throwKind = core::ThrowKind::Moab;
     def.fuse = 1.5f;
     def.blastRadius = 800.f; // 16 tiles: engole um chunk inteiro (16×16)
     def.blastDamage = 140;
