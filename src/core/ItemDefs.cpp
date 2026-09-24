@@ -21,6 +21,14 @@ void heal30(Player& p) {
     p.hp = std::min(p.hpMax, p.hp + 30);
 }
 
+void curePoisonUse(Player& p) {
+    p.curePoison();
+}
+
+void cureBleedUse(Player& p) {
+    p.cureBleed();
+}
+
 } // namespace
 
 
@@ -492,6 +500,64 @@ REGISTER_ITEM("potion", [] {
     def.rarity = ItemRarity::Uncommon;
     def.stackMax = 10;
     def.onUse = heal30;
+    return def;
+}())
+
+// ---- Musgos (F7): curam status. Slime dropa (tabela do archetype).
+inline const core::PaletteEntry kItemMossPurplePal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'M', {170, 90, 220}},
+    {'m', {110, 60, 150}},
+};
+inline constexpr std::size_t kItemMossPurplePalCount = 3;
+inline const core::PaletteEntry kItemMossRedPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'M', {220, 80, 80}},
+    {'m', {150, 50, 50}},
+};
+inline constexpr std::size_t kItemMossRedPalCount = 3;
+inline const char* const kItemMossSprite[] = {
+    "...MM...",
+    "..MMMM..",
+    ".MMmMMM.",
+    ".MMMMMM.",
+    "..MmMM..",
+    "...MM...",
+    "........",
+    "........",
+};
+
+REGISTER_ITEM("purple_moss", [] {
+    core::ItemDef def;
+    def.id = "purple_moss";
+    def.description = "Musgo roxo: cura veneno.";
+    def.spriteRows = kItemMossSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemMossPurplePal;
+    def.spritePalCount = kItemMossPurplePalCount;
+    def.name = "Musgo Roxo";
+    def.type = ItemType::Consumable;
+    def.rarity = ItemRarity::Common;
+    def.stackMax = 10;
+    def.onUse = curePoisonUse;
+    return def;
+}())
+
+REGISTER_ITEM("bloodred_moss", [] {
+    core::ItemDef def;
+    def.id = "bloodred_moss";
+    def.description = "Musgo rubro: cura sangramento.";
+    def.spriteRows = kItemMossSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemMossRedPal;
+    def.spritePalCount = kItemMossRedPalCount;
+    def.name = "Musgo Rubro";
+    def.type = ItemType::Consumable;
+    def.rarity = ItemRarity::Common;
+    def.stackMax = 10;
+    def.onUse = cureBleedUse;
     return def;
 }())
 

@@ -124,6 +124,13 @@ struct Attributes {
         if (end < 1) end = 1;
         return 60.f + (end - kBase) * 2.f; // END 10 = 60 (atual)
     }
+    // Limiar de acúmulo poison/bleed (F7): RES conta 5, ATT conta 2
+    // (ATT sem magia ainda serve p/ algo; RES nunca é ponto morto).
+    static float statusThreshold(int res, int att) {
+        if (res < 1) res = 1;
+        if (att < 1) att = 1;
+        return 100.f + res * 5.f + att * 2.f; // base 10/10 = 170
+    }
 
 private:
     std::array<int, kAttrCount> v_{kBase, kBase, kBase, kBase,

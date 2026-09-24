@@ -77,6 +77,30 @@ class Player : public Entity
         int souls = 0;
         void addSouls(int v) { souls += v; }
 
+        // Status effects (F7): acúmulo veneno/sangramento + veneno ativo.
+        float poisonBuildup = 0.f;
+        float bleedBuildup = 0.f;
+        float poisonTimer = 0.f; // >0 = envenenado (DoT correndo)
+        float poisonFrac_ = 0.f; // fração de dano acumulada (hp é int)
+        static constexpr float kPoisonDps = 3.f;
+        static constexpr float kPoisonDur = 8.f;
+        static constexpr float kBleedPct = 0.15f; // burst do HP máximo
+        static constexpr float kSlimePoison = 25.f; // por mordida
+        static constexpr float kDwarfBleed = 30.f;  // por golpe
+        float statusThreshold() const {
+            return core::Attributes::statusThreshold(
+                attrs.get(core::Attr::Resistance),
+                attrs.get(core::Attr::Attunement));
+        }
+        void addPoison(float amt);
+        void addBleed(float amt);
+        void curePoison() {
+            poisonBuildup = 0.f;
+            poisonTimer = 0.f;
+            poisonFrac_ = 0.f;
+        }
+        void cureBleed() { bleedBuildup = 0.f; }
+
         // Arma equipada (def do slot RightHand) ou nullptr = soco.
         // Fonte única p/ render, BodySystem e meleeHitbox.
         const core::ItemDef* weaponDef() const;

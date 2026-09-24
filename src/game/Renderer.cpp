@@ -763,6 +763,27 @@ void Game::render()
         stFg.setFillColor(sf::Color(80, 200, 80));
         window->draw(stFg);
 
+        // Status F7: acúmulo/veneno ativo (só quando >0).
+        const float stTh = static_cast<float>(p->statusThreshold());
+        auto statusBar = [&](float v, float maxv, float y, sf::Color c) {
+            if (v <= 0.f && maxv <= 0.f) return;
+            sf::RectangleShape b({60.f, 7.f});
+            b.setPosition(224.f, y);
+            b.setFillColor(sf::Color(20, 20, 20));
+            window->draw(b);
+            const float f = maxv > 0.f
+                                ? std::min(1.f, std::max(0.f, v / maxv))
+                                : 1.f;
+            sf::RectangleShape fgr({58.f * f, 5.f});
+            fgr.setPosition(225.f, y + 1.f);
+            fgr.setFillColor(c);
+            window->draw(fgr);
+        };
+        statusBar(p->poisonTimer > 0.f ? stTh : p->poisonBuildup, stTh, 16.f,
+                  sf::Color(170, 90, 220)); // veneno roxo
+        statusBar(p->bleedBuildup, stTh, 26.f,
+                  sf::Color(220, 60, 60)); // sangue vermelho
+
         auto text = [&](const std::string &s, float x, float y, int size = 18) {
             sf::Text t;
             t.setFont(font);

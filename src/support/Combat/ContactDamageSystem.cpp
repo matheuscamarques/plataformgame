@@ -68,6 +68,9 @@ void ContactDamageSystem::tick(float dt, GameContext &ctx) {
         if (s.biteWindup > 0.f) return;
         s.biteWindup = kBiteWindup;
         if (!p->hurt(kContactDamage)) return; // i-frame segurou, tenta de novo
+        // Status (F7): slime envenena, anão faz sangrar (por mordida).
+        if (s.archetypeId == "slime") p->addPoison(Player::kSlimePoison);
+        else if (s.archetypeId == "dwarf") p->addBleed(Player::kDwarfBleed);
         // SFX mordida (dano aplicado; sem ctx.audio em teste = mudo).
         if (ctx.audio) ctx.audio->play(game::keyOf(game::Sfx::SlimeBite));
         if (ctx.screenshots)

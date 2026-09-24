@@ -229,6 +229,19 @@ void Player::tick() {
     staminaDelay.tick(1.f / 30.0f);
     if (stamina < staminaMax && staminaDelay.ready())
         stamina = std::min(staminaMax, stamina + 1.f);
+
+    // Veneno ativo: DoT direto (fura i-frame, pode matar). hp é int:
+    // acumula a fração e desconta os inteiros (3/s = 1 a cada 10 ticks).
+    if (poisonTimer > 0.f) {
+        poisonTimer -= 1.f / 30.0f;
+        poisonFrac_ += kPoisonDps / 30.0f;
+        const int whole = static_cast<int>(poisonFrac_);
+        if (whole > 0) {
+            hp -= whole;
+            poisonFrac_ -= whole;
+            if (hp < 0) hp = 0;
+        }
+    }
 }
 
 void Player::topUpDynamite() {
@@ -325,6 +338,24 @@ const core::ItemDef* Player::offHandDef() const {
     return w.isEmpty() ? nullptr : w.def();
 }
 
+void Player::addPoison(float amt) {
+    if (poisonTimer > 0.f) return; // ativo: barra não acumula de novo
+    poisonBuildup += amt;
+    if (poisonBuildup >= statusThreshold()) {
+        poisonBuildup = 0.f;
+        poisonTimer = kPoisonDur;
+    }
+}
+
+void Player::addBleed(float amt) {
+    bleedBuildup += amt;
+    if (bleedBuildup >= statusThreshold()) {
+        bleedBuildup = 0.f; // burst e reseta (reacumula depois)
+        hp -= static_cast<int>(hpMax * kBleedPct);
+        if (hp < 0) hp = 0;
+    }
+}
+
 bool Player::hurt(int dmg) {
     if (dmg <= 0 || hp <= 0 || !hurtIframes.ready()) return false;
     hp -= dmg;
@@ -342,6 +373,8 @@ void Player::respawn(float x, float y) {
     hurtIframes.reset();
     throwCooldown.reset();
     staminaDelay.reset();
+    curePoison();
+    cureBleed();
     topUpDynamite();
     topUpStarterKit();
     refreshDerived();

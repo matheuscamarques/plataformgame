@@ -39,6 +39,8 @@ REGISTER_ENEMY_ARCHETYPE("slime", [] {
     a.spawnWeight = 1.0f;
     a.maxAlive = 100;
     a.drops.entries.push_back({"slime_gel", 0.8f, 1, 2});
+    a.drops.entries.push_back({"purple_moss", 0.3f, 1, 1});
+    a.drops.entries.push_back({"bloodred_moss", 0.2f, 1, 1});
     return a;
 }());
 
