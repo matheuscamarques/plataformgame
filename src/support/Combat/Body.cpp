@@ -48,14 +48,14 @@ BodySchema BodySchema::dwarf(float height, float width) {
     return s;
 }
 
-void Body::rebuild(sf::Vector2f topLeftPos, int facing_) {
+void Body::rebuild(core::Vec2f topLeftPos, int facing_) {
     facing = facing_;
     if (!schema) return;
 
     // Centro do corpo no mundo. topLeftPos é o canto superior esquerdo
     // do AABB (convenção SFML); o centro fica a overallHeight/2 abaixo
     // do topo e a halfWidth da esquerda.
-    const sf::Vector2f center{
+    const core::Vec2f center{
         topLeftPos.x + schema->halfWidth,
         topLeftPos.y + schema->overallHeight * 0.5f
     };
@@ -85,7 +85,7 @@ const PartState* Body::find(BodyPartId id) const {
 }
 
 void Body::rebuildFromSprite(
-    sf::Vector2f entityTopLeft, sf::Vector2f aabbSize,
+    core::Vec2f entityTopLeft, core::Vec2f aabbSize,
     const char* const* rows, int sw, int sh,
     const core::PaletteEntry* pal, std::size_t palN,
     int facing_)

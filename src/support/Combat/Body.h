@@ -6,6 +6,8 @@
  */
 
 #pragma once
+
+#include "core/Vec.h"
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cstddef>
@@ -24,8 +26,8 @@ using core::BodyPartId;
 
 struct PartDef {
     BodyPartId   id;
-    sf::Vector2f offset;        // relativo ao centro do corpo
-    sf::Vector2f size;          // hitbox da parte
+    core::Vec2f  offset;        // relativo ao centro do corpo
+    core::Vec2f  size;          // hitbox da parte
     float        damageMult  = 1.0f;
     float        postureMult = 1.0f;
     bool         breakable   = false;
@@ -74,12 +76,12 @@ struct Body {
         parts.resize(s ? s->parts.size() : 0);
     }
 
-    void rebuild(sf::Vector2f topLeftPos, int facing_);
+    void rebuild(core::Vec2f topLeftPos, int facing_);
 
     // Hitbox = bbox dos pixels de cada parte no sprite atual.
     // Sem pixels p/ parte => fallback no schema (comportamento antigo).
     void rebuildFromSprite(
-        sf::Vector2f entityTopLeft, sf::Vector2f aabbSize,
+        core::Vec2f entityTopLeft, core::Vec2f aabbSize,
         const char* const* rows, int spriteW, int spriteH,
         const core::PaletteEntry* pal, std::size_t palCount,
         int facing_);

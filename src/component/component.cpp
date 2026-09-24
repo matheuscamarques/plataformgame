@@ -25,11 +25,11 @@ sf::FloatRect(sf::Vector2f(x, y), sf::Vector2f(w, h)) {
     
 }
 
-Component::Component(int name,sf::Vector2f pos, sf::Vector2f size) :
-sf::RectangleShape(size) ,
-sf::FloatRect(pos, size)
+Component::Component(int name, core::Vec2f pos, core::Vec2f size) :
+sf::RectangleShape(core::toSf(size)) ,
+sf::FloatRect(core::toSf(pos), core::toSf(size))
 {
-    setPosition(pos);
+    setPosition(core::toSf(pos));
     left = pos.x;
     top  = pos.y;
     this->name = name;
@@ -75,10 +75,10 @@ float Component::getBottom() const {
     return top + h;
 }
 
-sf::Vector2f Component::getTopLeft() const {
+core::Vec2f Component::getTopLeft() const {
     return {left, top};
 }
-sf::Vector2f Component::getCenter() const {
+core::Vec2f Component::getCenter() const {
     return {left + w/2, top + h/2};
 }
 

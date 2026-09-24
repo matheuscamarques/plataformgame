@@ -13,10 +13,13 @@
 #define PLATOFORMGAME_COMPONENT_H
 #include <SFML/Graphics.hpp>
 
+#include "core/Vec.h"
+#include "core/VecSfml.h"
+
 class Component : public sf::RectangleShape , public sf::FloatRect {
 public:
     Component(const int name,float x, float y, float w, float h);
-    Component(const int name,sf::Vector2f pos, sf::Vector2f size);
+    Component(const int name, core::Vec2f pos, core::Vec2f size);
     Component();
     void setX(float x);
     void setY(float y);
@@ -29,8 +32,8 @@ public:
 
     float getRight() const;
     float getBottom() const;
-    sf::Vector2f getTopLeft() const;
-    sf::Vector2f getCenter() const;
+    core::Vec2f getTopLeft() const;
+    core::Vec2f getCenter() const;
 
     int getName();
 
