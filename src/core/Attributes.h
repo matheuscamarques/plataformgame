@@ -131,6 +131,14 @@ struct Attributes {
         if (att < 1) att = 1;
         return 100.f + res * 5.f + att * 2.f; // base 10/10 = 170
     }
+    // Espaços de sintonia (F8): limiares DS (12, 18, ...), teto 8.
+    static int spellSlots(int att) {
+        static constexpr int kMarks[] = {12, 18, 24, 32, 40, 50, 62, 76};
+        int slots = 0;
+        for (int m : kMarks)
+            if (att >= m) ++slots;
+        return slots;
+    }
 
 private:
     std::array<int, kAttrCount> v_{kBase, kBase, kBase, kBase,

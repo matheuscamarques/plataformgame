@@ -78,6 +78,36 @@ int main() {
         for (int i = 0; i < 30; ++i) p.tick();
         assert(p.stamina > 100.f); // voltou a regenar
     }
+    { // AttuneRules (req, slots, dup, remove)
+        Player p;
+        assert(p.spellSlots() == 0); // ATT 10
+        assert(!p.attune("soul_arrow")); // INT 10 < 12
+        assert(!p.attune("pedra_que_nao_existe"));
+        assert(!p.attune("stone")); // não é magia
+        int souls = 1000000000;
+        assert(p.attrs.buy(core::Attr::Intelligence, souls));
+        assert(p.attrs.buy(core::Attr::Intelligence, souls)); // INT 12
+        assert(p.attrs.buy(core::Attr::Attunement, souls));
+        assert(p.attrs.buy(core::Attr::Attunement, souls)); // ATT 12
+        assert(p.spellSlots() == 1);
+        assert(p.attune("soul_arrow"));
+        assert(!p.attune("soul_arrow")); // dup
+        assert(!p.attune("heal_light")); // FÉ 10 < 12 (req)
+        assert(p.unattune("soul_arrow"));
+        assert(!p.unattune("soul_arrow"));
+        assert(p.attuned.empty());
+    }
+    { // FpPool (teto, regen, refresh no buy)
+        Player p;
+        assert(p.fpMax == 200.f && p.fp == 200.f);
+        p.fp = 100.f;
+        p.tick();
+        assert(p.fp > 100.f && p.fp <= 200.f); // 8/s
+        int souls = 1000000000;
+        assert(p.attrs.buy(core::Attr::Attunement, souls)); // ATT 11
+        p.refreshDerived();
+        assert(p.fpMax == 210.f);
+    }
 
     std::printf("player test OK\n");
     return 0;

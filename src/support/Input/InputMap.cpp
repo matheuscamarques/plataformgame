@@ -47,6 +47,7 @@ InputMap::InputMap() {
     bind(Action::SubTabRight, sf::Keyboard::D);
     bind(Action::FirstSlot, sf::Keyboard::Home);
     bind(Action::LastSlot, sf::Keyboard::End);
+    bind(Action::Cast, sf::Keyboard::G);
     bind(Action::ArrangeAll, sf::Keyboard::T);
     bind(Action::UseItem, sf::Keyboard::U);
     addBind(Action::UseItem, sf::Keyboard::Return);

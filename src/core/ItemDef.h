@@ -28,6 +28,7 @@ enum class ItemType : uint8_t {
     Consumable, // poção, comida — onUse consome 1
     Weapon,     // espada, machado — equipa no Equipment
     Armor,      // elmo, peitoral — equipa no Equipment
+    Spell,      // magia: sintoniza (F8), conjura com G (não equipa)
     Key,        // progressão — não empilha, não descarta
     Quest,      // missão — idem
 };
@@ -62,6 +63,8 @@ struct ItemDef {
     ScaleGrade  faiScale = ScaleGrade::None;
     int         strReq = 0;
     int         dexReq = 0;
+    int         intReq = 0; // magia (F8): INT mínima p/ sintonizar/conjurar
+    int         faiReq = 0; // idem FÉ
     // Bomba arremessável (J joga o slot ativo da hotbar): stats vão
     // direto p/ o Throwable (fonte única, sem switch por id).
     bool                 throwable   = false;

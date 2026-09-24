@@ -76,9 +76,17 @@ int main() {
         assert(scaleFactor(40) == 1.0f);
         assert(scaleFactor(25) == 0.5f);
         assert(scaleFactor(1) == 0.f); // clamp, sem negativo
-        assert(scaleLetter(ScaleGrade::B) == 'B' && scaleLetter(ScaleGrade::None) == '-');
+        assert(scaleLetter(ScaleGrade::B) == 'B' &&
+               scaleLetter(ScaleGrade::None) == '-');
     }
-
+    { // SpellSlots (limiares 12..76, teto 8)
+        assert(Attributes::spellSlots(10) == 0);
+        assert(Attributes::spellSlots(11) == 0);
+        assert(Attributes::spellSlots(12) == 1);
+        assert(Attributes::spellSlots(18) == 2);
+        assert(Attributes::spellSlots(76) == 8);
+        assert(Attributes::spellSlots(99) == 8);
+    }
     std::printf("attributes test OK\n");
     return 0;
 }

@@ -57,7 +57,9 @@ public:
     };
     enum class UIState : uint8_t { Closed, Browse, ActionMenu, ConfirmDrop };
     // Ações do menu (lista dinâmica por item; Cancel = Esc).
-    enum class MenuAction : uint8_t { Use, Equip, Unequip, Drop, Arrange, COUNT };
+    enum class MenuAction : uint8_t {
+        Use, Equip, Unequip, Drop, Arrange, Attune, Unattune, COUNT
+    };
 
     static constexpr int   kCols     = 8;
     static constexpr int   kRows     = 10;

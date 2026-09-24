@@ -561,6 +561,75 @@ REGISTER_ITEM("bloodred_moss", [] {
     return def;
 }())
 
+// ---- Magias (F8): sintoniza no menu, conjura com G ----
+inline const core::PaletteEntry kItemArrowPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'C', {120, 220, 255}},
+    {'W', {230, 250, 255}},
+};
+inline constexpr std::size_t kItemArrowPalCount = 3;
+inline const char* const kItemArrowSprite[] = {
+    "......CC",
+    ".....CCW",
+    "....CCW.",
+    "...CCW..",
+    "..CCW...",
+    ".CCW....",
+    "CCW.....",
+    "........",
+};
+
+inline const core::PaletteEntry kItemHealPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'G', {120, 220, 140}},
+    {'g', {70, 150, 90}},
+};
+inline constexpr std::size_t kItemHealPalCount = 3;
+inline const char* const kItemHealSprite[] = {
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    ".GGGGG..",
+    ".GGGGG..",
+    "...Gg...",
+    "...Gg...",
+    "........",
+};
+
+REGISTER_ITEM("soul_arrow", [] {
+    core::ItemDef def;
+    def.id = "soul_arrow";
+    def.description = "Flecha da alma: projétil que escala com INT.";
+    def.spriteRows = kItemArrowSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemArrowPal;
+    def.spritePalCount = kItemArrowPalCount;
+    def.name = "Flecha da Alma";
+    def.type = ItemType::Spell;
+    def.rarity = ItemRarity::Uncommon;
+    def.stackMax = 1;
+    def.intReq = 12;
+    return def;
+}())
+
+REGISTER_ITEM("heal_light", [] {
+    core::ItemDef def;
+    def.id = "heal_light";
+    def.description = "Luz curativa: restaura HP, escala com FÉ.";
+    def.spriteRows = kItemHealSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemHealPal;
+    def.spritePalCount = kItemHealPalCount;
+    def.name = "Luz Curativa";
+    def.type = ItemType::Spell;
+    def.rarity = ItemRarity::Uncommon;
+    def.stackMax = 1;
+    def.faiReq = 12;
+    return def;
+}())
+
 REGISTER_ITEM("rusty_key", [] {
     core::ItemDef def;
     def.id = "rusty_key";

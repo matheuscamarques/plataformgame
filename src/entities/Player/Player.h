@@ -8,6 +8,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include <SFML/Graphics/Rect.hpp>
 #include "entities/Entity.hpp"
@@ -76,6 +77,18 @@ class Player : public Entity
         // (RunManager); R voluntário mantém; respawn não mexe.
         int souls = 0;
         void addSouls(int v) { souls += v; }
+
+        // Magia (F8): FP + magias sintonizadas (cap = spellSlots(ATT)).
+        float fp = 200.f;
+        float fpMax = 200.f;
+        std::vector<std::string> attuned; // defIds, ordem de sintonia
+        int spellSlots() const {
+            return core::Attributes::spellSlots(
+                attrs.get(core::Attr::Attunement));
+        }
+        // Sintonia: def Spell com req cumprido e espaço livre.
+        bool attune(const std::string& defId);
+        bool unattune(const std::string& defId);
 
         // Status effects (F7): acúmulo veneno/sangramento + veneno ativo.
         float poisonBuildup = 0.f;

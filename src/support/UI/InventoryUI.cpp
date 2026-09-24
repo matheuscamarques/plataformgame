@@ -57,6 +57,8 @@ const char* InventoryUI::menuActionName(MenuAction a) {
         case MenuAction::Unequip: return "Unequip";
         case MenuAction::Drop:    return "Drop";
         case MenuAction::Arrange: return "Arrange";
+        case MenuAction::Attune:  return "Attune";
+        case MenuAction::Unattune: return "Unattune";
         default:                  return "?";
     }
 }
@@ -173,6 +175,13 @@ std::vector<InventoryUI::MenuAction> InventoryUI::menuActions() const {
     if (def->onUse) out.push_back(MenuAction::Use);
     if (equipment_ && def->equipSlot != core::EquipSlot::None)
         out.push_back(MenuAction::Equip);
+    // Magia (F8): sintoniza se cabe, senão oferece tirar.
+    if (player_ && def->type == T::Spell) {
+        bool isAttuned = false;
+        for (const auto& id : player_->attuned)
+            if (id == item.defId) isAttuned = true;
+        out.push_back(isAttuned ? MenuAction::Unattune : MenuAction::Attune);
+    }
     if (def->type != T::Key && def->type != T::Quest)
         out.push_back(MenuAction::Drop);
     out.push_back(MenuAction::Arrange); // sempre disponível
@@ -260,6 +269,26 @@ bool InventoryUI::executeAction(MenuAction action) {
     if (item.isEmpty()) return false;
     const core::ItemDef* def = item.def();
     if (!def) return false;
+
+    if (action == MenuAction::Attune) {
+        if (!player_) return false;
+        if (player_->attune(item.defId)) {
+            feedback_ = "Sintonizado (G conjura)";
+            playUi(static_cast<int>(game::Sfx::UiConfirm));
+            return true;
+        }
+        feedback_ = "Sem espaços ou req (INT/FÉ 12)";
+        return false;
+    }
+    if (action == MenuAction::Unattune) {
+        if (!player_) return false;
+        if (player_->unattune(item.defId)) {
+            feedback_ = "Sintonia removida";
+            playUi(static_cast<int>(game::Sfx::UiConfirm));
+            return true;
+        }
+        return false;
+    }
 
     switch (action) {
         case MenuAction::Use:
@@ -1025,6 +1054,9 @@ void InventoryUI::renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
         line("guardado (nao dropavel)", 12, sf::Color(150, 150, 150));
     } else if (def->type == T::Consumable) {
         line("[F] Use / Drop", 12, sf::Color(240, 220, 160));
+    } else if (def->type == T::Spell) {
+        line("[F] Sintonia / Drop  (G conjura)", 12,
+             sf::Color(240, 220, 160));
     } else if (def->type == T::Material) {
         line("[F] Drop", 12, sf::Color(240, 220, 160));
     } else if (equipment_) {
@@ -1064,6 +1096,9 @@ void InventoryUI::renderStatusTab(sf::RenderTarget& t, float sw, float sh,
          sf::Color(240, 220, 140), y);
     // Level-up (F4): 8 atributos compráveis com souls, em qualquer lugar.
     if (player_) {
+        line("Magias: " + std::to_string(player_->attuned.size()) + "/" +
+                 std::to_string(player_->spellSlots()),
+             13, sf::Color(150, 200, 255), y);
         const int lv = player_->attrs.level();
         const int cost = core::Attributes::costForLevel(lv);
         line("Nv " + std::to_string(lv) + "   Souls: " +

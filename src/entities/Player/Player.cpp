@@ -230,6 +230,9 @@ void Player::tick() {
     if (stamina < staminaMax && staminaDelay.ready())
         stamina = std::min(staminaMax, stamina + 1.f);
 
+    // Regen de FP: 8/s, sem delay (magia F8).
+    if (fp < fpMax) fp = std::min(fpMax, fp + 8.f / 30.0f);
+
     // Veneno ativo: DoT direto (fura i-frame, pode matar). hp é int:
     // acumula a fração e desconta os inteiros (3/s = 1 a cada 10 ticks).
     if (poisonTimer > 0.f) {
@@ -324,8 +327,29 @@ void Player::refreshDerived() {
     hpMax = core::Attributes::maxHP(attrs.get(core::Attr::Vitality));
     staminaMax = static_cast<float>(
         core::Attributes::maxStamina(attrs.get(core::Attr::Endurance)));
+    fpMax = 100.f + attrs.get(core::Attr::Attunement) * 10.f;
     if (hp > hpMax) hp = hpMax;
     if (stamina > staminaMax) stamina = staminaMax;
+    if (fp > fpMax) fp = fpMax;
+}
+
+bool Player::attune(const std::string& defId) {
+    const core::ItemDef* def = core::ItemRegistry::instance().find(defId);
+    if (!def || def->type != core::ItemType::Spell) return false;
+    for (const auto& id : attuned)
+        if (id == defId) return false; // já sintonizada
+    if (static_cast<int>(attuned.size()) >= spellSlots()) return false;
+    if (attrs.get(core::Attr::Intelligence) < def->intReq) return false;
+    if (attrs.get(core::Attr::Faith) < def->faiReq) return false;
+    attuned.push_back(defId);
+    return true;
+}
+
+bool Player::unattune(const std::string& defId) {
+    const auto it = std::remove(attuned.begin(), attuned.end(), defId);
+    if (it == attuned.end()) return false;
+    attuned.erase(it, attuned.end());
+    return true;
 }
 
 const core::ItemDef* Player::weaponDef() const {
@@ -375,6 +399,7 @@ void Player::respawn(float x, float y) {
     staminaDelay.reset();
     curePoison();
     cureBleed();
+    fp = fpMax; // respawn renova FP (DS)
     topUpDynamite();
     topUpStarterKit();
     refreshDerived();

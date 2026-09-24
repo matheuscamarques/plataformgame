@@ -688,8 +688,10 @@ int main() {
         assert(p.inventory.count("moab") == 999);
         assert(p.inventory.count("purple_moss") == 10);
         assert(p.inventory.count("bloodred_moss") == 10);
-        // Kit inteiro: 38 defs em 1 slot cada + dinamite 999 em 1 só.
-        assert(p.inventory.usedSlots() == 39);
+        assert(p.inventory.count("soul_arrow") == 1);
+        assert(p.inventory.count("heal_light") == 1);
+        // Kit inteiro: 40 defs em 1 slot cada + dinamite 999 em 1 só.
+        assert(p.inventory.usedSlots() == 41);
     }
     { // EquipViaMenu (F→Equip: direita livre, esq, depois troca)
         InventoryUI ui;

@@ -32,6 +32,7 @@ enum class Action : uint8_t {
     SubTabRight,     // D: próxima sub-tab
     FirstSlot,       // Home: primeiro slot
     LastSlot,        // End: último slot
+    Cast,            // G: conjura a 1ª magia sintonizada (F8)
     ArrangeAll,      // T: reordena tudo (atalho, também no menu)
     UseItem,         // U/Enter: usa o selecionado (atalho, também no menu)
     COUNT
