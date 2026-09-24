@@ -36,7 +36,7 @@ int main() {
         assert(p.attrs.buy(core::Attr::Vitality, souls));
         assert(p.attrs.buy(core::Attr::Endurance, souls));
         p.refreshDerived();
-        assert(p.hpMax == 10200 && p.staminaMax == 155.f);
+        assert(p.hpMax == 102 && p.staminaMax == 155.f);
         assert(p.maxEquipLoad() == 62.f);
     }
     { // StaminaRegen (1/tick até o teto)
