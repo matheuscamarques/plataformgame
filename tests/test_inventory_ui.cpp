@@ -137,6 +137,48 @@ int main() {
         assert(z.hp == 0 && z.damage == 0 && z.defense == 0);
         assert(z.weaponName == "Soco");
     }
+    { // LevelUpBuysAttr (F na Status: souls -> +1 VIT, hpMax sobe)
+        InventoryUI ui;
+        InputMap in;
+        Player p;
+        p.souls = 100000;
+        ui.setPlayer(&p);
+        ui.setInventory(&p.inventory);
+        ui.open();
+        ui.setMainTab(InventoryUI::MainTab::Status);
+        assert(ui.attrCursor() == 0); // Vitalidade
+        press(in, sf::Keyboard::Down);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Down);
+        assert(ui.attrCursor() == 1); // Conhecimento
+        press(in, sf::Keyboard::Up);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::Up);
+        assert(ui.attrCursor() == 0);
+        const int cost = core::Attributes::costForLevel(1);
+        press(in, sf::Keyboard::F);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::F);
+        assert(p.attrs.get(core::Attr::Vitality) == 11);
+        assert(p.attrs.level() == 2);
+        assert(p.souls == 100000 - cost);
+        assert(p.hpMax == 10200); // refreshDerived no buy
+    }
+    { // LevelUpBrokeNoOp (sem souls: nada muda, feedback avisa)
+        InventoryUI ui;
+        InputMap in;
+        Player p;
+        ui.setPlayer(&p);
+        ui.setInventory(&p.inventory);
+        ui.open();
+        ui.setMainTab(InventoryUI::MainTab::Status);
+        press(in, sf::Keyboard::F);
+        ui.handleInput(in);
+        release(in, sf::Keyboard::F);
+        assert(p.attrs.get(core::Attr::Vitality) == 10);
+        assert(p.attrs.level() == 1 && p.souls == 0);
+        assert(ui.feedback().find("insuficientes") != std::string::npos);
+    }
     { // SystemTab (volume A/D, Save em breve, Sair pede quit)
         InventoryUI ui;
         InputMap in;

@@ -99,11 +99,13 @@ public:
         cursor_ = std::clamp(i, 0, kSlots - 1);
         snapCursor();
     }
+    int attrCursor() const { return attrCursor_; }
     MainTab mainTab() const { return mainTab_; }
     void setMainTab(MainTab t) {
         mainTab_ = t;
         cursor_ = 0;
         equipCursor_ = 0;
+        attrCursor_ = 0;
         snapCursor();
     }
     SubTab subTab() const { return subTab_; }
@@ -183,7 +185,8 @@ private:
     MainTab mainTab_   = MainTab::Inventory;
     SubTab  subTab_    = SubTab::All;
     int     cursor_      = 0; // slot do grid (índice; hotbar lê índice)
-    int     equipCursor_ = 0; // 0..4 (mão, Head, Chest, Legs, Boots)
+    int     equipCursor_ = 0; // 0..5 (mãos, Head..Boots, ordem exibição)
+    int     attrCursor_  = 0; // atributo da aba Status (0..7)
     int     actionCursor_ = 0; // índice em menuActions()
     int     sysCursor_   = 0; // linha da aba System (0..kSysRows-1)
     int     volumePct_   = 70; // dono é a UI; aplica ao ajustar
@@ -200,6 +203,7 @@ private:
     void openActionMenu();
     void adjustVolume(int delta); // aplica em audio_+music_ (se setados)
     void activateSystemRow();     // F na linha sysCursor_
+    void buySelectedAttr();       // F na Status: compra 1 ponto c/ souls
     void playUi(int sfx) const;   // game::Sfx como int (sem incluir Bank)
 
     bool slotMatches(int index) const; // ocupado + casa com a sub-tab

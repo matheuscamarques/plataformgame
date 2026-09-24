@@ -84,6 +84,7 @@ void InventoryUI::open() {
     subTab_ = SubTab::All;
     cursor_ = 0;
     equipCursor_ = 0;
+    attrCursor_ = 0;
     sysCursor_ = 0;
     feedback_.clear();
     openTime_ = core::Time::elapsed();
@@ -372,6 +373,7 @@ void InventoryUI::cycleMainTab(int delta) {
         (static_cast<int>(mainTab_) + delta + n) % n);
     cursor_ = 0;
     equipCursor_ = 0;
+    attrCursor_ = 0;
     snapCursor();
     playUi(static_cast<int>(game::Sfx::UiSelect));
 }
@@ -409,6 +411,24 @@ void InventoryUI::activateSystemRow() {
         playUi(static_cast<int>(game::Sfx::UiConfirm));
     }
     // Linha 0 (Volume): ajusta com A/D, F não faz nada.
+}
+
+void InventoryUI::buySelectedAttr() {
+    if (!player_) return;
+    const auto attr = static_cast<core::Attr>(attrCursor_);
+    const int cost =
+        core::Attributes::costForLevel(player_->attrs.level());
+    if (player_->attrs.buy(attr, player_->souls)) {
+        player_->refreshDerived();
+        feedback_ = std::string("+1 ") + core::attrName(attr) + " (Nv " +
+                    std::to_string(player_->attrs.level()) + ")";
+        playUi(static_cast<int>(game::Sfx::UiConfirm));
+    } else {
+        feedback_ = player_->souls < cost
+                        ? "Souls insuficientes (" + std::to_string(cost) + ")"
+                        : "Atributo no máximo";
+        playUi(static_cast<int>(game::Sfx::UiCancel));
+    }
 }
 
 void InventoryUI::handleBrowse(const InputMap& input) {
@@ -466,7 +486,21 @@ void InventoryUI::handleBrowse(const InputMap& input) {
         return;
     }
 
-    if (mainTab_ != MainTab::Inventory) return; // Status: só tabs/fechar
+    if (mainTab_ == MainTab::Status) {
+        if (input.pressed(Action::Up)) {
+            attrCursor_ = (attrCursor_ + core::kAttrCount - 1) %
+                          core::kAttrCount;
+            playUi(static_cast<int>(game::Sfx::UiMove));
+        }
+        if (input.pressed(Action::Down)) {
+            attrCursor_ = (attrCursor_ + 1) % core::kAttrCount;
+            playUi(static_cast<int>(game::Sfx::UiMove));
+        }
+        if (input.pressed(Action::Interact)) buySelectedAttr();
+        return;
+    }
+
+    if (mainTab_ != MainTab::Inventory) return; // segurança
 
     // Grid: atalhos + Home/End + setas + F.
     if (input.pressed(Action::FirstSlot)) {
@@ -1007,6 +1041,31 @@ void InventoryUI::renderStatusTab(sf::RenderTarget& t, float sw, float sh,
          sf::Color(120, 180, 255), y);
     line("Ouro: " + std::to_string(st.gold), 14,
          sf::Color(240, 220, 140), y);
+    // Level-up (F4): 8 atributos compráveis com souls, em qualquer lugar.
+    if (player_) {
+        const int lv = player_->attrs.level();
+        const int cost = core::Attributes::costForLevel(lv);
+        line("Nv " + std::to_string(lv) + "   Souls: " +
+                 std::to_string(player_->souls),
+             15, sf::Color(255, 240, 200), y);
+        line("Custo: " + std::to_string(cost) + "  [F] upar", 12,
+             sf::Color(150, 150, 150), y);
+        for (int i = 0; i < core::kAttrCount; ++i) {
+            const bool sel = (i == attrCursor_);
+            const auto a = static_cast<core::Attr>(i);
+            sf::Text tt;
+            tt.setFont(font);
+            tt.setString(std::string(sel ? "> " : "  ") +
+                         core::attrName(a) + ": " +
+                         std::to_string(player_->attrs.get(a)));
+            tt.setCharacterSize(13);
+            tt.setFillColor(sel ? sf::Color(255, 220, 100)
+                                : sf::Color(200, 200, 200));
+            tt.setPosition(px + 20.f, y);
+            t.draw(tt);
+            y += 13.f + 5.f;
+        }
+    }
     if (player_) {
         const float load = player_->equipLoad();
         const float maxLoad = player_->maxEquipLoad();
