@@ -168,6 +168,30 @@ void Game::render()
     drawPlayerWeapon();    // espada por cima
     drawEnemiesSprites();
 
+    // Status F7 flutuante (DS): acima do player, só quando aplicado.
+    // Veneno ativo = barra cheia; sangue só tem acúmulo (burst).
+    {
+        Player* pl = player.get();
+        const float stTh = static_cast<float>(pl->statusThreshold());
+        const float cx = pl->getCenterX();
+        auto floatBar = [&](float v, float yOff, sf::Color c) {
+            if (v <= 0.f) return;
+            const float f = std::min(1.f, std::max(0.f, v / stTh));
+            sf::RectangleShape b({60.f, 7.f});
+            b.setPosition(cx - 30.f, pl->getY() + yOff);
+            b.setFillColor(sf::Color(20, 20, 20, 200));
+            window->draw(b);
+            sf::RectangleShape fgr({58.f * f, 5.f});
+            fgr.setPosition(cx - 29.f, pl->getY() + yOff + 1.f);
+            fgr.setFillColor(c);
+            window->draw(fgr);
+        };
+        floatBar(pl->poisonTimer > 0.f ? stTh : pl->poisonBuildup, -40.f,
+                 sf::Color(170, 90, 220)); // veneno
+        floatBar(pl->bleedBuildup, -30.f,
+                 sf::Color(220, 60, 60)); // sangue
+    }
+
     // Barks com fade 1.5s acima da cabeça (texto; áudio futuro).
     enemies_->forEach([&](support::Enemy &s) {
         if (s.barkTimer <= 0.f || s.currentBark.empty()) return;
@@ -771,27 +795,6 @@ void Game::render()
         stFg.setFillColor(sf::Color(80, 200, 80));
         window->draw(stFg);
 
-        // Status F7: acúmulo/veneno ativo (só quando >0).
-        const float stTh = static_cast<float>(p->statusThreshold());
-        auto statusBar = [&](float v, float maxv, float y, sf::Color c) {
-            if (v <= 0.f && maxv <= 0.f) return;
-            sf::RectangleShape b({60.f, 7.f});
-            b.setPosition(224.f, y);
-            b.setFillColor(sf::Color(20, 20, 20));
-            window->draw(b);
-            const float f = maxv > 0.f
-                                ? std::min(1.f, std::max(0.f, v / maxv))
-                                : 1.f;
-            sf::RectangleShape fgr({58.f * f, 5.f});
-            fgr.setPosition(225.f, y + 1.f);
-            fgr.setFillColor(c);
-            window->draw(fgr);
-        };
-        statusBar(p->poisonTimer > 0.f ? stTh : p->poisonBuildup, stTh, 16.f,
-                  sf::Color(170, 90, 220)); // veneno roxo
-        statusBar(p->bleedBuildup, stTh, 26.f,
-                  sf::Color(220, 60, 60)); // sangue vermelho
-
         auto text = [&](const std::string &s, float x, float y, int size = 18) {
             sf::Text t;
             t.setFont(font);
@@ -1074,5 +1077,23 @@ void Game::drawEnemiesSprites() {
         spr.setPosition(s.body.getCenterX(), s.body.getY() + s.body.getH());
         spr.setScale(static_cast<float>(s.body.facing) * sc, sc);
         window->draw(spr);
+
+        // Barra de vida overhead (DS): só quando machucado.
+        const int ehp = s.resources.hp;
+        const int ehpMax = s.resources.hpMax;
+        if (ehpMax > 0 && ehp < ehpMax) {
+            const float f = std::max(
+                0.f, std::min(1.f, static_cast<float>(ehp) / ehpMax));
+            sf::RectangleShape ebg({36.f, 5.f});
+            ebg.setPosition(s.body.getCenterX() - 18.f,
+                            s.body.getY() - 12.f);
+            ebg.setFillColor(sf::Color(20, 0, 0));
+            window->draw(ebg);
+            sf::RectangleShape efg({34.f * f, 3.f});
+            efg.setPosition(s.body.getCenterX() - 17.f,
+                            s.body.getY() - 11.f);
+            efg.setFillColor(sf::Color(200, 30, 30));
+            window->draw(efg);
+        }
     });
 }

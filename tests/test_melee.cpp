@@ -36,7 +36,7 @@ int main() {
         for (int i = 0; i < 6; ++i) ms.tick(1.f / 30.f, ctx);
         int hp = -1;
         enemies.forEach([&](Enemy &s) { hp = s.resources.hp; });
-        assert(hp == 14);
+        assert(hp == 44);
     }
     { // HitsSlimeBehindWhenFacingLeft (regressão: W ia p/ direita)
         Player p; // (100,0) 30x50, centro (115,25)
@@ -61,7 +61,7 @@ int main() {
         for (int i = 0; i < 6; ++i) ms.tick(1.f / 30.f, ctx);
         int hp = -1;
         enemies.forEach([&](Enemy &s) { hp = s.resources.hp; });
-        assert(hp == 14);
+        assert(hp == 44);
     }
     { // WhiffsWhenFar
         Player p;
@@ -77,9 +77,9 @@ int main() {
         for (int i = 0; i < 6; ++i) ms.tick(1.f / 30.f, ctx);
         int hp = -1;
         enemies.forEach([&](Enemy &s) { hp = s.resources.hp; });
-        assert(hp == 30);
+        assert(hp == 60);
     }
-    { // ChainsComboInRecovery (combo 0 → 1; combo1 head overkilla)
+    { // ChainsComboInRecovery (combo 0 → 1 → 2 mata slime 60)
         Player p;
         p.equipment.unequip(core::EquipSlot::RightHand); // soco (seed equipa espada)
         EnemySystem enemies;
@@ -100,9 +100,17 @@ int main() {
         assert(p.meleePhase == MeleePhase::Recovery);
         int hp0 = -1;
         enemies.forEach([&](Enemy &s) { hp0 = s.resources.hp; });
-        assert(hp0 == 14); // combo0 head: 8 * 2.0 = 16
+        assert(hp0 == 44); // combo0 head: 60 - 8 * 2.0
         assert(p.startSwing() && p.meleeCombo == 1);
-        // Combo1 head (10 * 2.0 = 20) overkilla os 14 restantes.
+        // Combo1 head (10 * 2.0 = 20): 44 -> 24, vivo.
+        for (int i = 0; i < 10; ++i) ms.tick(1.f / 30.f, ctx);
+        int hp1 = -1;
+        enemies.forEach([&](Enemy &s) { hp1 = s.resources.hp; });
+        assert(hp1 == 24);
+        // Combo2 head (16 * 2.0 = 32) fecha a conta.
+        for (int i = 0; i < 20 && p.meleePhase != MeleePhase::Recovery; ++i)
+            ms.tick(1.f / 30.f, ctx);
+        assert(p.startSwing() && p.meleeCombo == 2);
         for (int i = 0; i < 10; ++i) ms.tick(1.f / 30.f, ctx);
         int hp = -1;
         bool dead = false;

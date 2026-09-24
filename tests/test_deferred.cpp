@@ -28,7 +28,7 @@ int main() {
         assert(visited == 2); // loop completou (sem invalidação)
         assert(enemies.count() == 2); // nada removido ainda
         int deaths = 0;
-        enemies.removeDead([&](sf::Vector2f) { ++deaths; }, nullptr);
+        enemies.removeDead([&](Enemy &) { ++deaths; }, nullptr);
         assert(deaths == 1);
         assert(enemies.count() == 1);
     }
@@ -37,14 +37,14 @@ int main() {
         enemies.spawn("slime", 0.f, 0.f);
         enemies.forEach([](Enemy& e) { e.resources.hp = 0; });
         int deaths = 0;
-        enemies.removeDead([&](sf::Vector2f) { ++deaths; }, nullptr);
+        enemies.removeDead([&](Enemy &) { ++deaths; }, nullptr);
         assert(deaths == 1 && enemies.count() == 0);
     }
     { // VivoNaoMarcadoSobrevive (sweep sem efeito colateral)
         EnemySystem enemies;
         enemies.spawn("slime", 0.f, 0.f);
         int deaths = 0;
-        enemies.removeDead([&](sf::Vector2f) { ++deaths; }, nullptr);
+        enemies.removeDead([&](Enemy &) { ++deaths; }, nullptr);
         assert(deaths == 0 && enemies.count() == 1);
     }
 

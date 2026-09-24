@@ -48,6 +48,9 @@ struct EnemyArchetype {
     // Skills disponíveis (IDs no SkillRegistry). Vazio = behavior manual.
     std::vector<std::string> skills;
 
+    // Souls da morte (orbe XP). Slime 100, anão 150.
+    int xp = 1;
+
     // Drops ao morrer (rolados em DeathSystem via rollDrops). Vazio = só XP.
     core::DropTable drops;
 };

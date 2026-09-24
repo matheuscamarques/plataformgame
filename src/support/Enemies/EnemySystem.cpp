@@ -26,7 +26,7 @@ void EnemySystem::forEach(const std::function<void(Enemy &)> &fn) {
     for (auto &s : slimes_) fn(*s);
 }
 
-void EnemySystem::removeDead(const std::function<void(sf::Vector2f)> &onDeath,
+void EnemySystem::removeDead(const std::function<void(Enemy&)> &onDeath,
                              GameContext *ctx) {
     for (auto it = slimes_.begin(); it != slimes_.end(); ) {
         if (!(*it)->resources.isDead() && !(*it)->destroyPending) {
@@ -39,9 +39,8 @@ void EnemySystem::removeDead(const std::function<void(sf::Vector2f)> &onDeath,
             ctx->audio->play(game::keyOf(
                 (*it)->ai->kind() == core::EntityKind::Dwarf
                     ? game::Sfx::DwarfDeath : game::Sfx::SlimeDeath));
-        sf::Vector2f pos{(*it)->body.getCenterX(), (*it)->body.getCenterY()};
+        onDeath(**it); // antes do erase (ref pendurada depois)
         it = slimes_.erase(it);
-        onDeath(pos);
     }
 }
 

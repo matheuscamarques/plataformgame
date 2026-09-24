@@ -30,6 +30,14 @@ void cureBleedUse(Player& p) {
     p.cureBleed();
 }
 
+void soulLostUse(Player& p) {
+    p.addSouls(50);
+}
+
+void soulGreatUse(Player& p) {
+    p.addSouls(200);
+}
+
 } // namespace
 
 
@@ -559,6 +567,64 @@ REGISTER_ITEM("bloodred_moss", [] {
     def.rarity = ItemRarity::Common;
     def.stackMax = 10;
     def.onUse = cureBleedUse;
+    return def;
+}())
+
+// ---- Almas consumíveis (DS): usar dá souls na hora ----
+inline const core::PaletteEntry kItemSoulLostPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {140, 220, 230}},
+    {'s', {90, 150, 160}},
+};
+inline constexpr std::size_t kItemSoulLostPalCount = 3;
+inline const core::PaletteEntry kItemSoulGreatPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {250, 220, 120}},
+    {'s', {180, 150, 70}},
+};
+inline constexpr std::size_t kItemSoulGreatPalCount = 3;
+inline const char* const kItemSoulSprite[] = {
+    "...SS...",
+    "..SSSS..",
+    "..SsSS..",
+    "..SSSS..",
+    "...SS...",
+    "....s...",
+    "........",
+    "........",
+};
+
+REGISTER_ITEM("soul_lost", [] {
+    core::ItemDef def;
+    def.id = "soul_lost";
+    def.description = "Alma perdida: +50 souls ao usar.";
+    def.spriteRows = kItemSoulSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemSoulLostPal;
+    def.spritePalCount = kItemSoulLostPalCount;
+    def.name = "Alma Perdida";
+    def.type = ItemType::Consumable;
+    def.rarity = ItemRarity::Common;
+    def.stackMax = 99;
+    def.onUse = soulLostUse;
+    return def;
+}())
+
+REGISTER_ITEM("soul_great", [] {
+    core::ItemDef def;
+    def.id = "soul_great";
+    def.description = "Alma grande: +200 souls ao usar.";
+    def.spriteRows = kItemSoulSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemSoulGreatPal;
+    def.spritePalCount = kItemSoulGreatPalCount;
+    def.name = "Alma Grande";
+    def.type = ItemType::Consumable;
+    def.rarity = ItemRarity::Uncommon;
+    def.stackMax = 99;
+    def.onUse = soulGreatUse;
     return def;
 }())
 

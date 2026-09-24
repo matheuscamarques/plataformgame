@@ -99,6 +99,7 @@ class Player : public Entity
         static constexpr float kPoisonDur = 8.f;
         static constexpr float kBleedPct = 0.15f; // burst do HP máximo
         static constexpr float kSlimePoison = 25.f; // por mordida
+        static constexpr float kSlimeBleed = 15.f;  // slime aplica os dois
         static constexpr float kDwarfBleed = 30.f;  // por golpe
         float statusThreshold() const {
             return core::Attributes::statusThreshold(

@@ -42,9 +42,18 @@ void DeathSystem::tick(float /*dt*/, GameContext &ctx) {
             }
         });
     }
-    ctx.enemies->removeDead([&](sf::Vector2f pos) {
+    ctx.enemies->removeDead([&](Enemy &e) {
+        const sf::Vector2f pos{e.body.getCenterX(), e.body.getCenterY()};
         if (particles_) particles_->spawnTileBreak(pos, 0, 0, 0);
-        if (drops_)     drops_->spawnXP(pos, 1);
+        if (!drops_) return;
+        // XP por arquétipo (slime 100, anão 150); sem archetype = 1.
+        int xp = 1;
+        if (!e.archetypeId.empty()) {
+            if (const EnemyArchetype *arch =
+                    ArchetypeRegistry::instance().find(e.archetypeId))
+                xp = arch->xp;
+        }
+        drops_->spawnXP(pos, xp);
     }, &ctx);
 }
 

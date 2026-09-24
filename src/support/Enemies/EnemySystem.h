@@ -102,12 +102,12 @@ public:
     // Limpa todos (restart da run). Slimes iniciais respawnam pelo caller.
     void clear() { slimes_.clear(); }
 
-    // Remove mortos; onDeath(pos do centro) por removido para juice
-    // (partículas/drops no DeathSystem). Erase mora aqui, no dono.
+    // Remove mortos; onDeath(inimigo) por removido para juice
+    // (partículas/drops/XP no DeathSystem). Erase mora aqui, no dono.
     // Com ctx, dispara ai->onDeath antes do erase (hook opcional).
     // Também varre destroyPending (markForDestroy): morte marcada
     // durante iteração cai aqui no fim do frame, nunca no meio do loop.
-    void removeDead(const std::function<void(sf::Vector2f)> &onDeath,
+    void removeDead(const std::function<void(Enemy&)> &onDeath,
                     GameContext *ctx = nullptr);
 
     // Marca p/ destruição adiada (seguro dentro de forEach/tick).

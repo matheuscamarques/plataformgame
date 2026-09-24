@@ -30,7 +30,7 @@ REGISTER_ENEMY_ARCHETYPE("slime", [] {
     a.kind = core::EntityKind::Slime;
     a.bodySchema = "humanoid";
     a.isTrash = true;
-    a.hp = 30;
+    a.hp = 60; // trash com corpo: 2 golpes de espada (era 30)
     a.postureMax = 20.f;
     a.postureRegen = 10.f;
     a.postureRegenDelay = 1.0f;
@@ -41,6 +41,9 @@ REGISTER_ENEMY_ARCHETYPE("slime", [] {
     a.drops.entries.push_back({"slime_gel", 0.8f, 1, 2});
     a.drops.entries.push_back({"purple_moss", 0.3f, 1, 1});
     a.drops.entries.push_back({"bloodred_moss", 0.2f, 1, 1});
+    a.drops.entries.push_back({"soul_lost", 0.35f, 1, 1});
+    a.drops.entries.push_back({"soul_great", 0.1f, 1, 1});
+    a.xp = 100; // slime vale 100 souls
     return a;
 }());
 
@@ -68,6 +71,7 @@ REGISTER_ENEMY_ARCHETYPE("dwarf", [] {
     a.maxAlive = 1;
     a.drops.entries.push_back({"iron_ore", 0.4f, 1, 1});
     a.skills = {"dwarf_dynamite", "dwarf_melee"};
+    a.xp = 150; // elite vale mais que trash
     return a;
 }());
 

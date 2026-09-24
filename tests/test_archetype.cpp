@@ -22,7 +22,7 @@ int main() {
         assert(a != nullptr);
         assert(a->behaviorKind == "slime" && a->kind == core::EntityKind::Slime);
         assert(a->bodySchema == "humanoid");
-        assert(a->isTrash && a->hp == 30);
+        assert(a->isTrash && a->hp == 60);
         assert(a->minStratum == 0 && a->maxAlive == 100);
     }
     { // DwarfRegisteredAsElite
@@ -46,7 +46,7 @@ int main() {
     }
     { // FactoryResolvesArchetype (slime/anão/desconhecido)
         auto s = Factory::spawnEnemy("slime", 0.f, 0.f);
-        assert(s != nullptr && s->resources.hp == 30 && s->resources.isTrash);
+        assert(s != nullptr && s->resources.hp == 60 && s->resources.isTrash);
         assert(s->bodyParts.schema != nullptr);
         auto d = Factory::spawnEnemy("dwarf", 0.f, 0.f);
         assert(d != nullptr && d->resources.hp == 60 && !d->resources.isTrash);

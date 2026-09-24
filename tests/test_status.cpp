@@ -76,7 +76,7 @@ int main() {
                 cs.tick(1.f / 30.f, ctx);
             }
             assert(p.poisonBuildup > 0.f);
-            assert(p.bleedBuildup == 0.f);
+            assert(p.bleedBuildup > 0.f); // slime aplica os dois
         }
         {
             Player p;

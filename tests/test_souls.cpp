@@ -2,6 +2,9 @@
 #include <cstdio>
 
 #include "entities/Player/Player.h"
+#include "support/Combat/DeathSystem.h"
+#include "support/Enemies/EnemyArchetype.h"
+#include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
 #include "support/Progression/DropSystem.h"
 #include "support/Progression/RunManager.h"
@@ -89,6 +92,40 @@ int main() {
         run.restart(ctx);
         assert(p.souls == 0);
         assert(drops.activeCount() == 1u); // sem duplicar
+    }
+    { // SlimeDeathPays100 (XP por arquétipo; slime 100, anão 150)
+        const EnemyArchetype* slime =
+            ArchetypeRegistry::instance().find("slime");
+        const EnemyArchetype* dwarf =
+            ArchetypeRegistry::instance().find("dwarf");
+        assert(slime && slime->xp == 100);
+        assert(dwarf && dwarf->xp == 150);
+        Player p;
+        EnemySystem enemies;
+        DropSystem drops;
+        DeathSystem deaths;
+        deaths.setDropSystem(&drops);
+        enemies.spawn("slime", p.getX(), p.getY());
+        enemies.forEach([](Enemy& e) { e.resources.hp = 0; });
+        GameContext ctx{};
+        ctx.player = &p;
+        ctx.enemies = &enemies;
+        ctx.drops = &drops;
+        deaths.tick(1.f / 30.f, ctx);
+        for (int i = 0; i < 60; ++i) drops.tick(1.f / 30.f, ctx);
+        assert(p.souls >= 100); // 100 do XP (+soul item se rolou)
+    }
+    { // SoulUse (almas consumíveis viram souls na hora)
+        Player p;
+        const core::ItemDef* lost =
+            core::ItemRegistry::instance().find("soul_lost");
+        const core::ItemDef* great =
+            core::ItemRegistry::instance().find("soul_great");
+        assert(lost && great && lost->onUse && great->onUse);
+        lost->onUse(p);
+        assert(p.souls == 50);
+        great->onUse(p);
+        assert(p.souls == 250);
     }
 
     std::printf("souls test OK\n");
