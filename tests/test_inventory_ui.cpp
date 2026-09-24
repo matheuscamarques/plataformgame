@@ -683,8 +683,11 @@ int main() {
         assert(p.inventory.count("iron_boots") == 1);
         assert(p.inventory.count("iron_gloves") == 1);
         assert(p.inventory.count("leather_boots") == 1);
+        assert(p.inventory.count("leather_gloves") == 1);
         assert(p.inventory.count("gold_boots") == 1);
+        assert(p.inventory.count("gold_gloves") == 1);
         assert(p.inventory.count("diamond_boots") == 1);
+        assert(p.inventory.count("diamond_gloves") == 1);
         assert(p.inventory.count("tnt") == 999);
         assert(p.inventory.count("c4") == 999);
         assert(p.inventory.count("daisy") == 999);
@@ -697,8 +700,8 @@ int main() {
         assert(p.inventory.count("soul_great") == 99);
         assert(p.inventory.count("soul_arrow") == 1);
         assert(p.inventory.count("heal_light") == 1);
-        // Kit inteiro: 42 defs em 1 slot cada + dinamite 999 em 1 só.
-        assert(p.inventory.usedSlots() == 44);
+        // Kit inteiro: 45 defs em 1 slot cada + dinamite 999 em 1 só.
+        assert(p.inventory.usedSlots() == 47);
     }
     { // EquipViaMenu (F→Equip: direita livre, esq, depois troca)
         InventoryUI ui;

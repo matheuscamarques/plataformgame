@@ -1402,6 +1402,85 @@ REGISTER_ITEM("iron_gloves", [] {
     return def;
 }())
 
+inline const core::PaletteEntry kItemLeatherGlovesPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {160, 110, 70}},
+    {'s', {100, 70, 45}},
+};
+inline constexpr std::size_t kItemLeatherGlovesPalCount = 3;
+inline const core::PaletteEntry kItemGoldGlovesPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {220, 190, 90}},
+    {'s', {170, 140, 50}},
+};
+inline constexpr std::size_t kItemGoldGlovesPalCount = 3;
+inline const core::PaletteEntry kItemDiamondGlovesPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {180, 220, 240}},
+    {'s', {100, 150, 190}},
+};
+inline constexpr std::size_t kItemDiamondGlovesPalCount = 3;
+
+REGISTER_ITEM("leather_gloves", [] {
+    core::ItemDef def;
+    def.id = "leather_gloves";
+    def.description = "Luvas de couro. Flexíveis e silenciosas.";
+    def.spriteRows = kItemGlovesSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemLeatherGlovesPal;
+    def.spritePalCount = kItemLeatherGlovesPalCount;
+    def.name = "Luvas de Couro";
+    def.weight = 1.f;
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Common;
+    def.stackMax = 1;
+    def.defense = 1;
+    def.equipSlot = core::EquipSlot::Gloves;
+    def.material = core::MaterialId::Leather;
+    return def;
+}())
+
+REGISTER_ITEM("gold_gloves", [] {
+    core::ItemDef def;
+    def.id = "gold_gloves";
+    def.description = "Manoplas de ouro. Pesadas e vistosas.";
+    def.spriteRows = kItemGlovesSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemGoldGlovesPal;
+    def.spritePalCount = kItemGoldGlovesPalCount;
+    def.name = "Manoplas de Ouro";
+    def.weight = 3.f;
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Rare;
+    def.stackMax = 1;
+    def.defense = 3;
+    def.equipSlot = core::EquipSlot::Gloves;
+    def.material = core::MaterialId::Gold;
+    return def;
+}())
+
+REGISTER_ITEM("diamond_gloves", [] {
+    core::ItemDef def;
+    def.id = "diamond_gloves";
+    def.description = "Manoplas de diamante. Inquebráveis.";
+    def.spriteRows = kItemGlovesSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemDiamondGlovesPal;
+    def.spritePalCount = kItemDiamondGlovesPalCount;
+    def.name = "Manoplas de Diamante";
+    def.weight = 2.f;
+    def.type = ItemType::Armor;
+    def.rarity = ItemRarity::Epic;
+    def.stackMax = 1;
+    def.defense = 5;
+    def.equipSlot = core::EquipSlot::Gloves;
+    def.material = core::MaterialId::Diamond;
+    return def;
+}())
+
 REGISTER_ITEM("leather_boots", [] {
     core::ItemDef def;
     def.id = "leather_boots";

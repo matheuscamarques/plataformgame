@@ -65,6 +65,20 @@ int main() {
         assert(back.defId == "iron_gloves" && back.quantity == 1);
         assert(eq.isEmpty());
     }
+    { // GlovesAllMaterials (4 materiais, slot/defesas espelham botas)
+        const char *ids[] = {"leather_gloves", "gold_gloves",
+                             "diamond_gloves"};
+        const int defs[] = {1, 3, 5};
+        for (int i = 0; i < 3; ++i) {
+            const core::ItemDef *d =
+                core::ItemRegistry::instance().find(ids[i]);
+            assert(d != nullptr && d->equipSlot == core::EquipSlot::Gloves);
+            assert(d->defense == defs[i]);
+            core::Equipment eq;
+            assert(eq.equip(core::Item{ids[i], 1}));
+            assert(eq.isOccupied(core::EquipSlot::Gloves));
+        }
+    }
 
     std::printf("equipment test OK\n");
     return 0;
