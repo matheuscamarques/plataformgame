@@ -98,7 +98,7 @@ void Game::render()
 
     camera.setViewport(viewW_, viewH_);
     camera.follow(player.get()->getX(), player.get()->getY());
-    sf::Vector2f camPos = camera.position();
+    core::Vec2f camPos = camera.position();
     // Snap do canto superior-esquerdo (não do centro): vale p/ janela
     // par e ímpar — view/2 fracionário não reintroduz a fresta de 1px
     // entre tiles (céu aparecendo na grade) nem no lightmap bilinear.

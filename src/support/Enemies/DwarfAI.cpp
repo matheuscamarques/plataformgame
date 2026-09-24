@@ -20,6 +20,7 @@
 #include "support/Skills/SkillSystem.h"
 #include "support/Effects/ThrowSystem.h"
 #include "support/Skills/UtilityAI.h"
+#include "core/Vec.h"
 
 namespace support {
 
@@ -36,7 +37,7 @@ constexpr float kRetreatSpeed = 3.0f;
 constexpr float kHopVy = -32.0f;   // pula degrau travado
 constexpr int kHopCooldown = 60;   // ticks entre tentativas
 
-float dist(sf::Vector2f a, sf::Vector2f b) {
+float dist(core::Vec2f a, core::Vec2f b) {
     const float dx = a.x - b.x, dy = a.y - b.y;
     return std::sqrt(dx * dx + dy * dy);
 }
@@ -72,9 +73,9 @@ void DwarfAI::onTick(Enemy &e, float dt, GameContext &ctx) {
         else if (lastWarning_ >= 3) emitBark(e, BarkId::Warning3);
     }
 
-    const sf::Vector2f c{e.body.getCenterX(), e.body.getCenterY()};
-    const sf::Vector2f pp = ctx.player
-        ? sf::Vector2f{ctx.player->getCenterX(), ctx.player->getCenterY()}
+    const core::Vec2f c{e.body.getCenterX(), e.body.getCenterY()};
+    const core::Vec2f pp = ctx.player
+        ? core::Vec2f{ctx.player->getCenterX(), ctx.player->getCenterY()}
         : home_;
     const float dp = ctx.player ? dist(c, pp) : 1e9f;
 
@@ -132,9 +133,9 @@ void DwarfAI::tickPatrol(Enemy &e, float /*dt*/, GameContext & /*ctx*/) {
 }
 
 void DwarfAI::tickCombat(Enemy &e, float /*dt*/, GameContext &ctx) {
-    const sf::Vector2f c{e.body.getCenterX(), e.body.getCenterY()};
-    const sf::Vector2f pp = ctx.player
-        ? sf::Vector2f{ctx.player->getCenterX(), ctx.player->getCenterY()}
+    const core::Vec2f c{e.body.getCenterX(), e.body.getCenterY()};
+    const core::Vec2f pp = ctx.player
+        ? core::Vec2f{ctx.player->getCenterX(), ctx.player->getCenterY()}
         : home_;
     const float dp = ctx.player ? dist(c, pp) : 1e9f;
     e.body.facing = (pp.x < c.x) ? -1 : 1;

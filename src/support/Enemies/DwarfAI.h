@@ -14,6 +14,7 @@
 #include "entities/Entity.hpp"
 #include "Barks.h"
 #include "Behavior.h"
+#include "core/Vec.h"
 
 namespace support {
 
@@ -60,7 +61,7 @@ private:
     Config cfg_;
     DwarfState state_ = DwarfState::Patrol;
 
-    sf::Vector2f home_{0.f, 0.f};
+    core::Vec2f home_{0.f, 0.f};
     bool homed_ = false;
     int patrolDir_ = 1;
 

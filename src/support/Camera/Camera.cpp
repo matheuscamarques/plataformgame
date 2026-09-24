@@ -33,8 +33,8 @@ void Camera::follow(float targetX, float targetY) {
     pos_.y = core::lerp(pos_.y, gy, lerp_);
 }
 
-sf::Vector2f Camera::position() const {
-    const sf::Vector2f off = shakeOffset();
+core::Vec2f Camera::position() const {
+    const core::Vec2f off = shakeOffset();
     return {pos_.x + off.x, pos_.y + off.y};
 }
 
@@ -46,7 +46,7 @@ void Camera::tickTrauma(float dt) {
     trauma_ = std::max(0.f, trauma_ - dt * 1.5f);
 }
 
-sf::Vector2f Camera::shakeOffset() const {
+core::Vec2f Camera::shakeOffset() const {
     if (trauma_ <= 0.f) return {0.f, 0.f};
     const float amt = trauma_ * trauma_; // quadrático: susto grande pesa
     const float t = core::Time::elapsed();
@@ -58,11 +58,11 @@ sf::FloatRect Camera::viewRect() const {
     return sf::FloatRect(pos_.x, pos_.y, viewW_, viewH_);
 }
 
-sf::Vector2f Camera::screenToWorld(sf::Vector2f screen) const {
+core::Vec2f Camera::screenToWorld(core::Vec2f screen) const {
     return screen + pos_;
 }
 
-sf::Vector2f Camera::worldToScreen(sf::Vector2f world) const {
+core::Vec2f Camera::worldToScreen(core::Vec2f world) const {
     return world - pos_;
 }
 

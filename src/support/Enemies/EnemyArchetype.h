@@ -14,6 +14,7 @@
 
 #include "core/DropTable.h"
 #include "core/EntityKind.h"
+#include "core/Vec.h"
 
 namespace support {
 
@@ -22,7 +23,7 @@ namespace support {
 // Física/combate/morte operam em Enemy e nunca conhecem o tipo.
 struct EnemyArchetype {
     sf::Color color{100, 200, 100};
-    sf::Vector2f hitboxSize{36.f, 44.f};
+    core::Vec2f hitboxSize{36.f, 44.f};
 
     std::string behaviorKind = "slime"; // chave no BehaviorRegistry
     core::EntityKind kind = core::EntityKind::Slime; // p/ contagem (cap)
