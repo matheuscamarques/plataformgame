@@ -11,6 +11,7 @@
 #include <SFML/Graphics/Texture.hpp>
 
 #include "assets/Sprites/SpriteSet.h"
+#include "assets/Sprites/PlayerParts.h"
 #include "support/Combat/AimDir.h"
 #include "support/Combat/SpriteFrame.h"
 
@@ -79,6 +80,27 @@ inline const sf::Texture *textureForFrame(support::SpriteFrameId id,
         case SpriteFrameId::None:
         case SpriteFrameId::COUNT:
         default: return &sp.playerIdle;
+    }
+}
+
+// Fase D: frame → pose das partes (espelha textureForFrame p/ player).
+// Slime/anão/None caem em Idle (drawPlayerSprite só chama p/ player).
+// Headless-testável (puro, sem GL).
+inline sprites::PlayerPose poseForFrameId(support::SpriteFrameId id) {
+    using support::SpriteFrameId;
+    using sprites::PlayerPose;
+    switch (id) {
+        case SpriteFrameId::PlayerIdle:      return PlayerPose::Idle;
+        case SpriteFrameId::PlayerWalkA:     return PlayerPose::WalkA;
+        case SpriteFrameId::PlayerWalkB:     return PlayerPose::WalkB;
+        case SpriteFrameId::PlayerJump:      return PlayerPose::Jump;
+        case SpriteFrameId::PlayerThrow:     return PlayerPose::Throw;
+        case SpriteFrameId::PlayerPunch:     return PlayerPose::Punch;
+        case SpriteFrameId::PlayerPunchUp:   return PlayerPose::PunchUp;
+        case SpriteFrameId::PlayerPunchDown: return PlayerPose::PunchDown;
+        case SpriteFrameId::PlayerHurt:      return PlayerPose::Hurt;
+        case SpriteFrameId::PlayerDeath:     return PlayerPose::Death;
+        default:                             return PlayerPose::Idle;
     }
 }
 

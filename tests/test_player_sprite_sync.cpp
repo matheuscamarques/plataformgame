@@ -75,6 +75,34 @@ int main() {
         assert(resolveFor(p) == SpriteFrameId::PlayerPunchUp);
     }
 
+    { // PoseForFrameId (Fase D: 10 frames mapeiam p/ pose certa)
+        using support::SpriteFrameId;
+        using sprites::PlayerPose;
+        assert(game::poseForFrameId(SpriteFrameId::PlayerIdle) ==
+               PlayerPose::Idle);
+        assert(game::poseForFrameId(SpriteFrameId::PlayerWalkA) ==
+               PlayerPose::WalkA);
+        assert(game::poseForFrameId(SpriteFrameId::PlayerWalkB) ==
+               PlayerPose::WalkB);
+        assert(game::poseForFrameId(SpriteFrameId::PlayerJump) ==
+               PlayerPose::Jump);
+        assert(game::poseForFrameId(SpriteFrameId::PlayerThrow) ==
+               PlayerPose::Throw);
+        assert(game::poseForFrameId(SpriteFrameId::PlayerPunch) ==
+               PlayerPose::Punch);
+        assert(game::poseForFrameId(SpriteFrameId::PlayerPunchUp) ==
+               PlayerPose::PunchUp);
+        assert(game::poseForFrameId(SpriteFrameId::PlayerPunchDown) ==
+               PlayerPose::PunchDown);
+        assert(game::poseForFrameId(SpriteFrameId::PlayerHurt) ==
+               PlayerPose::Hurt);
+        assert(game::poseForFrameId(SpriteFrameId::PlayerDeath) ==
+               PlayerPose::Death);
+        assert(game::poseForFrameId(SpriteFrameId::SlimeIdle) ==
+               PlayerPose::Idle); // fallback: nunca usado p/ player
+        assert(game::poseForFrameId(SpriteFrameId::COUNT) ==
+               PlayerPose::Idle);
+    }
     { // AimSurvivesJumpConsumption (↑ segurado no ar mantém N)
         Player p;
         p.moveUp = true;
