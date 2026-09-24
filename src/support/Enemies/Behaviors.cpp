@@ -75,6 +75,54 @@ REGISTER_ENEMY_ARCHETYPE("dwarf", [] {
     return a;
 }());
 
+REGISTER_ENEMY_ARCHETYPE("skeleton", [] {
+    support::EnemyArchetype a;
+    a.color = {200, 195, 170}; // osso
+    a.hitboxSize = {60.f, 100.f}; // reflexo do player (2 blocos)
+    a.behaviorKind = "skeleton";
+    a.kind = core::EntityKind::Skeleton;
+    a.bodySchema = "skeleton";
+    a.isTrash = false;
+    a.hp = 45;
+    a.postureMax = 25.f;
+    a.postureRegen = 12.f;
+    a.postureRegenDelay = 1.0f;
+    a.staminaMax = 30.f;
+    a.staminaRegen = 20.f;
+    a.staminaRegenDelay = 0.8f;
+    a.minStratum = 2;
+    a.maxStratum = 99;
+    a.spawnWeight = 0.4f;
+    a.maxAlive = 4;
+    a.drops.entries.push_back({"iron_ore", 0.25f, 1, 1});
+    a.drops.entries.push_back({"soul_lost", 0.35f, 1, 1});
+    a.drops.entries.push_back({"soul_great", 0.1f, 1, 1});
+    a.skills = {"skeleton_slash"}; // melee-only: sem dynamite
+    a.xp = 120;
+    return a;
+}());
+
+// Golpe do esqueleto: melee espelhado do dwarf_melee (mesmo alcance
+// 40px, dano 10 × damageMult). Nome próprio p/ feed e debug.
+REGISTER_SKILL("skeleton_slash", [] {
+    support::SkillDef s;
+    s.name = "Golpe Osseo";
+    s.cooldown = 0.9f;
+    s.telegraph = 0.25f;
+    s.staminaCost = 15.f;
+    s.isMelee = true;
+    s.minRange = 0.f;
+    s.maxRange = 40.f;
+    s.baseWeight = 15.f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx) {
+        if (!ctx.player) return;
+        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
+        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
+        if (dx * dx + dy * dy < 48.f * 48.f)
+            ctx.player->hurt(static_cast<int>(10.f * self.damageMult));
+    };
+    return s;
+}());
 // Cuspe de slime: projétil linear (sem gravidade/fuse), dano no impacto.
 // Valida o mecanismo SkillRegistry; anão ganha as dele no Elite.
 REGISTER_SKILL("slime_spit", [] {

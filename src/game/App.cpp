@@ -31,6 +31,7 @@
 #include "support/Combat/ExplosionSystem.h"
 #include "support/Combat/SpriteFrame.h"
 #include "support/Enemies/DwarfAI.h"
+#include "support/Enemies/SkeletonAI.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/Effects/ThrowSystem.h"
 #include "support/GameContext.h"
@@ -310,7 +311,31 @@ void Game::tick() {
                                     p->throwAnimT > 0.f,
                                     p->walkFrame);
     enemies_->forEach([&](support::Enemy &s) {
-        if (auto *d = dynamic_cast<support::DwarfAI *>(s.ai.get())) {
+        if (s.archetypeId == "skeleton") {
+            // Reflexo do player: Idle/WalkA/WalkB/Melee próprios.
+            // (dynamic_cast<DwarfAI*> casaria com a subclasse e daria
+            // frames do anão — archetype decide, não o tipo da IA.)
+            if (auto *sk = dynamic_cast<support::SkeletonAI *>(s.ai.get())) {
+                switch (sk->state()) {
+                    case support::DwarfState::Melee:
+                        s.currentFrameId =
+                            support::SpriteFrameId::SkeletonMelee;
+                        break;
+                    default:
+                        if (std::fabs(s.body.getVx()) > 0.5f) {
+                            s.currentFrameId = ((tickCount_ / 10) % 2 == 0)
+                                ? support::SpriteFrameId::SkeletonWalkA
+                                : support::SpriteFrameId::SkeletonWalkB;
+                        } else {
+                            s.currentFrameId =
+                                support::SpriteFrameId::SkeletonIdle;
+                        }
+                        break;
+                }
+            } else {
+                s.currentFrameId = support::SpriteFrameId::SkeletonIdle;
+            }
+        } else if (auto *d = dynamic_cast<support::DwarfAI *>(s.ai.get())) {
             switch (d->state()) {
                 case support::DwarfState::ThrowWindup:
                 case support::DwarfState::ThrowRelease:

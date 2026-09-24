@@ -39,6 +39,10 @@ struct SpriteSet {
     sf::Texture dwarfWalkB;
     sf::Texture dwarfThrow;
     sf::Texture dwarfMelee;
+    sf::Texture skeletonIdle;
+    sf::Texture skeletonWalkA;
+    sf::Texture skeletonWalkB;
+    sf::Texture skeletonMelee;
 
     // Equipment — 1 textura por (peça × material).
     static constexpr int kMats = static_cast<int>(core::MaterialId::COUNT);
@@ -87,6 +91,14 @@ inline SpriteSet build() {
                                     kDwarfPal, kDwarfPalCount);
     s.dwarfMelee = core::makeSprite(kDwarfMelee, kDwarfW, kDwarfH,
                                     kDwarfPal, kDwarfPalCount);
+    s.skeletonIdle = core::makeSprite(kSkeletonIdle, kSkeletonW, kSkeletonH,
+                                      kSkeletonPal, kSkeletonPalCount);
+    s.skeletonWalkA = core::makeSprite(kSkeletonWalkA, kSkeletonW, kSkeletonH,
+                                       kSkeletonPal, kSkeletonPalCount);
+    s.skeletonWalkB = core::makeSprite(kSkeletonWalkB, kSkeletonW, kSkeletonH,
+                                       kSkeletonPal, kSkeletonPalCount);
+    s.skeletonMelee = core::makeSprite(kSkeletonMelee, kSkeletonW, kSkeletonH,
+                                       kSkeletonPal, kSkeletonPalCount);
 
     // Paleta de equipamento por material: 5 entradas fixas (., W, w, G, E).
     for (int m = 0; m < SpriteSet::kMats; ++m) {

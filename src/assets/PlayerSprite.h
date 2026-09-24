@@ -67,6 +67,10 @@ inline const sf::Texture *textureForFrame(support::SpriteFrameId id,
         case SpriteFrameId::DwarfWalkB: return &sp.dwarfWalkB;
         case SpriteFrameId::DwarfThrow: return &sp.dwarfThrow;
         case SpriteFrameId::DwarfMelee: return &sp.dwarfMelee;
+        case SpriteFrameId::SkeletonIdle: return &sp.skeletonIdle;
+        case SpriteFrameId::SkeletonWalkA: return &sp.skeletonWalkA;
+        case SpriteFrameId::SkeletonWalkB: return &sp.skeletonWalkB;
+        case SpriteFrameId::SkeletonMelee: return &sp.skeletonMelee;
         case SpriteFrameId::None:
         case SpriteFrameId::COUNT:
         default: return &sp.slimeIdle;

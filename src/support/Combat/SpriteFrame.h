@@ -37,6 +37,11 @@ enum class SpriteFrameId : uint8_t {
     DwarfThrow,
     DwarfMelee,
 
+    SkeletonIdle,
+    SkeletonWalkA,
+    SkeletonWalkB,
+    SkeletonMelee,
+
     COUNT
 };
 

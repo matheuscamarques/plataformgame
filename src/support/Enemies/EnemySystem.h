@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "core/System.h"
+#include "core/Equipment.h"
 #include "entities/Entity.hpp"
 #include "Behavior.h"
 #include "support/Combat/Body.h"
@@ -52,6 +53,10 @@ struct Enemy {
     std::unordered_map<std::string, core::Cooldown> skillCds;
     // Skills do archetype (Factory copia). Vazio = behavior manual.
     std::vector<std::string> skillIds;
+    // Equipamento vestido (só humanoides; slime ignora). Factory rola
+    // por RNG determinístico; DeathSystem dropa o que está vestido.
+    // Item guarda defId (sem ponteiro): cópia sempre segura.
+    core::Equipment equipment;
     // Última skill usada (UtilityAI penaliza repetição).
     std::string lastSkillId;
     float lastSkillAge = 999.f;

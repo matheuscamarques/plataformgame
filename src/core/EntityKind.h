@@ -2,7 +2,7 @@
  * @file src/core/EntityKind.h
  * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
  * @brief Enum tipado de entidades mais IDs legados do jogo.
- * @details Define EntityKind para Player, Slime, Dwarf, TNT e Rock com kId legados, usado por Behavior, SpawnSystem e defines.h.
+ * @details Define EntityKind para Player, Slime, Dwarf, Skeleton, TNT e Rock com kId legados, usado por Behavior, SpawnSystem e defines.h.
  */
 
 #pragma once
@@ -14,8 +14,8 @@ namespace core {
 // Identidade tipada de entidade (novo). Troca os switches em string
 // (ai->name() == "DwarfAI") por comparação de enum — rename-safe e O(1).
 // Behavior::kind() é a fonte; EnemyArchetype::kind dirige SpawnSystem.
-enum class EntityKind : uint8_t { Player, Slime, Dwarf, TNT, Rock, COUNT };
-inline constexpr int kEntityKindCount = 5;
+enum class EntityKind : uint8_t { Player, Slime, Dwarf, Skeleton, TNT, Rock, COUNT };
+inline constexpr int kEntityKindCount = 6;
 
 // Domínio legado: IDs int de Entity::getName()/Component (defines.h
 // morreu: PLAYER=0, SLIME=40...). Migração futura: getName() vira kind().

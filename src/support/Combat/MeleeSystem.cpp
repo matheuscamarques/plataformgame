@@ -27,7 +27,9 @@ namespace {
 // Nome curto p/ log de debug (feed F4). Espelha kind(), sem string.
 const char *enemyKindName(const Enemy &s) {
     if (!s.ai) return "?";
-    return s.ai->kind() == core::EntityKind::Dwarf ? "dwarf" : "slime";
+    if (s.ai->kind() == core::EntityKind::Dwarf) return "dwarf";
+    if (s.ai->kind() == core::EntityKind::Skeleton) return "skeleton";
+    return "slime";
 }
 const char *partName(BodyPartId id) {
     switch (id) {

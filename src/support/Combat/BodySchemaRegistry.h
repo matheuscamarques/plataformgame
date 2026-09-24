@@ -39,9 +39,11 @@ private:
 inline void registerDefaultBodySchemas() {
     static BodySchema humanoid = BodySchema::humanoid(30.0f, 40.0f);
     static BodySchema dwarf = BodySchema::dwarf();
+    static BodySchema skeleton = BodySchema::humanoid(100.f, 60.f);
     auto &r = BodySchemaRegistry::instance();
     r.add("humanoid", &humanoid);
     r.add("dwarf", &dwarf);
+    r.add("skeleton", &skeleton);
 }
 
 namespace {

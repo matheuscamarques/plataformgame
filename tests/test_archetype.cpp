@@ -34,23 +34,39 @@ int main() {
         assert(a->minStratum == 3 && a->maxStratum == 99);
         assert(a->maxAlive == 1);
     }
+    { // SkeletonRegisteredAsMirror (reflexo do player, elite S2+)
+        const EnemyArchetype *a = ArchetypeRegistry::instance().find("skeleton");
+        assert(a != nullptr);
+        assert(a->behaviorKind == "skeleton" &&
+               a->kind == core::EntityKind::Skeleton);
+        assert(a->bodySchema == "skeleton");
+        assert(!a->isTrash && a->hp == 45);
+        assert(a->minStratum == 2 && a->maxStratum == 99);
+        assert(a->maxAlive == 4);
+    }
     { // UnknownReturnsNull + KeysDeterministic
         assert(ArchetypeRegistry::instance().find("nope") == nullptr);
         const auto &k = ArchetypeRegistry::instance().keys();
-        assert(k.size() == 2u && k[0] == "slime" && k[1] == "dwarf");
+        assert(k.size() == 3u && k[0] == "slime" && k[1] == "dwarf" &&
+               k[2] == "skeleton");
     }
     { // BodySchemasResolve (auto-registro; sem chamada de boot)
         assert(BodySchemaRegistry::instance().get("humanoid") != nullptr);
         assert(BodySchemaRegistry::instance().get("dwarf") != nullptr);
+        assert(BodySchemaRegistry::instance().get("skeleton") != nullptr);
         assert(BodySchemaRegistry::instance().get("nope") == nullptr);
     }
-    { // FactoryResolvesArchetype (slime/anão/desconhecido)
+    { // FactoryResolvesArchetype (slime/anão/esqueleto/desconhecido)
         auto s = Factory::spawnEnemy("slime", 0.f, 0.f);
         assert(s != nullptr && s->resources.hp == 60 && s->resources.isTrash);
         assert(s->bodyParts.schema != nullptr);
         auto d = Factory::spawnEnemy("dwarf", 0.f, 0.f);
         assert(d != nullptr && d->resources.hp == 60 && !d->resources.isTrash);
         assert(d->bodyParts.schema != nullptr);
+        auto sk = Factory::spawnEnemy("skeleton", 0.f, 0.f);
+        assert(sk != nullptr && sk->resources.hp == 45 &&
+               !sk->resources.isTrash);
+        assert(sk->bodyParts.schema != nullptr);
         assert(Factory::spawnEnemy("nope", 0.f, 0.f) == nullptr);
     }
 

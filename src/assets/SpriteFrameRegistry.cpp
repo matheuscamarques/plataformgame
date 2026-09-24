@@ -86,6 +86,22 @@ SpriteFrameData frameData(support::SpriteFrameId id) {
         case SpriteFrameId::DwarfMelee:
             return {sprites::kDwarfMelee, sprites::kDwarfW, sprites::kDwarfH,
                     sprites::kDwarfPal, sprites::kDwarfPalCount};
+        case SpriteFrameId::SkeletonIdle:
+            return {sprites::kSkeletonIdle, sprites::kSkeletonW,
+                    sprites::kSkeletonH, sprites::kSkeletonPal,
+                    sprites::kSkeletonPalCount};
+        case SpriteFrameId::SkeletonWalkA:
+            return {sprites::kSkeletonWalkA, sprites::kSkeletonW,
+                    sprites::kSkeletonH, sprites::kSkeletonPal,
+                    sprites::kSkeletonPalCount};
+        case SpriteFrameId::SkeletonWalkB:
+            return {sprites::kSkeletonWalkB, sprites::kSkeletonW,
+                    sprites::kSkeletonH, sprites::kSkeletonPal,
+                    sprites::kSkeletonPalCount};
+        case SpriteFrameId::SkeletonMelee:
+            return {sprites::kSkeletonMelee, sprites::kSkeletonW,
+                    sprites::kSkeletonH, sprites::kSkeletonPal,
+                    sprites::kSkeletonPalCount};
         case SpriteFrameId::None:
         case SpriteFrameId::COUNT:
         default:

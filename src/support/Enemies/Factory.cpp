@@ -58,6 +58,18 @@ std::unique_ptr<Enemy> Factory::spawnEnemy(const std::string &kind,
 
     e->skillIds = a->skills;
 
+    // Esqueleto veste ferro (RNG determinístico por posição, mesmo
+    // padrão do dropSalt: LCG local, nunca global em gameplay).
+    if (kind == "skeleton") {
+        uint32_t rng = static_cast<uint32_t>(x * 13.7f + y * 71.3f) * 1103515245u + 12345u;
+        rng = rng * 1103515245u + 12345u;
+        if ((rng & 0xFFFF) / 65536.f < 0.35f)
+            e->equipment.equip(core::Item{"iron_helm", 1});
+        rng = rng * 1103515245u + 12345u;
+        if ((rng & 0xFFFF) / 65536.f < 0.50f)
+            e->equipment.equip(core::Item{"iron_sword", 1});
+    }
+
     // Variante por profundidade (dano/hp/skills extras). Slime não tem
     // variantes: forDepth retorna null e nada muda.
     const int stratum = stratumAt(static_cast<int>(std::floor(y / core::kBlockSize)));
