@@ -45,6 +45,11 @@ REGISTER_ENEMY_ARCHETYPE("slime", [] {
     a.drops.entries.push_back({"soul_lost", 0.35f, 1, 1});
     a.drops.entries.push_back({"soul_great", 0.1f, 1, 1});
     a.xp = 100; // slime vale 100 souls
+    a.frameIdle = support::SpriteFrameId::SlimeIdle;
+    a.frameWalkA = support::SpriteFrameId::SlimeSquash;
+    a.frameWalkB = support::SpriteFrameId::SlimeSquash;
+    a.frameMelee = support::SpriteFrameId::SlimeIdle;
+    a.frameRanged = support::SpriteFrameId::SlimeIdle;
     return a;
 }());
 
@@ -73,6 +78,11 @@ REGISTER_ENEMY_ARCHETYPE("dwarf", [] {
     a.drops.entries.push_back({"iron_ore", 0.4f, 1, 1});
     a.skills = {"dwarf_dynamite", "dwarf_melee"};
     a.xp = 150; // elite vale mais que trash
+    a.frameIdle = support::SpriteFrameId::DwarfIdle;
+    a.frameWalkA = support::SpriteFrameId::DwarfWalkA;
+    a.frameWalkB = support::SpriteFrameId::DwarfWalkB;
+    a.frameMelee = support::SpriteFrameId::DwarfMelee;
+    a.frameRanged = support::SpriteFrameId::DwarfThrow;
     return a;
 }());
 
@@ -101,6 +111,11 @@ REGISTER_ENEMY_ARCHETYPE("skeleton", [] {
     a.skills = {"skeleton_slash"}; // melee-only: sem dynamite
     a.startingEquipment = {{"iron_helm", 0.35f}, {"iron_sword", 0.50f}};
     a.xp = 120;
+    a.frameIdle = support::SpriteFrameId::SkeletonIdle;
+    a.frameWalkA = support::SpriteFrameId::SkeletonWalkA;
+    a.frameWalkB = support::SpriteFrameId::SkeletonWalkB;
+    a.frameMelee = support::SpriteFrameId::SkeletonMelee;
+    a.frameRanged = support::SpriteFrameId::SkeletonIdle; // sem throw
     return a;
 }());
 

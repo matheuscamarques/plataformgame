@@ -99,6 +99,20 @@ int main() {
         }
     }
 
+    { // FramesFromData (App sem branch: tudo vem do arquétipo)
+        const EnemyArchetype *a = ArchetypeRegistry::instance().find("skeleton");
+        assert(a->frameIdle == SpriteFrameId::SkeletonIdle);
+        assert(a->frameWalkA == SpriteFrameId::SkeletonWalkA);
+        assert(a->frameWalkB == SpriteFrameId::SkeletonWalkB);
+        assert(a->frameMelee == SpriteFrameId::SkeletonMelee);
+        const EnemyArchetype *d = ArchetypeRegistry::instance().find("dwarf");
+        assert(d->frameMelee == SpriteFrameId::DwarfMelee);
+        assert(d->frameRanged == SpriteFrameId::DwarfThrow);
+        const EnemyArchetype *s = ArchetypeRegistry::instance().find("slime");
+        assert(s->frameIdle == SpriteFrameId::SlimeIdle);
+        assert(s->frameWalkA == SpriteFrameId::SlimeSquash);
+    }
+
     std::printf("skeleton test OK\n");
     return 0;
 }

@@ -15,6 +15,8 @@
 
 #include "core/Config.h"
 #include "core/VecSfml.h"
+#include "render/Render2D.h"
+#include "render/SpriteConvert.h"
 #include "core/Celestial.h"
 #include "core/Material.h"
 #include "core/RadialTexture.h"
@@ -1094,38 +1096,53 @@ void Game::drawPlayerWeapon() {
 }
 
 void Game::drawEnemiesSprites() {
+    // Fase 3: inimigos desenham via RenderBackend (prova do backend).
+    // Handles criados sob demanda por frame e cacheados no run;
+    // arte vem do registry (frameData), mesma fonte do fallback antigo.
+    render::Render2D backend(*window);
+    render::Camera cam;
+    backend.beginFrame(cam);
     enemies_->forEach([&](support::Enemy &s) {
         // Frame já decidido no tick (currentFrameId); aqui só desenha.
         // Dimensões vêm do registry para não hardcodar por tipo.
         // None (inimigo sem frame) = fallback slime 14x12.
-        const auto f = assets::frameData(s.currentFrameId);
-        const float fw = f.rows ? static_cast<float>(f.w) : 14.f;
-        const float fh = f.rows ? static_cast<float>(f.h) : 12.f;
-        const sf::Texture *tex = game::textureForFrame(s.currentFrameId, sprites_);
+        auto fid = s.currentFrameId;
+        auto f = assets::frameData(fid);
+        if (!f.rows) {
+            fid = support::SpriteFrameId::SlimeIdle;
+            f = assets::frameData(fid);
+        }
+        const float fw = static_cast<float>(f.w);
+        const float fh = static_cast<float>(f.h);
+        const int key = static_cast<int>(fid);
+        auto hit = backendHandles_.find(key);
+        if (hit == backendHandles_.end()) {
+            auto data = render::toSpriteData(f.rows, f.w, f.h, f.pal,
+                                             f.palCount);
+            hit = backendHandles_.emplace(key, backend.createSprite(data)).first;
+        }
         const float sc = s.body.getH() / fh;
-        sf::Sprite spr;
-        spr.setTexture(*tex);
-        spr.setOrigin(fw * 0.5f, fh);
-        spr.setPosition(s.body.getCenterX(), s.body.getY() + s.body.getH());
-        spr.setScale(static_cast<float>(s.body.facing) * sc, sc);
-        window->draw(spr);
+        render::SpriteDrawCmd cmd;
+        cmd.handle = hit->second;
+        cmd.position = {s.body.getCenterX(), s.body.getY() + s.body.getH()};
+        cmd.origin = {fw * 0.5f, fh};
+        cmd.scale = {sc, sc};
+        cmd.facing = s.body.facing;
+        backend.drawSprite(cmd);
 
         // Barra de vida overhead (DS): só quando machucado.
         const int ehp = s.resources.hp;
         const int ehpMax = s.resources.hpMax;
         if (ehpMax > 0 && ehp < ehpMax) {
-            const float f = std::max(
+            const float frac = std::max(
                 0.f, std::min(1.f, static_cast<float>(ehp) / ehpMax));
-            sf::RectangleShape ebg({36.f, 5.f});
-            ebg.setPosition(s.body.getCenterX() - 18.f,
-                            s.body.getY() - 12.f);
-            ebg.setFillColor(sf::Color(20, 0, 0));
-            window->draw(ebg);
-            sf::RectangleShape efg({34.f * f, 3.f});
-            efg.setPosition(s.body.getCenterX() - 17.f,
-                            s.body.getY() - 11.f);
-            efg.setFillColor(sf::Color(200, 30, 30));
-            window->draw(efg);
+            backend.drawRect({s.body.getCenterX() - 18.f,
+                              s.body.getY() - 12.f},
+                             {36.f, 5.f}, core::rgba(20, 0, 0));
+            backend.drawRect({s.body.getCenterX() - 17.f,
+                              s.body.getY() - 11.f},
+                             {34.f * frac, 3.f}, core::rgba(200, 30, 30));
         }
     });
+    backend.endFrame();
 }

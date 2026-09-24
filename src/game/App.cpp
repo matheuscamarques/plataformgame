@@ -31,7 +31,7 @@
 #include "support/Combat/ExplosionSystem.h"
 #include "support/Combat/SpriteFrame.h"
 #include "support/Enemies/DwarfAI.h"
-#include "support/Enemies/SkeletonAI.h"
+#include "support/Enemies/EnemyArchetype.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/Effects/ThrowSystem.h"
 #include "support/GameContext.h"
@@ -311,53 +311,45 @@ void Game::tick() {
                                     p->throwAnimT > 0.f,
                                     p->walkFrame);
     enemies_->forEach([&](support::Enemy &s) {
-        if (s.archetypeId == "skeleton") {
-            // Reflexo do player: Idle/WalkA/WalkB/Melee próprios.
-            // (dynamic_cast<DwarfAI*> casaria com a subclasse e daria
-            // frames do anão — archetype decide, não o tipo da IA.)
-            if (auto *sk = dynamic_cast<support::SkeletonAI *>(s.ai.get())) {
-                switch (sk->state()) {
-                    case support::DwarfState::Melee:
-                        s.currentFrameId =
-                            support::SpriteFrameId::SkeletonMelee;
-                        break;
-                    default:
-                        if (std::fabs(s.body.getVx()) > 0.5f) {
-                            s.currentFrameId = ((tickCount_ / 10) % 2 == 0)
-                                ? support::SpriteFrameId::SkeletonWalkA
-                                : support::SpriteFrameId::SkeletonWalkB;
-                        } else {
-                            s.currentFrameId =
-                                support::SpriteFrameId::SkeletonIdle;
-                        }
-                        break;
-                }
-            } else {
-                s.currentFrameId = support::SpriteFrameId::SkeletonIdle;
-            }
-        } else if (auto *d = dynamic_cast<support::DwarfAI *>(s.ai.get())) {
+        // Frames por dado (Fase 3): o arquétipo diz quais; aqui só o
+        // estado. Sem branch por archetypeId — inimigo novo com DwarfAI
+        // herda o caminho certo de graça (SkeletonAI incluso, pois o
+        // dynamic_cast casa com a subclasse e os frames vêm do dado).
+        const support::EnemyArchetype *arch =
+            support::ArchetypeRegistry::instance().find(s.archetypeId);
+        const auto idle =
+            arch ? arch->frameIdle : support::SpriteFrameId::SlimeIdle;
+        const auto walkA =
+            arch ? arch->frameWalkA : support::SpriteFrameId::SlimeSquash;
+        const auto walkB =
+            arch ? arch->frameWalkB : support::SpriteFrameId::SlimeSquash;
+        const auto melee =
+            arch ? arch->frameMelee : support::SpriteFrameId::SlimeIdle;
+        const auto ranged =
+            arch ? arch->frameRanged : support::SpriteFrameId::SlimeIdle;
+        if (auto *d = dynamic_cast<support::DwarfAI *>(s.ai.get())) {
             switch (d->state()) {
                 case support::DwarfState::ThrowWindup:
                 case support::DwarfState::ThrowRelease:
-                    s.currentFrameId = support::SpriteFrameId::DwarfThrow;
+                    s.currentFrameId = ranged;
                     break;
                 case support::DwarfState::Melee:
-                    s.currentFrameId = support::SpriteFrameId::DwarfMelee;
+                    s.currentFrameId = melee;
                     break;
                 default:
                     if (std::fabs(s.body.getVx()) > 0.5f) {
                         s.currentFrameId = ((tickCount_ / 10) % 2 == 0)
-                            ? support::SpriteFrameId::DwarfWalkA
-                            : support::SpriteFrameId::DwarfWalkB;
+                            ? walkA
+                            : walkB;
                     } else {
-                        s.currentFrameId = support::SpriteFrameId::DwarfIdle;
+                        s.currentFrameId = idle;
                     }
                     break;
             }
         } else {
             s.currentFrameId = (std::fabs(s.body.getVx()) > 4.5f)
-                ? support::SpriteFrameId::SlimeSquash
-                : support::SpriteFrameId::SlimeIdle;
+                ? walkA
+                : idle;
         }
     });
 

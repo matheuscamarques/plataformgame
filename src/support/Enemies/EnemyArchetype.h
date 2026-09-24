@@ -15,6 +15,7 @@
 #include "core/DropTable.h"
 #include "core/EntityKind.h"
 #include "core/Vec.h"
+#include "support/Combat/SpriteFrame.h"
 
 namespace support {
 
@@ -48,6 +49,16 @@ struct EnemyArchetype {
 
     // Skills disponíveis (IDs no SkillRegistry). Vazio = behavior manual.
     std::vector<std::string> skills;
+
+    // Frames por estado (Fase 3: sem branch por archetypeId no App).
+    // idle = parado; walkA/B = andando (alterna por tick); melee =
+    // ataque corpo-a-corpo; ranged = telegraph de arremesso.
+    // Slime: walkA/B = Squash, melee/ranged = Idle (não tem).
+    support::SpriteFrameId frameIdle = support::SpriteFrameId::None;
+    support::SpriteFrameId frameWalkA = support::SpriteFrameId::None;
+    support::SpriteFrameId frameWalkB = support::SpriteFrameId::None;
+    support::SpriteFrameId frameMelee = support::SpriteFrameId::None;
+    support::SpriteFrameId frameRanged = support::SpriteFrameId::None;
 
     // Souls da morte (orbe XP). Slime 100, anão 150.
     int xp = 1;

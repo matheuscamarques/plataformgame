@@ -10,8 +10,10 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include <memory>
+#include <unordered_map>
 #include "vector"
 #include "core/System.h"
+#include "render/RenderBackend.h"
 #include "../support/Camera/Camera.h"
 #include "../support/Debug/DebugOverlay.h"
 #include "../support/Debug/DebugFeed.h"
@@ -87,6 +89,9 @@ private:
     support::ParticleSystem *particles_ = nullptr; // observa; dono é o scheduler
     sprites::SpriteSet sprites_; // dono: build 1x no run (precisa de GL)
     bool spritesBuilt_ = false;
+    // Handles do backend p/ frames de inimigo (Fase 3): criados sob
+    // demanda por SpriteFrameId, vivos até o fim do run.
+    std::unordered_map<int, render::SpriteHandle> backendHandles_;
     core::MusicSystem music_; // dono: tracks sintetizadas 1x no run (RAM)
     bool musicBuilt_ = false;
     int lastMusicStratum_ = -1;
