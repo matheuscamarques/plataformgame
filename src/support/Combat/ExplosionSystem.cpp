@@ -29,7 +29,7 @@
 namespace support {
 
 namespace {
-float distSq(sf::Vector2f a, sf::Vector2f b) {
+float distSq(core::Vec2f a, core::Vec2f b) {
     const float dx = a.x - b.x, dy = a.y - b.y;
     return dx * dx + dy * dy;
 }
@@ -38,7 +38,7 @@ float distSq(sf::Vector2f a, sf::Vector2f b) {
 constexpr float kKnockbackLockTime = 0.2f;
 } // namespace
 
-int ExplosionSystem::explode(sf::Vector2f center, const ExplosionDef &def, GameContext &ctx) {
+int ExplosionSystem::explode(core::Vec2f center, const ExplosionDef &def, GameContext &ctx) {
     // 1. Quebra tiles
     breakTilesInCircle(center, def.tilesRadius, ctx);
 
@@ -73,7 +73,7 @@ int ExplosionSystem::explode(sf::Vector2f center, const ExplosionDef &def, GameC
 }
 
 bool ExplosionSystem::applyToTarget(const ExplosionTarget &t,
-                                    sf::Vector2f center,
+                                    core::Vec2f center,
                                     const ExplosionDef &def) {
     const float r2 = def.radius * def.radius;
     if (!t.body) return false;
@@ -86,7 +86,7 @@ bool ExplosionSystem::applyToTarget(const ExplosionTarget &t,
 
     t.body->forEach([&](const PartState &st, const PartDef &pd) {
         if (st.fromSchema) return; // parte oculta: não sofre dano de área
-        const sf::Vector2f pc{
+        const core::Vec2f pc{
             st.worldBox.left + st.worldBox.width  * 0.5f,
             st.worldBox.top  + st.worldBox.height * 0.5f
         };
@@ -117,7 +117,7 @@ bool ExplosionSystem::applyToTarget(const ExplosionTarget &t,
         const float dist = std::sqrt(distSq(t.center, center));
         const float k = std::max(0.f, 1.f - dist / def.radius);
 
-        sf::Vector2f dir = t.center - center;
+        core::Vec2f dir = t.center - center;
         const float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
         if (len > 1.f) { dir.x /= len; dir.y /= len; }
         else           { dir = {0.f, -1.f}; } // centro exato → pop up
@@ -130,7 +130,7 @@ bool ExplosionSystem::applyToTarget(const ExplosionTarget &t,
     return true;
 }
 
-void ExplosionSystem::breakTilesInCircle(sf::Vector2f center, int tilesRadius, GameContext &ctx) {
+void ExplosionSystem::breakTilesInCircle(core::Vec2f center, int tilesRadius, GameContext &ctx) {
     if (!ctx.world) return;
 
     const int cx = static_cast<int>(std::floor(center.x / core::kBlockSize));
@@ -149,7 +149,7 @@ void ExplosionSystem::breakTilesInCircle(sf::Vector2f center, int tilesRadius, G
 
             Tile broken = Tile::Air;
             if (ctx.world->breakTile(tx, ty, &broken) && particles_) {
-                const sf::Vector2f tileCenter{
+                const core::Vec2f tileCenter{
                     (tx + 0.5f) * core::kBlockSize,
                     (ty + 0.5f) * core::kBlockSize
                 };

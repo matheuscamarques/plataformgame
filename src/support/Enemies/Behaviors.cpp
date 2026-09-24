@@ -19,6 +19,7 @@
 #include "support/GameContext.h"
 #include "support/Effects/ThrowSystem.h"
 #include "world/World.h"
+#include "core/Vec.h"
 
 // Slime (trash) + anão básico (elite). Terceiro inimigo = append aqui
 // + 1 arquivo Behavior. Zero edição em Factory/SpawnSystem.
@@ -137,9 +138,9 @@ REGISTER_SKILL("slime_spit", [] {
     s.baseWeight = 1.0f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx) {
         if (!ctx.player || !ctx.throws) return;
-        sf::Vector2f from{self.body.getCenterX(), self.body.getCenterY()};
-        sf::Vector2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
-        sf::Vector2f dir = to - from;
+        core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
+        core::Vec2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
+        core::Vec2f dir = to - from;
         const float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
         if (len < 1.f) return;
         dir /= len;
@@ -168,8 +169,8 @@ REGISTER_SKILL("dwarf_dynamite", [] {
     s.baseWeight = 10.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx) {
         if (!ctx.player || !ctx.throws) return;
-        sf::Vector2f from{self.body.getCenterX(), self.body.getCenterY()};
-        sf::Vector2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
+        core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
+        core::Vec2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
         const float dir = (to.x < from.x) ? -1.f : 1.f;
         auto *t = ctx.throws->throwItem(from, {dir * 180.f, -320.f},
                                         support::ThrowKind::Dynamite);
@@ -241,7 +242,7 @@ REGISTER_SKILL("dwarf_barrel", [] {
     s.baseWeight = 8.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx) {
         if (!ctx.throws || !ctx.player) return;
-        sf::Vector2f from{self.body.getCenterX(), self.body.getCenterY()};
+        core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
         const float dir = (ctx.player->getCenterX() < from.x) ? -1.f : 1.f;
         auto *t = ctx.throws->throwItem(from, {dir * 200.f, 0.f},
                                         support::ThrowKind::Barrel);

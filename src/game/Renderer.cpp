@@ -14,6 +14,7 @@
 #include <utility>
 
 #include "core/Config.h"
+#include "core/VecSfml.h"
 #include "core/Celestial.h"
 #include "core/Material.h"
 #include "core/RadialTexture.h"
@@ -264,7 +265,7 @@ void Game::render()
         if (t.kind == support::ThrowKind::Bolt) {
             sf::CircleShape c(3.f);
             c.setOrigin(3.f, 3.f);
-            c.setPosition(t.pos);
+            c.setPosition(core::toSf(t.pos));
             c.setFillColor(sf::Color(120, 220, 255));
             window->draw(c);
             return;
@@ -272,7 +273,7 @@ void Game::render()
         if (!support::isPlayerBomb(t.kind)) {
             sf::CircleShape c(3.f);
             c.setOrigin(3.f, 3.f);
-            c.setPosition(t.pos);
+            c.setPosition(core::toSf(t.pos));
             c.setFillColor(sf::Color(200, 180, 60));
             window->draw(c);
             return;
@@ -287,7 +288,7 @@ void Game::render()
 
             sf::CircleShape ring(radius);
             ring.setOrigin(radius, radius);
-            ring.setPosition(t.pos);
+            ring.setPosition(core::toSf(t.pos));
             ring.setFillColor(sf::Color(255, 100, 40,
                                         static_cast<sf::Uint8>(alpha)));
             ring.setOutlineColor(sf::Color(255, 200, 80,
@@ -307,7 +308,7 @@ void Game::render()
             const float scale = 2.5f; // mesmo do player
             sf::Sprite spr(sprites_.tnt[frame]);
             spr.setOrigin(3.f, 4.f); // centro do sprite 6x8
-            spr.setPosition(t.pos);
+            spr.setPosition(core::toSf(t.pos));
             spr.setScale(scale, scale);
 
             // Flash branco no último 15% (o "vai explodir agora").
@@ -331,7 +332,7 @@ void Game::render()
                 const float sc = 2.5f; // mesmo do player
                 spr.setScale(sc, sc);
                 spr.setOrigin(dd->spriteW * 0.5f, dd->spriteH * 0.5f);
-                spr.setPosition(t.pos);
+                spr.setPosition(core::toSf(t.pos));
                 if (t.fuse < 0.15f) { // vai explodir: flash branco
                     const float flash = 0.5f + 0.5f * std::sin(t.fuse * 60.f);
                     spr.setColor(sf::Color(
@@ -352,7 +353,7 @@ void Game::render()
                 if (t.fuse < 0.15f) coreC = sf::Color::White;
                 sf::CircleShape core(coreR);
                 core.setOrigin(coreR, coreR);
-                core.setPosition(t.pos);
+                core.setPosition(core::toSf(t.pos));
                 core.setFillColor(coreC);
                 window->draw(core);
             }
@@ -710,14 +711,14 @@ void Game::render()
         if (t.fuse <= 0.f) return;
         const auto gp =
             support::tntGlowParams(t.fuse, core::Time::elapsed());
-        lighting_.drawRadial(*window, t.pos, gp.radius,
+        lighting_.drawRadial(*window, core::toSf(t.pos), gp.radius,
                              sf::Color(
                                  static_cast<sf::Uint8>(gp.r),
                                  static_cast<sf::Uint8>(gp.g),
                                  static_cast<sf::Uint8>(gp.b),
                                  static_cast<sf::Uint8>(gp.a)));
         // Halo: mesma cor, ~2.2× o raio, 1/4 do alpha.
-        lighting_.drawRadial(*window, t.pos, gp.radius * 2.2f,
+        lighting_.drawRadial(*window, core::toSf(t.pos), gp.radius * 2.2f,
                              sf::Color(
                                  static_cast<sf::Uint8>(gp.r),
                                  static_cast<sf::Uint8>(gp.g),

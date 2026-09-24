@@ -68,7 +68,7 @@ void ParticleSystem::render(sf::RenderTarget &target) {
     sf::RectangleShape rs;
     auto draw = [&](const Particle &p) {
         rs.setSize({p.size.x, p.size.y});
-        rs.setPosition(p.pos);
+        rs.setPosition(core::toSf(p.pos));
         rs.setFillColor(p.color);
         target.draw(rs);
     };
@@ -76,7 +76,7 @@ void ParticleSystem::render(sf::RenderTarget &target) {
     dust_.forEachActive(draw);
 }
 
-void ParticleSystem::spawnTileBreak(sf::Vector2f center,
+void ParticleSystem::spawnTileBreak(core::Vec2f center,
                                     int primaryKind,
                                     int secondaryKind,
                                     uint8_t oreMask) {
@@ -92,7 +92,7 @@ void ParticleSystem::spawnTileBreak(sf::Vector2f center,
     emitDust(center, 10 + oreCount * 2, 180.f);
 }
 
-void ParticleSystem::spawnHitSpark(sf::Vector2f point) {
+void ParticleSystem::spawnHitSpark(core::Vec2f point) {
     for (int i = 0; i < 4; ++i) {
         auto *p = dust_.acquire();
         if (!p) return;
@@ -111,7 +111,7 @@ void ParticleSystem::spawnHitSpark(sf::Vector2f point) {
     }
 }
 
-void ParticleSystem::emitDebris(sf::Vector2f origin, int kind, int count, float spread) {
+void ParticleSystem::emitDebris(core::Vec2f origin, int kind, int count, float spread) {
     const sf::Color col = colorForBlock(kind);
     for (int i = 0; i < count; ++i) {
         auto *p = debris_.acquire();
@@ -131,7 +131,7 @@ void ParticleSystem::emitDebris(sf::Vector2f origin, int kind, int count, float 
     }
 }
 
-void ParticleSystem::emitDust(sf::Vector2f origin, int count, float spread) {
+void ParticleSystem::emitDust(core::Vec2f origin, int count, float spread) {
     for (int i = 0; i < count; ++i) {
         auto *p = dust_.acquire();
         if (!p) return;

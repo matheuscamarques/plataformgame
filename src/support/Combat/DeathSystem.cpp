@@ -15,6 +15,7 @@
 #include "support/GameContext.h"
 #include "support/Effects/ParticleSystem.h"
 #include "world/World.h"
+#include "core/Vec.h"
 
 namespace support {
 
@@ -49,7 +50,7 @@ void DeathSystem::tick(float /*dt*/, GameContext &ctx) {
         });
     }
     ctx.enemies->removeDead([&](Enemy &e) {
-        const sf::Vector2f pos{e.body.getCenterX(), e.body.getCenterY()};
+        const core::Vec2f pos{e.body.getCenterX(), e.body.getCenterY()};
         if (particles_) particles_->spawnTileBreak(pos, 0, 0, 0);
         if (!drops_) return;
         // XP por arquétipo (slime 100, anão 150); sem archetype = 1.
@@ -59,7 +60,7 @@ void DeathSystem::tick(float /*dt*/, GameContext &ctx) {
                     ArchetypeRegistry::instance().find(e.archetypeId))
                 xp = arch->xp;
         }
-        drops_->spawnXP(pos, xp);
+        drops_->spawnXP(core::toSf(pos), xp);
     }, &ctx);
 }
 

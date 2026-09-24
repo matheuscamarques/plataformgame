@@ -6,6 +6,8 @@
  */
 
 #pragma once
+
+#include "core/Vec.h"
 #include <SFML/System/Vector2.hpp>
 #include <cstdint>
 
@@ -33,8 +35,8 @@ inline bool isPlayerBomb(ThrowKind k) {
 }
 
 struct Throwable {
-    sf::Vector2f pos{0.f, 0.f};
-    sf::Vector2f vel{0.f, 0.f};
+    core::Vec2f pos{0.f, 0.f};
+    core::Vec2f vel{0.f, 0.f};
     float        gravity     = 600.f;
     float        fuse        = 1.0f;   // >0 = countdown; <=0 = sem fuse
     float        radius      = 40.f;   // raio de explosão em pixels (0 = sem)

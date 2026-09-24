@@ -297,7 +297,7 @@ bool Player::tryThrowSlot(support::ThrowSystem &throws, int slot) {
     const core::ItemDef* def = item.def();
     if (!def || !def->throwable) return false;
     // Mesmo arco da dinamite; stats do def (sem switch por id).
-    sf::Vector2f vel{220.f * static_cast<float>(facing), -320.f};
+    core::Vec2f vel{220.f * static_cast<float>(facing), -320.f};
     support::Throwable* t = throws.throwItem({getCenterX(), getCenterY()},
                                              vel, def->throwKind);
     if (!t) return false;
@@ -335,7 +335,7 @@ bool Player::castAttuned(support::ThrowSystem &throws) {
     if (inte < def->intReq || fai < def->faiReq) return false;
     if (def->spellKind == core::SpellKind::Arrow) {
         if (fp < kArrowCost) return false;
-        sf::Vector2f vel{500.f * static_cast<float>(facing), -80.f};
+        core::Vec2f vel{500.f * static_cast<float>(facing), -80.f};
         support::Throwable* t = throws.throwItem(
             {getCenterX(), getCenterY()}, vel, support::ThrowKind::Bolt);
         if (!t) return false;
@@ -362,7 +362,7 @@ bool Player::castAttuned(support::ThrowSystem &throws) {
 bool Player::tryThrow(support::ThrowSystem &throws) {    if (!throwCooldown.ready() || inventory.count("dynamite") <= 0)
         return false;
     // Arco fixo na direção do facing; sem mira manual no MVP.
-    sf::Vector2f vel{220.f * static_cast<float>(facing), -320.f};
+    core::Vec2f vel{220.f * static_cast<float>(facing), -320.f};
     if (!throws.throwItem({getCenterX(), getCenterY()}, vel)) return false;
     inventory.remove("dynamite");
     throwCooldown.trigger();

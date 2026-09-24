@@ -6,6 +6,8 @@
  */
 
 #pragma once
+
+#include "core/Vec.h"
 #include "core/System.h"
 #include "core/Pool.h"
 #include "Throwable.h"
@@ -57,7 +59,7 @@ class ParticleSystem;
 // Flash de luz: overlay ADD temporário (não persiste no grid, atravessa
 // parede — aceitável, explosão é rápida). TNT no chão não ilumina.
 struct BlastVisual {
-    sf::Vector2f center;
+    core::Vec2f center;
     float        radius;      // alvo (o raio real do dano)
     float        ttl;         // restante
     float        maxTtl = 0.35f;
@@ -74,7 +76,7 @@ public:
     void tick(float dt, GameContext &ctx) override;
 
     // Lança um item. Retorna ponteiro ou nullptr se pool cheio.
-    Throwable *throwItem(sf::Vector2f from, sf::Vector2f vel,
+    Throwable *throwItem(core::Vec2f from, core::Vec2f vel,
                          ThrowKind kind = ThrowKind::Dynamite);
 
     // Fiação (chamada uma vez no setup)
@@ -87,7 +89,7 @@ public:
     void clear() { pool_.releaseAll(); blasts_.clear(); }
 
     // Blast do boom: registrado por ExplosionSystem::explode().
-    void spawnBlast(sf::Vector2f center, float radius);
+    void spawnBlast(core::Vec2f center, float radius);
     void tickBlasts(float dt);
     // glow nulo = pula o flash (headless). Com glow: via drawRadial.
     void renderBlasts(sf::RenderTarget& target, BlastGlowFn glow = nullptr);

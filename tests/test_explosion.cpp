@@ -73,7 +73,7 @@ int main() {
 
         const PartState *head = b.find(BodyPartId::Head);
         assert(head != nullptr);
-        sf::Vector2f headCenter{
+        core::Vec2f headCenter{
             head->worldBox.left + head->worldBox.width * 0.5f,
             head->worldBox.top + head->worldBox.height * 0.5f
         };

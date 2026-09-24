@@ -289,11 +289,11 @@ void Game::tick() {
     // Alvos de explosão: montados aqui (Player + Slimes), lidos pelo
     // ExplosionSystem durante o tick do ThrowSystem.
     std::vector<support::ExplosionTarget> targets;
-    targets.push_back({sf::Vector2f(p->getCenterX(), p->getCenterY()),
+    targets.push_back({core::Vec2f(p->getCenterX(), p->getCenterY()),
                        &p->body, nullptr, true, p, nullptr});
     enemies_->forEach([&](support::Enemy &s) {
         if (s.resources.isDead()) return;
-        targets.push_back({sf::Vector2f(s.body.getCenterX(), s.body.getCenterY()),
+        targets.push_back({core::Vec2f(s.body.getCenterX(), s.body.getCenterY()),
                            &s.bodyParts, &s.resources, false,
                            &s.body, &s.knockbackLock});
     });

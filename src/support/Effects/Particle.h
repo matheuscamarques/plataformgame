@@ -6,6 +6,8 @@
  */
 
 #pragma once
+
+#include "core/Vec.h"
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <cstdint>
@@ -19,9 +21,9 @@ enum class ParticleKind : uint8_t {
 };
 
 struct Particle {
-    sf::Vector2f pos{0.f, 0.f};
-    sf::Vector2f vel{0.f, 0.f};
-    sf::Vector2f size{2.f, 2.f};
+    core::Vec2f pos{0.f, 0.f};
+    core::Vec2f vel{0.f, 0.f};
+    core::Vec2f size{2.f, 2.f};
     sf::Color    color{255, 255, 255, 255};
     ParticleKind kind = ParticleKind::Dust;
     float        lifetime    = 0.f;

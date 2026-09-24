@@ -23,6 +23,7 @@
 #include "world/Chunk.h"
 #include "world/LightPropagator.h"
 #include "world/World.h"
+#include "core/VecSfml.h"
 
 namespace support {
 
@@ -42,7 +43,7 @@ inline int chunkOfTile(int t) {
 }
 }
 
-Throwable *ThrowSystem::throwItem(sf::Vector2f from, sf::Vector2f vel, ThrowKind kind) {
+Throwable *ThrowSystem::throwItem(core::Vec2f from, core::Vec2f vel, ThrowKind kind) {
     auto *t = pool_.acquire();
     if (!t) return nullptr;
     *t = Throwable{};
@@ -189,7 +190,7 @@ void ThrowSystem::handleTileCollision(Throwable &t, GameContext &ctx) {
     }
 }
 
-void ThrowSystem::spawnBlast(sf::Vector2f center, float radius) {
+void ThrowSystem::spawnBlast(core::Vec2f center, float radius) {
     BlastVisual b;
     b.center = center;
     b.radius = radius;
@@ -222,7 +223,7 @@ void ThrowSystem::renderBlasts(sf::RenderTarget& target,
             const float fade = (1.f - u) * (1.f - u);
             const auto a = static_cast<sf::Uint8>(255.f * fade * b.lightPeak);
             if (a >= 4)
-                glow(b.center, b.lightRadius, sf::Color(255, 160, 60, a));
+                glow(core::toSf(b.center), b.lightRadius, sf::Color(255, 160, 60, a));
         }
         // Anel cresce de 20% a 100% do raio em 0.35s.
         const float r = b.radius * (0.2f + 0.8f * u);
@@ -231,7 +232,7 @@ void ThrowSystem::renderBlasts(sf::RenderTarget& target,
 
         sf::CircleShape ring(r);
         ring.setOrigin(r, r);
-        ring.setPosition(b.center);
+        ring.setPosition(core::toSf(b.center));
         ring.setFillColor(sf::Color::Transparent);
         ring.setOutlineColor(sf::Color(255, 120, 40,
                                        static_cast<sf::Uint8>(a)));
@@ -244,7 +245,7 @@ void ThrowSystem::renderBlasts(sf::RenderTarget& target,
             const float innerR = r * 0.5f;
             sf::CircleShape flash(innerR);
             flash.setOrigin(innerR, innerR);
-            flash.setPosition(b.center);
+            flash.setPosition(core::toSf(b.center));
             flash.setFillColor(sf::Color(255, 240, 180,
                                          static_cast<sf::Uint8>(innerA)));
             target.draw(flash);
@@ -284,7 +285,8 @@ void ThrowSystem::handleFuse(Throwable &t, GameContext &ctx) {
         explosions_->explode(t.pos, def, ctx);
         // SFX explosão com atenuação (ouvinte = player; sem ctx = sem custo).
         if (ctx.audio && ctx.player)
-            ctx.audio->playAt(game::keyOf(game::Sfx::Explosion), t.pos,
+            ctx.audio->playAt(game::keyOf(game::Sfx::Explosion),
+                              core::toSf(t.pos),
                               {ctx.player->getCenterX(), ctx.player->getCenterY()});
     } else if (particles_) {
         // Sem ExplosionSystem: ao menos o flash visual.

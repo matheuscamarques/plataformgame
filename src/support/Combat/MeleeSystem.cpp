@@ -20,6 +20,8 @@
 #include "support/GameContext.h"
 #include "support/Input/InputMap.h"
 #include "support/Effects/ParticleSystem.h"
+#include "core/Vec.h"
+#include "core/VecSfml.h"
 
 namespace support {
 
@@ -138,9 +140,9 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
         }
         // Feed de debug (F2 números, F4 log). Sem ctx.debug, sem custo.
         if (ctx.debug && applied > 0) {
-            const sf::Vector2f at{bestBox.left + bestBox.width * 0.5f,
+            const core::Vec2f at{bestBox.left + bestBox.width * 0.5f,
                                   bestBox.top + bestBox.height * 0.5f};
-            ctx.debug->pushNumber("-" + std::to_string(applied), at);
+            ctx.debug->pushNumber("-" + std::to_string(applied), core::toSf(at));
             ctx.debug->pushLog(std::string("melee ") + enemyKindName(s) +
                                " " + (best ? partName(best->id) : "body") +
                                " -" + std::to_string(applied));

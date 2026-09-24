@@ -6,6 +6,8 @@
  */
 
 #pragma once
+
+#include "core/Vec.h"
 #include "core/Pool.h"
 #include "core/System.h"
 #include "support/GameContext.h"
@@ -28,11 +30,11 @@ public:
 
     // Quebra de tile: detritos do material + poeira.
     // oreMask: 8 bits, cada bit = 1 sub-bloco de minério.
-    void spawnTileBreak(sf::Vector2f center, int primaryKind,
+    void spawnTileBreak(core::Vec2f center, int primaryKind,
                         int secondaryKind, uint8_t oreMask);
 
     // Impacto de ataque: só faísca + poeira.
-    void spawnHitSpark(sf::Vector2f point);
+    void spawnHitSpark(core::Vec2f point);
 
     std::size_t activeDebris() const { return debris_.activeCount(); }
     std::size_t activeDust()   const { return dust_.activeCount(); }
@@ -44,8 +46,8 @@ private:
     core::Pool<Particle> debris_{512};
     core::Pool<Particle> dust_{4096};
 
-    void emitDebris(sf::Vector2f origin, int kind, int count, float spread);
-    void emitDust(sf::Vector2f origin, int count, float spread);
+    void emitDebris(core::Vec2f origin, int kind, int count, float spread);
+    void emitDust(core::Vec2f origin, int count, float spread);
 };
 
 } // namespace support

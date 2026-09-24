@@ -6,6 +6,8 @@
  */
 
 #pragma once
+
+#include "core/Vec.h"
 #include "core/Cooldown.h"
 #include "core/System.h"
 #include "support/Combat/Body.h"
@@ -34,7 +36,7 @@ struct ExplosionDef {
 // por isso ponteiro para Entity, não para vel).
 // Campos novos no fim: inits antigos de 4 campos continuam válidos.
 struct ExplosionTarget {
-    sf::Vector2f    center;
+    core::Vec2f     center;
     Body           *body = nullptr;
     EnemyResources *resources = nullptr; // nullptr = Player, sem recursos
     bool            isPlayer = false;
@@ -50,7 +52,7 @@ public:
     void tick(float /*dt*/, GameContext & /*ctx*/) override {} // explosões são síncronas
 
     // Explode e retorna quantos alvos foram atingidos (útil para testes).
-    int explode(sf::Vector2f center, const ExplosionDef &def, GameContext &ctx);
+    int explode(core::Vec2f center, const ExplosionDef &def, GameContext &ctx);
 
     void setParticleSystem(ParticleSystem *p) { particles_ = p; }
 
@@ -62,8 +64,8 @@ private:
     ParticleSystem *particles_ = nullptr;
     DropSystem *drops_ = nullptr;
 
-    void breakTilesInCircle(sf::Vector2f center, int tilesRadius, GameContext &ctx);
-    bool applyToTarget(const ExplosionTarget &t, sf::Vector2f center,
+    void breakTilesInCircle(core::Vec2f center, int tilesRadius, GameContext &ctx);
+    bool applyToTarget(const ExplosionTarget &t, core::Vec2f center,
                        const ExplosionDef &def);
 };
 
