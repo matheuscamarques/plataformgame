@@ -891,18 +891,34 @@ void Game::drawPlayerSprite() {
     Player *p = player.get();
     // Escala p/ altura da entidade (100px), aspecto preservado.
     const float s = p->getH() / static_cast<float>(sprites::kPlayerH);
-    // Fase E2: só partes (pixel-idêntico ao monolítico morto).
+    // 4 partes; se Boots equipada, ela SUBSTITUI o feet (não sobrepõe).
     const auto pose = game::poseForFrameId(p->currentFrameId);
     const auto& pp =
         sprites_.playerParts[static_cast<int>(pose)];
     const assets::Part* parts = sprites::poseParts(pose);
-    const sf::Texture* texs[3] = {&pp.head, &pp.torso, &pp.legs};
-    for (int i = 0; i < 3; ++i) {
+    const core::Item& boots = p->equipment.get(core::EquipSlot::Boots);
+    const core::ItemDef* bootsDef =
+        boots.isEmpty() ? nullptr : boots.def();
+    const sf::Texture* texs[4] = {&pp.head, &pp.torso, &pp.legs, &pp.feet};
+    for (int i = 0; i < 4; ++i) {
+        // Feet com botas: pula o pé base (a bota entra abaixo).
+        if (i == 3 && bootsDef) continue;
         sf::Sprite spr;
         spr.setTexture(*texs[i]);
         spr.setOrigin(sprites::kPlayerW * 0.5f,
                       static_cast<float>(sprites::kPlayerH -
                                          parts[i].offY));
+        spr.setPosition(p->getCenterX(), p->getY() + p->getH());
+        spr.setScale(static_cast<float>(p->facing) * s, s);
+        window->draw(spr);
+    }
+    // Bota no slot do feet (12x6, mesma origem do pé que substitui).
+    if (bootsDef) {
+        const int m = static_cast<int>(bootsDef->material);
+        sf::Sprite spr(sprites_.boots[m]);
+        spr.setOrigin(sprites::kPlayerW * 0.5f,
+                      static_cast<float>(sprites::kPlayerH -
+                                         parts[3].offY));
         spr.setPosition(p->getCenterX(), p->getY() + p->getH());
         spr.setScale(static_cast<float>(p->facing) * s, s);
         window->draw(spr);
@@ -924,9 +940,7 @@ void Game::drawPlayerEquipment() {
     const int mHelm = materialOf(core::EquipSlot::Head);
     const int mChest = materialOf(core::EquipSlot::Chest);
     const int mLegs = materialOf(core::EquipSlot::Legs);
-    // Bota própria; sem ela, segue a perneira (comportamento antigo).
-    int mBoots = materialOf(core::EquipSlot::Boots);
-    if (mBoots < 0) mBoots = mLegs;
+    // Botas: ver drawPlayerSprite — substituem o feet (não há overlay aqui).
 
     // Peça full-width centralizada no centro-x da parte âncora.
     // Offsets em rows do sprite (nunca world): a âncora segue o Body,
@@ -974,10 +988,6 @@ void Game::drawPlayerEquipment() {
     if (mLegs >= 0)
         drawFullWidth(sprites_.legs[mLegs], sprites::kLegsW,
                       support::BodyPartId::Torso, 1.f, -2.f);
-    // Botas 12x3: topo 1 row abaixo da base do torso.
-    if (mBoots >= 0)
-        drawFullWidth(sprites_.boots[mBoots], sprites::kBootsW,
-                      support::BodyPartId::Torso, 1.f, 1.f);
 
     if (mHelm >= 0) {
         drawGlove(support::BodyPartId::ArmL, mHelm);

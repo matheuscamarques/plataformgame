@@ -35,7 +35,7 @@ const ComposedFrame& composedFor(sprites::PlayerPose pose) {
             const Part* pp = sprites::poseParts(
                 static_cast<sprites::PlayerPose>(i));
             ComposedFrame& c = cache[i];
-            c.text = compose(pp, 3, sprites::kPlayerW, sprites::kPlayerH);
+            c.text = compose(pp, 4, sprites::kPlayerW, sprites::kPlayerH);
             c.rows.reserve(c.text.size());
             for (const auto& s : c.text) c.rows.push_back(s.c_str());
         }
