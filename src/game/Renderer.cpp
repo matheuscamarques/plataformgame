@@ -807,7 +807,6 @@ void Game::render()
             window->draw(t);
         };
         text("HP " + std::to_string(p->hp) + "/" + std::to_string(p->hpMax), 16.f, 48.f);
-        text("TNT:" + std::to_string(p->inventory.count("dynamite")) + " J  K melee", 16.f, 62.f);
         text("Souls: " + std::to_string(p->souls), 16.f, 158.f);
         // FP (F8b): barra azul no canto superior direito.
         {
@@ -829,21 +828,27 @@ void Game::render()
                      std::to_string(static_cast<int>(p->fpMax)),
                  fx, 28.f, 11);
         }
-        text(std::string("Mat: ") + (p->weaponDef()
-                                          ? core::materialName(
-                                                p->weaponDef()->material)
-                                          : "--"),
-             16.f, 110.f);
-        const int pty = static_cast<int>(std::floor(p->getY() / core::kBlockSize));
-        text(std::string(support::stratumName(support::stratumAt(pty)))
-             + "  y" + std::to_string(pty), 16.f, 86.f);
-        {
-            const float h = dayNight_.hour();
-            const int hh = static_cast<int>(h);
-            const int mm = static_cast<int>((h - hh) * 60);
-            text(std::string("Hora ") + std::to_string(hh) + ":"
-                     + (mm < 10 ? "0" : "") + std::to_string(mm),
-                 16.f, 134.f);
+        // Debug de mundo (F6, apagado por padrão): material, estrato,
+        // hora. Linha TNT morreu aqui (badge da hotbar já mostra).
+        if (overlay_.visible() && overlay_.world()) {
+            text(std::string("Mat: ") + (p->weaponDef()
+                                              ? core::materialName(
+                                                    p->weaponDef()->material)
+                                              : "--"),
+                 16.f, 110.f);
+            const int pty =
+                static_cast<int>(std::floor(p->getY() / core::kBlockSize));
+            text(std::string(support::stratumName(support::stratumAt(pty))) +
+                     "  y" + std::to_string(pty),
+                 16.f, 86.f);
+            {
+                const float h = dayNight_.hour();
+                const int hh = static_cast<int>(h);
+                const int mm = static_cast<int>((h - hh) * 60);
+                text(std::string("Hora ") + std::to_string(hh) + ":" +
+                         (mm < 10 ? "0" : "") + std::to_string(mm),
+                     16.f, 134.f);
+            }
         }
 
         if (run_.isDead()) {
