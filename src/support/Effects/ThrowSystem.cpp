@@ -15,6 +15,7 @@
 #include "defines.h"
 #include "entities/Player/Player.h"
 #include "game/SoundBank.h"
+#include "physics/Physics2D.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/Combat/ExplosionSystem.h"
 #include "support/GameContext.h"
@@ -176,7 +177,9 @@ void ThrowSystem::handleTileCollision(Throwable &t, GameContext &ctx) {
 
     const int tx = static_cast<int>(std::floor(t.pos.x / core::kBlockSize));
     const int ty = static_cast<int>(std::floor(t.pos.y / core::kBlockSize));
-    if (!ctx.world->isSolid(tx, ty)) return;
+    // Query via backend (Fase 2): mesma pergunta ao World, pela interface.
+    const physics::Physics2D phys(*ctx.world);
+    if (!phys.isSolidTile(tx, ty)) return;
 
     // Reverte ~1 frame e zera vertical, atrito na horizontal.
     // Spark só em impacto de verdade: sem gate, os 4 substeps gerariam
@@ -223,7 +226,7 @@ void ThrowSystem::renderBlasts(sf::RenderTarget& target,
             const float fade = (1.f - u) * (1.f - u);
             const auto a = static_cast<sf::Uint8>(255.f * fade * b.lightPeak);
             if (a >= 4)
-                glow(core::toSf(b.center), b.lightRadius, sf::Color(255, 160, 60, a));
+                glow(b.center, b.lightRadius, sf::Color(255, 160, 60, a));
         }
         // Anel cresce de 20% a 100% do raio em 0.35s.
         const float r = b.radius * (0.2f + 0.8f * u);
