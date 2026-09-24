@@ -164,6 +164,12 @@ void Player::tick() {
     // Wrapper fino sobre physics::step (fonte única do movimento).
     // Comportamento bit-idêntico ao tick antigo: monta State/Input,
     // roda o step puro e escreve de volta (membros + Entity + cooldowns).
+    // Sprint drena 10/s e zera corta a corrida; regen com delay 0.8s.
+    if (runFast && (moveLeft || moveRight)) {
+        stamina = std::max(0.f, stamina - kSprintCost / 30.f);
+        staminaDelay.trigger();
+    }
+    if (runFast && stamina <= 0.f) runFast = false;
     physics::State st;
     st.x = getX();
     st.y = getY();
@@ -219,8 +225,9 @@ void Player::tick() {
     this->top = getY();
     this->setPosition(getX(), getY());
 
-    // Regen de estamina: 30/s (F5 drena em swing/roll/run).
-    if (stamina < staminaMax)
+    // Regen de estamina: 30/s, só com delay pronto (gastou há 0.8s+).
+    staminaDelay.tick(1.f / 30.0f);
+    if (stamina < staminaMax && staminaDelay.ready())
         stamina = std::min(staminaMax, stamina + 1.f);
 }
 
@@ -334,6 +341,7 @@ void Player::respawn(float x, float y) {
     hp = hpMax;
     hurtIframes.reset();
     throwCooldown.reset();
+    staminaDelay.reset();
     topUpDynamite();
     topUpStarterKit();
     refreshDerived();
@@ -390,6 +398,9 @@ bool Player::startSwing() {
     } else {
         return false; // Windup/Active: press ignorado
     }
+    if (stamina < kSwingCost) return false; // sem fôlego: sem golpe
+    stamina -= kSwingCost;
+    staminaDelay.trigger();
     meleePhase = MeleePhase::Windup;
     meleeTimer = kLight[meleeCombo].windup;
     meleeSwingId++;

@@ -48,6 +48,36 @@ int main() {
         p.tick();
         assert(p.stamina == 150.f); // trava no teto, sem passar
     }
+    { // SwingDrainsBlocks (20 por golpe; sem fôlego não sai)
+        Player p;
+        assert(p.startSwing());
+        assert(p.stamina == 130.f);
+        p.meleePhase = MeleePhase::Idle;
+        p.stamina = 10.f;
+        assert(!p.startSwing());
+        assert(p.meleePhase == MeleePhase::Idle);
+        assert(p.stamina == 10.f); // sem gasto no bloqueio
+    }
+    { // SprintDrainsCutsRun (10/s; zerou corta a corrida)
+        Player p;
+        p.runFast = true;
+        p.moveRight = true;
+        p.stamina = 5.f;
+        p.tick();
+        assert(p.stamina < 5.f && p.runFast); // ainda corre
+        p.stamina = 0.2f;
+        p.tick();
+        assert(p.stamina == 0.f && !p.runFast); // cortou
+    }
+    { // RegenDelay (0.8s sem regen após gastar)
+        Player p;
+        assert(p.startSwing()); // drena + arma o delay
+        p.stamina = 100.f;
+        for (int i = 0; i < 10; ++i) p.tick();
+        assert(p.stamina == 100.f); // delay segurando
+        for (int i = 0; i < 30; ++i) p.tick();
+        assert(p.stamina > 100.f); // voltou a regenar
+    }
 
     std::printf("player test OK\n");
     return 0;

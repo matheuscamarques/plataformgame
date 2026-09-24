@@ -68,6 +68,9 @@ class Player : public Entity
         // Estamina (F3: teto + regen; F5: consumo em swing/roll/run).
         float stamina = 150.f;
         float staminaMax = 150.f;
+        core::Cooldown staminaDelay{0.8f}; // regen só após gastar
+        static constexpr float kSwingCost = 20.f;
+        static constexpr float kSprintCost = 10.f; // por segundo
 
         // Carteira de souls (XP coletado). Morte derruba no cadáver
         // (RunManager); R voluntário mantém; respawn não mexe.
