@@ -962,22 +962,22 @@ void Game::drawPlayerEquipment() {
         window->draw(spr);
     };
 
-    // Elmo 24x10: topo 4 rows acima do topo da cabeça.
+    // Elmo 12x5: topo 2 rows acima do topo da cabeça.
     if (mHelm >= 0)
         drawFullWidth(sprites_.helm[mHelm], sprites::kHelmW,
-                      support::BodyPartId::Head, 0.f, -4.f);
-    // Peitoral 24x16: topo no topo do torso.
+                      support::BodyPartId::Head, 0.f, -2.f);
+    // Peitoral 12x8: topo no topo do torso.
     if (mChest >= 0)
         drawFullWidth(sprites_.chest[mChest], sprites::kChestW,
                       support::BodyPartId::Torso, 0.f, 0.f);
-    // Perneiras 24x12: topo 4 rows acima da base do torso.
+    // Perneiras 12x6: topo 2 rows acima da base do torso.
     if (mLegs >= 0)
         drawFullWidth(sprites_.legs[mLegs], sprites::kLegsW,
-                      support::BodyPartId::Torso, 1.f, -4.f);
-    // Botas 24x6: topo 2 rows abaixo da base do torso.
+                      support::BodyPartId::Torso, 1.f, -2.f);
+    // Botas 12x3: topo 1 row abaixo da base do torso.
     if (mBoots >= 0)
         drawFullWidth(sprites_.boots[mBoots], sprites::kBootsW,
-                      support::BodyPartId::Torso, 1.f, 2.f);
+                      support::BodyPartId::Torso, 1.f, 1.f);
 
     if (mHelm >= 0) {
         drawGlove(support::BodyPartId::ArmL, mHelm);

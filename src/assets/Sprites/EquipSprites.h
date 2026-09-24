@@ -18,35 +18,29 @@ inline constexpr int kSwordW = 8;
 inline constexpr int kSwordH = 20;
 inline constexpr int kSwordSwingW = 16;
 inline constexpr int kSwordSwingH = 8;
-inline constexpr int kHelmW = 24;
-inline constexpr int kHelmH = 10;
-inline constexpr int kChestW = 24;
-inline constexpr int kChestH = 16;
-inline constexpr int kLegsW = 24;
-inline constexpr int kLegsH = 12;
+inline constexpr int kHelmW = 12;
+inline constexpr int kHelmH = 5;
+inline constexpr int kChestW = 12;
+inline constexpr int kChestH = 8;
+inline constexpr int kLegsW = 12;
+inline constexpr int kLegsH = 6;
 
-inline constexpr int kBootsW = 24;
-inline constexpr int kBootsH = 6;
+inline constexpr int kBootsW = 12;
+inline constexpr int kBootsH = 3;
 
 inline const char *const kIronBootsIdle[] = {
-    "....WWWWWWWWWWWWWWWW....",
-    "....WWWWWWWWWWWWWWWW....",
-    "....WWwwwwwwwwwwwwWW....",
-    "....WWwwwwwwwwwwwwWW....",
-    "....WWWWWWWWWWWWWWWW....",
-    "....WWWWWWWWWWWWWWWW....",
+    "..WWWWWWWW..",
+    "..WwwwwwwW..",
+    "..WWWWWWWW..",
 };
 
-inline constexpr int kGloveW = 8;
-inline constexpr int kGloveH = 6;
+inline constexpr int kGloveW = 4;
+inline constexpr int kGloveH = 3;
 
 inline const char *const kIronGlovesIdle[] = {
-    "..WWWW..",
-    "..WWWW..",
-    "WWWWWWww",
-    "WWWWWWww",
-    "..wwWW..",
-    "..wwWW..",
+    ".WW.",
+    "WWWw",
+    ".wW.",
 };
 
 inline const char *const kIronSwordIdle[] = {
@@ -130,50 +124,31 @@ inline const char *const kIronSwordSwing[] = {
 };
 
 inline const char *const kIronHelmIdle[] = {
-    "GGGGGGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGGGGGG",
-    "GGwwwwwwwwwwwwwwwwwwwwGG",
-    "GGwwwwwwwwwwwwwwwwwwwwGG",
-    "GGwwwwwwwwwwwwwwwwwwwwGG",
-    "GGwwwwwwwwwwwwwwwwwwwwGG",
-    "GGww....EEEE....EEEEwwGG",
-    "GGww....EEEE....EEEEwwGG",
-    "GGww................wwGG",
-    "GGww................wwGG",
+    "GGGGGGGGGGGG",
+    "GwwwwwwwwwwG",
+    "GwwwwwwwwwwG",
+    "Gw..EE..EEwG",
+    "Gw........wG",
 };
 
 inline const char *const kIronChestIdle[] = {
-    "wwwwwwwwwwwwwwwwwwwwwwww",
-    "wwwwwwwwwwwwwwwwwwwwwwww",
-    "wwWWWWWWWWWWWWWWWWWWWWww",
-    "wwWWWWWWWWWWWWWWWWWWWWww",
-    "wwWWWWWWWWWWWWWWWWWWWWww",
-    "wwWWWWWWWWWWWWWWWWWWWWww",
-    "wwWWWWGGGGGGGGGGGGWWWWww",
-    "wwWWWWGGGGGGGGGGGGWWWWww",
-    "wwWWWWGGGGGGGGGGGGWWWWww",
-    "wwWWWWGGGGGGGGGGGGWWWWww",
-    "wwWWWWWWWWWWWWWWWWWWWWww",
-    "wwWWWWWWWWWWWWWWWWWWWWww",
-    "wwwwwwwwwwwwwwwwwwwwwwww",
-    "wwwwwwwwwwwwwwwwwwwwwwww",
-    "..wwwwwwwwwwwwwwwwwwww..",
-    "..wwwwwwwwwwwwwwwwwwww..",
+    "wwwwwwwwwwww",
+    "wWWWWWWWWWWw",
+    "wWWWWWWWWWWw",
+    "wWWGGGGGGWWw",
+    "wWWGGGGGGWWw",
+    "wWWWWWWWWWWw",
+    "wwwwwwwwwwww",
+    ".wwwwwwwwww.",
 };
 
 inline const char *const kIronLegsIdle[] = {
-    "....WWWWWWWWWWWWWWWW....",
-    "....WWWWWWWWWWWWWWWW....",
-    "....WWwwwwwwwwwwwwWW....",
-    "....WWwwwwwwwwwwwwWW....",
-    "....WWwwWWWWWWWWwwWW....",
-    "....WWwwWWWWWWWWwwWW....",
-    "....WWwwWWGGGGWWwwWW....",
-    "....WWwwWWGGGGWWwwWW....",
-    "....WWwwwwwwwwwwwwWW....",
-    "....WWwwwwwwwwwwwwWW....",
-    "......WWWWWWWWWWWW......",
-    "......WWWWWWWWWWWW......",
+    "..WWWWWWWW..",
+    "..WwwwwwwW..",
+    "..WwWWWWwW..",
+    "..WwWGGWwW..",
+    "..WwwwwwwW..",
+    "...WWWWWW...",
 };
 
 } // namespace sprites
