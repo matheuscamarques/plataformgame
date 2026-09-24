@@ -68,6 +68,37 @@ int main() {
         assert(back.defId == "iron_sword");
     }
 
+    { // DeathSfxPerKind (esqueleto não morre com SFX de slime)
+        assert(deathSfxFor(core::EntityKind::Skeleton) ==
+               game::Sfx::SkeletonDeath);
+        assert(deathSfxFor(core::EntityKind::Dwarf) ==
+               game::Sfx::DwarfDeath);
+        assert(deathSfxFor(core::EntityKind::Slime) ==
+               game::Sfx::SlimeDeath);
+        assert(std::string(game::keyOf(game::Sfx::SkeletonDeath)) ==
+               "skeleton_death");
+    }
+    { // StartingEquipmentIsData (tabela no arquétipo, sem branch)
+        const EnemyArchetype *a =
+            ArchetypeRegistry::instance().find("skeleton");
+        assert(a->startingEquipment.size() == 2u);
+        assert(a->startingEquipment[0].itemId == "iron_helm");
+        assert(a->startingEquipment[1].itemId == "iron_sword");
+        const EnemyArchetype *s =
+            ArchetypeRegistry::instance().find("slime");
+        assert(s->startingEquipment.empty()); // slime nasce nu
+    }
+    { // FactoryEquipDeterministic (mesma posição = mesmo vestido)
+        auto e1 = Factory::spawnEnemy("skeleton", 100.f, 200.f);
+        auto e2 = Factory::spawnEnemy("skeleton", 100.f, 200.f);
+        assert(e1 && e2);
+        for (int i = 1; i < core::kEquipSlotCount; ++i) {
+            const auto slot = static_cast<core::EquipSlot>(i);
+            assert(e1->equipment.get(slot).defId ==
+                   e2->equipment.get(slot).defId);
+        }
+    }
+
     std::printf("skeleton test OK\n");
     return 0;
 }

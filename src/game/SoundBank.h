@@ -30,6 +30,8 @@ enum class Sfx : uint8_t {
     // Dwarf
     DwarfAlert, DwarfThrow, DwarfMelee, DwarfHurt, DwarfDeath,
     DwarfWarn1, DwarfWarn2, DwarfWarn3, DwarfBetray,
+    // Skeleton (reflexo do player)
+    SkeletonDeath,
     // UI
     UiSelect, UiMove, UiConfirm, UiCancel, UiEquip, UiDrop,
     COUNT
@@ -62,6 +64,7 @@ inline const char* keyOf(Sfx s) {
         case Sfx::DwarfWarn2:    return "dwarf_warn2";
         case Sfx::DwarfWarn3:    return "dwarf_warn3";
         case Sfx::DwarfBetray:   return "dwarf_betray";
+        case Sfx::SkeletonDeath: return "skeleton_death";
         case Sfx::UiSelect:      return "ui_select";
         case Sfx::UiMove:        return "ui_move";
         case Sfx::UiConfirm:     return "ui_confirm";
@@ -181,6 +184,10 @@ inline void buildSoundBank(core::AudioSystem& a) {
     a.registerSound("dwarf_betray",
         tone({{90.f, 0.f, 0.80f, 0.7f}, {45.f, 0.f, 0.80f, 0.3f}},
              0.80f, Wave::Sine, {0.01f,0.1f,0.7f,0.4f}, 0.60f));
+
+    // ── Skeleton ── chocalho seco: sweep agudo que desaba
+    a.registerSound("skeleton_death",
+        swp(350.f, 80.f, 0.35f, 0.40f, {0.005f,0.03f,0.4f,0.20f}));
 
     // ── UI ──
     a.registerSound("ui_select",

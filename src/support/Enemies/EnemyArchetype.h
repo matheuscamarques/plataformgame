@@ -53,6 +53,14 @@ struct EnemyArchetype {
 
     // Drops ao morrer (rolados em DeathSystem via rollDrops). Vazio = só XP.
     core::DropTable drops;
+
+    // Peça vestida no spawn + chance (0..1). Rolado na Factory com RNG
+    // determinístico por posição. Vazio = nasce nu (slime, anão).
+    struct StartingEquip {
+        std::string itemId;
+        float chance = 1.f;
+    };
+    std::vector<StartingEquip> startingEquipment;
 };
 
 class ArchetypeRegistry {

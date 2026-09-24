@@ -36,9 +36,7 @@ void EnemySystem::removeDead(const std::function<void(Enemy&)> &onDeath,
         if (ctx && (*it)->ai) (*it)->ai->onDeath(**it, *ctx);
         // SFX morte por kind (sem ctx.audio em teste = mudo).
         if (ctx && ctx->audio && (*it)->ai)
-            ctx->audio->play(game::keyOf(
-                (*it)->ai->kind() == core::EntityKind::Dwarf
-                    ? game::Sfx::DwarfDeath : game::Sfx::SlimeDeath));
+            ctx->audio->play(game::keyOf(deathSfxFor((*it)->ai->kind())));
         onDeath(**it); // antes do erase (ref pendurada depois)
         it = slimes_.erase(it);
     }

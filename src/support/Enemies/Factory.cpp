@@ -8,6 +8,7 @@
 #include "EnemySystem.h"
 
 #include <cmath>
+#include <cstring>
 
 #include <SFML/Graphics/Color.hpp>
 
@@ -58,16 +59,20 @@ std::unique_ptr<Enemy> Factory::spawnEnemy(const std::string &kind,
 
     e->skillIds = a->skills;
 
-    // Esqueleto veste ferro (RNG determinístico por posição, mesmo
-    // padrão do dropSalt: LCG local, nunca global em gameplay).
-    if (kind == "skeleton") {
-        uint32_t rng = static_cast<uint32_t>(x * 13.7f + y * 71.3f) * 1103515245u + 12345u;
-        rng = rng * 1103515245u + 12345u;
-        if ((rng & 0xFFFF) / 65536.f < 0.35f)
-            e->equipment.equip(core::Item{"iron_helm", 1});
-        rng = rng * 1103515245u + 12345u;
-        if ((rng & 0xFFFF) / 65536.f < 0.50f)
-            e->equipment.equip(core::Item{"iron_sword", 1});
+    // Equipamento inicial da tabela do arquétipo (vazio = nasce nu).
+    // RNG determinístico por posição: bit-cast do float (memcpy, seguro
+    // p/ negativos) + LCG local. Nunca global em gameplay (Random.h).
+    if (!a->startingEquipment.empty()) {
+        uint32_t xb = 0, yb = 0;
+        static_assert(sizeof(float) == sizeof(uint32_t), "float 32 bits");
+        std::memcpy(&xb, &x, sizeof(float));
+        std::memcpy(&yb, &y, sizeof(float));
+        uint32_t rng = (xb * 13u) ^ (yb * 71u) ^ 0x9E3779B9u;
+        for (const auto &se : a->startingEquipment) {
+            rng = rng * 1103515245u + 12345u;
+            if ((rng & 0xFFFF) / 65536.f < se.chance)
+                e->equipment.equip(core::Item{se.itemId, 1});
+        }
     }
 
     // Variante por profundidade (dano/hp/skills extras). Slime não tem

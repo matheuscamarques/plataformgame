@@ -16,6 +16,7 @@
 #include "core/System.h"
 #include "core/Equipment.h"
 #include "entities/Entity.hpp"
+#include "game/SoundBank.h"
 #include "Behavior.h"
 #include "support/Combat/Body.h"
 #include "support/Combat/SpriteFrame.h"
@@ -27,6 +28,15 @@
 namespace support {
 
 class Behavior;
+
+// SFX de morte por kind (puro, testável). Default = slime (trash).
+inline game::Sfx deathSfxFor(core::EntityKind kind) {
+    switch (kind) {
+        case core::EntityKind::Dwarf:    return game::Sfx::DwarfDeath;
+        case core::EntityKind::Skeleton: return game::Sfx::SkeletonDeath;
+        default:                         return game::Sfx::SlimeDeath;
+    }
+}
 
 // Enemy = corpo (Entity) + identidade (Behavior via registry).
 // Dono: EnemySystem. Física: EnemySystem. Desenho: Game via forEach.

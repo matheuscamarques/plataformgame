@@ -98,6 +98,7 @@ REGISTER_ENEMY_ARCHETYPE("skeleton", [] {
     a.drops.entries.push_back({"soul_lost", 0.35f, 1, 1});
     a.drops.entries.push_back({"soul_great", 0.1f, 1, 1});
     a.skills = {"skeleton_slash"}; // melee-only: sem dynamite
+    a.startingEquipment = {{"iron_helm", 0.35f}, {"iron_sword", 0.50f}};
     a.xp = 120;
     return a;
 }());
