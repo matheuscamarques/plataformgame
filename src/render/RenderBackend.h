@@ -15,6 +15,9 @@
 namespace render {
 
 // Alça opaca de sprite (id > 0 válido; 0 = nulo).
+// INVARIANTE: o handle só vale no backend que o criou — se o backend
+// morre, os handles viram pó e drawSprite os ignora em silêncio.
+// Por isso o backend dono de texturas é persistente, nunca local.
 struct SpriteHandle {
     uint32_t id = 0;
     bool valid() const { return id != 0; }

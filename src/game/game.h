@@ -13,6 +13,7 @@
 #include <unordered_map>
 #include "vector"
 #include "core/System.h"
+#include "render/Render2D.h"
 #include "render/RenderBackend.h"
 #include "../support/Camera/Camera.h"
 #include "../support/Debug/DebugOverlay.h"
@@ -92,6 +93,9 @@ private:
     // Handles do backend p/ frames de inimigo (Fase 3): criados sob
     // demanda por SpriteFrameId, vivos até o fim do run.
     std::unordered_map<int, render::SpriteHandle> backendHandles_;
+    // Backend dono das texturas: MEMBRO (não local por frame — handles
+    // morrem junto com o backend que os criou; local = sprites sumem).
+    std::unique_ptr<render::Render2D> enemyBackend_;
     core::MusicSystem music_; // dono: tracks sintetizadas 1x no run (RAM)
     bool musicBuilt_ = false;
     int lastMusicStratum_ = -1;

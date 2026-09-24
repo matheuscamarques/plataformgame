@@ -23,6 +23,10 @@ void Game::setWindow(sf::RenderWindow *window)
     //window->setView(*this->view);
     this->window = window;
     screenshots_.setWindow(window);
+    // Backend persistente: texturas dos handles vivem aqui. Recria com
+    // a janela e invalida handles antigos (ids do backend morto).
+    enemyBackend_ = std::make_unique<render::Render2D>(*window);
+    backendHandles_.clear();
 }
 
 

@@ -1100,7 +1100,10 @@ void Game::drawEnemiesSprites() {
     // Fase 3: inimigos desenham via RenderBackend (prova do backend).
     // Handles criados sob demanda por frame e cacheados no run;
     // arte vem do registry (frameData), mesma fonte do fallback antigo.
-    render::Render2D backend(*window);
+    // Backend é membro persistente (texturas morrem com ele — nunca
+    // local por frame, senão os handles cacheados viram pó).
+    if (!enemyBackend_) return;
+    render::Render2D &backend = *enemyBackend_;
     render::Camera cam;
     backend.beginFrame(cam);
     enemies_->forEach([&](support::Enemy &s) {
