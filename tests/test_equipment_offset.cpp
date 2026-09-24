@@ -19,10 +19,10 @@ bool near(float a, float b) { return std::fabs(a - b) < 0.01f; }
 int main() {
     { // ScaleApplies (sprite 12x20 em (100,200), s=2.5)
         // Elmo em (0,0): canto superior esquerdo do sprite.
-        sf::Vector2f p = game::equipSpritePos(100.f, 200.f, 2.5f, 1, 0.f, 0.f);
+        core::Vec2f p = game::equipSpritePos(100.f, 200.f, 2.5f, 1, 0.f, 0.f);
         assert(near(p.x, 100.f) && near(p.y, 200.f));
         // Peitoral em (0,6): 6 rows * 2.5 = 15px abaixo.
-        sf::Vector2f c = game::equipSpritePos(100.f, 200.f, 2.5f, 1, 0.f, 6.f);
+        core::Vec2f c = game::equipSpritePos(100.f, 200.f, 2.5f, 1, 0.f, 6.f);
         assert(near(c.x, 100.f) && near(c.y, 215.f));
     }
     { // MirrorLandsOnSameScreenBox (full-width: mesmo box espelhado)
@@ -42,8 +42,8 @@ int main() {
         assert(near(left.x, 4.f)); // [4-4, 4] = [0, 4]
     }
     { // ScaleDoublesOffset (s=2.5 vs 5.0: mesma grade, dobra mundo)
-        sf::Vector2f a = game::equipSpritePos(0.f, 0.f, 2.5f, 1, 0.f, 8.f);
-        sf::Vector2f b = game::equipSpritePos(0.f, 0.f, 5.0f, 1, 0.f, 8.f);
+        core::Vec2f a = game::equipSpritePos(0.f, 0.f, 2.5f, 1, 0.f, 8.f);
+        core::Vec2f b = game::equipSpritePos(0.f, 0.f, 5.0f, 1, 0.f, 8.f);
         assert(near(a.y, 20.f) && near(b.y, 40.f));
     }
 

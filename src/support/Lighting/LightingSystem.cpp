@@ -7,6 +7,7 @@
 
 #include "support/Lighting/LightingSystem.h"
 #include "core/RadialTexture.h"
+#include "core/VecSfml.h"
 #include <algorithm>
 #include <cmath>
 
@@ -21,7 +22,7 @@ void LightingSystem::init() {
 }
 
 void LightingSystem::drawRadial(sf::RenderTarget& target,
-                                 sf::Vector2f worldPos,
+                                 core::Vec2f worldPos,
                                  float radius,
                                  sf::Color color) {
     if (!ready_) return;
@@ -29,7 +30,7 @@ void LightingSystem::drawRadial(sf::RenderTarget& target,
     const RadialTransform t = radialTransform(w, radius);
     sf::Sprite spr(playerTex_);
     spr.setOrigin(t.origin, t.origin);
-    spr.setPosition(worldPos); // coords de mundo (view de mundo ativa)
+    spr.setPosition(core::toSf(worldPos)); // coords de mundo (view ativa)
     spr.setScale(t.scale, t.scale);
     spr.setColor(color);
 

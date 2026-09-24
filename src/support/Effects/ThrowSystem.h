@@ -25,7 +25,7 @@ namespace support {
 
 // Desenha glow radial (injetado pelo Renderer via LightingSystem).
 // Assinatura desacoplada: ThrowSystem nunca inclui LightingSystem.
-using BlastGlowFn = std::function<void(sf::Vector2f, float, sf::Color)>;
+using BlastGlowFn = std::function<void(core::Vec2f, float, sf::Color)>;
 
 struct GameContext;
 class ExplosionSystem;

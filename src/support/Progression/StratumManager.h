@@ -7,6 +7,7 @@
 
 #pragma once
 #include "core/System.h"
+#include "core/Vec.h"
 #include <SFML/System/Vector2.hpp>
 #include <cstdint>
 
@@ -34,7 +35,7 @@ public:
 
     // Ponto de respawn: x atual do player, y do checkpoint mais fundo.
     // Sala real do checkpoint (altar) é futura; B refina o x/y exato.
-    sf::Vector2f respawnPoint(float x) const;
+    core::Vec2f respawnPoint(float x) const;
 
 private:
     uint32_t unlocked_ = 1u; // estrato 0 nasce desbloqueado

@@ -54,7 +54,7 @@ int main() {
         for (int i = 0; i <= 5; ++i) assert(sm.unlocked(i));
         assert(!sm.unlocked(6));
 
-        sf::Vector2f r = sm.respawnPoint(123.f);
+        core::Vec2f r = sm.respawnPoint(123.f);
         assert(r.x == 123.f && r.y == 5000.f * 50.f); // entrada do 5
     }
     { // DeepestStratumGenerates (determinístico, sem bedrock antes)

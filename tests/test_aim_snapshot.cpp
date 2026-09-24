@@ -71,11 +71,11 @@ int main() {
     }
     { // AimVectorIsUnit
         for (int i = 0; i < static_cast<int>(AimDir::COUNT); ++i) {
-            sf::Vector2f v =
+            core::Vec2f v =
                 support::aimVector(static_cast<AimDir>(i));
             assert(near(std::sqrt(v.x * v.x + v.y * v.y), 1.f));
         }
-        sf::Vector2f n = support::aimVector(AimDir::N);
+        core::Vec2f n = support::aimVector(AimDir::N);
         assert(near(n.x, 0.f) && near(n.y, -1.f)); // Y cresce p/ baixo
     }
 

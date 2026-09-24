@@ -1,3 +1,4 @@
+#include "core/Vec.h"
 /**
  * @file src/world/RaycastLight.h
  * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
@@ -39,7 +40,7 @@ public:
     // sempre visível). maxDist = level + 2 tiles; chunk ausente
     // encerra o raio (não atravessa o vazio descarregado).
     static void castRaysCrossChunk(ChunkProvider findChunk,
-                                   sf::Vector2f worldOriginPx, int level);
+                                   core::Vec2f worldOriginPx, int level);
 
     // Contagem de tiles visíveis (debug/teste).
     static int visibleCount(const Chunk& c);

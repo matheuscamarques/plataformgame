@@ -9,6 +9,7 @@
 #include "core/Inventory.h"
 #include "core/Pool.h"
 #include "core/System.h"
+#include "core/Vec.h"
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <cstddef>
@@ -19,8 +20,8 @@ namespace support {
 struct GameContext;
 
 struct XPOrb {
-    sf::Vector2f pos{0.f, 0.f};
-    sf::Vector2f vel{0.f, 0.f};
+    core::Vec2f pos{0.f, 0.f};
+    core::Vec2f vel{0.f, 0.f};
     int          value = 1;
     float        lifetime = 0.f;
     float        maxLifetime = 12.f;
@@ -33,8 +34,8 @@ struct XPOrb {
 // (chão guarda o que não coube). Render: rect na cor da raridade.
 struct ItemOrb {
     core::Item   item;
-    sf::Vector2f pos{0.f, 0.f};
-    sf::Vector2f vel{0.f, 0.f};
+    core::Vec2f pos{0.f, 0.f};
+    core::Vec2f vel{0.f, 0.f};
     float        lifetime = 0.f;
     float        maxLifetime = 60.f;
     float        pickupDelay = 0.5f;
@@ -53,11 +54,11 @@ public:
     void tick(float dt, GameContext &ctx) override;
     void render(sf::RenderTarget &target);
 
-    XPOrb *spawnXP(sf::Vector2f pos, int value = 1);
+    XPOrb *spawnXP(core::Vec2f pos, int value = 1);
 
     // Spawna orbe de item (def precisa existir; senão nullptr, sem custo).
     // Espalha: vel inicial aleatória p/ cima (visual, randRange de efeitos).
-    ItemOrb *spawnItem(const std::string& defId, int qty, sf::Vector2f pos);
+    ItemOrb *spawnItem(const std::string& defId, int qty, core::Vec2f pos);
 
     std::size_t activeCount() const { return pool_.activeCount(); }
     std::size_t activeItemCount() const { return itemPool_.activeCount(); }

@@ -1,3 +1,4 @@
+#include "core/Vec.h"
 /**
  * @file src/support/Combat/AimDir.h
  * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
@@ -25,7 +26,7 @@ enum class AimDir : uint8_t {
     COUNT
 };
 
-inline sf::Vector2f aimVector(AimDir d) {
+inline core::Vec2f aimVector(AimDir d) {
     constexpr float k = 0.70710678f;
     switch (d) {
         case AimDir::E: return {1.f, 0.f};

@@ -1,3 +1,4 @@
+#include "core/Vec.h"
 /**
  * @file src/support/Debug/DebugFeed.h
  * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
@@ -25,7 +26,7 @@ namespace support {
 // CPU puro (fstream, sem GL): testável headless.
 struct DamageNumber {
     std::string text;
-    sf::Vector2f pos{0.f, 0.f};
+    core::Vec2f pos{0.f, 0.f};
     float ttl = 0.5f;
 };
 
@@ -37,7 +38,7 @@ struct DebugFeed {
     std::vector<DamageNumber> numbers;
     std::vector<std::string> log;
 
-    void pushNumber(const std::string &text, sf::Vector2f pos) {
+    void pushNumber(const std::string &text, core::Vec2f pos) {
         numbers.push_back({text, pos, kNumberTtl});
     }
     void pushLog(const std::string &line) {

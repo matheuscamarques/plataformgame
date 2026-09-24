@@ -711,14 +711,14 @@ void Game::render()
         if (t.fuse <= 0.f) return;
         const auto gp =
             support::tntGlowParams(t.fuse, core::Time::elapsed());
-        lighting_.drawRadial(*window, core::toSf(t.pos), gp.radius,
+        lighting_.drawRadial(*window, t.pos, gp.radius,
                              sf::Color(
                                  static_cast<sf::Uint8>(gp.r),
                                  static_cast<sf::Uint8>(gp.g),
                                  static_cast<sf::Uint8>(gp.b),
                                  static_cast<sf::Uint8>(gp.a)));
         // Halo: mesma cor, ~2.2× o raio, 1/4 do alpha.
-        lighting_.drawRadial(*window, core::toSf(t.pos), gp.radius * 2.2f,
+        lighting_.drawRadial(*window, t.pos, gp.radius * 2.2f,
                              sf::Color(
                                  static_cast<sf::Uint8>(gp.r),
                                  static_cast<sf::Uint8>(gp.g),
@@ -726,7 +726,7 @@ void Game::render()
                                  static_cast<sf::Uint8>(gp.a * 0.25f)));
     });
     throws_->renderBlasts(*window,
-        [&](sf::Vector2f p, float r, sf::Color c) {
+        [&](core::Vec2f p, float r, sf::Color c) {
             lighting_.drawRadial(*window, p, r, c);
             // Halo do blast: mesma cor, ~2.2× o raio, 1/4 do alpha.
             lighting_.drawRadial(*window, p, r * 2.2f,

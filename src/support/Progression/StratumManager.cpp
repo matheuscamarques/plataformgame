@@ -31,7 +31,7 @@ void StratumManager::tick(float /*dt*/, GameContext &ctx) {
     }
 }
 
-sf::Vector2f StratumManager::respawnPoint(float x) const {
+core::Vec2f StratumManager::respawnPoint(float x) const {
     return {x, static_cast<float>(checkpointTy(deepest_)) * core::kBlockSize};
 }
 

@@ -12,6 +12,7 @@
 #include <cmath>
 
 #include "core/ItemDef.h"
+#include "core/VecSfml.h"
 #include "core/Random.h"
 #include "entities/Player/Player.h"
 #include "game/SoundBank.h"
@@ -34,7 +35,7 @@ sf::Color rarityColor(core::ItemRarity r) {
 }
 } // namespace
 
-XPOrb *DropSystem::spawnXP(sf::Vector2f pos, int value) {
+XPOrb *DropSystem::spawnXP(core::Vec2f pos, int value) {
     auto *o = pool_.acquire();
     if (!o) return nullptr;
     *o = XPOrb{};
@@ -155,7 +156,7 @@ void DropSystem::render(sf::RenderTarget &target) {
     c.setOrigin(3.f, 3.f);
     c.setFillColor({100, 220, 120});
     pool_.forEachActive([&](const XPOrb &o) {
-        c.setPosition(o.pos);
+        c.setPosition(core::toSf(o.pos));
         target.draw(c);
     });
     sf::RectangleShape r({7.f, 7.f});
@@ -172,7 +173,7 @@ void DropSystem::render(sf::RenderTarget &target) {
 }
 
 ItemOrb *DropSystem::spawnItem(const std::string& defId, int qty,
-                               sf::Vector2f pos) {
+                               core::Vec2f pos) {
     const core::ItemDef* def = core::ItemRegistry::instance().find(defId);
     if (!def || qty <= 0) return nullptr;
     auto *o = itemPool_.acquire();

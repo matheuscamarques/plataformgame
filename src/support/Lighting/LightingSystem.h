@@ -7,6 +7,7 @@
 
 #pragma once
 #include "core/DayNightCycle.h"
+#include "core/Vec.h"
 #include <algorithm>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
@@ -36,7 +37,7 @@ public:
     // derivadas da textura — nunca literal. `radius` = raio visual
     // (centro à borda); largura renderizada = 2×radius.
     void drawRadial(sf::RenderTarget& target,
-                    sf::Vector2f worldPos,
+                    core::Vec2f worldPos,
                     float radius,
                     sf::Color color);
 

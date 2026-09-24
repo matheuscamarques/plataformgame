@@ -1,3 +1,4 @@
+#include "core/Vec.h"
 /**
  * @file src/assets/EquipmentLayout.h
  * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
@@ -14,7 +15,7 @@ namespace game {
 // spriteLeft/Top = canto superior esquerdo do sprite no mundo.
 // Espelha X quando facing<0. Pura, testável sem GL.
 // REGRA: posições em pixels do SPRITE (rows do ASCII), nunca world.
-inline sf::Vector2f equipSpritePos(float spriteLeft, float spriteTop, float s,
+inline core::Vec2f equipSpritePos(float spriteLeft, float spriteTop, float s,
                                    int facing, float spriteX, float spriteY,
                                    int spriteW = 12) {
     // facing=-1: setScale(-s,s) com origin (0,0) desenha o sprite da

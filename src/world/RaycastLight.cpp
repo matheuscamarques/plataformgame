@@ -64,7 +64,7 @@ int RaycastLight::visibleCount(const Chunk& c) {
 }
 
 void RaycastLight::castRaysCrossChunk(ChunkProvider findChunk,
-                                      sf::Vector2f oPx, int level) {
+                                      core::Vec2f oPx, int level) {
     if (level <= 0) return;
     const float bs = static_cast<float>(core::kBlockSize);
     const int maxDist = level + 2;        // folga p/ borda do alcance
