@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "assets/SpriteComposer.h"
+#include "assets/SpriteFrameRegistry.h"
 #include "assets/Sprites/PlayerParts.h"
 #include "assets/Sprites/PlayerSprites.h"
 
@@ -80,6 +81,29 @@ int main() {
         }
         // Fora da faixa: fallback idle (nunca nullptr).
         assert(poseParts(static_cast<PlayerPose>(99)) == kPlayerIdleParts);
+    }
+    { // RegistryServesComposed (frameData == monolítico, pré-Fase E3)
+        const struct {
+            support::SpriteFrameId id;
+            const char* const* ref;
+        } cases[] = {
+            {support::SpriteFrameId::PlayerIdle, kPlayerIdle},
+            {support::SpriteFrameId::PlayerWalkA, kPlayerWalkA},
+            {support::SpriteFrameId::PlayerWalkB, kPlayerWalkB},
+            {support::SpriteFrameId::PlayerJump, kPlayerJump},
+            {support::SpriteFrameId::PlayerThrow, kPlayerThrow},
+            {support::SpriteFrameId::PlayerPunch, kPlayerPunch},
+            {support::SpriteFrameId::PlayerPunchUp, kPlayerPunchUp},
+            {support::SpriteFrameId::PlayerPunchDown, kPlayerPunchDown},
+            {support::SpriteFrameId::PlayerHurt, kPlayerHurt},
+            {support::SpriteFrameId::PlayerDeath, kPlayerDeath},
+        };
+        for (const auto& c : cases) {
+            const auto f = assets::frameData(c.id);
+            assert(f.rows != nullptr && f.w == 12 && f.h == 40);
+            for (int row = 0; row < 40; ++row)
+                assert(std::string(f.rows[row]) == c.ref[row]);
+        }
     }
 
     std::printf("sprite compose test OK\n");

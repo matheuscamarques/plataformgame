@@ -7,42 +7,63 @@
 
 #include "SpriteFrameRegistry.h"
 
+#include <string>
+#include <vector>
+
+#include "assets/PlayerSprite.h"
+#include "assets/SpriteComposer.h"
+#include "assets/Sprites/PlayerParts.h"
 #include "assets/Sprites/SpriteSet.h"
 
 namespace assets {
+
+namespace {
+
+// Cache composto por pose (Fase E1): frameData do player serve daqui,
+// byte-idêntico ao monolítico (test_sprite_compose prova a igualdade).
+// vector<string> é o dono; rows aponta p/ c_str estáveis (pós-fill).
+struct ComposedFrame {
+    std::vector<std::string> text;
+    std::vector<const char*> rows;
+};
+
+const ComposedFrame& composedFor(sprites::PlayerPose pose) {
+    static ComposedFrame cache[sprites::kPlayerPoseCount];
+    static bool built = false;
+    if (!built) {
+        for (int i = 0; i < sprites::kPlayerPoseCount; ++i) {
+            const Part* pp = sprites::poseParts(
+                static_cast<sprites::PlayerPose>(i));
+            ComposedFrame& c = cache[i];
+            c.text = compose(pp, 3, sprites::kPlayerW, sprites::kPlayerH);
+            c.rows.reserve(c.text.size());
+            for (const auto& s : c.text) c.rows.push_back(s.c_str());
+        }
+        built = true;
+    }
+    return cache[static_cast<int>(pose)];
+}
+
+const char* const* composedRows(support::SpriteFrameId id) {
+    return composedFor(game::poseForFrameId(id)).rows.data();
+}
+
+} // namespace
 
 SpriteFrameData frameData(support::SpriteFrameId id) {
     using support::SpriteFrameId;
     switch (id) {
         case SpriteFrameId::PlayerIdle:
-            return {sprites::kPlayerIdle, sprites::kPlayerW, sprites::kPlayerH,
-                    sprites::kPlayerPal, sprites::kPlayerPalCount};
         case SpriteFrameId::PlayerWalkA:
-            return {sprites::kPlayerWalkA, sprites::kPlayerW, sprites::kPlayerH,
-                    sprites::kPlayerPal, sprites::kPlayerPalCount};
         case SpriteFrameId::PlayerWalkB:
-            return {sprites::kPlayerWalkB, sprites::kPlayerW, sprites::kPlayerH,
-                    sprites::kPlayerPal, sprites::kPlayerPalCount};
         case SpriteFrameId::PlayerJump:
-            return {sprites::kPlayerJump, sprites::kPlayerW, sprites::kPlayerH,
-                    sprites::kPlayerPal, sprites::kPlayerPalCount};
         case SpriteFrameId::PlayerThrow:
-            return {sprites::kPlayerThrow, sprites::kPlayerW, sprites::kPlayerH,
-                    sprites::kPlayerPal, sprites::kPlayerPalCount};
         case SpriteFrameId::PlayerPunch:
-            return {sprites::kPlayerPunch, sprites::kPlayerW, sprites::kPlayerH,
-                    sprites::kPlayerPal, sprites::kPlayerPalCount};
         case SpriteFrameId::PlayerPunchUp:
-            return {sprites::kPlayerPunchUp, sprites::kPlayerW, sprites::kPlayerH,
-                    sprites::kPlayerPal, sprites::kPlayerPalCount};
         case SpriteFrameId::PlayerPunchDown:
-            return {sprites::kPlayerPunchDown, sprites::kPlayerW, sprites::kPlayerH,
-                    sprites::kPlayerPal, sprites::kPlayerPalCount};
         case SpriteFrameId::PlayerHurt:
-            return {sprites::kPlayerHurt, sprites::kPlayerW, sprites::kPlayerH,
-                    sprites::kPlayerPal, sprites::kPlayerPalCount};
         case SpriteFrameId::PlayerDeath:
-            return {sprites::kPlayerDeath, sprites::kPlayerW, sprites::kPlayerH,
+            return {composedRows(id), sprites::kPlayerW, sprites::kPlayerH,
                     sprites::kPlayerPal, sprites::kPlayerPalCount};
         case SpriteFrameId::SlimeIdle:
             return {sprites::kSlimeIdle, sprites::kSlimeW, sprites::kSlimeH,
