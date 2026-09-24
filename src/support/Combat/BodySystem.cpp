@@ -22,7 +22,7 @@ namespace {
 sf::FloatRect computeWeaponBbox(Player &p) {
     const PartState *arm = p.body.find(BodyPartId::ArmR);
     if (!arm) return {0.f, 0.f, 0.f, 0.f};
-    const float s = p.getH() / 20.f; // kPlayerH
+    const float s = p.getH() / 40.f; // kPlayerH (era 20: sprite dobrou)
     const float handX = arm->worldBox.left + arm->worldBox.width * 0.5f;
     const float handY = arm->worldBox.top + arm->worldBox.height;
     // Offsets por arma via registry (mesma matemática de antes).

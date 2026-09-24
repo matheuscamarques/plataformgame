@@ -51,9 +51,10 @@ int main() {
         });
         assert(s != nullptr && s->id == "dwarf_dynamite");
     }
-    { // MeleeWinsClose (20px: picaretada)
+    { // MeleeWinsClose (perto: picaretada)
         Player p;
-        place(p, 20.f);
+        place(p, 0.f);
+        p.setY(-28.f); // centros a ~12px (era ~17 no corpo 30x50)
         auto enemies = makeDwarf();
         GameContext ctx{};
         ctx.player = &p;
@@ -94,7 +95,8 @@ int main() {
     }
     { // RepeatPenaltyDoesNotVeto (melee penalizada ainda vence sozinha)
         Player p;
-        place(p, -7.f); // centro a ~3px: bônus melee conta (15+20-25=10)
+        place(p, -12.f); // centro colado no anão (era ~3px no 30x50)
+        p.setY(-28.f);
         auto enemies = makeDwarf();
         GameContext ctx{};
         ctx.player = &p;
@@ -108,7 +110,8 @@ int main() {
     }
     { // SpecialSwingsLowHp (skill de teste com isSpecial)
         Player p;
-        place(p, 20.f);
+        place(p, 0.f);
+        p.setY(-28.f); // centro a ~12px do anão (era ~17 no 30x50)
         auto enemies = makeDwarf();
         GameContext ctx{};
         ctx.player = &p;

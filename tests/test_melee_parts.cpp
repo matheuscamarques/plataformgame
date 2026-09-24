@@ -53,7 +53,7 @@ int main() {
         p.equipment.unequip(core::EquipSlot::RightHand); // soco: geometria fixa facing-E
         p.setY(10.f); // soco [30,46]x[25,45]: head [11.2,17.8] fora
         EnemySystem enemies;
-        enemies.spawn("slime", 32.f, 10.f);
+        enemies.spawn("slime", 62.f, 35.f);
         rebuildAll(enemies);
 
         MeleeSystem ms;
@@ -73,7 +73,7 @@ int main() {
         p.equipment.unequip(core::EquipSlot::RightHand); // soco: geometria fixa facing-E
         p.setX(-14.5f); // soco [15.5,31.5]x[15,35]: torso x>=32 fora
         EnemySystem enemies;
-        enemies.spawn("slime", 32.f, 10.f);
+        enemies.spawn("slime", 62.f, 35.f);
         rebuildAll(enemies);
 
         MeleeSystem ms;
@@ -94,7 +94,7 @@ int main() {
         p.setX(-13.f);
         p.setY(-24.f); // soco [17,33]x[9,11]: AABB ok, head x>=40 fora
         EnemySystem enemies;
-        enemies.spawn("slime", 32.f, 10.f);
+        enemies.spawn("slime", 62.f, 35.f);
         rebuildAll(enemies);
 
         MeleeSystem ms;
@@ -124,7 +124,7 @@ int main() {
         p.equipment.unequip(core::EquipSlot::RightHand); // soco: geometria fixa facing-E
         p.setX(20.f);
         EnemySystem enemies;
-        enemies.spawn("slime", 32.f, 10.f);
+        enemies.spawn("slime", 62.f, 35.f);
         enemies.forEach([&](Enemy &s) {
             s.bodyParts.attach(&gap);
             s.bodyParts.rebuild({s.body.getX(), s.body.getY()}, 1);
@@ -146,7 +146,7 @@ int main() {
         Player p;
         p.equipment.unequip(core::EquipSlot::RightHand); // soco: geometria fixa facing-E
         EnemySystem enemies;
-        enemies.spawn("slime", 32.f, 10.f);
+        enemies.spawn("slime", 62.f, 35.f);
         enemies.forEach([](Enemy &s) {
             s.bodyParts.schema = nullptr;
             s.bodyParts.parts.clear();
@@ -169,7 +169,7 @@ int main() {
         p.equipment.unequip(core::EquipSlot::RightHand); // soco: geometria fixa facing-E
         p.setY(10.f);
         EnemySystem enemies;
-        enemies.spawn("slime", 32.f, 10.f);
+        enemies.spawn("slime", 62.f, 35.f);
         rebuildAll(enemies);
 
         MeleeSystem ms;
@@ -188,7 +188,7 @@ int main() {
         Player p; // (0,0): best=head
         p.equipment.unequip(core::EquipSlot::RightHand); // soco: geometria fixa facing-E
         EnemySystem enemies;
-        enemies.spawn("slime", 32.f, 10.f);
+        enemies.spawn("slime", 62.f, 35.f);
         rebuildAll(enemies);
 
         MeleeSystem ms;

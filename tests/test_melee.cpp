@@ -16,11 +16,11 @@
 int main() {
     using namespace support;
 
-    { // HitsSlimeInFrontOnce (head 2x: 30 → 14, sem duplo hit)
-        Player p; // (0,0) 30x50 facing 1 → soco combo0 x=[30,46] y=[15,35]
+    { // HitsSlimeInFrontOnce (head 2x: 60 → 44, sem duplo hit)
+        Player p; // (0,0) 60x100 facing 1 → soco combo0 x=[60,76] y=[40,60]
         p.equipment.unequip(core::EquipSlot::RightHand); // soco (seed equipa espada)
         EnemySystem enemies;
-        enemies.spawn("slime", 32.f, 10.f); // 40x30 sobre a hitbox
+        enemies.spawn("slime", 62.f, 35.f); // 40x30 sobre a hitbox
         // Body posicionado (como BodySystem 250 faz em jogo): hitbox
         // toca Head+Torso+ArmL → best=head → 8 * 2.0 = 16.
         enemies.forEach([](Enemy &s) {
@@ -45,7 +45,7 @@ int main() {
         p.facing = -1;
         p.aimDir = support::AimDir::W; // tecla esquerda = esquerda da tela
         EnemySystem enemies;
-        enemies.spawn("slime", 60.f, 10.f); // [60,100] sobre a hitbox [85,105]
+        enemies.spawn("slime", 60.f, 35.f); // [60,100]x[35,65] sobre a hitbox [84,100]x[40,60]
 
         MeleeSystem ms;
         GameContext ctx{};
@@ -83,7 +83,7 @@ int main() {
         Player p;
         p.equipment.unequip(core::EquipSlot::RightHand); // soco (seed equipa espada)
         EnemySystem enemies;
-        enemies.spawn("slime", 32.f, 10.f);
+        enemies.spawn("slime", 62.f, 35.f); // 40x30 sobre o soco combo0
         enemies.forEach([](Enemy &s) {
             s.bodyParts.rebuild({s.body.getX(), s.body.getY()}, 1);
         });

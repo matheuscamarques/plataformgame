@@ -22,7 +22,7 @@ int main() {
                                                  core::kBlockSize, core::kBlockSize));
     Player p;
     p.setX(0.0f);
-    p.setY(static_cast<float>(core::kBlockSize)); // em pe
+    p.setY(0.0f); // em pe: pes (0+100) no topo do chao (100)
 
     float maxX = 0.0f;
     for (int t = 0; t < 120; t++) {
@@ -41,7 +41,7 @@ int main() {
         std::printf("FALHOU: emperrou na emenda (parede invisivel)\n");
         return 1;
     }
-    if (p.getY() < 40.0f || p.getY() > 60.0f) {
+    if (p.getY() < -2.0f || p.getY() > 2.0f) {
         std::printf("FALHOU: saiu do chao y=%.1f\n", p.getY());
         return 1;
     }

@@ -80,8 +80,8 @@ int main() {
     }
     { // SpecialGateLowHp (collapse +100 com hp<20%)
         Player pl;
-        pl.setX(20.f);
-        pl.setY(0.f);
+        pl.setX(5.f); // centro (35,25): mesma geometria do 30x50
+        pl.setY(-25.f);
         EnemySystem enemies;
         enemies.spawn("dwarf", 0.f, 0.f);
         GameContext ctx{};

@@ -465,9 +465,11 @@ void Game::render()
                     hs = wd->spriteH / 8.f;
                 }
             }
-            const float w = hb.w * ws, h = hb.h * hs;
-            const float cx = p->getCenterX() + hb.cx;
-            const float cy = p->getCenterY() + hb.cy;
+            // Preview espelha meleeHitbox: alcance escala com o corpo.
+            const float bs = p->getH() / 50.f;
+            const float w = hb.w * bs * ws, h = hb.h * bs * hs;
+            const float cx = p->getCenterX() + hb.cx * bs;
+            const float cy = p->getCenterY() + hb.cy * bs;
             sf::RectangleShape r({w, h});
             r.setPosition(cx - w * 0.5f, cy - h * 0.5f);
             r.setFillColor(sf::Color::Transparent);

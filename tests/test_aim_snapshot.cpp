@@ -39,10 +39,10 @@ int main() {
         p.swingAim = AimDir::N;
 
         sf::FloatRect box = p.meleeHitbox();
-        // Rect do N: cy=-20, h=20 → topo 20px acima do centro.
-        assert(near(box.top, p.getCenterY() - 30.f));
-        assert(near(box.height, 20.f));
-        assert(near(box.top + box.height, p.getCenterY() - 10.f));
+        // Rect do N x2 (corpo 100): cy=-40, h=40 → topo 60px acima.
+        assert(near(box.top, p.getCenterY() - 60.f));
+        assert(near(box.height, 40.f));
+        assert(near(box.top + box.height, p.getCenterY() - 20.f));
     }
     { // FallbackSocoWhenUnequipped (N ignorado sem arma)
         Player p;

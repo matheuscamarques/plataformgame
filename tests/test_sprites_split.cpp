@@ -17,8 +17,8 @@
 // agregado continua íntegro (counts que os testes legados cobrem).
 // build() NÃO é chamado (textura exige GL, sem teste headless).
 int main() {
-    // Player 12x20 (8 frames), slime 14x12 (2), dwarf 14x18 (5).
-    assert(sprites::kPlayerW == 12 && sprites::kPlayerH == 20);
+    // Player 12x40 (8 frames), slime 14x12 (2), dwarf 14x18 (5).
+    assert(sprites::kPlayerW == 12 && sprites::kPlayerH == 40);
     assert(sprites::kSlimeW == 14 && sprites::kSlimeH == 12);
     assert(sprites::kDwarfW == 14 && sprites::kDwarfH == 18);
     // Equip: espada 8x20 (idle/windup), 16x8 (swing).

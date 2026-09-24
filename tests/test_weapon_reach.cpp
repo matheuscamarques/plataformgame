@@ -28,10 +28,10 @@ int main() {
         BodySchema s = BodySchema::humanoid(50.f, 50.f);
         p.body.attach(&s);
         p.body.rebuild({100.f, 100.f}, 1);
-        // E = {20,0,20,14}: cx=35, cy=25 → {25,18,20,14}.
+        // E x2 (corpo 100): {40,0,40,28}: cx=70, cy=50 → {50,36,40,28}.
         sf::FloatRect box = p.meleeHitbox();
-        assert(near(box.left, 25.f) && near(box.width, 20.f));
-        assert(near(box.top, 18.f) && near(box.height, 14.f));
+        assert(near(box.left, 50.f) && near(box.width, 40.f));
+        assert(near(box.top, 36.f) && near(box.height, 28.f));
     }
     { // FallbackToLightWhenNoWeapon (sem equipamento = kLight, soco)
         Player p;

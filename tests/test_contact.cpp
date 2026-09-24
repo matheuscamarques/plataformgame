@@ -18,13 +18,13 @@
 int main() {
     using namespace support;
     auto recol = [](EnemySystem &e) {
-        e.forEach([](Enemy &s) { s.body.setX(10.f); s.body.setY(10.f); });
+        e.forEach([](Enemy &s) { s.body.setX(20.f); s.body.setY(10.f); });
     };
 
     { // DamagesAfterWindup + pushback (11 ticks colado → hp 90, x -6)
-        Player p; // (0,0) 50x50
+        Player p; // (0,0) 60x100, centro x=30; slime à direita (centro 40)
         EnemySystem enemies;
-        enemies.spawn("slime", 10.f, 10.f);
+        enemies.spawn("slime", 20.f, 10.f);
 
         ContactDamageSystem cs;
         GameContext ctx{};

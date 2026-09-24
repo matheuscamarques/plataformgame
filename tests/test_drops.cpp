@@ -30,8 +30,8 @@ int main() {
     }
     { // CollectIncrementsCounter (orb no centro do player)
         DropSystem ds;
-        Player mock; // 50x50 em (0,0) → centro (25,25)
-        ds.spawnXP({25.f, 25.f});
+        Player mock; // 60x100 em (0,0) → centro (30,50)
+        ds.spawnXP({30.f, 50.f});
 
         GameContext ctx{};
         ctx.player = &mock;

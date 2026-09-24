@@ -20,12 +20,12 @@ constexpr float kGravity = 2.0f;
 constexpr float kTerminalVelocity = 25.0f;
 }
  Player::Player() :
-Entity(core::kIdPlayer,0,0,30,50) // AABB derivado do sprite 12x20 a 2.5x
+Entity(core::kIdPlayer,0,0,60,100) // AABB 2 blocos (sprite 12x40 a 2.5x)
 {
     setFillColor(sf::Color::Red);
-    // humanoid(ALTURA, LARGURA): AABB 30x50. Já foi (30, 50) invertido —
-    // hw=25 punha o ArmL 12px fora do AABB (caixa magenta flutuante).
-    static auto schema = support::BodySchema::humanoid(50.f, 30.f);
+    // humanoid(ALTURA, LARGURA): proporcional total — partes, arma e
+    // câmera concordam entre si. Visual fino (30px) centrado na caixa.
+    static auto schema = support::BodySchema::humanoid(100.f, 60.f);
     body.attach(&schema);
     topUpDynamite();
     topUpStarterKit();
@@ -557,9 +557,12 @@ sf::FloatRect Player::meleeHitbox() {
             ws = wd->spriteW / 16.f;
             hs = wd->spriteH / 8.f;
         }
-        const float w = hb.w * ws, h = hb.h * hs;
-        const float cx = getCenterX() + hb.cx;
-        const float cy = getCenterY() + hb.cy;
+        // Alcance escala com o corpo (bs=2 a 100px): soco de 1 bloco
+        // nunca sairia do corpo de 2 blocos. Soco (abaixo) já é dinâmico.
+        const float bs = getH() / 50.f;
+        const float w = hb.w * bs * ws, h = hb.h * bs * hs;
+        const float cx = getCenterX() + hb.cx * bs;
+        const float cy = getCenterY() + hb.cy * bs;
         return sf::FloatRect{cx - w * 0.5f, cy - h * 0.5f, w, h};
     }
 
