@@ -17,7 +17,7 @@ int main() {
         assert(p.hurtIframes.running());   // arrancou
         for (int i = 0; i < 20; ++i) p.tick(); // ~0.66s > 0.6s
         assert(!p.hurtIframes.running());  // expirou
-        assert(p.hp == 9990);
+        assert(p.hp == 90);
     }
     { // ThrowCooldownTicksInPlayerTick (1 só lugar, sem Game)
         Player p;
@@ -26,9 +26,9 @@ int main() {
         for (int i = 0; i < 20; ++i) p.tick();
         assert(p.throwCooldown.ready());
     }
-    { // DerivedFromAttributes (seed VIT/END 10: 10000/150/60)
+    { // DerivedFromAttributes (seed VIT/END 10: 100/150/60)
         Player p;
-        assert(p.hpMax == 10000);
+        assert(p.hpMax == 100);
         assert(p.staminaMax == 150.f && p.stamina == 150.f);
         assert(p.maxEquipLoad() == 60.f);
         assert(!p.heavilyLoaded()); // set ferro 28 <= 30

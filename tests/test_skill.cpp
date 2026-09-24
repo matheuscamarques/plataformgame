@@ -101,7 +101,7 @@ int main() {
             enemies.tick(1.f / 30.f, ctx);
             throws.tick(1.f / 30.f, ctx);
         }
-        assert(p.hp < 10000); // cuspe acertou (hurt respeita i-frame; ≥1 passou)
+        assert(p.hp < 100); // cuspe acertou (hurt respeita i-frame; ≥1 passou)
     }
     { // SpitWithoutFuseNeverExplodesAndExpiresResting (mundo real)
         World world(1337u);

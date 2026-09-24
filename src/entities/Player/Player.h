@@ -59,8 +59,8 @@ class Player : public Entity
         core::Equipment equipment;
 
         // Combate: HP + i-frames. Morte/restart ficam para o bloco B.
-        int hp = 10000;
-        int hpMax = 10000;
+        int hp = 100;
+        int hpMax = 100;
         core::Cooldown hurtIframes;
 
         // Atributos DS (F2+): dirigem hpMax/stamina/carga (refreshDerived).

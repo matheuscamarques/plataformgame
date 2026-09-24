@@ -36,7 +36,7 @@ int main() {
         ctx.enemies = &enemies;
 
         for (int i = 0; i < 3; ++i) { recol(enemies); cs.tick(1.f / 30.f, ctx); }
-        assert(windup(enemies) < 0.35f && p.hp == 10000);
+        assert(windup(enemies) < 0.35f && p.hp == 100);
     }
     { // BiteResetsWindup (mordeu → rearma cheio)
         Player p;
@@ -49,7 +49,7 @@ int main() {
         ctx.enemies = &enemies;
 
         for (int i = 0; i < 11; ++i) { recol(enemies); cs.tick(1.f / 30.f, ctx); }
-        assert(p.hp == 9990);
+        assert(p.hp == 90);
         assert(windup(enemies) == 0.35f);
     }
     { // WindupRecoversWithoutContact (saiu de perto: sobe, não zera)
@@ -96,10 +96,10 @@ int main() {
         ctx.enemies = &enemies;
 
         for (int i = 0; i < 11; ++i) { recol(enemies); cs.tick(1.f / 30.f, ctx); }
-        assert(p.hp == 9990);
+        assert(p.hp == 90);
         p.hurtIframes.tick(1.f); // expira i-frame: próxima morde quando windup
         for (int i = 0; i < 5; ++i) { recol(enemies); cs.tick(1.f / 30.f, ctx); }
-        assert(p.hp == 9990); // windup (0.35) ainda não esgotou de novo
+        assert(p.hp == 90); // windup (0.35) ainda não esgotou de novo
     }
 
     std::printf("telegraph test OK\n");

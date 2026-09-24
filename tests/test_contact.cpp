@@ -32,9 +32,9 @@ int main() {
         ctx.enemies = &enemies;
 
         for (int i = 0; i < 5; ++i) { recol(enemies); cs.tick(1.f / 30.f, ctx); }
-        assert(p.hp == 10000); // windup (~0.18s) ainda não esgotou
+        assert(p.hp == 100); // windup (~0.18s) ainda não esgotou
         for (int i = 0; i < 6; ++i) { recol(enemies); cs.tick(1.f / 30.f, ctx); }
-        assert(p.hp == 9990 && p.getX() == -6.f);
+        assert(p.hp == 90 && p.getX() == -6.f);
     }
     { // DeadSlimeNoDamage + NoOverlapNoDamage
         Player p;
@@ -51,7 +51,7 @@ int main() {
         ctx.enemies = &enemies;
 
         cs.tick(1.f / 30.f, ctx);
-        assert(p.hp == 10000);
+        assert(p.hp == 100);
     }
     { // SeparatesSlimeOut (1 tick: rects não se tocam mais)
         Player p;

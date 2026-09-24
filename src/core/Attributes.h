@@ -110,11 +110,11 @@ struct Attributes {
         return true;
     }
 
-    // Derivados (F3): VIT 10 = 10000 (compatível com o jogo atual).
+    // Derivados (F3): VIT 10 = 100 (base de gente, não de deus).
     static int maxHP(int vit) {
         if (vit < 1) vit = 1;
-        if (vit <= 40) return 8000 + vit * 200;
-        return 8000 + 40 * 200 + (vit - 40) * 50; // soft cap 40
+        if (vit <= 40) return 80 + vit * 2;
+        return 80 + 40 * 2 + (vit - 40) / 2; // soft cap 40
     }
     static int maxStamina(int end) {
         if (end < 1) end = 1;

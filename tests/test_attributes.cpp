@@ -49,11 +49,11 @@ int main() {
             assert(n != nullptr && n[0] != '?' && n[0] != '\0');
         }
     }
-    { // DerivedFormulas (VIT10 = 10000; soft cap 40; END10 = 150/60)
-        assert(Attributes::maxHP(10) == 10000);
-        assert(Attributes::maxHP(40) == 16000);
-        assert(Attributes::maxHP(41) - Attributes::maxHP(40) == 50);
-        assert(Attributes::maxHP(1) == 8200);
+    { // DerivedFormulas (VIT10 = 100; soft cap 40; END10 = 150/60)
+        assert(Attributes::maxHP(10) == 100);
+        assert(Attributes::maxHP(40) == 160);
+        assert(Attributes::maxHP(42) - Attributes::maxHP(40) == 1);
+        assert(Attributes::maxHP(1) == 82);
         int prev = Attributes::maxHP(1);
         for (int v = 2; v <= 99; ++v) {
             const int h = Attributes::maxHP(v);

@@ -68,7 +68,7 @@ int main() {
         run.tick(1.f / 30.f, ctx);
         in.onTickEnd(); // tick observou: expira o latch // R: restart
         assert(!run.isDead());
-        assert(p.hp == 10000 && p.getX() == 999.f && p.getY() == 0.f); // x atual
+        assert(p.hp == 100 && p.getX() == 999.f && p.getY() == 0.f); // x atual
         assert(enemies.count() == 2); // 2 slimes perto do respawn
         assert(throws.activeCount() == 0u && drops.activeCount() == 0u);
     }
@@ -100,7 +100,7 @@ int main() {
         in.handleEvent(keyEvent(sf::Event::KeyPressed, sf::Keyboard::R));
         run.tick(1.f / 30.f, ctx);
         in.onTickEnd(); // tick observou: expira o latch
-        assert(!run.isDead() && p.hp == 10000);
+        assert(!run.isDead() && p.hp == 100);
         // No checkpoint do estrato 5 (ty 5000), fora da rocha:
         const int ty = static_cast<int>(p.getY() / 50.f);
         assert(ty <= 5000);
@@ -162,7 +162,7 @@ int main() {
         in.handleEvent(keyEvent(sf::Event::KeyPressed, sf::Keyboard::R));
         run.tick(1.f / 30.f, ctx);
         in.onTickEnd(); // tick observou: expira o latch
-        assert(!run.isDead() && p.hp == 10000 && enemies.count() == 2);
+        assert(!run.isDead() && p.hp == 100 && enemies.count() == 2);
     }
 
     std::printf("run manager test OK\n");

@@ -127,11 +127,11 @@ int main() {
     }
     { // HurtGatesOnIframes
         Player p;
-        assert(p.hp == 10000);
-        assert(p.hurt(10) && p.hp == 9990);
-        assert(!p.hurt(10) && p.hp == 9990); // i-frame segurou
+        assert(p.hp == 100);
+        assert(p.hurt(10) && p.hp == 90);
+        assert(!p.hurt(10) && p.hp == 90); // i-frame segurou
         p.hurtIframes.tick(1.f);
-        assert(p.hurt(9990) && p.hp == 0);
+        assert(p.hurt(90) && p.hp == 0);
         assert(!p.hurt(10)); // já em 0, sem efeito
     }
     { // ScalingStrDex (espada ferro: D FOR + B DES; base 8 intacta)

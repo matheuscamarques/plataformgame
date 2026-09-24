@@ -128,7 +128,7 @@ int main() {
         ui.setEquipment(&p.equipment);
         ui.setInventory(&p.inventory);
         const auto st = ui.status();
-        assert(st.hp == 10000 && st.hpMax == 10000);
+        assert(st.hp == 100 && st.hpMax == 100);
         assert(st.weaponName == "Espada de Ferro" && st.damage == 12);
         assert(st.defense == 4 + 6 + 4 + 3);
         assert(st.gold == 0);
@@ -323,7 +323,7 @@ int main() {
         core::Inventory inv;
         InputMap in;
         Player p;
-        p.hp = 9000;
+        p.hp = 50;
         inv.add(core::Item{"potion", 3});
         ui.setInventory(&inv);
         ui.setPlayer(&p);
@@ -337,7 +337,7 @@ int main() {
         ui.handleInput(in);
         release(in, sf::Keyboard::F);
         assert(ui.state() == InventoryUI::UIState::Browse);
-        assert(p.hp == 9030 && inv.count("potion") == 2);
+        assert(p.hp == 80 && inv.count("potion") == 2);
     }
     { // MenuArrangeShortcut (T ordena por tipo+id)
         InventoryUI ui;

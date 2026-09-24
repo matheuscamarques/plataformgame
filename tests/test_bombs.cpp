@@ -81,12 +81,12 @@ int main() {
     }
     { // UseSlotPocao (poção no slot: cura + consome 1 do slot exato)
         Player p;
-        p.hp = 9000;
+        p.hp = 50;
         p.inventory = core::Inventory{};
         p.inventory.add(core::Item{"potion", 10}); // slot 0 cheio
         p.inventory.add(core::Item{"potion", 2});  // slot 1
         assert(p.tryUseSlot(0));
-        assert(p.hp == 9030);
+        assert(p.hp == 80);
         assert(p.inventory.slot(0).quantity == 9); // slot exato, não o 1
         assert(p.inventory.slot(1).quantity == 2);
         assert(!p.tryUseSlot(5)); // vazio

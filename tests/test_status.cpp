@@ -22,7 +22,7 @@ int main() {
         p.addPoison(200.f);
         assert(p.poisonTimer == 8.f && p.poisonBuildup == 0.f);
         for (int i = 0; i < 30; ++i) p.tick();
-        assert(p.hp == 10000 - 3); // 3/s por 1s
+        assert(p.hp == 100 - 3); // 3/s por 1s
         assert(p.poisonTimer > 0.f);
         p.addPoison(50.f); // ativo: não reacumula
         assert(p.poisonBuildup == 0.f);
@@ -30,7 +30,7 @@ int main() {
     { // BleedBurstsAndResets (15% do max em burst, sem timer)
         Player p;
         p.addBleed(200.f);
-        assert(p.hp == 10000 - 1500 && p.bleedBuildup == 0.f);
+        assert(p.hp == 100 - 15 && p.bleedBuildup == 0.f);
         assert(p.poisonTimer == 0.f);
     }
     { // MossCures (onUse dos defs limpa; J usa via slot também)

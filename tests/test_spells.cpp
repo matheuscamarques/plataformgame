@@ -51,12 +51,12 @@ int main() {
         ThrowSystem ts;
         attuneAll(p);
         assert(p.attune("heal_light"));
-        p.hp = 9000;
+        p.hp = 10;
         assert(p.castAttuned(ts));
-        assert(p.hp == 9000 + 50 + 24); // base + FÉ×2
+        assert(p.hp == 10 + 50 + 24); // base + FÉ×2
         assert(p.fp == 160.f);
         assert(ts.activeCount() == 0u); // sem projétil
-        p.hp = 9990;
+        p.hp = 90;
         p.throwCooldown.reset();
         assert(p.castAttuned(ts));
         assert(p.hp == p.hpMax); // trava no teto
