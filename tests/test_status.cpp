@@ -94,6 +94,41 @@ int main() {
             assert(p.poisonBuildup == 0.f);
         }
     }
+    { // ModifiersPipeline (identidade limpo; slow no proc; clamp)
+        Player p;
+        core::StatusModifiers clean = p.computeModifiers();
+        assert(clean.moveSpeedMult == 1.f);
+        assert(clean.staminaRegenMult == 1.f);
+        assert(clean.staminaCostMult == 1.f);
+        assert(clean.damageTakenMult == 1.f);
+        assert(clean.hpMaxMult == 1.f);
+        assert(clean.canRoll && clean.canAttack && !clean.blocksHealing);
+        assert(p.effectiveHpMax() == p.hpMax);
+    }
+    { // BleedSlowCutsRun (burst arma 0.3s; sprint cai; expira sozinho)
+        Player p;
+        p.runFast = true;
+        p.addBleed(200.f); // burst + slow
+        assert(p.computeModifiers().moveSpeedMult == 0.9f);
+        p.tick();
+        assert(!p.runFast); // micro-stagger comportamental
+        for (int i = 0; i < 10; ++i) p.tick();
+        assert(p.computeModifiers().moveSpeedMult == 1.f);
+    }
+    { // PoisonFaithful (só dano: speeds intactos com timer ativo)
+        Player p;
+        p.addPoison(200.f);
+        const core::StatusModifiers m = p.computeModifiers();
+        assert(m.moveSpeedMult == 1.f && m.staminaRegenMult == 1.f);
+        assert(m.staminaCostMult == 1.f && m.damageTakenMult == 1.f);
+    }
+    { // EffectiveHpMaxClamp (overheal volta ao teto no tick)
+        Player p;
+        p.hp = p.hpMax + 50;
+        p.tick();
+        assert(p.hp == p.effectiveHpMax());
+        assert(p.effectiveHpMax() == p.hpMax); // sem curse: igual
+    }
     { // SlimeDropsMoss (tabela do archetype tem os 2 musgos)
         const EnemyArchetype* a =
             ArchetypeRegistry::instance().find("slime");

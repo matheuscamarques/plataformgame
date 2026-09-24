@@ -16,6 +16,7 @@
 #include "support/Combat/Body.h"
 #include "support/Combat/SpriteFrame.h"
 #include "core/Attributes.h"
+#include "core/StatusModifiers.h"
 #include "core/Cooldown.h"
 #include "core/Equipment.h"
 #include "core/Inventory.h"
@@ -95,6 +96,13 @@ class Player : public Entity
         float bleedBuildup = 0.f;
         float poisonTimer = 0.f; // >0 = envenenado (DoT correndo)
         float poisonFrac_ = 0.f; // fração de dano acumulada (hp é int)
+        float bleedSlowTimer = 0.f; // >0 = micro-slow pós-burst (0.3s)
+
+        // Pipeline comportamental (review F7+): agrega status ativos.
+        // Poison fiel: identidade (só dano, já aplicado). Bleed: slow.
+        core::StatusModifiers computeModifiers() const;
+        // HP máximo efetivo (hpMax × curse futura). Tick clampa hp.
+        int effectiveHpMax() const;
         static constexpr float kPoisonDps = 3.f;
         static constexpr float kPoisonDur = 8.f;
         static constexpr float kBleedPct = 0.15f; // burst do HP máximo
@@ -113,7 +121,10 @@ class Player : public Entity
             poisonTimer = 0.f;
             poisonFrac_ = 0.f;
         }
-        void cureBleed() { bleedBuildup = 0.f; }
+        void cureBleed() {
+            bleedBuildup = 0.f;
+            bleedSlowTimer = 0.f;
+        }
 
         // Arma equipada (def do slot RightHand) ou nullptr = soco.
         // Fonte única p/ render, BodySystem e meleeHitbox.

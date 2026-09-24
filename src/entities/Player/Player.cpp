@@ -165,11 +165,15 @@ void Player::tick() {
     // Comportamento bit-idêntico ao tick antigo: monta State/Input,
     // roda o step puro e escreve de volta (membros + Entity + cooldowns).
     // Sprint drena 10/s e zera corta a corrida; regen com delay 0.8s.
+    // Sprint drena 10/s e zera corta a corrida; slow do bleed também
+    // corta (micro-stagger comportamental). Custos × staminaCostMult.
+    const core::StatusModifiers mods = computeModifiers();
     if (runFast && (moveLeft || moveRight)) {
-        stamina = std::max(0.f, stamina - kSprintCost / 30.f);
+        stamina = std::max(
+            0.f, stamina - (kSprintCost * mods.staminaCostMult) / 30.f);
         staminaDelay.trigger();
     }
-    if (runFast && stamina <= 0.f) runFast = false;
+    if (runFast && (stamina <= 0.f || bleedSlowTimer > 0.f)) runFast = false;
     physics::State st;
     st.x = getX();
     st.y = getY();
@@ -225,10 +229,17 @@ void Player::tick() {
     this->top = getY();
     this->setPosition(getX(), getY());
 
-    // Regen de estamina: 30/s, só com delay pronto (gastou há 0.8s+).
+    // Regen de estamina: 30/s × mult, só com delay pronto.
     staminaDelay.tick(1.f / 30.0f);
     if (stamina < staminaMax && staminaDelay.ready())
-        stamina = std::min(staminaMax, stamina + 1.f);
+        stamina = std::min(
+            staminaMax, stamina + 1.f * computeModifiers().staminaRegenMult);
+
+    // Slow do bleed decai aqui (0.3s de micro-stagger).
+    if (bleedSlowTimer > 0.f) bleedSlowTimer -= 1.f / 30.0f;
+
+    // HP nunca acima do máximo efetivo (Curse futura reduz).
+    if (hp > effectiveHpMax()) hp = effectiveHpMax();
 
     // Regen de FP: 8/s, sem delay (magia F8).
     if (fp < fpMax) fp = std::min(fpMax, fp + 8.f / 30.0f);
@@ -410,14 +421,25 @@ void Player::addBleed(float amt) {
     bleedBuildup += amt;
     if (bleedBuildup >= statusThreshold()) {
         bleedBuildup = 0.f; // burst e reseta (reacumula depois)
+        bleedSlowTimer = 0.3f; // micro-slow: corta sprint, pune posição
         hp -= static_cast<int>(hpMax * kBleedPct);
         if (hp < 0) hp = 0;
     }
 }
 
+core::StatusModifiers Player::computeModifiers() const {
+    core::StatusModifiers mods;
+    if (bleedSlowTimer > 0.f) mods.moveSpeedMult = 0.9f;
+    return mods;
+}
+
+int Player::effectiveHpMax() const {
+    return static_cast<int>(hpMax * computeModifiers().hpMaxMult);
+}
+
 bool Player::hurt(int dmg) {
     if (dmg <= 0 || hp <= 0 || !hurtIframes.ready()) return false;
-    hp -= dmg;
+    hp -= static_cast<int>(dmg * computeModifiers().damageTakenMult);
     if (hp < 0) hp = 0;
     hurtIframes.trigger(0.6f);
     return true;
@@ -491,8 +513,9 @@ bool Player::startSwing() {
     } else {
         return false; // Windup/Active: press ignorado
     }
-    if (stamina < kSwingCost) return false; // sem fôlego: sem golpe
-    stamina -= kSwingCost;
+    if (stamina < kSwingCost * computeModifiers().staminaCostMult)
+        return false; // sem fôlego: sem golpe
+    stamina -= kSwingCost * computeModifiers().staminaCostMult;
     staminaDelay.trigger();
     meleePhase = MeleePhase::Windup;
     meleeTimer = kLight[meleeCombo].windup;
