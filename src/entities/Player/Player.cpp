@@ -37,8 +37,21 @@ Entity(core::kIdPlayer,0,0,60,100) // AABB 2 blocos (sprite 12x40 a 2.5x)
     equipment.equip(core::Item{"iron_legs", 1});
     equipment.equip(core::Item{"iron_boots", 1});
     equipment.equip(core::Item{"iron_gloves", 1});
+    // Seed de apresentação: INT 14 / FÉ 12 / ATT 18 (Nv 15) com
+    // soul_arrow + heal_light sintonizadas (C mostra magia no cinto).
+    // HP/Stamina intactos (sem VIT/END); souls continuam 0 no ctor.
+    {
+        int seedSouls = 1000000000;
+        for (int i = 0; i < 4; ++i) attrs.buy(core::Attr::Intelligence, seedSouls);
+        for (int i = 0; i < 2; ++i) attrs.buy(core::Attr::Faith, seedSouls);
+        for (int i = 0; i < 8; ++i) attrs.buy(core::Attr::Attunement, seedSouls);
+        souls = 0;
+    }
     refreshDerived(); // hpMax/stamina/carga dos attrs base (10)
+    attune("soul_arrow");
+    attune("heal_light");
     stamina = staminaMax;
+    fp = fpMax;
     //this->setGravity(9.8f);
 }
 

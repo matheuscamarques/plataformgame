@@ -56,6 +56,8 @@ int main() {
     }
     { // CycleSpellRotates (0 vai p/ o fim)
         Player p;
+        p.unattune("soul_arrow"); // seed vem sintonizado
+        p.unattune("heal_light");
         int souls = 1000000000;
         for (int i = 0; i < 4; ++i)
             assert(p.attrs.buy(core::Attr::Intelligence, souls));
@@ -75,6 +77,7 @@ int main() {
         assert(p.cycleSpell());
         assert(p.attuned[0] == "soul_arrow");
         Player solo;
+        solo.attuned.clear(); // seed vem com 2
         assert(!solo.cycleSpell()); // <2 = false
     }
 

@@ -17,7 +17,7 @@ int main() {
         assert(p.hurtIframes.running());   // arrancou
         for (int i = 0; i < 20; ++i) p.tick(); // ~0.66s > 0.6s
         assert(!p.hurtIframes.running());  // expirou
-        assert(p.hp == 90);
+        assert(p.hp == 91); // 10 × universal Nv15 (0.972)
     }
     { // ThrowCooldownTicksInPlayerTick (1 só lugar, sem Game)
         Player p;
@@ -78,35 +78,32 @@ int main() {
         for (int i = 0; i < 30; ++i) p.tick();
         assert(p.stamina > 100.f); // voltou a regenar
     }
-    { // AttuneRules (req, slots, dup, remove)
+    { // AttuneRules (req, slots, dup, remove) — seed ATT 18/INT 14
         Player p;
-        assert(p.spellSlots() == 0); // ATT 10
-        assert(!p.attune("soul_arrow")); // INT 10 < 12
+        assert(p.spellSlots() == 2); // ATT 18
+        assert(p.attuned.size() == 2); // seed sintonizado
+        assert(!p.attune("soul_arrow")); // dup (já vem sintonizada)
         assert(!p.attune("pedra_que_nao_existe"));
         assert(!p.attune("stone")); // não é magia
-        int souls = 1000000000;
-        assert(p.attrs.buy(core::Attr::Intelligence, souls));
-        assert(p.attrs.buy(core::Attr::Intelligence, souls)); // INT 12
-        assert(p.attrs.buy(core::Attr::Attunement, souls));
-        assert(p.attrs.buy(core::Attr::Attunement, souls)); // ATT 12
-        assert(p.spellSlots() == 1);
-        assert(p.attune("soul_arrow"));
-        assert(!p.attune("soul_arrow")); // dup
-        assert(!p.attune("heal_light")); // FÉ 10 < 12 (req)
+        assert(!p.attune("fireball")); // INT 14 ok, mas sem slots (2/2)
+        assert(p.unattune("heal_light"));
+        assert(p.attune("fireball")); // agora cabe
+        assert(!p.attune("heal_light")); // FÉ 12 ok, sem slots de novo
         assert(p.unattune("soul_arrow"));
         assert(!p.unattune("soul_arrow"));
+        assert(p.unattune("fireball"));
         assert(p.attuned.empty());
     }
-    { // FpPool (teto, regen, refresh no buy)
+    { // FpPool (teto, regen, refresh no buy) — seed ATT 18
         Player p;
-        assert(p.fpMax == 200.f && p.fp == 200.f);
+        assert(p.fpMax == 280.f && p.fp == 280.f);
         p.fp = 100.f;
         p.tick();
-        assert(p.fp > 100.f && p.fp <= 200.f); // 8/s
+        assert(p.fp > 100.f && p.fp <= 280.f); // 8/s
         int souls = 1000000000;
-        assert(p.attrs.buy(core::Attr::Attunement, souls)); // ATT 11
+        assert(p.attrs.buy(core::Attr::Attunement, souls)); // ATT 19
         p.refreshDerived();
-        assert(p.fpMax == 210.f);
+        assert(p.fpMax == 290.f);
     }
 
     std::printf("player test OK\n");

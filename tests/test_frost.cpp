@@ -79,7 +79,8 @@ int main() {
             ran = support::SkillSystem::tryUse(e, ctx, "frost_touch");
         });
         assert(ran);
-        assert(p.hp == 92); // 8 frost, resist 1.0
+        // 8 × universal Nv15 (0.972) = 7
+        assert(p.hp == 93); // 8 frost, resist 1.0
         assert(p.frostBuildup == 20.f);
     }
     { // RespawnCuresFrost (morte congelada não volta congelada)

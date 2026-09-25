@@ -11,11 +11,11 @@
 int main() {
     using namespace support;
 
-    { // ThresholdScales (100 + 5 RES + 2 ATT; seed 170)
+    { // ThresholdScales (100 + 5 RES + 2 ATT; seed 186)
         assert(core::Attributes::statusThreshold(10, 10) == 170.f);
         assert(core::Attributes::statusThreshold(20, 10) == 220.f);
-        Player p;
-        assert(p.statusThreshold() == 170.f);
+        Player p; // seed RES 10/ATT 18
+        assert(p.statusThreshold() == 186.f);
     }
     { // PoisonTriggersAndDots (enche -> 8s de DoT 3/s, barra reseta)
         Player p;

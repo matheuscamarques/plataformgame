@@ -16,11 +16,14 @@ int main() {
     using core::Attr;
     using core::DamageType;
 
-    { // BaseNeutral (tudo 10, nível 1: tudo 1.0)
+    { // BaseSeed (Nv15: universal 0.972 em tudo, sem viés)
         Player p;
-        const auto r = p.computeResistances();
-        for (int i = 0; i < 4; ++i)
-            assert(r.get(static_cast<DamageType>(i)) == 1.f);
+        assert(p.attrs.level() == 15);
+        for (int i = 0; i < 4; ++i) {
+            const float r =
+                p.computeResistances().get(static_cast<DamageType>(i));
+            assert(r < 1.f && r > 0.9f); // só universal, sem viés
+        }
     }
     { // EndProtectsPhysical (END 20: físico 0.95, frost 0.97)
         Player p;
@@ -42,7 +45,7 @@ int main() {
         assert(p.hp == 90); // 20 * 0.5
         p.hurtIframes.tick(1.f); // zera i-frame p/ 2o golpe
         assert(p.hurt(20, DamageType::Physical));
-        assert(p.hp == 70); // 20 * 1.0
+        assert(p.hp == 71); // 20 × universal Nv15 (0.972) = 19
     }
     { // SkeletonBoneAndBurn (físico 0.7, fogo 1.3 no arquétipo)
         const support::EnemyArchetype *a =

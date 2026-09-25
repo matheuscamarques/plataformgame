@@ -108,7 +108,8 @@ int main() {
         ctx.player = &p;
         ctx.enemies = &enemies;
         for (int i = 0; i < 35; ++i) { pinY(enemies); enemies.tick(1.f / 30.f, ctx); }
-        assert(p.hp == 88); // 100 - 12, exatamente 1 hit
+        // 12 × universal Nv15 (0.972) = 11, exatamente 1 hit
+        assert(p.hp == 89); // 100 - 11, exatamente 1 hit
     }
     { // MeleeMissesOutOfRange (sai no meio do windup)
         Player p;

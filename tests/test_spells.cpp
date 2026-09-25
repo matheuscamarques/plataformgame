@@ -11,6 +11,8 @@
 // F8b: G conjura sintonizada — Arrow vira Bolt, Heal cura, FP paga.
 namespace {
 void attuneAll(Player& p) {
+    p.unattune("soul_arrow"); // seed vem sintonizado: limpa p/ teste
+    p.unattune("heal_light");
     int souls = 1000000000;
     p.attrs.buy(core::Attr::Intelligence, souls);
     p.attrs.buy(core::Attr::Intelligence, souls); // INT 12
@@ -30,9 +32,9 @@ int main() {
         ThrowSystem ts;
         attuneAll(p);
         assert(p.attune("soul_arrow"));
-        assert(p.fp == 200.f);
+        assert(p.fp == 280.f); // seed ATT 18
         assert(p.castAttuned(ts));
-        assert(p.fp == 175.f); // -25
+        assert(p.fp == 255.f); // -25
         assert(ts.activeCount() == 1u);
         bool seen = false;
         ts.forEachActive([&](const Throwable& t) {
@@ -40,12 +42,12 @@ int main() {
             assert(t.kind == ThrowKind::Bolt);
             assert(t.fuse == -1.f && t.radius == 0.f);
             assert(t.tilesRadius == 0);
-            // 30 + 30×((12-10)/20) = 33 (rampa nova)
-            assert(t.damage == 33);
+            // 30 + 30×((16-10)/20) = 39 (seed INT 14 + 2)
+            assert(t.damage == 39);
         });
         assert(seen);
         assert(!p.castAttuned(ts)); // cooldown
-        assert(p.fp == 175.f);      // sem gasto no bloqueio
+        assert(p.fp == 255.f);      // sem gasto no bloqueio
     }
     { // CastHeal (cura com teto, custa 40 FP)
         Player p;
@@ -54,8 +56,8 @@ int main() {
         assert(p.attune("heal_light"));
         p.hp = 10;
         assert(p.castAttuned(ts));
-        assert(p.hp == 10 + 50 + 24); // base + FÉ×2
-        assert(p.fp == 160.f);
+        assert(p.hp == 10 + 50 + 28); // base + FÉ×2 (seed 12 + 2)
+        assert(p.fp == 240.f); // 280 - 40
         assert(ts.activeCount() == 0u); // sem projétil
         p.hp = 90;
         p.throwCooldown.reset();
@@ -65,6 +67,7 @@ int main() {
     { // CastFails (vazio, sem FP, sem req, def morto)
         Player p;
         ThrowSystem ts;
+        p.attuned.clear(); // seed vem sintonizado
         assert(!p.castAttuned(ts)); // nada sintonizado
         attuneAll(p);
         assert(p.attune("soul_arrow"));
@@ -72,9 +75,13 @@ int main() {
         assert(!p.castAttuned(ts)); // sem FP
         assert(p.fp == 10.f);
         Player weak;
-        weak.attuned.push_back("soul_arrow"); // INT 10: req falha
-        assert(!weak.castAttuned(ts));
+        // Seed INT 14 cumpre todos os reqs: req-fail coberto em
+        // test_player (attune). Aqui: cooldown bloqueia recast.
+        weak.attuned.push_back("soul_arrow");
+        assert(weak.castAttuned(ts));
+        assert(!weak.castAttuned(ts)); // cooldown
         Player stale;
+        stale.attuned.clear(); // seed vem sintonizado
         stale.attuned.push_back("nao_existe");
         assert(!stale.castAttuned(ts));
     }
@@ -107,15 +114,11 @@ int main() {
     { // CastFireball (custo, projétil Fire, raio sem tiles)
         Player p;
         ThrowSystem ts;
-        attuneAll(p);
-        int souls = 1000000000;
-        p.attrs.buy(core::Attr::Intelligence, souls);
-        p.attrs.buy(core::Attr::Intelligence, souls); // INT 14
-        p.refreshDerived();
+        attuneAll(p); // seed 14 + 2 = INT 16 (req 14 ok)
         assert(p.attune("fireball"));
-        assert(p.fp == 200.f);
+        assert(p.fp == 280.f);
         assert(p.castAttuned(ts));
-        assert(p.fp == 165.f); // -35
+        assert(p.fp == 245.f); // -35
         assert(ts.activeCount() == 1u);
         bool seen = false;
         ts.forEachActive([&](const Throwable& t) {
@@ -124,8 +127,8 @@ int main() {
             assert(t.damageType == core::DamageType::Fire);
             assert(t.fuse == -1.f && t.radius == 40.f);
             assert(t.tilesRadius == 0);
-            // 40 + 40×((14-10)/20) = 48
-            assert(t.damage == 48);
+            // 40 + 40×((16-10)/20) = 52 (seed 14 + 2)
+            assert(t.damage == 52);
         });
         assert(seen);
     }
@@ -167,7 +170,7 @@ int main() {
         attuneAll(p);
         assert(p.attune("frost_weapon"));
         assert(p.castAttuned(ts));
-        assert(p.fp == 170.f); // -30
+        assert(p.fp == 250.f); // 280 - 30
         assert(p.weaponBuffType == core::DamageType::Frost);
         assert(p.weaponBuffTimer == 30.f);
         assert(ts.activeCount() == 0u); // buff: sem projétil

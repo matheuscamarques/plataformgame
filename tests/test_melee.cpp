@@ -126,13 +126,13 @@ int main() {
         assert(p.startSwing());
         assert(!p.startSwing()); // ainda em Windup
     }
-    { // HurtGatesOnIframes
+    { // HurtGatesOnIframes (seed Nv15: universal 0.972 filtra)
         Player p;
         assert(p.hp == 100);
-        assert(p.hurt(10) && p.hp == 90);
-        assert(!p.hurt(10) && p.hp == 90); // i-frame segurou
+        assert(p.hurt(10) && p.hp == 91); // 10 × 0.972 = 9
+        assert(!p.hurt(10) && p.hp == 91); // i-frame segurou
         p.hurtIframes.tick(1.f);
-        assert(p.hurt(90) && p.hp == 0);
+        assert(p.hurt(100) && p.hp == 0); // 100 × 0.972 = 97, mata
         assert(!p.hurt(10)); // já em 0, sem efeito
     }
     { // ScalingStrDex (espada ferro: D FOR + B DES; base 8 intacta)

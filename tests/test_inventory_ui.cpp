@@ -140,7 +140,7 @@ int main() {
     { // LevelUpBuysAttr (F na Status: souls -> +1 VIT, hpMax sobe)
         InventoryUI ui;
         InputMap in;
-        Player p;
+        Player p; // seed Nv15 (apresentação): compra sobe p/ 16
         p.souls = 100000;
         ui.setPlayer(&p);
         ui.setInventory(&p.inventory);
@@ -155,12 +155,12 @@ int main() {
         ui.handleInput(in);
         release(in, sf::Keyboard::Up);
         assert(ui.attrCursor() == 0);
-        const int cost = core::Attributes::costForLevel(1);
+        const int cost = core::Attributes::costForLevel(15);
         press(in, sf::Keyboard::F);
         ui.handleInput(in);
         release(in, sf::Keyboard::F);
         assert(p.attrs.get(core::Attr::Vitality) == 11);
-        assert(p.attrs.level() == 2);
+        assert(p.attrs.level() == 16);
         assert(p.souls == 100000 - cost);
         assert(p.hpMax == 102); // refreshDerived no buy (80+11*2)
     }
@@ -176,7 +176,7 @@ int main() {
         ui.handleInput(in);
         release(in, sf::Keyboard::F);
         assert(p.attrs.get(core::Attr::Vitality) == 10);
-        assert(p.attrs.level() == 1 && p.souls == 0);
+        assert(p.attrs.level() == 15 && p.souls == 0); // seed Nv15
         assert(ui.feedback().find("insuficientes") != std::string::npos);
     }
     { // SystemTab (volume A/D, Save em breve, Sair pede quit)
