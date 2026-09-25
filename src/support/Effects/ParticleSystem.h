@@ -36,6 +36,11 @@ public:
     // Impacto de ataque: só faísca + poeira.
     void spawnHitSpark(core::Vec2f point);
 
+    // Poeira genérica (rastro kamehameha, ambiente).
+
+    // Poeira genérica (rastro kamehameha, ambiente).
+    void emitDust(core::Vec2f origin, int count, float spread);
+
     std::size_t activeDebris() const { return debris_.activeCount(); }
     std::size_t activeDust()   const { return dust_.activeCount(); }
 
@@ -47,7 +52,6 @@ private:
     core::Pool<Particle> dust_{4096};
 
     void emitDebris(core::Vec2f origin, int kind, int count, float spread);
-    void emitDust(core::Vec2f origin, int count, float spread);
 };
 
 } // namespace support

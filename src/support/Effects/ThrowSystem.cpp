@@ -63,6 +63,44 @@ void ThrowSystem::tick(float dt, GameContext &ctx) {
         // Gravidade + integração
         t.vel.y += t.gravity * dt;
 
+        // Bolt teleguiado (kamehameha): persegue o inimigo mais
+        // próximo no cone de 65° à frente (alcance 350px), curva máx
+        // 8°/tick com velocidade preservada. Fora do cone voa reto
+        // (legado intacto).
+        if (t.kind == ThrowKind::Bolt && ctx.enemies) {
+            const float speed = t.vel.length();
+            if (speed > 1.f) {
+                const core::Vec2f dir = t.vel / speed;
+                float best = 350.f * 350.f;
+                core::Vec2f aim{0.f, 0.f};
+                bool found = false;
+                ctx.enemies->forEach([&](Enemy &s) {
+                    if (s.resources.isDead()) return;
+                    const core::Vec2f to{s.body.getCenterX() - t.pos.x,
+                                         s.body.getCenterY() - t.pos.y};
+                    const float d2 = to.dot(to);
+                    if (d2 > best || d2 <= 0.f) return;
+                    if (dir.dot(to.normalized()) < 0.42f) return; // cone
+                    best = d2;
+                    aim = to;
+                    found = true;
+                });
+                if (found) {
+                    const float ang = std::atan2(dir.y, dir.x);
+                    const float want = std::atan2(aim.y, aim.x);
+                    float diff = want - ang;
+                    while (diff > 3.14159265f) diff -= 2 * 3.14159265f;
+                    while (diff < -3.14159265f) diff += 2 * 3.14159265f;
+                    const float na =
+                        ang + std::clamp(diff, -0.14f, 0.14f);
+                    t.vel = {std::cos(na) * speed, std::sin(na) * speed};
+                }
+            }
+            // Rastro: poeira a cada 3 ticks.
+            if (particles_ && (++t.trailTick % 3 == 0))
+                particles_->emitDust(t.pos, 1, 30.f);
+        }
+
         // Integração em passos pequenos para não atravessar tile
         const int steps = 4;
         for (int s = 0; s < steps; ++s) {
@@ -147,6 +185,8 @@ void ThrowSystem::tick(float dt, GameContext &ctx) {
                     t.pos.y <= s.body.getY() + s.body.getH()) {
                     s.resources.takeDamage(t.damage, t.damageType);
                     if (particles_) particles_->spawnHitSpark(t.pos);
+                    // Clarão kamehameha no impacto (só visual, sem dano).
+                    spawnBlast(t.pos, 25.f);
                     hit = true;
                 }
             });

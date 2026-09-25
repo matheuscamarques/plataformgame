@@ -39,6 +39,7 @@ struct Throwable {
     float        knockback   = 250.f;  // reservado (recursos não têm pos)
     ThrowKind    kind        = ThrowKind::Dynamite;
     core::DamageType damageType = core::DamageType::Physical; // Fase 1
+    int          trailTick   = 0; // kamehameha: poeira a cada 3 ticks
     bool         active      = false;
     bool         resting     = false;  // parou de se mover
     float        restingTimer = 0.f;   // tempo parado

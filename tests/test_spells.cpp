@@ -3,6 +3,7 @@
 
 #include "entities/Player/Player.h"
 #include "support/Combat/ExplosionSystem.h"
+#include "support/Effects/ParticleSystem.h"
 #include "support/Effects/ThrowSystem.h"
 #include "support/Effects/Throwable.h"
 #include "support/Enemies/EnemySystem.h"
@@ -113,6 +114,47 @@ int main() {
         enemies.forEach([&](Enemy& s) { hp1 = s.resources.hp; });
         assert(hp1 == hp0 - 30);
         assert(ts.activeCount() == 0u);
+    }
+    { // BoltHomesInCone (fora do eixo reto, curva e acerta)
+        Player p;
+        EnemySystem enemies;
+        ThrowSystem ts;
+        ParticleSystem ps;
+        ts.setParticleSystem(&ps);
+        // Slime com centro (220,60); bolt sai em y=0 reto: sem curva erra.
+        enemies.spawn("slime", 200.f, 45.f);
+        Throwable* t = ts.throwItem({0.f, 0.f}, {500.f, 0.f},
+                                    ThrowKind::Bolt);
+        assert(t != nullptr);
+        t->fuse = -1.f;
+        t->gravity = 0.f; // sem gravidade: só o homing curva
+        t->damage = 30;
+        GameContext ctx{};
+        ctx.enemies = &enemies;
+        for (int i = 0; i < 60; ++i) ts.tick(1.f / 30.f, ctx);
+        int hp = -1;
+        enemies.forEach([&](Enemy& s) { hp = s.resources.hp; });
+        assert(hp == 40 - 30); // curvou e acertou
+        assert(ts.activeCount() == 0u);
+        assert(ps.activeDust() > 0u); // rastro kamehameha
+    }
+    { // BoltIgnoresBehind (fora do cone: voa reto, sem acerto)
+        Player p;
+        EnemySystem enemies;
+        ThrowSystem ts;
+        enemies.spawn("slime", 200.f, 45.f);
+        Throwable* t = ts.throwItem({0.f, 0.f}, {0.f, -500.f},
+                                    ThrowKind::Bolt); // p/ cima, longe
+        assert(t != nullptr);
+        t->fuse = -1.f;
+        t->gravity = 0.f;
+        t->damage = 30;
+        GameContext ctx{};
+        ctx.enemies = &enemies;
+        for (int i = 0; i < 60; ++i) ts.tick(1.f / 30.f, ctx);
+        int hp = -1;
+        enemies.forEach([&](Enemy& s) { hp = s.resources.hp; });
+        assert(hp == 40); // sem curva, sem acerto
     }
     { // CatalystRequired (sem catalisador ou errado: sem cast)
         Player p;
