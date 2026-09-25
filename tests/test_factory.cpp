@@ -25,7 +25,7 @@ int main() {
 
     // S2: recursos default de trash.
     assert(s->resources.isTrash == true);
-    assert(s->resources.hp == 60 && s->resources.hpMax == 60);
+    assert(s->resources.hp == 40 && s->resources.hpMax == 40);
     assert(std::fabs(s->resources.posture - 20.0f) < 0.001f);
 
     auto none = Factory::spawnEnemy("dragon", 0.0f, 0.0f);

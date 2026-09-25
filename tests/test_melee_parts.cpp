@@ -65,7 +65,7 @@ int main() {
         int hp = -1;
         float posture = -1.f;
         readEnemy(enemies, hp, posture);
-        assert(hp == 52); // 8 * 1.0
+        assert(hp == 32); // torso 8*1.0: 40 - 8
         assert(near(posture, 15.f)); // 20 - 5 * 1.0
     }
     { // ArmHit06x (só ArmL; torso escapa 0.5px à direita)
@@ -85,7 +85,7 @@ int main() {
         int hp = -1;
         float posture = -1.f;
         readEnemy(enemies, hp, posture);
-        assert(hp == 56); // 8 * 0.6 = 4 (trunca)
+        assert(hp == 36); // 40 - 8 * 0.6 = 4 (trunca)
         assert(near(posture, 17.5f)); // 20 - 5 * 0.5
     }
     { // WhiffInsideAABB (cruza o corpo no canto sem partes, sem dano)
@@ -106,7 +106,7 @@ int main() {
         int hp = -1;
         float posture = -1.f;
         readEnemy(enemies, hp, posture);
-        assert(hp == 60);
+        assert(hp == 40);
         assert(near(posture, 20.f));
     }
     { // NarrowWhiffInPartGap (união ok, nenhuma parte: whiff strict)
@@ -139,7 +139,7 @@ int main() {
         int hp = -1;
         float posture = -1.f;
         readEnemy(enemies, hp, posture);
-        assert(hp == 60);
+        assert(hp == 40);
         assert(near(posture, 20.f));
     }
     { // NoSchemaAABB (sem schema = legado 1x; regressão Fase C)
@@ -161,7 +161,7 @@ int main() {
         int hp = -1;
         float posture = -1.f;
         readEnemy(enemies, hp, posture);
-        assert(hp == 52);
+        assert(hp == 32); // torso 8: 40 - 8
         assert(near(posture, 15.f));
     }
     { // DedupPerSwing (30 ticks = 1 aplicação; torso 1x)
@@ -181,7 +181,7 @@ int main() {
         int hp = -1;
         float posture = -1.f;
         readEnemy(enemies, hp, posture);
-        assert(hp == 52);
+        assert(hp == 32); // torso 8: 40 - 8
         assert(near(posture, 15.f));
     }
     { // SparkSpawnsOnPartHit (faísca observável via activeDebris)
