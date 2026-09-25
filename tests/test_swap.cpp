@@ -12,19 +12,19 @@
 #include "entities/Player/Player.h"
 
 int main() {
-    { // CycleRightHand (espada -> machado e volta)
-        Player p; // seed: iron_sword na direita, iron_axe no kit
+    { // CycleRightHand (espada -> cajado -> sino, ordem do registry)
+        Player p; // seed: iron_sword na direita
         assert(p.equipment.get(core::EquipSlot::RightHand).defId ==
                "iron_sword");
         std::string name;
         assert(p.cycleHand(core::EquipSlot::RightHand, &name));
         assert(p.equipment.get(core::EquipSlot::RightHand).defId ==
-               "iron_axe");
-        assert(name == "Machado de Ferro");
+               "wooden_staff");
+        assert(name == "Cajado de Madeira");
         assert(p.inventory.count("iron_sword") >= 1); // devolvida
         assert(p.cycleHand(core::EquipSlot::RightHand, &name));
         assert(p.equipment.get(core::EquipSlot::RightHand).defId ==
-               "iron_sword");
+               "priest_bell");
     }
     { // SingleWeaponNoSwap (1 arma total = false)
         Player p;

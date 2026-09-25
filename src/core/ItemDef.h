@@ -36,6 +36,10 @@ enum class ItemType : uint8_t {
 // Comportamento de conjuração (F8b). None = não conjurável.
 enum class SpellKind : uint8_t { None, Arrow, Heal, Fire, FrostWeapon };
 
+// Catalisador DS: magia exige staff, milagre exige sino — EQUIPADO
+// (não basta ter na mochila). Equipamento fornece, spell requer.
+enum class CatalystKind : uint8_t { None, Staff, Bell };
+
 enum class ItemRarity : uint8_t {
     Common,
     Uncommon,
@@ -69,6 +73,8 @@ struct ItemDef {
     int         intReq = 0; // magia (F8): INT mínima p/ sintonizar/conjurar
     int         faiReq = 0; // idem FÉ
     SpellKind   spellKind = SpellKind::None; // Arrow/Heal (F8b)
+    CatalystKind reqCatalyst = CatalystKind::None; // spell: exige equipado
+    CatalystKind providesCatalyst = CatalystKind::None; // equip: fornece
     // Bomba arremessável (J joga o slot ativo da hotbar): stats vão
     // direto p/ o Throwable (fonte única, sem switch por id).
     bool                 throwable   = false;

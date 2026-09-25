@@ -353,6 +353,23 @@ bool Player::castAttuned(support::ThrowSystem &throws) {
     const int inte = attrs.get(core::Attr::Intelligence);
     const int fai = attrs.get(core::Attr::Faith);
     if (inte < def->intReq || fai < def->faiReq) return false;
+    // Catalisador DS: staff p/ magias, sino p/ milagres — EQUIPADO
+    // em qualquer mão (mochila não conta).
+    if (def->reqCatalyst != core::CatalystKind::None) {
+        bool has = false;
+        for (auto slot :
+             {core::EquipSlot::RightHand, core::EquipSlot::LeftHand}) {
+            const core::Item &it = equipment.get(slot);
+            if (it.isEmpty()) continue;
+            if (const core::ItemDef *d = it.def()) {
+                if (d->providesCatalyst == def->reqCatalyst) {
+                    has = true;
+                    break;
+                }
+            }
+        }
+        if (!has) return false;
+    }
     if (def->spellKind == core::SpellKind::Arrow) {
         if (fp < kArrowCost) return false;
         core::Vec2f vel{500.f * static_cast<float>(facing), -80.f};
@@ -446,17 +463,17 @@ bool Player::cycleHand(core::EquipSlot hand, std::string *outName) {
     if (hand != core::EquipSlot::RightHand &&
         hand != core::EquipSlot::LeftHand)
         return false;
-    // Candidatas: equipada atual + armas da mochila (ordem de slot).
+    // Candidatas: equipada atual + armas da mochila, em ordem do
+    // registry (canônica; Arrange do inventário não muda o ciclo).
     std::vector<std::string> ids;
     const core::Item &cur = equipment.get(hand);
     if (!cur.isEmpty()) ids.push_back(cur.defId);
-    for (int i = 0; i < core::Inventory::kCapacity; ++i) {
-        const core::Item &it = inventory.slot(i);
-        if (it.isEmpty()) continue;
-        const core::ItemDef *d = it.def();
+    for (const auto &id : core::ItemRegistry::instance().keys()) {
+        if (!cur.isEmpty() && id == cur.defId) continue;
+        if (inventory.count(id) <= 0) continue;
+        const core::ItemDef *d = core::ItemRegistry::instance().find(id);
         if (!d || d->type != core::ItemType::Weapon) continue;
-        if (std::find(ids.begin(), ids.end(), it.defId) == ids.end())
-            ids.push_back(it.defId);
+        ids.push_back(id);
     }
     if (ids.size() < 2) return false; // nada p/ trocar
     // Mão equipada: atual é ids[0], próxima é ids[1]. Mão vazia:

@@ -17,6 +17,7 @@ namespace {
 using core::ItemRarity;
 using core::ItemType;
 using core::SpellKind;
+using core::CatalystKind;
 
 void heal30(Player& p) {
     p.hp = std::min(p.hpMax, p.hp + 30);
@@ -678,6 +679,7 @@ REGISTER_ITEM("soul_arrow", [] {
     def.stackMax = 1;
     def.intReq = 12;
     def.spellKind = SpellKind::Arrow;
+    def.reqCatalyst = CatalystKind::Staff;
     return def;
 }())
 
@@ -696,6 +698,7 @@ REGISTER_ITEM("heal_light", [] {
     def.stackMax = 1;
     def.faiReq = 12;
     def.spellKind = SpellKind::Heal;
+    def.reqCatalyst = CatalystKind::Bell;
     return def;
 }())
 
@@ -751,6 +754,7 @@ REGISTER_ITEM("fireball", [] {
     def.stackMax = 1;
     def.intReq = 14;
     def.spellKind = SpellKind::Fire;
+    def.reqCatalyst = CatalystKind::Staff;
     return def;
 }())
 
@@ -769,6 +773,87 @@ REGISTER_ITEM("frost_weapon", [] {
     def.stackMax = 1;
     def.intReq = 12;
     def.spellKind = SpellKind::FrostWeapon;
+    def.reqCatalyst = CatalystKind::Staff;
+    return def;
+}())
+
+// ---- Catalisadores DS (Fase 3b): staff p/ magias, sino p/ milagres ----
+// Armas equipáveis (mão dir/esq); dano baixo, escala com INT/FÉ.
+inline const char* const kItemStaffSprite[] = {
+    "...WW...",
+    "...WW...",
+    "...WW...",
+    "...WW...",
+    "...WW...",
+    "...WW...",
+    "..WWWW..",
+    "........",
+};
+
+inline const core::PaletteEntry kItemStaffPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'W', {150, 110, 70}},
+};
+inline constexpr std::size_t kItemStaffPalCount = 2;
+
+inline const char* const kItemBellSprite[] = {
+    "..WWWW..",
+    ".WWWWWW.",
+    ".WWWWWW.",
+    "..WWWW..",
+    "...WW...",
+    "...WW...",
+    "........",
+    "........",
+};
+
+inline const core::PaletteEntry kItemBellPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'W', {220, 190, 120}},
+};
+inline constexpr std::size_t kItemBellPalCount = 2;
+
+REGISTER_ITEM("wooden_staff", [] {
+    core::ItemDef def;
+    def.id = "wooden_staff";
+    def.description = "Cajado de madeira: conjura magias de INT.";
+    def.spriteRows = kItemStaffSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemStaffPal;
+    def.spritePalCount = kItemStaffPalCount;
+    def.name = "Cajado de Madeira";
+    def.weight = 2.f;
+    def.type = ItemType::Weapon;
+    def.rarity = ItemRarity::Common;
+    def.stackMax = 1;
+    def.damage = 4;
+    def.equipSlot = core::EquipSlot::RightHand;
+    def.material = core::MaterialId::Iron;
+    def.intScale = core::ScaleGrade::C;
+    def.providesCatalyst = CatalystKind::Staff;
+    return def;
+}())
+
+REGISTER_ITEM("priest_bell", [] {
+    core::ItemDef def;
+    def.id = "priest_bell";
+    def.description = "Sino de sacerdote: conjura milagres de FÉ.";
+    def.spriteRows = kItemBellSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemBellPal;
+    def.spritePalCount = kItemBellPalCount;
+    def.name = "Sino Sacerdotal";
+    def.weight = 2.f;
+    def.type = ItemType::Weapon;
+    def.rarity = ItemRarity::Uncommon;
+    def.stackMax = 1;
+    def.damage = 3;
+    def.equipSlot = core::EquipSlot::RightHand;
+    def.material = core::MaterialId::Gold;
+    def.faiScale = core::ScaleGrade::C;
+    def.providesCatalyst = CatalystKind::Bell;
     return def;
 }())
 

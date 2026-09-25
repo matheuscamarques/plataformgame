@@ -15,12 +15,15 @@ void attuneAll(Player& p) {
     p.unattune("heal_light");
     int souls = 1000000000;
     p.attrs.buy(core::Attr::Intelligence, souls);
-    p.attrs.buy(core::Attr::Intelligence, souls); // INT 12
+    p.attrs.buy(core::Attr::Intelligence, souls); // seed 14 + 2 = 16
     p.attrs.buy(core::Attr::Faith, souls);
-    p.attrs.buy(core::Attr::Faith, souls); // FÉ 12
+    p.attrs.buy(core::Attr::Faith, souls); // seed 12 + 2 = 14
     p.attrs.buy(core::Attr::Attunement, souls);
-    p.attrs.buy(core::Attr::Attunement, souls); // ATT 12: 1 slot
+    p.attrs.buy(core::Attr::Attunement, souls); // seed 18 + 2 = 20
     p.refreshDerived();
+    // Cajado na esquerda p/ magias (cura troca p/ sino no bloco dela).
+    p.equipment.equipTo(core::EquipSlot::LeftHand,
+                        core::Item{"wooden_staff", 1});
 }
 } // namespace
 
@@ -53,6 +56,10 @@ int main() {
         Player p;
         ThrowSystem ts;
         attuneAll(p);
+        // Milagre: troca cajado por sino na esquerda.
+        p.equipment.unequip(core::EquipSlot::LeftHand);
+        assert(p.equipment.equipTo(core::EquipSlot::LeftHand,
+                                   core::Item{"priest_bell", 1}));
         assert(p.attune("heal_light"));
         p.hp = 10;
         assert(p.castAttuned(ts));
@@ -78,6 +85,8 @@ int main() {
         // Seed INT 14 cumpre todos os reqs: req-fail coberto em
         // test_player (attune). Aqui: cooldown bloqueia recast.
         weak.attuned.push_back("soul_arrow");
+        weak.equipment.equipTo(core::EquipSlot::LeftHand,
+                               core::Item{"wooden_staff", 1});
         assert(weak.castAttuned(ts));
         assert(!weak.castAttuned(ts)); // cooldown
         Player stale;
@@ -104,6 +113,30 @@ int main() {
         enemies.forEach([&](Enemy& s) { hp1 = s.resources.hp; });
         assert(hp1 == hp0 - 30);
         assert(ts.activeCount() == 0u);
+    }
+    { // CatalystRequired (sem catalisador ou errado: sem cast)
+        Player p;
+        ThrowSystem ts;
+        attuneAll(p);
+        p.equipment.unequip(core::EquipSlot::LeftHand); // sem nada
+        assert(p.attune("soul_arrow"));
+        assert(!p.castAttuned(ts)); // sem cajado
+        assert(p.equipment.equipTo(core::EquipSlot::LeftHand,
+                                   core::Item{"priest_bell", 1}));
+        assert(!p.castAttuned(ts)); // sino não serve p/ magia
+        assert(p.equipment.equipTo(core::EquipSlot::LeftHand,
+                                   core::Item{"wooden_staff", 1}));
+        assert(p.castAttuned(ts)); // cajado: vai
+        // Milagre exige sino mesmo com cajado na mão.
+        p.throwCooldown.reset();
+        p.unattune("soul_arrow");
+        assert(p.attune("heal_light"));
+        assert(!p.castAttuned(ts)); // cajado não serve p/ milagre
+        p.equipment.unequip(core::EquipSlot::LeftHand);
+        assert(p.equipment.equipTo(core::EquipSlot::LeftHand,
+                                   core::Item{"priest_bell", 1}));
+        p.throwCooldown.reset();
+        assert(p.castAttuned(ts)); // sino: vai
     }
     { // FpRegen (8/s até o teto)
         Player p;

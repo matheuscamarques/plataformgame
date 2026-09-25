@@ -702,8 +702,10 @@ int main() {
         assert(p.inventory.count("heal_light") == 1);
         assert(p.inventory.count("fireball") == 1);
         assert(p.inventory.count("frost_weapon") == 1);
-        // Kit inteiro: 48 defs + dinamite 999 em 1 slot = 49.
-        assert(p.inventory.usedSlots() == 49);
+        assert(p.inventory.count("wooden_staff") == 1);
+        assert(p.inventory.count("priest_bell") == 1);
+        // Kit inteiro: 50 defs + dinamite 999 em 1 slot = 51.
+        assert(p.inventory.usedSlots() == 51);
     }
     { // EquipViaMenu (F→Equip: direita livre, esq, depois troca)
         InventoryUI ui;
