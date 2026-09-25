@@ -27,6 +27,12 @@ int main() {
             assert(std::strlen(sprites::kIronGlovesIdle[y]) ==
                    static_cast<std::size_t>(sprites::kGloveW));
         }
+        for (int y = 0; y < sprites::kStaffH; ++y) {
+            assert(std::strlen(sprites::kStaffIdle[y]) ==
+                   static_cast<std::size_t>(sprites::kStaffW));
+            assert(std::strlen(sprites::kBellIdle[y]) ==
+                   static_cast<std::size_t>(sprites::kStaffW));
+        }
     }
     { // AnchorFollowsRebuild (peça anda com a parte: mesmo delta)
         BodySchema s = BodySchema::humanoid(50.f, 50.f);

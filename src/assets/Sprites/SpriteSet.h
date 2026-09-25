@@ -50,6 +50,8 @@ struct SpriteSet {
     sf::Texture swordWindup[kMats];
     sf::Texture swordSwing[kMats];
     sf::Texture axeIdle[kMats];
+    sf::Texture staffIdle[kMats];
+    sf::Texture bellIdle[kMats];
     sf::Texture helm[kMats];
     sf::Texture chest[kMats];
     sf::Texture legs[kMats];
@@ -114,6 +116,8 @@ inline SpriteSet build() {
         s.swordWindup[m] = core::makeSprite(kIronSwordWindup, kSwordW, kSwordH, pal, 5);
         s.swordSwing[m] = core::makeSprite(kIronSwordSwing, kSwordSwingW, kSwordSwingH, pal, 5);
         s.axeIdle[m] = core::makeSprite(kIronAxeIdle, kSwordW, kSwordH, pal, 5);
+        s.staffIdle[m] = core::makeSprite(kStaffIdle, kStaffW, kStaffH, pal, 5);
+        s.bellIdle[m] = core::makeSprite(kBellIdle, kStaffW, kStaffH, pal, 5);
         s.helm[m] = core::makeSprite(kIronHelmIdle, kHelmW, kHelmH, pal, 5);
         s.chest[m] = core::makeSprite(kIronChestIdle, kChestW, kChestH, pal, 5);
         s.legs[m] = core::makeSprite(kIronLegsIdle, kLegsW, kLegsH, pal, 5);

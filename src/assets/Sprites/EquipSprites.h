@@ -94,6 +94,58 @@ inline const char *const kIronAxeIdle[] = {
     "........",
 };
 
+// Cajado (8x20, vertical como o machado): cristal W no topo,
+// haste G embaixo. Cor vem do material (W=main, G=accent).
+inline constexpr int kStaffW = 8;
+inline constexpr int kStaffH = 20;
+
+inline const char *const kStaffIdle[] = {
+    "...WW...",
+    "..WWWW..",
+    "...WW...",
+    "....W...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "........",
+    "........",
+};
+
+// Sino (8x20): copa W em cima, cabo G embaixo.
+inline const char *const kBellIdle[] = {
+    "..WWWW..",
+    ".WWWWWW.",
+    ".WWwWWW.",
+    ".WWWWWW.",
+    "..WWWW..",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "...GG...",
+    "........",
+    "........",
+};
+
 inline const char *const kIronSwordWindup[] = {
     "........",
     "........",

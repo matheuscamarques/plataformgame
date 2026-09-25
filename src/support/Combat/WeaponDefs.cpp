@@ -126,3 +126,28 @@ REGISTER_WEAPON("leather_axe", [] {
     d.hasSwingPhases = false;
     return d;
 });
+
+// Catalisadores (Fase 3b): verticais como o machado, sem swing.
+REGISTER_WEAPON("wooden_staff", [] {
+    WeaponDef d;
+    d.spriteW = 8;
+    d.spriteH = 20;
+    d.originX = 4.f;
+    d.originY = 10.f;
+    d.handOffsetX = 4.f;
+    d.handOffsetY = 8.f;
+    d.hasSwingPhases = false; // cajado não tem lâmina de swing
+    return d;
+});
+
+REGISTER_WEAPON("priest_bell", [] {
+    WeaponDef d;
+    d.spriteW = 8;
+    d.spriteH = 20;
+    d.originX = 4.f;
+    d.originY = 10.f;
+    d.handOffsetX = 4.f;
+    d.handOffsetY = 8.f;
+    d.hasSwingPhases = false; // sino não tem lâmina de swing
+    return d;
+});

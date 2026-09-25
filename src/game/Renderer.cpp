@@ -1106,10 +1106,15 @@ void Game::drawPlayerWeapon() {
     const sf::Texture *tex = &sprites_.swordIdle[m];
     float originX = 4.f, originY = 20.f;
     // Machado só tem idle: mesma textura em toda fase (dado no registry).
+    // Cajado/sino: arte própria (não herdada do machado).
     const support::WeaponDef *wd =
         support::WeaponRegistry::instance().find(wdef->id);
     const bool phased = !wd || wd->hasSwingPhases;
-    if (!phased) {
+    if (wdef->id == "wooden_staff") {
+        tex = &sprites_.staffIdle[m];
+    } else if (wdef->id == "priest_bell") {
+        tex = &sprites_.bellIdle[m];
+    } else if (!phased) {
         tex = &sprites_.axeIdle[m];
     } else {
         switch (p->meleePhase) {
