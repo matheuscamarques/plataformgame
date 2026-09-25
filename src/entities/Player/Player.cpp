@@ -238,6 +238,7 @@ void Player::tick() {
 
     // Slow do bleed decai aqui (0.3s de micro-stagger).
     if (bleedSlowTimer > 0.f) bleedSlowTimer -= 1.f / 30.0f;
+    if (frostTimer > 0.f) frostTimer -= 1.f / 30.0f; // swing lento expira
 
     // HP nunca acima do máximo efetivo (Curse futura reduz).
     if (hp > effectiveHpMax()) hp = effectiveHpMax();
@@ -419,6 +420,15 @@ void Player::addPoison(float amt) {
     }
 }
 
+void Player::addFrost(float amt) {
+    if (frostTimer > 0.f) return; // ativo: barra não acumula de novo
+    frostBuildup += amt;
+    if (frostBuildup >= statusThreshold()) {
+        frostBuildup = 0.f;
+        frostTimer = kFrostDur;
+    }
+}
+
 void Player::addBleed(float amt) {
     bleedBuildup += amt;
     if (bleedBuildup >= statusThreshold()) {
@@ -432,6 +442,7 @@ void Player::addBleed(float amt) {
 core::StatusModifiers Player::computeModifiers() const {
     core::StatusModifiers mods;
     if (bleedSlowTimer > 0.f) mods.moveSpeedMult = 0.9f;
+    if (frostTimer > 0.f) mods.attackSpeedMult = kFrostSlow; // Fase 2
     return mods;
 }
 
@@ -549,7 +560,8 @@ bool Player::startSwing() {
 
 MeleePhase Player::updateMelee(float dt) {
     if (meleePhase == MeleePhase::Idle) return meleePhase;
-    meleeTimer -= dt;
+    // Frost ativo: swing inteiro corre em câmera lenta (×0.7).
+    meleeTimer -= dt * computeModifiers().attackSpeedMult;
     if (meleeTimer > 0.f) return meleePhase;
     const MeleeDef &d = kLight[meleeCombo];
     if (meleePhase == MeleePhase::Windup) {

@@ -95,6 +95,10 @@ class Player : public Entity
         float poisonTimer = 0.f; // >0 = envenenado (DoT correndo)
         float poisonFrac_ = 0.f; // fração de dano acumulada (hp é int)
         float bleedSlowTimer = 0.f; // >0 = micro-slow pós-burst (0.3s)
+        // Frost (Fase 2 elementais): buildup espelha poison; ativo =
+        // swing lento via attackSpeedMult (sem dano direto).
+        float frostBuildup = 0.f;
+        float frostTimer = 0.f; // >0 = congelando (swing ×0.7)
 
         // Pipeline comportamental (review F7+): agrega status ativos.
         // Poison fiel: identidade (só dano, já aplicado). Bleed: slow.
@@ -104,6 +108,8 @@ class Player : public Entity
         static constexpr float kPoisonDps = 3.f;
         static constexpr float kPoisonDur = 8.f;
         static constexpr float kBleedPct = 0.15f; // burst do HP máximo
+        static constexpr float kFrostDur = 6.f; // janela de swing lento
+        static constexpr float kFrostSlow = 0.7f; // attackSpeedMult ativo
         static constexpr float kSlimePoison = 25.f; // por mordida
         static constexpr float kSlimeBleed = 15.f;  // slime aplica os dois
         static constexpr float kDwarfBleed = 30.f;  // por golpe
@@ -114,6 +120,7 @@ class Player : public Entity
         }
         void addPoison(float amt);
         void addBleed(float amt);
+        void addFrost(float amt);
         void curePoison() {
             poisonBuildup = 0.f;
             poisonTimer = 0.f;

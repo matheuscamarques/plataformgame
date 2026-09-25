@@ -11,7 +11,7 @@ struct StatusModifiers {
     float moveSpeedMult    = 1.0f; // futuro: physics::step (outro dono)
     float staminaRegenMult = 1.0f; // F7+: regen de estamina
     float staminaCostMult  = 1.0f; // F7+: custo swing/sprint
-    float attackSpeedMult  = 1.0f; // futuro: duração do swing (Frost)
+    float attackSpeedMult  = 1.0f; // Frost ativo: duração do swing
     float damageTakenMult  = 1.0f; // F7+: hurt()
     float hpMaxMult        = 1.0f; // futuro: Curse (effectiveHpMax)
     bool  canRoll          = true; // futuro: sem rolagem sob efeito

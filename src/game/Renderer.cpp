@@ -194,6 +194,8 @@ void Game::render()
                  sf::Color(170, 90, 220)); // veneno
         floatBar(pl->bleedBuildup, -30.f,
                  sf::Color(220, 60, 60)); // sangue
+        floatBar(pl->frostTimer > 0.f ? stTh : pl->frostBuildup, -50.f,
+                 sf::Color(140, 200, 255)); // frost (Fase 2)
     }
 
     // Barks com fade 1.5s acima da cabeça (texto; áudio futuro).
