@@ -699,6 +699,79 @@ REGISTER_ITEM("heal_light", [] {
     return def;
 }())
 
+// ---- Spells elementais (Fase 3): Fireball + Arma Gélida ----
+inline const char* const kItemFireSprite[] = {
+    "..RR....",
+    ".RRRR...",
+    ".RWRRR..",
+    ".RRRRR..",
+    "..RRRR..",
+    "...RRR..",
+    "....R...",
+    "........",
+};
+
+inline const core::PaletteEntry kItemFirePal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'R', {230, 120, 40}},
+    {'W', {255, 220, 150}},
+};
+inline constexpr std::size_t kItemFirePalCount = 3;
+
+inline const char* const kItemFrostWepSprite[] = {
+    "....WW..",
+    "...WSS..",
+    "..WSS...",
+    ".SSS....",
+    ".SS.....",
+    "........",
+    "........",
+    "........",
+};
+
+inline const core::PaletteEntry kItemFrostWepPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'S', {140, 200, 255}},
+    {'W', {230, 245, 255}},
+};
+inline constexpr std::size_t kItemFrostWepPalCount = 3;
+
+REGISTER_ITEM("fireball", [] {
+    core::ItemDef def;
+    def.id = "fireball";
+    def.description = "Bola de fogo: explode em área, escala com INT.";
+    def.spriteRows = kItemFireSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemFirePal;
+    def.spritePalCount = kItemFirePalCount;
+    def.name = "Bola de Fogo";
+    def.type = ItemType::Spell;
+    def.rarity = ItemRarity::Rare;
+    def.stackMax = 1;
+    def.intReq = 14;
+    def.spellKind = SpellKind::Fire;
+    return def;
+}())
+
+REGISTER_ITEM("frost_weapon", [] {
+    core::ItemDef def;
+    def.id = "frost_weapon";
+    def.description = "Arma gélida: melee vira Frost por 30s.";
+    def.spriteRows = kItemFrostWepSprite;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = kItemFrostWepPal;
+    def.spritePalCount = kItemFrostWepPalCount;
+    def.name = "Arma Gélida";
+    def.type = ItemType::Spell;
+    def.rarity = ItemRarity::Rare;
+    def.stackMax = 1;
+    def.intReq = 12;
+    def.spellKind = SpellKind::FrostWeapon;
+    return def;
+}())
+
 REGISTER_ITEM("rusty_key", [] {
     core::ItemDef def;
     def.id = "rusty_key";

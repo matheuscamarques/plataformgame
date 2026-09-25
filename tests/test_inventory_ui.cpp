@@ -700,8 +700,10 @@ int main() {
         assert(p.inventory.count("soul_great") == 99);
         assert(p.inventory.count("soul_arrow") == 1);
         assert(p.inventory.count("heal_light") == 1);
-        // Kit inteiro: 45 defs em 1 slot cada + dinamite 999 em 1 só.
-        assert(p.inventory.usedSlots() == 47);
+        assert(p.inventory.count("fireball") == 1);
+        assert(p.inventory.count("frost_weapon") == 1);
+        // Kit inteiro: 48 defs + dinamite 999 em 1 slot = 49.
+        assert(p.inventory.usedSlots() == 49);
     }
     { // EquipViaMenu (F→Equip: direita livre, esq, depois troca)
         InventoryUI ui;

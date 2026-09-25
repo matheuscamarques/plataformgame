@@ -34,7 +34,7 @@ enum class ItemType : uint8_t {
 };
 
 // Comportamento de conjuração (F8b). None = não conjurável.
-enum class SpellKind : uint8_t { None, Arrow, Heal };
+enum class SpellKind : uint8_t { None, Arrow, Heal, Fire, FrostWeapon };
 
 enum class ItemRarity : uint8_t {
     Common,

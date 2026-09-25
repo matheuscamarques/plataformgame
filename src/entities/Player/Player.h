@@ -206,12 +206,17 @@ class Player : public Entity
         // Consome 1. Sem cooldown (igual ao menu Use).
         bool tryUseSlot(int slot);
 
-        // Conjura a 1ª magia sintonizada (G): Arrow vira Bolt, Heal cura.
-        // Custa FP + cooldown de arremesso; req INT/FÉ do def.
+        // Conjura a 1ª magia sintonizada (G): Arrow vira Bolt, Heal cura,
+        // Fire vira bola de fogo, FrostWeapon buffa a arma. FP + cooldown.
         static constexpr float kArrowCost = 25.f;
         static constexpr float kHealCost = 40.f;
         static constexpr float kArrowBase = 30.f;
         static constexpr float kHealBase = 50.f;
+        static constexpr float kFireCost = 35.f;
+        static constexpr float kFireBase = 40.f;
+        static constexpr float kFireRadius = 40.f;
+        static constexpr float kFrostWeaponCost = 30.f;
+        static constexpr float kFrostWeaponDur = 30.f;
         bool castAttuned(support::ThrowSystem &throws);
 
         // Completa a pilha "dynamite" até 999 (legado generoso).

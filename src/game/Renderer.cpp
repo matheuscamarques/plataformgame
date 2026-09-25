@@ -266,13 +266,22 @@ void Game::render()
     }
 
     // Throwables visíveis: bomba do player tem telegraph + núcleo por
-    // tier; Bolt (magia) é ponto ciano; outros kinds, círculo dourado.
+    // tier; Bolt (magia) é ponto ciano; Fireball é ponto laranja;
+    // outros kinds, círculo dourado.
     throws_->forEachActive([&](const support::Throwable &t) {
         if (t.kind == support::ThrowKind::Bolt) {
             sf::CircleShape c(3.f);
             c.setOrigin(3.f, 3.f);
             c.setPosition(core::toSf(t.pos));
             c.setFillColor(sf::Color(120, 220, 255));
+            window->draw(c);
+            return;
+        }
+        if (t.kind == support::ThrowKind::Fireball) {
+            sf::CircleShape c(4.f);
+            c.setOrigin(4.f, 4.f);
+            c.setPosition(core::toSf(t.pos));
+            c.setFillColor(sf::Color(255, 140, 40));
             window->draw(c);
             return;
         }

@@ -22,7 +22,8 @@ enum class ThrowKind : uint8_t {
     C4,           // C4 militar (grande)
     Daisy,        // BLU-82 Daisy Cutter (enorme)
     Moab,         // MOAB (colossal, 1 chunk)
-    Bolt          // magia do player (F8b): linear, dano no impacto
+    Bolt,         // magia do player (F8b): linear, dano no impacto
+    Fireball      // Fase 3: linear + explosão Fire no impacto
 };
 
 } // namespace core

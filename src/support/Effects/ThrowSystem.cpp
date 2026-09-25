@@ -155,6 +155,35 @@ void ThrowSystem::tick(float dt, GameContext &ctx) {
                 return;
             }
         }
+        // Fireball (Fase 3): no impacto explode Fire em área (sem dano
+        // direto — o alvo entra na área). Sem tiles quebrados.
+        if (t.kind == ThrowKind::Fireball && ctx.enemies) {
+            bool hit = false;
+            ctx.enemies->forEach([&](Enemy &s) {
+                if (hit || s.resources.isDead()) return;
+                if (t.pos.x >= s.body.getX() &&
+                    t.pos.x <= s.body.getX() + s.body.getW() &&
+                    t.pos.y >= s.body.getY() &&
+                    t.pos.y <= s.body.getY() + s.body.getH()) {
+                    hit = true;
+                }
+            });
+            if (hit) {
+                if (explosions_) {
+                    ExplosionDef def;
+                    def.radius = t.radius;
+                    def.damage = t.damage;
+                    def.postureDmg = t.postureDmg;
+                    def.tilesRadius = 0;
+                    def.knockback = t.knockback;
+                    def.damageType = core::DamageType::Fire;
+                    explosions_->explode(t.pos, def, ctx);
+                }
+                if (particles_) particles_->spawnHitSpark(t.pos);
+                pool_.release(&t);
+                return;
+            }
+        }
         if (t.fuse <= 0.f && t.resting) {
             if (particles_) particles_->spawnHitSpark(t.pos); // poof
             pool_.release(&t);

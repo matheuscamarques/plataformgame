@@ -363,6 +363,34 @@ bool Player::castAttuned(support::ThrowSystem &throws) {
         throwCooldown.trigger();
         return true;
     }
+    if (def->spellKind == core::SpellKind::Fire) {
+        // Bola de Fogo (Fase 3): linear rápida + explosão Fire no
+        // impacto (raio 40, sem quebrar tiles). Escala com INT.
+        if (fp < kFireCost) return false;
+        core::Vec2f vel{450.f * static_cast<float>(facing), -60.f};
+        support::Throwable* t = throws.throwItem(
+            {getCenterX(), getCenterY()}, vel, support::ThrowKind::Fireball);
+        if (!t) return false;
+        t->fuse = -1.f; // impacto dispara a explosão (igual Bolt)
+        t->damage =
+            static_cast<int>(kFireBase + kFireBase * core::scaleFactor(inte));
+        t->damageType = core::DamageType::Fire;
+        t->radius = kFireRadius;
+        t->tilesRadius = 0; // fogo não quebra rocha
+        fp -= kFireCost;
+        throwCooldown.trigger();
+        throwAnimT = kThrowAnimDur;
+        return true;
+    }
+    if (def->spellKind == core::SpellKind::FrostWeapon) {
+        // Arma Gélida (Fase 3): melee vira Frost por 30s (timer expira).
+        if (fp < kFrostWeaponCost) return false;
+        weaponBuffType = core::DamageType::Frost;
+        weaponBuffTimer = kFrostWeaponDur;
+        fp -= kFrostWeaponCost;
+        throwCooldown.trigger();
+        return true;
+    }
     return false;
 }
 
