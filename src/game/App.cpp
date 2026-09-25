@@ -207,8 +207,19 @@ void Game::tick() {
         }
         // G: conjura a magia sintonizada (F8b). Cooldown barra repetição.
         if (!uiOpen && input_.pressed(support::Action::Cast)) {
-            if (p->castAttuned(*throws_))
+            if (p->castAttuned(*throws_)) {
                 audio_.play(game::keyOf(game::Sfx::MeleeSwing));
+                // Cura explode em espiral verde (visual puro).
+                if (!p->attuned.empty()) {
+                    if (const core::ItemDef *d =
+                            core::ItemRegistry::instance().find(
+                                p->attuned[0])) {
+                        if (d->spellKind == core::SpellKind::Heal)
+                            spellfx_.burstHeal({p->getCenterX(),
+                                                p->getCenterY()});
+                    }
+                }
+            }
         }
         // Troca rápida DS (Z/X/C/V): cicla sem pausar, com toast.
         // Gates moram em canQuickSwap (morto/Active barram).
@@ -384,6 +395,7 @@ void Game::tick() {
     if (!run_.isPaused() && !run_.isDead()) scheduler_.tick(1.0f / 30.0f, ctx);
     // Blast do boom: tick fora do scheduler (visual puro, sem gameplay).
     if (throws_ && !run_.isPaused()) throws_->tickBlasts(1.0f / 30.0f);
+    if (!run_.isPaused()) spellfx_.tick(1.0f / 30.0f); // fx visual puro
 
     // SFX: libera canais terminados (mesmo pausado: sons <1s terminam).
     audio_.tick();

@@ -27,6 +27,7 @@
 #include "core/DayNightCycle.h"
 #include "core/MusicSystem.h"
 #include "support/Lighting/LightingSystem.h"
+#include "support/Effects/SpellFX.h"
 #include "support/UI/HotbarUI.h"
 #include "support/UI/InventoryUI.h"
 
@@ -107,6 +108,7 @@ private:
     int lastPlayerLightTileY_ = -1;
     core::DayNightCycle dayNight_; // dono: relógio dia/noite (10 min)
     support::LightingSystem lighting_; // dono: lightmap por frame (GL)
+    support::SpellFX spellfx_; // dono: fx de spells (visual puro)
     core::Bloom bloom_; // dono: bright-pass + blur + additive (item 21)
     sf::Texture vignetteTex_; // dono: vinheta 128px, upscale na tela (item 22)
     // Worker de chunks (camada 6): após `world` (destrói antes dele).

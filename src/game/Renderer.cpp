@@ -297,6 +297,9 @@ void Game::render()
             return;
         }
         if (t.kind == support::ThrowKind::Fireball && fireDef) {
+            // Fogo Doom atrás + ícone por cima (chama viva).
+            spellfx_.drawFire(core::Vec2f{t.pos.x, t.pos.y + 6.f}, 1.5f,
+                              *window);
             // Halo laranja pulsante (maior: área maior).
             sf::CircleShape halo(17.f + 4.f * pulse);
             halo.setOrigin(halo.getRadius(), halo.getRadius());
@@ -777,6 +780,8 @@ void Game::render()
                                  sf::Color(c.r, c.g, c.b,
                                            static_cast<sf::Uint8>(c.a * 0.25f)));
         });
+    // Sparks de spell (cura etc.): mundo, antes do overlay/HUD.
+    spellfx_.render(*window);
 
     overlay_.render(*window, font, *getWorld(), *player.get(), objects.size());
 
@@ -1138,6 +1143,9 @@ void Game::drawPlayerWeapon() {
     spr.setScale(s, s);
     spr.setRotation(angle);
     window->draw(spr);
+    // Aura frost: cristais orbitando a mão com buff ativo (Fase 3).
+    if (p->weaponBuffType == core::DamageType::Frost)
+        spellfx_.drawFrostAura({handX, handY}, *window);
     } // RightHand
 
     // Off-hand (LeftHand): pose idle na mão esquerda, sem fases e sem
