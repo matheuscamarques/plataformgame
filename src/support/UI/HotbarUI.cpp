@@ -10,6 +10,7 @@
 #include "core/ItemDef.h"
 #include "support/Input/InputMap.h"
 #include "support/UI/ItemIcon.h"
+#include "support/SfString.h"
 
 namespace support {
 
@@ -86,7 +87,7 @@ void HotbarUI::render(sf::RenderTarget& target, const core::Inventory& inv,
         if (item.quantity > 1) {
             sf::Text qty;
             qty.setFont(font);
-            qty.setString(std::to_string(item.quantity));
+            qty.setString(support::utf8(std::to_string(item.quantity)));
             qty.setCharacterSize(12);
             qty.setFillColor(sf::Color::White);
             qty.setOutlineColor(sf::Color::Black);

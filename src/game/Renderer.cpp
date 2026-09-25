@@ -42,6 +42,7 @@
 #include "support/Progression/DropSystem.h"
 #include "support/UI/ItemIcon.h"
 #include "core/Coords.h"
+#include "support/SfString.h"
 
 // Renderer: tudo que desenha (render + draws + helpers de char-view).
 
@@ -203,7 +204,7 @@ void Game::render()
         if (s.barkTimer <= 0.f || s.currentBark.empty()) return;
         sf::Text t;
         t.setFont(font);
-        t.setString(s.currentBark);
+        t.setString(support::utf8(s.currentBark));
         t.setCharacterSize(14);
         const sf::Uint8 a = static_cast<sf::Uint8>(
             255.f * std::max(0.f, std::min(1.f, s.barkTimer / 1.5f)));
@@ -226,7 +227,7 @@ void Game::render()
                 const auto [label, color] = dwarfLabel(d->state());
                 sf::Text t;
                 t.setFont(font);
-                t.setString(label);
+                t.setString(support::utf8(label));
                 t.setCharacterSize(12);
                 t.setFillColor(color);
                 t.setOutlineColor(sf::Color::Black);
@@ -246,7 +247,7 @@ void Game::render()
                                s.ai.get())) {
                 sf::Text t;
                 t.setFont(font);
-                t.setString(sl->chasing() ? "CHASE" : "PATROL");
+                t.setString(support::utf8(sl->chasing() ? "CHASE" : "PATROL"));
                 t.setFillColor(sl->chasing() ? sf::Color(255, 80, 80)
                                              : sf::Color(160, 160, 160));
                 t.setCharacterSize(12);
@@ -509,7 +510,7 @@ void Game::render()
                                                          support::DebugFeed::kNumberTtl)));
             sf::Text t;
             t.setFont(font);
-            t.setString(n.text);
+            t.setString(support::utf8(n.text));
             t.setCharacterSize(14);
             t.setFillColor(sf::Color(255, 240, 200, a));
             t.setOutlineColor(sf::Color(0, 0, 0, a));
@@ -769,7 +770,7 @@ void Game::render()
             for (const auto &line : debugFeed_.log) {
                 sf::Text t;
                 t.setFont(font);
-                t.setString(line);
+                t.setString(support::utf8(line));
                 t.setCharacterSize(14);
                 t.setFillColor(sf::Color(200, 255, 200));
                 t.setOutlineColor(sf::Color::Black);
@@ -809,7 +810,7 @@ void Game::render()
         auto text = [&](const std::string &s, float x, float y, int size = 18) {
             sf::Text t;
             t.setFont(font);
-            t.setString(s);
+            t.setString(support::utf8(s));
             t.setCharacterSize(size);
             t.setFillColor(sf::Color::White);
             t.setOutlineColor(sf::Color::Black);

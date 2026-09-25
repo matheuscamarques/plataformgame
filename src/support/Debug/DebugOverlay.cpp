@@ -11,6 +11,7 @@
 #include "entities/Player/Player.h"
 #include "../../world/World.h"
 #include "../../world/Chunk.h"
+#include "support/SfString.h"
 
 namespace support {
 
@@ -48,7 +49,7 @@ void DebugOverlay::render(sf::RenderWindow &window, const sf::Font &font,
 
         sf::Text t;
         t.setFont(font);
-        t.setString(std::to_string(world.debugCellCount(cell.first, cell.second)));
+        t.setString(support::utf8(std::to_string(world.debugCellCount(cell.first, cell.second))));
         t.setCharacterSize(12);
         t.setFillColor(sf::Color::Yellow);
         t.setOutlineColor(sf::Color::Black);
@@ -62,7 +63,7 @@ void DebugOverlay::render(sf::RenderWindow &window, const sf::Font &font,
 
     sf::Text totalPlataformsTxt;
     totalPlataformsTxt.setFont(font);
-    totalPlataformsTxt.setString("Total Platforms: " + std::to_string(totalPlatforms));
+    totalPlataformsTxt.setString(support::utf8("Total Platforms: " + std::to_string(totalPlatforms)));
     totalPlataformsTxt.setCharacterSize(20);
     totalPlataformsTxt.setFillColor(sf::Color::Green);
     totalPlataformsTxt.setPosition(player.getX(), player.getY() - 200);
@@ -71,9 +72,9 @@ void DebugOverlay::render(sf::RenderWindow &window, const sf::Font &font,
     window.draw(totalPlataformsTxt);
 
     sf::Text text;
-    text.setString("HASH: " + std::to_string(candidatos.size())
+    text.setString(support::utf8("HASH: " + std::to_string(candidatos.size())
         + " HP: " + std::to_string(player.hp)
-        + " TNT: " + std::to_string(player.inventory.count("dynamite")) + " (J/K)");
+        + " TNT: " + std::to_string(player.inventory.count("dynamite")) + " (J/K)"));
     text.setCharacterSize(20);
     text.setFont(font);
     text.setFillColor(sf::Color::Green);

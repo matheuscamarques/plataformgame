@@ -25,6 +25,7 @@
 #include "support/Input/InputMap.h"
 #include "support/Progression/DropSystem.h"
 #include "support/UI/ItemIcon.h"
+#include "support/SfString.h"
 
 namespace support {
 
@@ -676,7 +677,7 @@ void InventoryUI::renderMainTabs(sf::RenderTarget& t, float sw,
         t.draw(bg);
         sf::Text txt;
         txt.setFont(font);
-        txt.setString(mainTabName(static_cast<MainTab>(i)));
+        txt.setString(support::utf8(mainTabName(static_cast<MainTab>(i))));
         txt.setCharacterSize(16);
         txt.setFillColor(active ? sf::Color(255, 240, 200)
                                 : sf::Color(160, 160, 160));
@@ -705,7 +706,7 @@ void InventoryUI::renderSubTabs(sf::RenderTarget& t, float sw,
         t.draw(bg);
         sf::Text txt;
         txt.setFont(font);
-        txt.setString(subTabName(static_cast<SubTab>(i)));
+        txt.setString(support::utf8(subTabName(static_cast<SubTab>(i))));
         txt.setCharacterSize(13);
         txt.setFillColor(active ? sf::Color(240, 220, 160)
                                 : sf::Color(150, 150, 150));
@@ -730,8 +731,8 @@ void InventoryUI::renderGrid(sf::RenderTarget& t, float sw, float sh,
     if (!any) {
         sf::Text msg;
         msg.setFont(font);
-        msg.setString(inv_->usedSlots() == 0 ? "Inventário vazio"
-                                             : "Nenhum item nesta categoria");
+        msg.setString(support::utf8(inv_->usedSlots() == 0 ? "Inventário vazio"
+                                             : "Nenhum item nesta categoria"));
         msg.setCharacterSize(14);
         msg.setFillColor(sf::Color(150, 150, 150));
         const core::Vec2f o = gridOrigin(sw, sh);
@@ -790,7 +791,7 @@ void InventoryUI::renderGrid(sf::RenderTarget& t, float sw, float sh,
         if (item.quantity > 1) {
             sf::Text q;
             q.setFont(font);
-            q.setString(std::to_string(item.quantity));
+            q.setString(support::utf8(std::to_string(item.quantity)));
             q.setCharacterSize(13);
             q.setFillColor(sf::Color::White);
             q.setOutlineColor(sf::Color::Black);
@@ -825,7 +826,7 @@ void InventoryUI::renderEquipTab(sf::RenderTarget& t, float sw, float sh,
     auto header = [&](const std::string& s, float x, float y) {
         sf::Text h;
         h.setFont(font);
-        h.setString(s);
+        h.setString(support::utf8(s));
         h.setCharacterSize(13);
         h.setFillColor(sf::Color(200, 180, 120));
         h.setPosition(x, y);
@@ -861,7 +862,7 @@ void InventoryUI::renderEquipTab(sf::RenderTarget& t, float sw, float sh,
         const core::EquipSlot s = core::equipDisplaySlot(i);
         sf::Text label;
         label.setFont(font);
-        label.setString(core::equipSlotName(s));
+        label.setString(support::utf8(core::equipSlotName(s)));
         label.setCharacterSize(12);
         label.setFillColor(sf::Color(160, 160, 160));
         label.setPosition(pos[i].x, pos[i].y - 18.f);
@@ -906,7 +907,7 @@ void InventoryUI::renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
     auto line = [&](const std::string& s, int size, sf::Color c) {
         sf::Text tt;
         tt.setFont(font);
-        tt.setString(s);
+        tt.setString(support::utf8(s));
         tt.setCharacterSize(static_cast<unsigned>(size));
         tt.setFillColor(c);
         tt.setPosition(x, y);
@@ -926,7 +927,7 @@ void InventoryUI::renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
 
     sf::Text name;
     name.setFont(font);
-    name.setString(def->name);
+    name.setString(support::utf8(def->name));
     name.setCharacterSize(18);
     name.setFillColor(sf::Color(230, 230, 230));
     name.setPosition(x, y);
@@ -950,7 +951,7 @@ void InventoryUI::renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
         const std::string test = cur.empty() ? word : cur + " " + word;
         sf::Text tmp;
         tmp.setFont(font);
-        tmp.setString(test);
+        tmp.setString(support::utf8(test));
         tmp.setCharacterSize(12);
         if (tmp.getLocalBounds().width > maxW) {
             if (!cur.empty()) wrapped.push_back(cur);
@@ -965,7 +966,7 @@ void InventoryUI::renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
          ++li) {
         sf::Text tt;
         tt.setFont(font);
-        tt.setString(wrapped[li]);
+        tt.setString(support::utf8(wrapped[li]));
         tt.setCharacterSize(12);
         tt.setFillColor(sf::Color(200, 200, 200));
         tt.setPosition(x, y);
@@ -975,7 +976,7 @@ void InventoryUI::renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
     if (wrapped.size() > static_cast<std::size_t>(kDescMaxLines)) {
         sf::Text more;
         more.setFont(font);
-        more.setString("...");
+        more.setString(support::utf8("..."));
         more.setCharacterSize(12);
         more.setFillColor(sf::Color(150, 150, 150));
         more.setPosition(x, y);
@@ -1092,7 +1093,7 @@ void InventoryUI::renderStatusTab(sf::RenderTarget& t, float sw, float sh,
                     sf::Color c) {
         sf::Text tt;
         tt.setFont(font);
-        tt.setString(s);
+        tt.setString(support::utf8(s));
         tt.setCharacterSize(static_cast<unsigned>(size));
         tt.setFillColor(c);
         tt.setPosition(x, y);
@@ -1226,7 +1227,7 @@ void InventoryUI::renderSystemTab(sf::RenderTarget& t, float sw, float sh,
         if (i == 1) label += " (em breve)";
         sf::Text tt;
         tt.setFont(font);
-        tt.setString((sel ? "> " : "  ") + label);
+        tt.setString(support::utf8((sel ? "> " : "  ") + label));
         tt.setCharacterSize(16);
         tt.setFillColor(sel ? sf::Color(255, 220, 100)
                             : sf::Color(200, 200, 200));
@@ -1235,7 +1236,7 @@ void InventoryUI::renderSystemTab(sf::RenderTarget& t, float sw, float sh,
     }
     sf::Text hint;
     hint.setFont(font);
-    hint.setString("A/D ajusta volume  F ativa");
+    hint.setString(support::utf8("A/D ajusta volume  F ativa"));
     hint.setCharacterSize(12);
     hint.setFillColor(sf::Color(150, 150, 150));
     hint.setPosition(px + 20.f, py + 16.f + kSysRows * 34.f + 8.f);
@@ -1264,7 +1265,7 @@ void InventoryUI::renderActionMenu(sf::RenderTarget& t, float sw, float sh,
         const bool sel = (i == actionCursor_);
         sf::Text tt;
         tt.setFont(font);
-        tt.setString(menuActionName(actions[i]));
+        tt.setString(support::utf8(menuActionName(actions[i])));
         tt.setCharacterSize(15);
         tt.setFillColor(sel ? sf::Color(255, 220, 100)
                             : sf::Color(200, 200, 200));
@@ -1286,7 +1287,7 @@ void InventoryUI::renderConfirmDrop(sf::RenderTarget& t, float sw, float sh,
     t.draw(bg);
     sf::Text tt;
     tt.setFont(font);
-    tt.setString(confirmText());
+    tt.setString(support::utf8(confirmText()));
     tt.setCharacterSize(15);
     tt.setFillColor(sf::Color::White);
     const float tw = tt.getLocalBounds().width;
@@ -1299,7 +1300,7 @@ void InventoryUI::renderFooter(sf::RenderTarget& t, float sw, float sh,
     sf::Text gold, hints;
     gold.setFont(font);
     hints.setFont(font);
-    gold.setString("Ouro: " + std::to_string(inv_ ? inv_->gold() : 0));
+    gold.setString(support::utf8("Ouro: " + std::to_string(inv_ ? inv_->gold() : 0)));
     gold.setCharacterSize(14);
     gold.setFillColor(sf::Color(240, 220, 140));
     gold.setPosition(24.f, sh - 34.f);
@@ -1308,14 +1309,14 @@ void InventoryUI::renderFooter(sf::RenderTarget& t, float sw, float sh,
     if (!feedback_.empty()) {
         sf::Text fb;
         fb.setFont(font);
-        fb.setString(feedback_);
+        fb.setString(support::utf8(feedback_));
         fb.setCharacterSize(13);
         fb.setFillColor(sf::Color(240, 220, 160));
         const float fw = fb.getLocalBounds().width;
         fb.setPosition((sw - fw) * 0.5f, sh - 34.f);
         t.draw(fb);
     }
-    hints.setString("[Q][Tab] Tab  [A][D] Sub  [F] Acao  [E] Fechar");
+    hints.setString(support::utf8("[Q][Tab] Tab  [A][D] Sub  [F] Acao  [E] Fechar"));
     hints.setCharacterSize(12);
     hints.setFillColor(sf::Color(150, 150, 150));
     const float w = hints.getLocalBounds().width;
