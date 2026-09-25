@@ -223,6 +223,17 @@ class Player : public Entity
         // Mesmo padrão generoso da dinamite (ctor + respawn).
         void topUpStarterKit();
 
+        // Decomposição do dano p/ UI (mesma matemática do combate).
+        struct MeleeBreakdown {
+            int base = 0;
+            float strBonus = 0.f;
+            float dexBonus = 0.f;
+            float intBonus = 0.f;
+            float faiBonus = 0.f;
+            bool halvedByReq = false;
+            int total = 0;
+        };
+        MeleeBreakdown meleeDamageBreakdown() const;
         // Buff elemental da arma (Fase 1: campo; Fase 3 spells setam).
         // MeleeSystem passa o tipo; default físico = comportamento atual.
         // Timer: 0 = permanente até trocar (frost_weapon seta 30s).

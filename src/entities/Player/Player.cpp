@@ -615,28 +615,39 @@ sf::FloatRect Player::meleeHitbox() {
     return sf::FloatRect{cx - d.hx * 0.5f, cy - d.hy * 0.5f, d.hx, d.hy};
 }
 
-int Player::meleeDamage() const {
-    // Acumula em float e trunca UMA vez no fim (bônus < 1 somado ao
-    // combo ainda conta; truncar cada parcela zerava STR baixo).
-    float dmg = static_cast<float>(kLight[meleeCombo].damage);
-    if (const core::ItemDef* off = offHandDef()) dmg += off->damage;
+Player::MeleeBreakdown Player::meleeDamageBreakdown() const {
+    MeleeBreakdown bd;
+    bd.base = kLight[meleeCombo].damage;
+    if (const core::ItemDef* off = offHandDef()) bd.base += off->damage;
     if (const core::ItemDef* wdef = weaponDef()) {
-        // Scaling DS: dano base × Σ letra×fator. Base 10 = zero bônus
-        // (seed intacto); soft cap 30. Sem req = metade de tudo.
-        dmg += wdef->damage *
-            (core::scaleMult(wdef->strScale) *
-                 core::scaleFactor(attrs.get(core::Attr::Strength)) +
-             core::scaleMult(wdef->dexScale) *
-                 core::scaleFactor(attrs.get(core::Attr::Dexterity)) +
-             core::scaleMult(wdef->intScale) *
-                 core::scaleFactor(attrs.get(core::Attr::Intelligence)) +
-             core::scaleMult(wdef->faiScale) *
-                 core::scaleFactor(attrs.get(core::Attr::Faith)));
+        bd.strBonus = wdef->damage *
+            core::scaleMult(wdef->strScale) *
+            core::scaleFactor(attrs.get(core::Attr::Strength));
+        bd.dexBonus = wdef->damage *
+            core::scaleMult(wdef->dexScale) *
+            core::scaleFactor(attrs.get(core::Attr::Dexterity));
+        bd.intBonus = wdef->damage *
+            core::scaleMult(wdef->intScale) *
+            core::scaleFactor(attrs.get(core::Attr::Intelligence));
+        bd.faiBonus = wdef->damage *
+            core::scaleMult(wdef->faiScale) *
+            core::scaleFactor(attrs.get(core::Attr::Faith));
+        float dmg = static_cast<float>(bd.base) + bd.strBonus +
+            bd.dexBonus + bd.intBonus + bd.faiBonus;
         if (attrs.get(core::Attr::Strength) < wdef->strReq ||
-            attrs.get(core::Attr::Dexterity) < wdef->dexReq)
+            attrs.get(core::Attr::Dexterity) < wdef->dexReq) {
             dmg *= 0.5f;
+            bd.halvedByReq = true;
+        }
+        bd.total = static_cast<int>(dmg);
+    } else {
+        bd.total = bd.base;
     }
-    return static_cast<int>(dmg);
+    return bd;
+}
+
+int Player::meleeDamage() const {
+    return meleeDamageBreakdown().total;
 }
 
 float Player::meleePosture() const { return kLight[meleeCombo].posture; }

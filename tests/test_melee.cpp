@@ -160,6 +160,19 @@ int main() {
         assert(p.meleeDamage() == 8 + 1); // +30×0.6×0.1=1.8 (rampa nova)
     }
 
+    { // BreakdownMatchesDamage (UI mostra o mesmo numero do combate)
+        Player p; // seed: espada ferro
+        auto bd = p.meleeDamageBreakdown();
+        assert(bd.total == p.meleeDamage());
+        assert(!bd.halvedByReq); // seed cumpre req (FOR 5/DES 8)
+        int souls = 1000000000;
+        for (int i = 0; i < 30; ++i)
+            assert(p.attrs.buy(core::Attr::Strength, souls));
+        bd = p.meleeDamageBreakdown();
+        assert(bd.total == p.meleeDamage());
+        assert(bd.strBonus > 0.f && bd.dexBonus == 0.f);
+    }
+
     std::printf("melee test OK\n");
     return 0;
 }

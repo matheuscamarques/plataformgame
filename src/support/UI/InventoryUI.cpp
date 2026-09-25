@@ -1070,71 +1070,146 @@ void InventoryUI::renderDetailPanel(sf::RenderTarget& t, float sw, float sh,
 
 void InventoryUI::renderStatusTab(sf::RenderTarget& t, float sw, float sh,
                                    const sf::Font& font) const {
-    const StatusInfo st = status();
-    const float pw = 420.f;
+    if (!player_) return;
+
+    const float pw = 620.f;
     const float px = (sw - pw) * 0.5f;
     const float py = 110.f;
+    const float ph = std::max(320.f, sh - py - 60.f);
 
-    auto line = [&](const std::string& s, int size, sf::Color c, float& y) {
+    sf::RectangleShape bg({pw, ph});
+    bg.setPosition(px, py);
+    bg.setFillColor(sf::Color(15, 15, 25, 230));
+    bg.setOutlineColor(sf::Color(90, 90, 110));
+    bg.setOutlineThickness(1.f);
+    t.draw(bg);
+
+    const float xL = px + 20.f;
+    const float xR = px + pw * 0.5f + 10.f;
+    const float colW = pw * 0.5f - 30.f;
+
+    auto line = [&](float x, float& y, const std::string& s, int size,
+                    sf::Color c) {
         sf::Text tt;
         tt.setFont(font);
         tt.setString(s);
         tt.setCharacterSize(static_cast<unsigned>(size));
         tt.setFillColor(c);
-        tt.setPosition(px + 20.f, y);
+        tt.setPosition(x, y);
         t.draw(tt);
-        y += static_cast<float>(size) + 8.f;
+        y += static_cast<float>(size) + 6.f;
+    };
+    auto sep = [&](float x, float& y) {
+        sf::RectangleShape s({colW, 1.f});
+        s.setPosition(x, y);
+        s.setFillColor(sf::Color(60, 60, 70));
+        t.draw(s);
+        y += 10.f;
     };
 
-    float y = py + 16.f;
-    line("HP: " + std::to_string(st.hp) + " / " + std::to_string(st.hpMax),
-         18, sf::Color(255, 150, 150), y);
-    line("Arma: " + st.weaponName, 15, sf::Color(230, 230, 230), y);
-    line("DMG: " + std::to_string(st.damage), 14,
-         sf::Color(255, 200, 100), y);
-    line("DEF: " + std::to_string(st.defense) + " (armaduras)", 14,
-         sf::Color(120, 180, 255), y);
-    line("Ouro: " + std::to_string(st.gold), 14,
-         sf::Color(240, 220, 140), y);
-    // Level-up (F4): 8 atributos compráveis com souls, em qualquer lugar.
-    if (player_) {
-        line("Magias: " + std::to_string(player_->attuned.size()) + "/" +
-                 std::to_string(player_->spellSlots()),
-             13, sf::Color(150, 200, 255), y);
-        const int lv = player_->attrs.level();
-        const int cost = core::Attributes::costForLevel(lv);
-        line("Nv " + std::to_string(lv) + "   Souls: " +
-                 std::to_string(player_->souls),
-             15, sf::Color(255, 240, 200), y);
-        line("Custo: " + std::to_string(cost) + "  [F] upar", 12,
-             sf::Color(150, 150, 150), y);
-        for (int i = 0; i < core::kAttrCount; ++i) {
-            const bool sel = (i == attrCursor_);
-            const auto a = static_cast<core::Attr>(i);
-            sf::Text tt;
-            tt.setFont(font);
-            tt.setString(std::string(sel ? "> " : "  ") +
-                         core::attrName(a) + ": " +
-                         std::to_string(player_->attrs.get(a)));
-            tt.setCharacterSize(13);
-            tt.setFillColor(sel ? sf::Color(255, 220, 100)
-                                : sf::Color(200, 200, 200));
-            tt.setPosition(px + 20.f, y);
-            t.draw(tt);
-            y += 13.f + 5.f;
-        }
+    // Coluna esquerda: atributos + level-up.
+    float yL = py + 16.f;
+    line(xL, yL, "ATRIBUTOS", 15, sf::Color(200, 180, 120));
+    sep(xL, yL);
+    for (int i = 0; i < core::kAttrCount; ++i) {
+        const bool sel = (i == attrCursor_);
+        const auto a = static_cast<core::Attr>(i);
+        const int val = player_->attrs.get(a);
+        line(xL, yL,
+             std::string(sel ? "> " : "  ") + core::attrName(a) + ": " +
+                 std::to_string(val),
+             14, sel ? sf::Color(255, 220, 100) : sf::Color(200, 200, 200));
     }
-    if (player_) {
-        const float load = player_->equipLoad();
-        const float maxLoad = player_->maxEquipLoad();
-        const bool heavy = player_->heavilyLoaded();
-        line("Carga: " + std::to_string(static_cast<int>(load)) + "/" +
-                 std::to_string(static_cast<int>(maxLoad)) +
-                 (heavy ? " (pesada: sem correr)" : " (leve)"),
-             14,
-             heavy ? sf::Color(240, 120, 120) : sf::Color(170, 170, 180), y);
+    yL += 8.f;
+    sep(xL, yL);
+    const int lv = player_->attrs.level();
+    const int cost = core::Attributes::costForLevel(lv);
+    line(xL, yL, "Nv " + std::to_string(lv) + "   Souls: " +
+                     std::to_string(player_->souls),
+         14, sf::Color(255, 240, 200));
+    line(xL, yL, "Custo: " + std::to_string(cost) + "  [F] upar", 12,
+         sf::Color(150, 150, 150));
+    yL += 8.f;
+    line(xL, yL, "Magias: " + std::to_string(player_->attuned.size()) + " / " +
+                     std::to_string(player_->spellSlots()),
+         13, sf::Color(150, 200, 255));
+
+    // Coluna direita: derivados.
+    float yR = py + 16.f;
+    line(xR, yR, "DERIVADOS", 15, sf::Color(200, 180, 120));
+    sep(xR, yR);
+    line(xR, yR, "HP: " + std::to_string(player_->hp) + " / " +
+                     std::to_string(player_->hpMax),
+         14, sf::Color(255, 150, 150));
+    line(xR, yR, "Stamina: " + std::to_string((int)player_->stamina) +
+                     " / " + std::to_string((int)player_->staminaMax),
+         14, sf::Color(150, 255, 150));
+    line(xR, yR, "FP: " + std::to_string((int)player_->fp) + " / " +
+                     std::to_string((int)player_->fpMax),
+         14, sf::Color(150, 200, 255));
+    const bool heavy = player_->heavilyLoaded();
+    line(xR, yR, "Carga: " + std::to_string((int)player_->equipLoad()) +
+                     "/" + std::to_string((int)player_->maxEquipLoad()) +
+                     (heavy ? " (pesada)" : " (leve)"),
+         14, heavy ? sf::Color(240, 120, 120) : sf::Color(170, 170, 180));
+
+    yR += 8.f;
+    sep(xR, yR);
+    line(xR, yR, "RESISTENCIAS", 15, sf::Color(200, 180, 120));
+    auto resLine = [&](const char* name, core::DamageType type, sf::Color c) {
+        const float r = player_->resistances_.get(type);
+        const int pct = static_cast<int>((1.f - r) * 100.f);
+        char buf[64];
+        std::snprintf(buf, sizeof(buf), "%s: %.2f  (%d%%)", name, r, pct);
+        line(xR, yR, buf, 13, c);
+    };
+    resLine("FISICO", core::DamageType::Physical,  sf::Color(200, 200, 200));
+    resLine("FOGO",   core::DamageType::Fire,      sf::Color(255, 160, 100));
+    resLine("GELO",   core::DamageType::Frost,     sf::Color(120, 200, 255));
+    resLine("RAIO",   core::DamageType::Lightning, sf::Color(255, 240, 120));
+
+    // Breakdown de dano da arma (mesma fonte do combate).
+    yR += 8.f;
+    sep(xR, yR);
+    const StatusInfo st = status();
+    line(xR, yR, "ARMA: " + st.weaponName, 14, sf::Color(230, 230, 230));
+    if (const core::ItemDef* wdef = player_->weaponDef()) {
+        const auto bd = player_->meleeDamageBreakdown();
+        line(xR, yR, "Base ................ " + std::to_string(bd.base),
+             13, sf::Color(200, 200, 200));
+        if (bd.strBonus >= 0.01f)
+            line(xR, yR,
+                 "+ STR " +
+                     std::to_string((int)player_->attrs.get(
+                         core::Attr::Strength)) +
+                     "  " + core::scaleLetter(wdef->strScale) +
+                     " ..... +" + std::to_string((int)bd.strBonus),
+                 13, sf::Color(255, 180, 120));
+        if (bd.dexBonus >= 0.01f)
+            line(xR, yR,
+                 "+ DEX " +
+                     std::to_string((int)player_->attrs.get(
+                         core::Attr::Dexterity)) +
+                     "  " + core::scaleLetter(wdef->dexScale) +
+                     " ..... +" + std::to_string((int)bd.dexBonus),
+                 13, sf::Color(180, 255, 180));
+        if (bd.intBonus >= 0.01f)
+            line(xR, yR,
+                 "+ INT ..... +" + std::to_string((int)bd.intBonus),
+                 13, sf::Color(180, 180, 255));
+        if (bd.faiBonus >= 0.01f)
+            line(xR, yR,
+                 "+ FE  ..... +" + std::to_string((int)bd.faiBonus),
+                 13, sf::Color(255, 220, 180));
+        if (bd.halvedByReq)
+            line(xR, yR, "(req nao atendido: -50%)", 11,
+                 sf::Color(240, 120, 120));
+        line(xR, yR,
+             "TOTAL ............... " + std::to_string(bd.total),
+             14, sf::Color(255, 200, 100));
+    } else {
+        line(xR, yR, "(sem arma equipada)", 13, sf::Color(150, 150, 150));
     }
-    (void)sh;
 }
 
 void InventoryUI::renderSystemTab(sf::RenderTarget& t, float sw, float sh,
