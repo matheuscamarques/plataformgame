@@ -1,0 +1,64 @@
+/**
+ * @file tests/test_player_resistances.cpp
+ * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
+ * @brief Teste headless que trava resistências do player (Fase 1 elementais).
+ * @details Cobre derivação por END/VIT/FTH + universal por nível, hurt com tipo e esqueleto físico/fogo, roda com make test que compila em build/tests/test_player_resistances.
+ */
+
+#include <cassert>
+#include <cstdio>
+
+#include "entities/Player/Player.h"
+#include "support/Enemies/EnemyArchetype.h"
+#include "support/Enemies/EnemySystem.h"
+
+int main() {
+    using core::Attr;
+    using core::DamageType;
+
+    { // BaseNeutral (tudo 10, nível 1: tudo 1.0)
+        Player p;
+        const auto r = p.computeResistances();
+        for (int i = 0; i < 4; ++i)
+            assert(r.get(static_cast<DamageType>(i)) == 1.f);
+    }
+    { // EndProtectsPhysical (END 20: físico 0.95, frost 0.97)
+        Player p;
+        int souls = 100000;
+        for (int i = 0; i < 10; ++i)
+            assert(p.attrs.buy(Attr::Endurance, souls));
+        p.refreshDerived();
+        const auto r = p.computeResistances();
+        assert(r.get(DamageType::Physical) < 1.f);
+        assert(r.get(DamageType::Frost) < 1.f);
+        assert(r.get(DamageType::Physical) < r.get(DamageType::Frost));
+        assert(r.get(DamageType::Fire) < 1.f); // universal por nível
+    }
+    { // HurtAppliesType (fogo 0.5 filtra; físico passa cheio)
+        Player p;
+        p.resistances_.set(DamageType::Fire, 0.5f);
+        p.hp = 100;
+        assert(p.hurt(20, DamageType::Fire));
+        assert(p.hp == 90); // 20 * 0.5
+        p.hurtIframes.tick(1.f); // zera i-frame p/ 2o golpe
+        assert(p.hurt(20, DamageType::Physical));
+        assert(p.hp == 70); // 20 * 1.0
+    }
+    { // SkeletonBoneAndBurn (físico 0.7, fogo 1.3 no arquétipo)
+        const support::EnemyArchetype *a =
+            support::ArchetypeRegistry::instance().find("skeleton");
+        assert(a != nullptr);
+        assert(a->resistances.get(DamageType::Physical) == 0.7f);
+        assert(a->resistances.get(DamageType::Fire) == 1.3f);
+        auto e = support::Factory::spawnEnemy("skeleton", 0.f, 0.f);
+        assert(e != nullptr);
+        assert(e->resources.resistances.get(DamageType::Physical) == 0.7f);
+        e->resources.hp = 100;
+        e->resources.hpMax = 100;
+        assert(e->resources.takeDamage(10, DamageType::Physical) == 7);
+        assert(e->resources.takeDamage(10, DamageType::Fire) == 13);
+    }
+
+    std::printf("player_resistances test OK\n");
+    return 0;
+}

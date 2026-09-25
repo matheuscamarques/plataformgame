@@ -23,7 +23,8 @@ REGISTER_SKILL("test_special", [] {
     s.minRange = 0.f;
     s.maxRange = 999.f;
     s.baseWeight = 10.f;
-    s.execute = [](support::Enemy &, support::GameContext &) {};
+    s.execute = [](support::Enemy &, support::GameContext &,
+                    const support::SkillDef &) {};
     return s;
 }());
 

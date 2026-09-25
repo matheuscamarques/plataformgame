@@ -116,7 +116,8 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
             return; // whiff: dentro do AABB, fora das partes
         }
         const int dmg = static_cast<int>(dmgBase * dmgMult);
-        const int applied = s.resources.takeDamage(dmg);
+        const int applied =
+            s.resources.takeDamage(dmg, p->weaponBuffType);
         // SFX hit (só com dano; sem ctx.audio em teste = sem custo).
         if (applied > 0 && ctx.audio) {
             ctx.audio->play(game::keyOf(game::Sfx::MeleeHit), 0.8f);
@@ -145,7 +146,8 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
             ctx.debug->pushNumber("-" + std::to_string(applied), at);
             ctx.debug->pushLog(std::string("melee ") + enemyKindName(s) +
                                " " + (best ? partName(best->id) : "body") +
-                               " -" + std::to_string(applied));
+                               " -" + std::to_string(applied) + " " +
+                               core::damageTypeName(p->weaponBuffType));
         }
     });
 }

@@ -16,6 +16,7 @@
 #include "support/Combat/Body.h"
 #include "support/Combat/SpriteFrame.h"
 #include "core/Attributes.h"
+#include "core/Resistances.h"
 #include "core/StatusModifiers.h"
 #include "core/Cooldown.h"
 #include "core/Equipment.h"
@@ -211,9 +212,20 @@ class Player : public Entity
         // Mesmo padrão generoso da dinamite (ctor + respawn).
         void topUpStarterKit();
 
+        // Buff elemental da arma (Fase 1: campo; Fase 3 spells setam).
+        // MeleeSystem passa o tipo; default físico = comportamento atual.
+        core::DamageType weaponBuffType = core::DamageType::Physical;
+
         // Dano com gate de i-frame (0.6s). Retorna se aplicou.
         // hp trava em 0; morte/restart vêm no bloco B.
-        bool hurt(int dmg);
+        // Tipo filtra pela resistência antes dos i-frames.
+        bool hurt(int dmg,
+                  core::DamageType type = core::DamageType::Physical);
+
+        // Resistências derivadas (Fase 1 elementais): END/VIT/FTH +
+        // defesa universal por nível (DS1: todo nível protege um pouco).
+        core::Resistances resistances_;
+        core::Resistances computeResistances() const;
 
         // Reset completo para respawn (RunManager): HP, pos, vel,
         // cooldowns, melee idle, inventário. Facing vira direita.

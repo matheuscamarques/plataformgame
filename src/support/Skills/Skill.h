@@ -11,6 +11,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "core/DamageType.h"
+
 namespace support {
 
 struct Enemy;
@@ -29,7 +31,11 @@ struct SkillDef {
     float cooldown = 1.f;
     float telegraph = 0.f;
 
-    std::function<void(Enemy &, GameContext &)> execute;
+    std::function<void(Enemy &, GameContext &, const SkillDef &)> execute;
+
+    // Tipo de dano da skill (Fase 1 elementais; default físico).
+    // Propagado via def no execute (Opção B, sem estado global).
+    core::DamageType damageType = core::DamageType::Physical;
 
     // Metadados p/ UtilityAI.
     float baseWeight = 1.f;

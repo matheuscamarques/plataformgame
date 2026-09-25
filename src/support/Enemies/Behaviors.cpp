@@ -111,6 +111,8 @@ REGISTER_ENEMY_ARCHETYPE("skeleton", [] {
     a.drops.entries.push_back({"soul_great", 0.1f, 1, 1});
     a.skills = {"skeleton_slash"}; // melee-only: sem dynamite
     a.startingEquipment = {{"iron_helm", 0.35f}, {"iron_sword", 0.50f}};
+    a.resistances.set(core::DamageType::Physical, 0.7f); // osso duro
+    a.resistances.set(core::DamageType::Fire, 1.3f); // ...mas queima
     a.xp = 120;
     a.frameIdle = support::SpriteFrameId::SkeletonIdle;
     a.frameWalkA = support::SpriteFrameId::SkeletonWalkA;
@@ -132,12 +134,14 @@ REGISTER_SKILL("skeleton_slash", [] {
     s.minRange = 0.f;
     s.maxRange = 40.f;
     s.baseWeight = 15.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx) {
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
         if (!ctx.player) return;
         const float dx = ctx.player->getCenterX() - self.body.getCenterX();
         const float dy = ctx.player->getCenterY() - self.body.getCenterY();
         if (dx * dx + dy * dy < 48.f * 48.f)
-            ctx.player->hurt(static_cast<int>(10.f * self.damageMult));
+            ctx.player->hurt(static_cast<int>(10.f * self.damageMult),
+                             def.damageType);
     };
     return s;
 }());
@@ -152,7 +156,8 @@ REGISTER_SKILL("slime_spit", [] {
     s.isRanged = true;
     s.maxRange = 220.f;
     s.baseWeight = 1.0f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx) {
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
         if (!ctx.player || !ctx.throws) return;
         core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
         core::Vec2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
@@ -183,7 +188,8 @@ REGISTER_SKILL("dwarf_dynamite", [] {
     s.minRange = 48.f;
     s.maxRange = 128.f;
     s.baseWeight = 10.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx) {
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
         if (!ctx.player || !ctx.throws) return;
         core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
         core::Vec2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
@@ -211,12 +217,14 @@ REGISTER_SKILL("dwarf_melee", [] {
     s.minRange = 0.f;
     s.maxRange = 40.f;
     s.baseWeight = 15.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx) {
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
         if (!ctx.player) return;
         const float dx = ctx.player->getCenterX() - self.body.getCenterX();
         const float dy = ctx.player->getCenterY() - self.body.getCenterY();
         if (dx * dx + dy * dy < 48.f * 48.f)
-            ctx.player->hurt(static_cast<int>(12.f * self.damageMult));
+            ctx.player->hurt(static_cast<int>(12.f * self.damageMult),
+                             def.damageType);
     };
     return s;
 }());
@@ -234,7 +242,8 @@ REGISTER_SKILL("dwarf_smoke", [] {
     s.minRange = 32.f;
     s.maxRange = 200.f;
     s.baseWeight = 6.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx) {
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
         if (!ctx.player) return;
         const float dir =
             (ctx.player->getCenterX() < self.body.getCenterX()) ? 1.f : -1.f;
@@ -256,7 +265,8 @@ REGISTER_SKILL("dwarf_barrel", [] {
     s.minRange = 48.f;
     s.maxRange = 240.f;
     s.baseWeight = 8.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx) {
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
         if (!ctx.throws || !ctx.player) return;
         core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
         const float dir = (ctx.player->getCenterX() < from.x) ? -1.f : 1.f;
@@ -285,7 +295,8 @@ REGISTER_SKILL("dwarf_dig", [] {
     s.minRange = 0.f;
     s.maxRange = 400.f;
     s.baseWeight = 4.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx) {
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
         if (!ctx.player || !ctx.world) return;
         const float dir = (ctx.player->getCenterX() < self.body.getCenterX())
                               ? -1.f
@@ -326,7 +337,8 @@ REGISTER_SKILL("dwarf_collapse", [] {
     s.minRange = 0.f;
     s.maxRange = 300.f;
     s.baseWeight = 5.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx) {
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
         if (!ctx.world || !ctx.player) return;
         const float dir = (ctx.player->getCenterX() < self.body.getCenterX())
                               ? -1.f
@@ -339,7 +351,8 @@ REGISTER_SKILL("dwarf_collapse", [] {
         }
         // SFX colapso (1 por evento, não por tile).
         if (ctx.audio) ctx.audio->play(game::keyOf(game::Sfx::TileBreak), 0.7f);
-        ctx.player->hurt(static_cast<int>(40.f * self.damageMult));
+        ctx.player->hurt(static_cast<int>(40.f * self.damageMult),
+                         def.damageType);
     };
     return s;
 }());

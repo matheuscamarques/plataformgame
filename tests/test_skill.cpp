@@ -20,7 +20,8 @@ REGISTER_SKILL("test_expensive", [] {
     support::SkillDef s;
     s.name = "Expensive";
     s.staminaCost = 9999.f;
-    s.execute = [](support::Enemy &, support::GameContext &) {};
+    s.execute = [](support::Enemy &, support::GameContext &,
+                    const support::SkillDef &) {};
     return s;
 }());
 

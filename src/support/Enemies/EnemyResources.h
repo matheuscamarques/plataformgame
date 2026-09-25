@@ -7,6 +7,7 @@
 
 #pragma once
 #include "core/Cooldown.h"
+#include "core/Resistances.h"
 #include <algorithm>
 
 namespace support {
@@ -51,6 +52,10 @@ struct EnemyResources {
     // Trash ignora mana e stamina em canPay/pay/regen.
     bool isTrash = false;
 
+    // Resistências por tipo (Fase 1 elementais; default 1.0).
+    // Copiado do arquétipo na Factory.
+    core::Resistances resistances;
+
     // --- API ---
     bool canPay(const Cost& c) const;
     void pay(const Cost& c);
@@ -61,7 +66,9 @@ struct EnemyResources {
 
     // Retorna dano efetivamente aplicado (0 se já morto ou amount <= 0).
     // Protege duplo hit no mesmo frame de re-trigger.
-    int takeDamage(int amount);
+    // Tipo filtra pela resistência antes de aplicar.
+    int takeDamage(int amount,
+                   core::DamageType type = core::DamageType::Physical);
 
     // Reduz postura e atualiza stagger. Use isso, não mexa em .posture direto
     // se quiser stagger automático.

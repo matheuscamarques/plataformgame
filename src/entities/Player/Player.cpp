@@ -375,6 +375,7 @@ void Player::refreshDerived() {
     staminaMax = static_cast<float>(
         core::Attributes::maxStamina(attrs.get(core::Attr::Endurance)));
     fpMax = 100.f + attrs.get(core::Attr::Attunement) * 10.f;
+    resistances_ = computeResistances();
     if (hp > hpMax) hp = hpMax;
     if (stamina > staminaMax) stamina = staminaMax;
     if (fp > fpMax) fp = fpMax;
@@ -438,12 +439,33 @@ int Player::effectiveHpMax() const {
     return static_cast<int>(hpMax * computeModifiers().hpMaxMult);
 }
 
-bool Player::hurt(int dmg) {
+bool Player::hurt(int dmg, core::DamageType type) {
     if (dmg <= 0 || hp <= 0 || !hurtIframes.ready()) return false;
-    hp -= static_cast<int>(dmg * computeModifiers().damageTakenMult);
+    const int after =
+        core::applyResistance(dmg, type, resistances_);
+    hp -= static_cast<int>(after * computeModifiers().damageTakenMult);
     if (hp < 0) hp = 0;
     hurtIframes.trigger(0.6f);
     return true;
+}
+
+core::Resistances Player::computeResistances() const {
+    using core::Attr;
+    using core::DamageType;
+    core::Resistances r;
+    // Mapeamento do plano: END protege físico/frost, VIT o fogo,
+    // FTH o lightning. DS1: todo nível de alma protege um pouco
+    // (universal = 0.2% por nível além do 1 em tudo).
+    const float uni =
+        1.f - static_cast<float>(attrs.level() - 1) * 0.002f;
+    const float end = static_cast<float>(attrs.get(Attr::Endurance) - 10);
+    const float vit = static_cast<float>(attrs.get(Attr::Vitality) - 10);
+    const float fth = static_cast<float>(attrs.get(Attr::Faith) - 10);
+    r.set(DamageType::Physical, uni - end * 0.005f);
+    r.set(DamageType::Frost, uni - end * 0.003f);
+    r.set(DamageType::Fire, uni - vit * 0.003f);
+    r.set(DamageType::Lightning, uni - fth * 0.004f);
+    return r;
 }
 
 void Player::respawn(float x, float y) {

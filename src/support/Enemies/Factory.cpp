@@ -59,6 +59,7 @@ std::unique_ptr<Enemy> Factory::spawnEnemy(const std::string &kind,
     e->resources.manaRegenDelay = core::Cooldown(a->manaRegenDelay);
 
     e->skillIds = a->skills;
+    e->resources.resistances = a->resistances;
 
     // Equipamento inicial da tabela do arquétipo (vazio = nasce nu).
     // RNG determinístico por posição: bit-cast do float (memcpy, seguro

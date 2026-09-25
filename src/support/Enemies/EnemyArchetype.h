@@ -14,6 +14,7 @@
 
 #include "core/DropTable.h"
 #include "core/EntityKind.h"
+#include "core/Resistances.h"
 #include "core/Vec.h"
 #include "support/Combat/SpriteFrame.h"
 
@@ -65,6 +66,10 @@ struct EnemyArchetype {
 
     // Drops ao morrer (rolados em DeathSystem via rollDrops). Vazio = só XP.
     core::DropTable drops;
+
+    // Resistências por tipo (default 1.0 em tudo; esqueleto: osso
+    // resiste a físico e queima fácil — dado, sem branch).
+    core::Resistances resistances;
 
     // Peça vestida no spawn + chance (0..1). Rolado na Factory com RNG
     // determinístico por posição. Vazio = nasce nu (slime, anão).

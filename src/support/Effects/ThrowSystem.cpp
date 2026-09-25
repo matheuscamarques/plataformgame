@@ -130,7 +130,7 @@ void ThrowSystem::tick(float dt, GameContext &ctx) {
             Player *pl = ctx.player;
             if (t.pos.x >= pl->getX() && t.pos.x <= pl->getX() + pl->getW() &&
                 t.pos.y >= pl->getY() && t.pos.y <= pl->getY() + pl->getH()) {
-                pl->hurt(t.damage);
+                pl->hurt(t.damage, t.damageType);
                 if (particles_) particles_->spawnHitSpark(t.pos);
                 pool_.release(&t);
                 return;
@@ -145,7 +145,7 @@ void ThrowSystem::tick(float dt, GameContext &ctx) {
                     t.pos.x <= s.body.getX() + s.body.getW() &&
                     t.pos.y >= s.body.getY() &&
                     t.pos.y <= s.body.getY() + s.body.getH()) {
-                    s.resources.takeDamage(t.damage);
+                    s.resources.takeDamage(t.damage, t.damageType);
                     if (particles_) particles_->spawnHitSpark(t.pos);
                     hit = true;
                 }

@@ -12,6 +12,7 @@
 #include <cstdint>
 
 #include "core/ThrowKind.h"
+#include "core/DamageType.h"
 
 namespace support {
 
@@ -37,6 +38,7 @@ struct Throwable {
     int          tilesRadius = 3;      // raio de quebra em tiles
     float        knockback   = 250.f;  // reservado (recursos não têm pos)
     ThrowKind    kind        = ThrowKind::Dynamite;
+    core::DamageType damageType = core::DamageType::Physical; // Fase 1
     bool         active      = false;
     bool         resting     = false;  // parou de se mover
     float        restingTimer = 0.f;   // tempo parado

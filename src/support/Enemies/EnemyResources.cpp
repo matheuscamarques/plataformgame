@@ -55,10 +55,12 @@ void EnemyResources::tick(float dt) {
         posture = std::min(postureMax, posture + postureRegen * dt);
 }
 
-int EnemyResources::takeDamage(int amount) {
+int EnemyResources::takeDamage(int amount, core::DamageType type) {
     if (hp <= 0)    return 0;
     if (amount <= 0) return 0;
-    int applied = std::min(amount, hp);
+    const int after = core::applyResistance(amount, type, resistances);
+    if (after <= 0) return 0;
+    int applied = std::min(after, hp);
     hp -= applied;
     return applied;
 }

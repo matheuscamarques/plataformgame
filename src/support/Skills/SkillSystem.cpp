@@ -25,7 +25,7 @@ bool tryUse(Enemy &self, GameContext &ctx, const std::string &skillId) {
     if (!self.resources.canPay(c)) return false;
 
     self.resources.pay(c);
-    def->execute(self, ctx);
+    def->execute(self, ctx, *def);
     cd.trigger(def->cooldown);
     self.lastSkillId = skillId;
     self.lastSkillAge = 0.f;
