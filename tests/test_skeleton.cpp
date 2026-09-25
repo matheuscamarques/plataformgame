@@ -10,13 +10,17 @@
 #include <string>
 
 #include "assets/Sprites/EnemySprites.h"
+#include "entities/Player/Player.h"
 #include "support/Enemies/EnemyArchetype.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/Enemies/SkeletonAI.h"
 #include "support/Combat/BodySchemaRegistry.h"
 #include "support/Combat/SpriteFrame.h"
 #include "assets/SpriteFrameRegistry.h"
+#include "support/Enemies/VariantRegistry.h"
+#include "support/GameContext.h"
 #include "support/Skills/Skill.h"
+#include "support/Skills/SkillSystem.h"
 
 int main() {
     using namespace support;
@@ -111,6 +115,47 @@ int main() {
         const EnemyArchetype *s = ArchetypeRegistry::instance().find("slime");
         assert(s->frameIdle == SpriteFrameId::SlimeIdle);
         assert(s->frameWalkA == SpriteFrameId::SlimeSquash);
+    }
+
+    { // FlameVariantByDepth (S2-3 base; S4+ flamejante via dado)
+        const VariantDef *l1 =
+            VariantRegistry::instance().forDepth("skeleton", 3);
+        assert(l1 != nullptr && l1->level == 1);
+        assert(l1->extraSkills.empty());
+        const VariantDef *l2 =
+            VariantRegistry::instance().forDepth("skeleton", 4);
+        assert(l2 != nullptr && l2->level == 2);
+        assert(l2->extraSkills.size() == 1u &&
+               l2->extraSkills[0] == "skeleton_flame_slash");
+        const SkillDef *fs =
+            SkillRegistry::instance().find("skeleton_flame_slash");
+        assert(fs != nullptr && fs->isMelee);
+        assert(fs->damageType == core::DamageType::Fire);
+        // S4 = ty 3800+: spawn aplica variante (hp 55, skill extra).
+        auto e = Factory::spawnEnemy("skeleton", 100.f, 3800.f * 50.f);
+        assert(e != nullptr && e->variantLevel == 2);
+        assert(e->resources.hp == 55 && e->resources.hpMax == 55);
+        bool hasFlame = false;
+        for (auto &sk : e->skillIds)
+            if (sk == "skeleton_flame_slash") hasFlame = true;
+        assert(hasFlame);
+    }
+    { // FlameHurtsFire (golpe flamejante queima o player)
+        Player p;
+        p.setX(100.f);
+        p.setY(100.f);
+        p.hp = 100;
+        support::EnemySystem enemies;
+        enemies.spawn("skeleton", 100.f, 100.f);
+        support::GameContext ctx{};
+        ctx.player = &p;
+        ctx.enemies = &enemies;
+        bool ran = false;
+        enemies.forEach([&](support::Enemy &e) {
+            ran = support::SkillSystem::tryUse(e, ctx, "skeleton_flame_slash");
+        });
+        assert(ran);
+        assert(p.hp == 88); // 12 fogo, resist 1.0
     }
 
     std::printf("skeleton test OK\n");

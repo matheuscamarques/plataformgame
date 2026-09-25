@@ -175,6 +175,30 @@ REGISTER_SKILL("frost_touch", [] {
     return s;
 }());
 
+// Golpe Flamejante (Fase 4): slash do esqueleto em Fire. Entra via
+// variante (extraSkills), nunca no arquétipo base.
+REGISTER_SKILL("skeleton_flame_slash", [] {
+    support::SkillDef s;
+    s.name = "Golpe Flamejante";
+    s.cooldown = 1.1f;
+    s.telegraph = 0.25f;
+    s.damageType = core::DamageType::Fire;
+    s.staminaCost = 15.f;
+    s.isMelee = true;
+    s.minRange = 0.f;
+    s.maxRange = 40.f;
+    s.baseWeight = 15.f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
+        if (!ctx.player) return;
+        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
+        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
+        if (dx * dx + dy * dy < 48.f * 48.f)
+            ctx.player->hurt(static_cast<int>(12.f * self.damageMult),
+                             def.damageType);
+    };
+    return s;
+}());
 // Cuspe de slime: projétil linear (sem gravidade/fuse), dano no impacto.
 // Valida o mecanismo SkillRegistry; anão ganha as dele no Elite.
 REGISTER_SKILL("slime_spit", [] {
