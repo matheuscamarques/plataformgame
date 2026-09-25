@@ -266,23 +266,51 @@ void Game::render()
     }
 
     // Throwables visíveis: bomba do player tem telegraph + núcleo por
-    // tier; Bolt (magia) é ponto ciano; Fireball é ponto laranja;
-    // outros kinds, círculo dourado.
+    // tier; magias usam o ícone do item em tamanho de slime (~32px)
+    // com pulso + halo; outros kinds, círculo dourado.
     throws_->forEachActive([&](const support::Throwable &t) {
-        if (t.kind == support::ThrowKind::Bolt) {
-            sf::CircleShape c(3.f);
-            c.setOrigin(3.f, 3.f);
-            c.setPosition(core::toSf(t.pos));
-            c.setFillColor(sf::Color(120, 220, 255));
-            window->draw(c);
+        // Ícones cacheados (registry é estático; mesma fonte do menu).
+        static const core::ItemDef *arrowDef =
+            core::ItemRegistry::instance().find("soul_arrow");
+        static const core::ItemDef *fireDef =
+            core::ItemRegistry::instance().find("fireball");
+        const float pulse =
+            0.5f + 0.5f * std::sin(core::Time::elapsed() * 18.f);
+        if (t.kind == support::ThrowKind::Bolt && arrowDef) {
+            // Halo ciano pulsante atrás.
+            sf::CircleShape halo(13.f + 3.f * pulse);
+            halo.setOrigin(halo.getRadius(), halo.getRadius());
+            halo.setPosition(core::toSf(t.pos));
+            halo.setFillColor(sf::Color(120, 220, 255, 60));
+            window->draw(halo);
+            // Flecha do tamanho do slime, girada p/ velocidade.
+            if (const sf::Texture *tex = support::itemIconFor(arrowDef)) {
+                sf::Sprite spr(*tex);
+                const float s = 3.6f + 0.8f * pulse;
+                spr.setScale(s, s);
+                spr.setOrigin(4.f, 4.f);
+                spr.setPosition(core::toSf(t.pos));
+                spr.setRotation(std::atan2(t.vel.y, t.vel.x) * 180.f /
+                                3.14159265f);
+                window->draw(spr);
+            }
             return;
         }
-        if (t.kind == support::ThrowKind::Fireball) {
-            sf::CircleShape c(4.f);
-            c.setOrigin(4.f, 4.f);
-            c.setPosition(core::toSf(t.pos));
-            c.setFillColor(sf::Color(255, 140, 40));
-            window->draw(c);
+        if (t.kind == support::ThrowKind::Fireball && fireDef) {
+            // Halo laranja pulsante (maior: área maior).
+            sf::CircleShape halo(17.f + 4.f * pulse);
+            halo.setOrigin(halo.getRadius(), halo.getRadius());
+            halo.setPosition(core::toSf(t.pos));
+            halo.setFillColor(sf::Color(255, 140, 40, 70));
+            window->draw(halo);
+            if (const sf::Texture *tex = support::itemIconFor(fireDef)) {
+                sf::Sprite spr(*tex);
+                const float s = 4.2f + 0.9f * pulse;
+                spr.setScale(s, s);
+                spr.setOrigin(4.f, 4.f);
+                spr.setPosition(core::toSf(t.pos));
+                window->draw(spr);
+            }
             return;
         }
         if (!support::isPlayerBomb(t.kind)) {

@@ -125,7 +125,7 @@ int main() {
             seen = true;
             assert(t.kind == ThrowKind::Fireball);
             assert(t.damageType == core::DamageType::Fire);
-            assert(t.fuse == -1.f && t.radius == 40.f);
+            assert(t.fuse == -1.f && t.radius == 60.f);
             assert(t.tilesRadius == 0);
             // 40 + 40×((16-10)/20) = 52 (seed 14 + 2)
             assert(t.damage == 52);

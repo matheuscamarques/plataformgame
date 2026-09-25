@@ -214,7 +214,7 @@ class Player : public Entity
         static constexpr float kHealBase = 50.f;
         static constexpr float kFireCost = 35.f;
         static constexpr float kFireBase = 40.f;
-        static constexpr float kFireRadius = 40.f;
+        static constexpr float kFireRadius = 60.f; // área generosa
         static constexpr float kFrostWeaponCost = 30.f;
         static constexpr float kFrostWeaponDur = 30.f;
         bool castAttuned(support::ThrowSystem &throws);
