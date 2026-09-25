@@ -130,6 +130,10 @@ class Player : public Entity
             bleedBuildup = 0.f;
             bleedSlowTimer = 0.f;
         }
+        void cureFrost() {
+            frostBuildup = 0.f;
+            frostTimer = 0.f;
+        }
 
         // Arma equipada (def do slot RightHand) ou nullptr = soco.
         // Fonte única p/ render, BodySystem e meleeHitbox.

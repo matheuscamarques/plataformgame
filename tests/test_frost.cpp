@@ -9,6 +9,10 @@
 #include <cstdio>
 
 #include "entities/Player/Player.h"
+#include "support/Enemies/EnemySystem.h"
+#include "support/GameContext.h"
+#include "support/Skills/Skill.h"
+#include "support/Skills/SkillSystem.h"
 
 int main() {
     { // BuildupActivates (acumula até o limiar, ativa 6s)
@@ -54,6 +58,36 @@ int main() {
         const int slow = ticksToActive(true);
         const int fast = ticksToActive(false);
         assert(fast > 0 && slow > fast); // 0.7x desce mais devagar
+    }
+
+    { // FrostTouchApplies (skill registrada, dano frost + buildup)
+        const support::SkillDef *s =
+            support::SkillRegistry::instance().find("frost_touch");
+        assert(s != nullptr && s->isMelee);
+        assert(s->damageType == core::DamageType::Frost);
+        Player p;
+        p.setX(100.f);
+        p.setY(100.f);
+        p.hp = 100;
+        support::EnemySystem enemies;
+        enemies.spawn("dwarf", 100.f, 100.f); // elite paga stamina
+        support::GameContext ctx{};
+        ctx.player = &p;
+        ctx.enemies = &enemies;
+        bool ran = false;
+        enemies.forEach([&](support::Enemy &e) {
+            ran = support::SkillSystem::tryUse(e, ctx, "frost_touch");
+        });
+        assert(ran);
+        assert(p.hp == 92); // 8 frost, resist 1.0
+        assert(p.frostBuildup == 20.f);
+    }
+    { // RespawnCuresFrost (morte congelada não volta congelada)
+        Player p;
+        p.addFrost(p.statusThreshold());
+        assert(p.frostTimer > 0.f);
+        p.respawn(0.f, 0.f);
+        assert(p.frostTimer == 0.f && p.frostBuildup == 0.f);
     }
 
     std::printf("frost test OK\n");

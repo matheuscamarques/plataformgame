@@ -145,6 +145,34 @@ REGISTER_SKILL("skeleton_slash", [] {
     };
     return s;
 }());
+// Toque Gélido (Fase 2 elementais): aplica buildup de frost + dano.
+// Registrado mas SEM arquétipo (gancho da Fase 4: variante gelada).
+// Não atribuir a inimigo vivo sem rebalancear — teste cobre via tryUse.
+REGISTER_SKILL("frost_touch", [] {
+    support::SkillDef s;
+    s.name = "Toque Gelido";
+    s.cooldown = 2.0f;
+    s.telegraph = 0.3f;
+    s.damageType = core::DamageType::Frost;
+    s.staminaCost = 10.f;
+    s.isMelee = true;
+    s.minRange = 0.f;
+    s.maxRange = 40.f;
+    s.baseWeight = 12.f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
+        if (!ctx.player) return;
+        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
+        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
+        if (dx * dx + dy * dy < 48.f * 48.f) {
+            ctx.player->hurt(static_cast<int>(8.f * self.damageMult),
+                             def.damageType);
+            ctx.player->addFrost(20.f);
+        }
+    };
+    return s;
+}());
+
 // Cuspe de slime: projétil linear (sem gravidade/fuse), dano no impacto.
 // Valida o mecanismo SkillRegistry; anão ganha as dele no Elite.
 REGISTER_SKILL("slime_spit", [] {

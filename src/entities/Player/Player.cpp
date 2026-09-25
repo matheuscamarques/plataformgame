@@ -490,6 +490,7 @@ void Player::respawn(float x, float y) {
     staminaDelay.reset();
     curePoison();
     cureBleed();
+    cureFrost();
     fp = fpMax; // respawn renova FP (DS)
     topUpDynamite();
     topUpStarterKit();
