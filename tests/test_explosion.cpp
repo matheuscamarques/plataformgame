@@ -42,6 +42,31 @@ int main() {
         int hit = es.explode({106.f, 112.f}, def, ctx);
         assert(hit == 1 && res.hp < 100);
     }
+    { // TypeFlowsToTakeDamage (fogo 1.3 no alVO resistente)
+        ExplosionSystem es;
+        Body b;
+        auto s = BodySchema::humanoid(24.f, 12.f);
+        b.attach(&s);
+        b.rebuild({100.f, 100.f}, 1);
+
+        EnemyResources res;
+        res.hp = res.hpMax = 100;
+        res.resistances.set(core::DamageType::Fire, 1.3f);
+        res.resistances.set(core::DamageType::Physical, 0.7f);
+
+        std::vector<ExplosionTarget> targets;
+        targets.push_back({{106.f, 112.f}, &b, &res, false});
+
+        GameContext ctx{};
+        ctx.explosionTargets = &targets;
+
+        ExplosionDef fire;
+        fire.radius = 30.f;
+        fire.damage = 20;
+        fire.damageType = core::DamageType::Fire;
+        assert(es.explode({106.f, 112.f}, fire, ctx) == 1);
+        assert(res.hp == 100 - 52); // 20 × cabeça 2.0 × fogo 1.3
+    }
     { // MissesTargetOutsideRadius
         ExplosionSystem es;
         Body b;

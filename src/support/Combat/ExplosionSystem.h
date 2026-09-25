@@ -9,6 +9,7 @@
 
 #include "core/Vec.h"
 #include "core/Cooldown.h"
+#include "core/DamageType.h"
 #include "core/System.h"
 #include "support/Combat/Body.h"
 #include <SFML/System/Vector2.hpp>
@@ -29,6 +30,7 @@ struct ExplosionDef {
     float postureDmg  = 20.f;
     int   tilesRadius = 3;
     float knockback   = 250.f; // impulso no mover (vx/vy somam)
+    core::DamageType damageType = core::DamageType::Physical; // Fase 1
 };
 
 // Alvo da explosão. Caller monta a lista (Player + Slimes).

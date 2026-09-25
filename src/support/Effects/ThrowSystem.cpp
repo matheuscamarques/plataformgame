@@ -288,6 +288,7 @@ void ThrowSystem::handleFuse(Throwable &t, GameContext &ctx) {
         def.postureDmg  = t.postureDmg;
         def.tilesRadius = t.tilesRadius;
         def.knockback   = t.knockback;
+        def.damageType  = t.damageType; // bomba elemental explode elemental
         explosions_->explode(t.pos, def, ctx);
         // SFX explosão com atenuação (ouvinte = player; sem ctx = sem custo).
         if (ctx.audio && ctx.player)

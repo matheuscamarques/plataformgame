@@ -105,7 +105,7 @@ bool ExplosionSystem::applyToTarget(const ExplosionTarget &t,
     const float postDmg = def.postureDmg * (bestDef ? bestDef->postureMult : 1.f);
 
     if (t.resources) {
-        t.resources->takeDamage(dmg);
+        t.resources->takeDamage(dmg, def.damageType);
         t.resources->damagePosture(postDmg);
     }
     // Player não tem EnemyResources: HP próprio entra quando existir.

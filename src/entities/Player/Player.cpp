@@ -239,6 +239,12 @@ void Player::tick() {
     // Slow do bleed decai aqui (0.3s de micro-stagger).
     if (bleedSlowTimer > 0.f) bleedSlowTimer -= 1.f / 30.0f;
     if (frostTimer > 0.f) frostTimer -= 1.f / 30.0f; // swing lento expira
+    // Buff da arma expira sozinho (timer 0 = permanente até trocar).
+    if (weaponBuffTimer > 0.f) {
+        weaponBuffTimer -= 1.f / 30.0f;
+        if (weaponBuffTimer <= 0.f)
+            weaponBuffType = core::DamageType::Physical;
+    }
 
     // HP nunca acima do máximo efetivo (Curse futura reduz).
     if (hp > effectiveHpMax()) hp = effectiveHpMax();

@@ -29,9 +29,12 @@ namespace {
 // Nome curto p/ log de debug (feed F4). Espelha kind(), sem string.
 const char *enemyKindName(const Enemy &s) {
     if (!s.ai) return "?";
-    if (s.ai->kind() == core::EntityKind::Dwarf) return "dwarf";
-    if (s.ai->kind() == core::EntityKind::Skeleton) return "skeleton";
-    return "slime";
+    switch (s.ai->kind()) {
+        case core::EntityKind::Dwarf:    return "dwarf";
+        case core::EntityKind::Skeleton: return "skeleton";
+        case core::EntityKind::Slime:    return "slime";
+        default:                         return "?"; // novo kind: adiciona caso
+    }
 }
 const char *partName(BodyPartId id) {
     switch (id) {
@@ -147,7 +150,10 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
             ctx.debug->pushLog(std::string("melee ") + enemyKindName(s) +
                                " " + (best ? partName(best->id) : "body") +
                                " -" + std::to_string(applied) + " " +
-                               core::damageTypeName(p->weaponBuffType));
+                               core::damageTypeName(p->weaponBuffType) +
+                               " (x" + std::to_string(
+                                   s.resources.resistances.get(
+                                       p->weaponBuffType)) + ")");
         }
     });
 }

@@ -59,6 +59,19 @@ int main() {
         assert(e->resources.takeDamage(10, DamageType::Fire) == 13);
     }
 
+    { // WeaponBuffExpires (30s volta p/ físico; 0 = permanente)
+        Player p;
+        p.weaponBuffType = core::DamageType::Frost;
+        p.weaponBuffTimer = 30.f;
+        for (int i = 0; i < 950; ++i) p.tick(); // margem float de 1/30
+        assert(p.weaponBuffTimer <= 0.f);
+        assert(p.weaponBuffType == core::DamageType::Physical);
+        p.weaponBuffType = core::DamageType::Fire;
+        p.weaponBuffTimer = 0.f;
+        for (int i = 0; i < 100; ++i) p.tick();
+        assert(p.weaponBuffType == core::DamageType::Fire); // sem timer: fica
+    }
+
     std::printf("player_resistances test OK\n");
     return 0;
 }

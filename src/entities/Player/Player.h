@@ -225,7 +225,9 @@ class Player : public Entity
 
         // Buff elemental da arma (Fase 1: campo; Fase 3 spells setam).
         // MeleeSystem passa o tipo; default físico = comportamento atual.
+        // Timer: 0 = permanente até trocar (frost_weapon seta 30s).
         core::DamageType weaponBuffType = core::DamageType::Physical;
+        float weaponBuffTimer = 0.f;
 
         // Dano com gate de i-frame (0.6s). Retorna se aplicou.
         // hp trava em 0; morte/restart vêm no bloco B.
