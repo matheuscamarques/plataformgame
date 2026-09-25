@@ -20,6 +20,11 @@
 namespace support {
 
 class InputMap;
+} // namespace support
+
+class Player; // global ::Player (só fwd aqui; .cpp inclui)
+
+namespace support {
 
 // Hotbar: só consumíveis ou arremessáveis (poção, bombas), na ordem do
 // inventário, compactados nos 5 visíveis. Sem inventário separado
@@ -43,17 +48,14 @@ public:
     // Devolve o novo slot ativo se 1..5 foi apertado, senão `current`.
     int handleInput(const InputMap& input, int current) const;
 
-    void render(sf::RenderTarget& target, const core::Inventory& inv,
-                int activeSlot, float screenW, float screenH,
-                const sf::Font& font) const;
+    // Cinto DS (substitui a barra Minecraft): 4 boxes com ícones —
+    // [Z] mão esq, [X] mão dir, [C] magia sintonizada, [V] item ativo
+    // da hotbar (com qtd e n/5). Lógica 1-5 intacta; só o desenho muda.
+    void renderBelt(sf::RenderTarget& target, const ::Player& player,
+                    int activeSlot, float screenW, float screenH,
+                    const sf::Font& font) const;
 
 private:
-    core::Vec2f slotPos(int i, float screenW, float screenH) const {
-        const float totalW = kSlots * kSlotSize + (kSlots - 1) * kPad;
-        const float x0 = (screenW - totalW) * 0.5f;
-        const float y0 = screenH - kSlotSize - 16.f;
-        return {x0 + i * (kSlotSize + kPad), y0};
-    }
 };
 
 } // namespace support

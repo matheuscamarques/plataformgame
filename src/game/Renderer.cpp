@@ -882,52 +882,14 @@ void Game::render()
         }
     }
 
-    // Hotbar 4a: após o HUD (view default ativa), antes do screenshot.
-    hotbar_.render(*window, player.get()->inventory, activeHotbarSlot_,
-                   viewW_, viewH_, font);
+    // Cinto DS: após o HUD (view default ativa), antes do screenshot.
+    // Substitui a barra Minecraft (lógica 1-5 intacta, só desenho).
+    hotbar_.renderBelt(*window, *player.get(), activeHotbarSlot_, viewW_,
+                       viewH_, font);
 
-    // Troca rápida (Z/X/C/V): 4 mini-slots + toast 1.5s (DS, sem pausa).
+    // Troca rápida (Z/X/C/V): toast 1.5s do que entrou (DS, sem pausa).
+    // (Os 4 slots vivem no cinto; aqui só o toast central.)
     {
-        Player *pl = player.get();
-        auto stext = [&](const std::string &s, float x, float y,
-                         int size = 13) {
-            sf::Text t;
-            t.setFont(font);
-            t.setString(support::utf8(s));
-            t.setCharacterSize(size);
-            t.setFillColor(sf::Color(200, 200, 200));
-            t.setOutlineColor(sf::Color::Black);
-            t.setOutlineThickness(1);
-            t.setPosition(x, y);
-            window->draw(t);
-        };
-        auto wname = [&](core::EquipSlot slot) -> std::string {
-            const core::Item &it = pl->equipment.get(slot);
-            if (it.isEmpty()) return "--";
-            if (const core::ItemDef *d = it.def()) return d->name;
-            return "--";
-        };
-        std::string spell = "--";
-        if (!pl->attuned.empty()) {
-            if (const core::ItemDef *d =
-                    core::ItemRegistry::instance().find(pl->attuned[0]))
-                spell = d->name;
-        }
-        std::string item = "--";
-        const int real =
-            support::HotbarUI::realSlot(pl->inventory, activeHotbarSlot_);
-        if (real >= 0) {
-            const core::Item &it = pl->inventory.slot(real);
-            if (const core::ItemDef *d = it.def()) item = d->name;
-        }
-        const float sy = viewH_ * 0.5f + 20.f;
-        const float sx = viewW_ * 0.5f - 200.f;
-        stext("[Z] " + wname(core::EquipSlot::LeftHand), sx, sy);
-        stext("[X] " + wname(core::EquipSlot::RightHand), sx, sy + 18.f);
-        stext("[C] " + spell, sx, sy + 36.f);
-        stext("[V] " + item + " (" +
-                  std::to_string(activeHotbarSlot_ + 1) + "/5)",
-              sx, sy + 54.f);
         // Toast do que entrou (fade 1.5s, centro da tela).
         const float age = core::Time::elapsed() - swapToastTime_;
         if (!swapToast_.empty() && age >= 0.f && age < 1.5f) {
