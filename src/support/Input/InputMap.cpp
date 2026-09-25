@@ -51,6 +51,10 @@ InputMap::InputMap() {
     bind(Action::ArrangeAll, sf::Keyboard::T);
     bind(Action::UseItem, sf::Keyboard::U);
     addBind(Action::UseItem, sf::Keyboard::Return);
+    bind(Action::CycleLeftHand, sf::Keyboard::Z);
+    bind(Action::CycleRightHand, sf::Keyboard::X);
+    bind(Action::CycleSpell, sf::Keyboard::C);
+    bind(Action::CycleItem, sf::Keyboard::V);
 
     addBind(Action::Left,  sf::Keyboard::A);
     addBind(Action::Right, sf::Keyboard::D);

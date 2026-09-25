@@ -85,6 +85,8 @@ private:
     support::HotbarUI hotbar_; // valor: 5 primeiros slots (fase 4a)
     support::InventoryUI inventoryUI_; // valor: menu Dark Souls (tabs+menu)
     int activeHotbarSlot_ = 0; // 0..4 via teclas 1-5
+    std::string swapToast_; // nome do item trocado (Z/X/C/V)
+    float swapToastTime_ = -99.f; // fade 1.5s no HUD
     support::ScreenshotSystem screenshots_; // valor: PNGs de debug (F10-12)
     support::DropSystem *drops_ = nullptr; // observa; dono é o scheduler
     support::ParticleSystem *particles_ = nullptr; // observa; dono é o scheduler

@@ -35,6 +35,10 @@ enum class Action : uint8_t {
     Cast,            // G: conjura a 1ª magia sintonizada (F8)
     ArrangeAll,      // T: reordena tudo (atalho, também no menu)
     UseItem,         // U/Enter: usa o selecionado (atalho, também no menu)
+    CycleLeftHand,   // Z: troca arma da mão esquerda (fora de menu)
+    CycleRightHand,  // X: troca arma da mão direita (fora de menu)
+    CycleSpell,      // C: próxima magia sintonizada (fora de menu)
+    CycleItem,       // V: próximo slot da hotbar (fora de menu)
     COUNT
 };
 

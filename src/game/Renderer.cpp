@@ -886,6 +886,66 @@ void Game::render()
     hotbar_.render(*window, player.get()->inventory, activeHotbarSlot_,
                    viewW_, viewH_, font);
 
+    // Troca rápida (Z/X/C/V): 4 mini-slots + toast 1.5s (DS, sem pausa).
+    {
+        Player *pl = player.get();
+        auto stext = [&](const std::string &s, float x, float y,
+                         int size = 13) {
+            sf::Text t;
+            t.setFont(font);
+            t.setString(support::utf8(s));
+            t.setCharacterSize(size);
+            t.setFillColor(sf::Color(200, 200, 200));
+            t.setOutlineColor(sf::Color::Black);
+            t.setOutlineThickness(1);
+            t.setPosition(x, y);
+            window->draw(t);
+        };
+        auto wname = [&](core::EquipSlot slot) -> std::string {
+            const core::Item &it = pl->equipment.get(slot);
+            if (it.isEmpty()) return "--";
+            if (const core::ItemDef *d = it.def()) return d->name;
+            return "--";
+        };
+        std::string spell = "--";
+        if (!pl->attuned.empty()) {
+            if (const core::ItemDef *d =
+                    core::ItemRegistry::instance().find(pl->attuned[0]))
+                spell = d->name;
+        }
+        std::string item = "--";
+        const int real =
+            support::HotbarUI::realSlot(pl->inventory, activeHotbarSlot_);
+        if (real >= 0) {
+            const core::Item &it = pl->inventory.slot(real);
+            if (const core::ItemDef *d = it.def()) item = d->name;
+        }
+        const float sy = viewH_ * 0.5f + 20.f;
+        const float sx = viewW_ * 0.5f - 200.f;
+        stext("[Z] " + wname(core::EquipSlot::LeftHand), sx, sy);
+        stext("[X] " + wname(core::EquipSlot::RightHand), sx, sy + 18.f);
+        stext("[C] " + spell, sx, sy + 36.f);
+        stext("[V] " + item + " (" +
+                  std::to_string(activeHotbarSlot_ + 1) + "/5)",
+              sx, sy + 54.f);
+        // Toast do que entrou (fade 1.5s, centro da tela).
+        const float age = core::Time::elapsed() - swapToastTime_;
+        if (!swapToast_.empty() && age >= 0.f && age < 1.5f) {
+            sf::Text tt;
+            tt.setFont(font);
+            tt.setString(support::utf8(swapToast_));
+            tt.setCharacterSize(20);
+            const sf::Color gold(255, 220, 100,
+                                 static_cast<sf::Uint8>(255.f * (1.f - age / 1.5f)));
+            tt.setFillColor(gold);
+            tt.setOutlineColor(sf::Color::Black);
+            tt.setOutlineThickness(1);
+            const float tw = tt.getLocalBounds().width;
+            tt.setPosition((viewW_ - tw) * 0.5f, viewH_ * 0.5f - 60.f);
+            window->draw(tt);
+        }
+    }
+
     // Menu Dark Souls: por cima da hotbar (view default ativa).
     // Dependências já injetadas no tick (App); aqui só desenha.
     inventoryUI_.render(*window, font, viewW_, viewH_);

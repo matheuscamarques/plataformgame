@@ -239,7 +239,18 @@ class Player : public Entity
             int total = 0;
         };
         MeleeBreakdown meleeDamageBreakdown() const;
-        // Buff elemental da arma (Fase 1: campo; Fase 3 spells setam).
+        // Troca rápida DS (Z/X/C/V, sem pausar): cicla listas da
+        // mochila + equipado. Sem overlay (lista completa é o menu).
+        // Gates: morto e golpe Active barram (stagger futuro barra aqui).
+        bool canQuickSwap() const {
+            return hp > 0 && meleePhase != MeleePhase::Active;
+        }
+        // Próxima arma da mão (dir/esq): devolve a atual e equipa a
+        // próxima da mochila (ordem de slot). <2 armas = false.
+        // outName recebe o nome da arma que entrou (toast do HUD).
+        bool cycleHand(core::EquipSlot hand, std::string *outName = nullptr);
+        // Próxima magia: roda attuned (0 vai p/ o fim). <2 = false.
+        bool cycleSpell(std::string *outName = nullptr);
         // MeleeSystem passa o tipo; default físico = comportamento atual.
         // Timer: 0 = permanente até trocar (frost_weapon seta 30s).
         core::DamageType weaponBuffType = core::DamageType::Physical;

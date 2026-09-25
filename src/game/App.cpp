@@ -210,6 +210,28 @@ void Game::tick() {
             if (p->castAttuned(*throws_))
                 audio_.play(game::keyOf(game::Sfx::MeleeSwing));
         }
+        // Troca rápida DS (Z/X/C/V): cicla sem pausar, com toast.
+        // Gates moram em canQuickSwap (morto/Active barram).
+        if (!uiOpen) {
+            std::string swapped;
+            bool did = false;
+            if (input_.pressed(support::Action::CycleRightHand))
+                did = p->cycleHand(core::EquipSlot::RightHand, &swapped);
+            else if (input_.pressed(support::Action::CycleLeftHand))
+                did = p->cycleHand(core::EquipSlot::LeftHand, &swapped);
+            else if (input_.pressed(support::Action::CycleSpell))
+                did = p->cycleSpell(&swapped);
+            else if (input_.pressed(support::Action::CycleItem)) {
+                activeHotbarSlot_ = (activeHotbarSlot_ + 1) % 5;
+                did = true;
+                swapped = "Slot " + std::to_string(activeHotbarSlot_ + 1);
+            }
+            if (did) {
+                swapToast_ = swapped;
+                swapToastTime_ = core::Time::elapsed();
+                audio_.play(game::keyOf(game::Sfx::UiMove));
+            }
+        }
 
         // 1-5: slot ativo da hotbar (fase 4a; sem consumo — edge por frame).
         // Fora quando o grid está aberto (navegação é do grid).

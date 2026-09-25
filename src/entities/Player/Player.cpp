@@ -428,6 +428,57 @@ bool Player::attune(const std::string& defId) {
     return true;
 }
 
+bool Player::cycleHand(core::EquipSlot hand, std::string *outName) {
+    if (!canQuickSwap()) return false;
+    if (hand != core::EquipSlot::RightHand &&
+        hand != core::EquipSlot::LeftHand)
+        return false;
+    // Candidatas: equipada atual + armas da mochila (ordem de slot).
+    std::vector<std::string> ids;
+    const core::Item &cur = equipment.get(hand);
+    if (!cur.isEmpty()) ids.push_back(cur.defId);
+    for (int i = 0; i < core::Inventory::kCapacity; ++i) {
+        const core::Item &it = inventory.slot(i);
+        if (it.isEmpty()) continue;
+        const core::ItemDef *d = it.def();
+        if (!d || d->type != core::ItemType::Weapon) continue;
+        if (std::find(ids.begin(), ids.end(), it.defId) == ids.end())
+            ids.push_back(it.defId);
+    }
+    if (ids.size() < 2) return false; // nada p/ trocar
+    // Mão equipada: atual é ids[0], próxima é ids[1]. Mão vazia:
+    // ids[0] é da mochila, equipa direto.
+    const std::string &nextId = cur.isEmpty() ? ids[0] : ids[1];
+    if (!cur.isEmpty()) {
+        core::Item back = equipment.unequip(hand);
+        if (!back.isEmpty()) inventory.add(back);
+    }
+    if (!inventory.remove(nextId, 1)) return false;
+    if (!equipment.equipTo(hand, core::Item{nextId, 1})) {
+        inventory.add(core::Item{nextId, 1}); // reverte: devolve
+        return false;
+    }
+    if (outName) {
+        if (const core::ItemDef *d =
+                core::ItemRegistry::instance().find(nextId))
+            *outName = d->name;
+    }
+    refreshDerived(); // peso da arma conta na carga
+    return true;
+}
+
+bool Player::cycleSpell(std::string *outName) {
+    if (!canQuickSwap()) return false;
+    if (attuned.size() < 2) return false;
+    std::rotate(attuned.begin(), attuned.begin() + 1, attuned.end());
+    if (outName) {
+        if (const core::ItemDef *d =
+                core::ItemRegistry::instance().find(attuned[0]))
+            *outName = d->name;
+    }
+    return true;
+}
+
 bool Player::unattune(const std::string& defId) {
     const auto it = std::remove(attuned.begin(), attuned.end(), defId);
     if (it == attuned.end()) return false;
