@@ -39,8 +39,8 @@ int main() {
             assert(t.kind == ThrowKind::Bolt);
             assert(t.fuse == -1.f && t.radius == 0.f);
             assert(t.tilesRadius == 0);
-            // 30 + 30×((12-10)/30) = 32
-            assert(t.damage == 32);
+            // 30 + 30×((12-10)/20) = 33 (rampa nova)
+            assert(t.damage == 33);
         });
         assert(seen);
         assert(!p.castAttuned(ts)); // cooldown

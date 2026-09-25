@@ -75,7 +75,8 @@ int main() {
         assert(scaleMult(ScaleGrade::None) == 0.f);
         assert(scaleFactor(10) == 0.f); // seed não muda dano
         assert(scaleFactor(40) == 1.0f);
-        assert(scaleFactor(25) == 0.5f);
+        assert(scaleFactor(25) == 0.75f); // rampa íngreme: 20 já dá metade
+        assert(scaleFactor(20) == 0.5f);
         assert(scaleFactor(1) == 0.f); // clamp, sem negativo
         assert(scaleLetter(ScaleGrade::B) == 'B' &&
                scaleLetter(ScaleGrade::None) == '-');

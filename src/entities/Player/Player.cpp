@@ -616,13 +616,14 @@ sf::FloatRect Player::meleeHitbox() {
 }
 
 int Player::meleeDamage() const {
-    int dmg = kLight[meleeCombo].damage;
+    // Acumula em float e trunca UMA vez no fim (bônus < 1 somado ao
+    // combo ainda conta; truncar cada parcela zerava STR baixo).
+    float dmg = static_cast<float>(kLight[meleeCombo].damage);
     if (const core::ItemDef* off = offHandDef()) dmg += off->damage;
     if (const core::ItemDef* wdef = weaponDef()) {
         // Scaling DS: dano base × Σ letra×fator. Base 10 = zero bônus
-        // (seed intacto); soft cap 40. Sem req = metade de tudo.
-        const float bonus =
-            wdef->damage *
+        // (seed intacto); soft cap 30. Sem req = metade de tudo.
+        dmg += wdef->damage *
             (core::scaleMult(wdef->strScale) *
                  core::scaleFactor(attrs.get(core::Attr::Strength)) +
              core::scaleMult(wdef->dexScale) *
@@ -631,12 +632,11 @@ int Player::meleeDamage() const {
                  core::scaleFactor(attrs.get(core::Attr::Intelligence)) +
              core::scaleMult(wdef->faiScale) *
                  core::scaleFactor(attrs.get(core::Attr::Faith)));
-        dmg += static_cast<int>(bonus);
         if (attrs.get(core::Attr::Strength) < wdef->strReq ||
             attrs.get(core::Attr::Dexterity) < wdef->dexReq)
-            dmg /= 2;
+            dmg *= 0.5f;
     }
-    return dmg;
+    return static_cast<int>(dmg);
 }
 
 float Player::meleePosture() const { return kLight[meleeCombo].posture; }

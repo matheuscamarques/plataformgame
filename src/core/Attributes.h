@@ -64,13 +64,14 @@ inline char scaleLetter(ScaleGrade s) {
     }
 }
 
-// Fator do atributo no scaling: 0 na base 10, 1.0 aos 40 (soft cap;
-// além, +0.25/ponto). Base 10 contribui zero = seed não muda dano.
+// Fator do atributo no scaling: 0 na base 10, 1.0 aos 30 (soft cap;
+// além, +0.25/ponto com a rampa antiga). Base 10 contribui zero = seed
+// não muda dano. Rampa íngreme cedo (20 já dá metade) p/ investimento
+// baixo ser perceptível; teto igual ao antigo em 40+.
 inline float scaleFactor(int attr) {
-    const float eff =
-        attr <= 40 ? static_cast<float>(attr) : 40.f + (attr - 40) * 0.25f;
-    const float f = (eff - 10.f) / 30.f;
-    return f < 0.f ? 0.f : f;
+    if (attr <= 10) return 0.f;
+    if (attr >= 40) return 1.f + (attr - 40) * 0.25f / 30.f;
+    return (static_cast<float>(attr) - 10.f) / 20.f;
 }
 
 struct Attributes {

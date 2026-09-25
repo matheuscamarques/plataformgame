@@ -139,7 +139,10 @@ int main() {
         Player p; // seed: espada, STR/DEX 10 → bônus 0
         assert(p.meleeDamage() == 8);
         int souls = 1000000000;
-        for (int i = 0; i < 30; ++i)
+        for (int i = 0; i < 10; ++i)
+            assert(p.attrs.buy(core::Attr::Strength, souls));
+        assert(p.meleeDamage() == 8 + 1); // 12×0.2×0.5=1.2: STR 20 visível
+        for (int i = 0; i < 20; ++i)
             assert(p.attrs.buy(core::Attr::Strength, souls));
         assert(p.meleeDamage() == 8 + 2); // 12×0.2×1.0
         for (int i = 0; i < 30; ++i)
@@ -154,7 +157,7 @@ int main() {
         int souls = 1000000000;
         assert(p.attrs.buy(core::Attr::Strength, souls));
         assert(p.attrs.buy(core::Attr::Strength, souls)); // FOR 12
-        assert(p.meleeDamage() == 8 + 1); // +30×0.8×(2/30)
+        assert(p.meleeDamage() == 8 + 1); // +30×0.6×0.1=1.8 (rampa nova)
     }
 
     std::printf("melee test OK\n");
