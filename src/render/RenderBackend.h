@@ -39,6 +39,8 @@ struct SpriteDrawCmd {
     int facing = 1; // -1 espelha em X
     float rotation = 0.f;
     uint8_t alpha = 255;
+    // Tinta RGBA (variantes elementais); branco = identidade.
+    uint32_t color = 0xFFFFFFFFu;
 };
 
 // Backend de render: sprites + formas sólidas world-space.

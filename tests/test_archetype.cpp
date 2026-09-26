@@ -49,7 +49,7 @@ int main() {
     { // UnknownReturnsNull + KeysDeterministic
         assert(ArchetypeRegistry::instance().find("nope") == nullptr);
         const auto &k = ArchetypeRegistry::instance().keys();
-        assert(k.size() == 11u && k[0] == "slime" && k[1] == "dwarf" &&
+        assert(k.size() == 15u && k[0] == "slime" && k[1] == "dwarf" &&
                k[2] == "skeleton");
     }
     { // BodySchemasResolve (auto-registro; sem chamada de boot)
@@ -57,6 +57,29 @@ int main() {
         assert(BodySchemaRegistry::instance().get("dwarf") != nullptr);
         assert(BodySchemaRegistry::instance().get("skeleton") != nullptr);
         assert(BodySchemaRegistry::instance().get("nope") == nullptr);
+    }
+    { // VariantsShareSlimeKind (mesmo cap/SFX, arte e dados próprios)
+        const EnemyArchetype *f =
+            ArchetypeRegistry::instance().find("fire_slime");
+        assert(f != nullptr && f->kind == core::EntityKind::Slime);
+        assert(f->resistances.get(core::DamageType::Fire) == 0.5f);
+        assert(f->tint != 0 && f->scale == 1.f);
+        assert(f->skills.size() == 1u && f->skills[0] == "imp_fire_spit");
+        auto fe = Factory::spawnEnemy("fire_slime", 0.f, 0.f);
+        assert(fe && fe->resources.hp == 40);
+        assert(fe->resources.resistances.get(core::DamageType::Fire) ==
+               0.5f);
+        const EnemyArchetype *b =
+            ArchetypeRegistry::instance().find("baby_slime");
+        auto be = Factory::spawnEnemy("baby_slime", 0.f, 0.f);
+        assert(be && be->resources.hp == 28); // 40 × 0.7
+        assert(be->body.getW() < 40.f && be->body.getH() < 30.f);
+        auto ee = Factory::spawnEnemy("elder_slime", 0.f, 0.f);
+        assert(ee && ee->resources.hp == 60); // 40 × 1.5
+        assert(ee->body.getW() > 40.f && ee->body.getH() > 30.f);
+        const EnemyArchetype *i =
+            ArchetypeRegistry::instance().find("ice_slime");
+        assert(i->skills.size() == 1u && i->skills[0] == "slime_frost_spit");
     }
     { // FactoryResolvesArchetype (slime/anão/esqueleto/desconhecido)
         auto s = Factory::spawnEnemy("slime", 0.f, 0.f);

@@ -38,6 +38,7 @@
 #include "support/Effects/ThrowSystem.h"
 #include "support/Enemies/DwarfAI.h"
 #include "support/Enemies/EnemySystem.h"
+#include "support/Enemies/EnemyArchetype.h"
 #include "support/Enemies/SlimeAI.h"
 #include "support/Progression/DropSystem.h"
 #include "support/UI/ItemIcon.h"
@@ -1231,6 +1232,11 @@ void Game::drawEnemiesSprites() {
         cmd.origin = {fw * 0.5f, fh};
         cmd.scale = {sc, sc};
         cmd.facing = s.body.facing;
+        // Variante elemental: tinge pelo arquétipo (0 = identidade).
+        if (const support::EnemyArchetype *arch =
+                support::ArchetypeRegistry::instance().find(s.archetypeId)) {
+            if (arch->tint != 0) cmd.color = arch->tint;
+        }
         backend.drawSprite(cmd);
 
         // Barra de vida overhead (DS): só quando machucado.

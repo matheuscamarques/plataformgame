@@ -13,6 +13,7 @@
 #include <SFML/System/Vector2.hpp>
 
 #include "core/Config.h"
+#include "core/SpriteData.h"
 #include "entities/Player/Player.h"
 #include "game/SoundBank.h"
 #include "support/Enemies/EnemySystem.h"
@@ -586,6 +587,161 @@ REGISTER_ENEMY_ARCHETYPE("eye", [] {
     a.frameWalkB = support::SpriteFrameId::EyeWalkB;
     a.frameMelee = support::SpriteFrameId::EyeIdle;
     a.frameRanged = support::SpriteFrameId::EyeIdle;
+    return a;
+}());
+
+// Cuspe gelado (slime de gelo): espelho do fire spit em Frost.
+REGISTER_SKILL("slime_frost_spit", [] {
+    support::SkillDef s;
+    s.name = "Cuspe Gélido";
+    s.cooldown = 2.0f;
+    s.telegraph = 0.25f;
+    s.damageType = core::DamageType::Frost;
+    s.staminaCost = 10.f;
+    s.isRanged = true;
+    s.minRange = 40.f;
+    s.maxRange = 220.f;
+    s.baseWeight = 10.f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
+        if (!ctx.player || !ctx.throws) return;
+        core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
+        core::Vec2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
+        core::Vec2f dir = to - from;
+        const float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+        if (len < 1.f) return;
+        dir /= len;
+        auto *t = ctx.throws->throwItem(from, dir * 240.f,
+                                        support::ThrowKind::Spit);
+        if (t) {
+            t->gravity = 0.f;
+            t->fuse = -1.f;
+            t->damage = 8;
+            t->damageType = def.damageType;
+            t->radius = 0.f;
+            t->tilesRadius = 0;
+        }
+    };
+    return s;
+}());
+
+REGISTER_ENEMY_ARCHETYPE("fire_slime", [] {
+    support::EnemyArchetype a;
+    a.color = {230, 120, 40};
+    a.hitboxSize = {40.f, 30.f};
+    a.behaviorKind = "slime";
+    a.kind = core::EntityKind::Slime; // cap e SFX do slime
+    a.bodySchema = "humanoid";
+    a.isTrash = true;
+    a.hp = 40;
+    a.postureMax = 20.f;
+    a.postureRegen = 10.f;
+    a.postureRegenDelay = 1.0f;
+    a.resistances.set(core::DamageType::Fire, 0.5f);
+    a.minStratum = 2;
+    a.maxStratum = 99;
+    a.spawnWeight = 0.2f;
+    a.maxAlive = 100; // compartilha o cap do slime (mesmo kind)
+    a.tint = core::rgba(255, 150, 60, 255);
+    a.drops.entries.push_back({"slime_gel", 0.8f, 1, 2});
+    a.skills = {"imp_fire_spit"};
+    a.xp = 120;
+    a.frameIdle = support::SpriteFrameId::SlimeIdle;
+    a.frameWalkA = support::SpriteFrameId::SlimeSquash;
+    a.frameWalkB = support::SpriteFrameId::SlimeSquash;
+    a.frameMelee = support::SpriteFrameId::SlimeIdle;
+    a.frameRanged = support::SpriteFrameId::SlimeIdle;
+    return a;
+}());
+
+REGISTER_ENEMY_ARCHETYPE("ice_slime", [] {
+    support::EnemyArchetype a;
+    a.color = {140, 200, 255};
+    a.hitboxSize = {40.f, 30.f};
+    a.behaviorKind = "slime";
+    a.kind = core::EntityKind::Slime;
+    a.bodySchema = "humanoid";
+    a.isTrash = true;
+    a.hp = 40;
+    a.postureMax = 20.f;
+    a.postureRegen = 10.f;
+    a.postureRegenDelay = 1.0f;
+    a.resistances.set(core::DamageType::Frost, 0.5f);
+    a.resistances.set(core::DamageType::Fire, 1.3f);
+    a.minStratum = 3;
+    a.maxStratum = 99;
+    a.spawnWeight = 0.2f;
+    a.maxAlive = 100;
+    a.tint = core::rgba(150, 210, 255, 255);
+    a.drops.entries.push_back({"slime_gel", 0.8f, 1, 2});
+    a.skills = {"slime_frost_spit"};
+    a.xp = 120;
+    a.frameIdle = support::SpriteFrameId::SlimeIdle;
+    a.frameWalkA = support::SpriteFrameId::SlimeSquash;
+    a.frameWalkB = support::SpriteFrameId::SlimeSquash;
+    a.frameMelee = support::SpriteFrameId::SlimeIdle;
+    a.frameRanged = support::SpriteFrameId::SlimeIdle;
+    return a;
+}());
+
+REGISTER_ENEMY_ARCHETYPE("baby_slime", [] {
+    support::EnemyArchetype a;
+    a.color = {80, 180, 90};
+    a.hitboxSize = {40.f, 30.f};
+    a.behaviorKind = "slime";
+    a.kind = core::EntityKind::Slime;
+    a.bodySchema = "humanoid";
+    a.isTrash = true;
+    a.hp = 40; // ×0.7 = 28 no spawn
+    a.postureMax = 20.f;
+    a.postureRegen = 10.f;
+    a.postureRegenDelay = 1.0f;
+    a.minStratum = 0;
+    a.maxStratum = 99;
+    a.spawnWeight = 0.3f;
+    a.maxAlive = 100;
+    a.scale = 0.7f;
+    a.drops.entries.push_back({"slime_gel", 0.5f, 1, 1});
+    a.skills = {"slime_spit"};
+    a.xp = 25;
+    a.frameIdle = support::SpriteFrameId::SlimeIdle;
+    a.frameWalkA = support::SpriteFrameId::SlimeSquash;
+    a.frameWalkB = support::SpriteFrameId::SlimeSquash;
+    a.frameMelee = support::SpriteFrameId::SlimeIdle;
+    a.frameRanged = support::SpriteFrameId::SlimeIdle;
+    return a;
+}());
+
+REGISTER_ENEMY_ARCHETYPE("elder_slime", [] {
+    support::EnemyArchetype a;
+    a.color = {30, 120, 60};
+    a.hitboxSize = {40.f, 30.f};
+    a.behaviorKind = "slime";
+    a.kind = core::EntityKind::Slime;
+    a.bodySchema = "humanoid";
+    a.isTrash = false;
+    a.hp = 40; // ×1.5 = 60 no spawn
+    a.postureMax = 30.f;
+    a.postureRegen = 12.f;
+    a.postureRegenDelay = 1.0f;
+    a.staminaMax = 30.f;
+    a.staminaRegen = 20.f;
+    a.staminaRegenDelay = 0.8f;
+    a.minStratum = 4;
+    a.maxStratum = 99;
+    a.spawnWeight = 0.15f;
+    a.maxAlive = 100;
+    a.scale = 1.5f;
+    a.tint = core::rgba(120, 220, 130, 255);
+    a.drops.entries.push_back({"slime_gel", 0.8f, 1, 3});
+    a.drops.entries.push_back({"soul_lost", 0.3f, 1, 1});
+    a.skills = {"slime_spit"};
+    a.xp = 200;
+    a.frameIdle = support::SpriteFrameId::SlimeIdle;
+    a.frameWalkA = support::SpriteFrameId::SlimeSquash;
+    a.frameWalkB = support::SpriteFrameId::SlimeSquash;
+    a.frameMelee = support::SpriteFrameId::SlimeIdle;
+    a.frameRanged = support::SpriteFrameId::SlimeIdle;
     return a;
 }());
 

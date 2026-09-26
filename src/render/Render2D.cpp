@@ -62,11 +62,11 @@ void Render2D::drawSprite(const SpriteDrawCmd &cmd) {
     spr.setPosition(cmd.position.x, cmd.position.y);
     spr.setScale(cmd.scale.x * static_cast<float>(cmd.facing), cmd.scale.y);
     if (cmd.rotation != 0.f) spr.setRotation(cmd.rotation);
-    if (cmd.alpha != 255) {
-        sf::Color c = spr.getColor();
-        c.a = cmd.alpha;
-        spr.setColor(c);
-    }
+    sf::Color c((uint8_t)(cmd.color >> 24), (uint8_t)(cmd.color >> 16),
+                (uint8_t)(cmd.color >> 8), (uint8_t)(cmd.color));
+    if (cmd.alpha != 255)
+        c.a = static_cast<uint8_t>(c.a * cmd.alpha / 255u);
+    spr.setColor(c);
     target_.draw(spr);
 }
 

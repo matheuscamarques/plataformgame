@@ -53,6 +53,12 @@ struct EnemyArchetype {
     int packMin = 1;
     int packMax = 1;
 
+    // Variante visual/física (gerador elemental): escala multiplica
+    // hitbox e HP na Factory; tint tinge o sprite no render (0 = sem
+    // tint). Mesma arte, mesmo kind (cap e SFX compartilhados).
+    float scale = 1.f;
+    uint32_t tint = 0; // RGBA; 0 = identidade (branco)
+
     // Skills disponíveis (IDs no SkillRegistry). Vazio = behavior manual.
     std::vector<std::string> skills;
 

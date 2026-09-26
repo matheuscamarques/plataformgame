@@ -34,7 +34,8 @@ std::unique_ptr<Enemy> Factory::spawnEnemy(const std::string &kind,
     auto ai = BehaviorRegistry::instance().create(a->behaviorKind);
     if (!ai) return nullptr;
 
-    Entity body(core::kIdSlime, x, y, a->hitboxSize.x, a->hitboxSize.y);
+    Entity body(core::kIdSlime, x, y, a->hitboxSize.x * a->scale,
+                a->hitboxSize.y * a->scale);
     body.setFillColor(a->color);
 
     auto e = std::make_unique<Enemy>(std::move(body), std::move(ai));
@@ -43,8 +44,8 @@ std::unique_ptr<Enemy> Factory::spawnEnemy(const std::string &kind,
         e->bodyParts.attach(s);
 
     e->resources.isTrash = a->isTrash;
-    e->resources.hp = a->hp;
-    e->resources.hpMax = a->hp;
+    e->resources.hp = static_cast<int>(a->hp * a->scale);
+    e->resources.hpMax = static_cast<int>(a->hp * a->scale);
     e->resources.posture = a->postureMax;
     e->resources.postureMax = a->postureMax;
     e->resources.postureRegen = a->postureRegen;
