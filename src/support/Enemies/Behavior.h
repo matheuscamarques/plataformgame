@@ -30,6 +30,8 @@ public:
     virtual void onTick(Enemy &e, float dt, GameContext &ctx) = 0;
     // Física avisa; default ignora (nem todo Behavior pula).
     virtual void setGrounded(bool) {}
+    // Voadores ignoram gravidade e chão (FlyingAI); default caminha.
+    virtual bool ignoresGravity() const { return false; }
     // Ciclo de vida: Factory (spawn), Melee/Explosion (hit aplicado),
     // EnemySystem::removeDead (morte). Default ignora.
     virtual void onSpawn(Enemy &, GameContext &) {}

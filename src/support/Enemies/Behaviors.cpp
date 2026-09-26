@@ -199,6 +199,392 @@ REGISTER_SKILL("skeleton_flame_slash", [] {
     };
     return s;
 }());
+// Golpe do soldado oco: espada enferrujada (melee físico 10).
+// Reuso de forma: mesmo alcance do dwarf_melee, nome próprio.
+REGISTER_SKILL("soldier_slash", [] {
+    support::SkillDef s;
+    s.name = "Golpe Enferrujado";
+    s.cooldown = 1.0f;
+    s.telegraph = 0.25f;
+    s.staminaCost = 12.f;
+    s.isMelee = true;
+    s.minRange = 0.f;
+    s.maxRange = 40.f;
+    s.baseWeight = 12.f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
+        if (!ctx.player) return;
+        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
+        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
+        if (dx * dx + dy * dy < 48.f * 48.f)
+            ctx.player->hurt(static_cast<int>(10.f * self.damageMult),
+                             def.damageType);
+    };
+    return s;
+}());
+
+// Mordida de rato: melee físico 6, rápido (cooldown curto).
+REGISTER_SKILL("rat_bite", [] {
+    support::SkillDef s;
+    s.name = "Mordida";
+    s.cooldown = 0.7f;
+    s.telegraph = 0.15f;
+    s.staminaCost = 8.f;
+    s.isMelee = true;
+    s.minRange = 0.f;
+    s.maxRange = 36.f;
+    s.baseWeight = 14.f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
+        if (!ctx.player) return;
+        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
+        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
+        if (dx * dx + dy * dy < 44.f * 44.f)
+            ctx.player->hurt(static_cast<int>(6.f * self.damageMult),
+                             def.damageType);
+    };
+    return s;
+}());
+
+// Detonação (creeper): explode no corpo-a-corpo — dano em área no
+// player, clarão visual e morte própria (drop/XP seguem normais).
+REGISTER_SKILL("burst_detonate", [] {
+    support::SkillDef s;
+    s.name = "Detonação";
+    s.cooldown = 2.5f;
+    s.telegraph = 0.5f;
+    s.staminaCost = 20.f;
+    s.isMelee = true;
+    s.minRange = 0.f;
+    s.maxRange = 44.f;
+    s.baseWeight = 20.f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
+        if (!ctx.player) return;
+        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
+        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
+        if (dx * dx + dy * dy < 52.f * 52.f) {
+            ctx.player->hurt(static_cast<int>(30.f * self.damageMult),
+                             def.damageType);
+            if (ctx.throws)
+                ctx.throws->spawnBlast(
+                    {self.body.getCenterX(), self.body.getCenterY()}, 60.f);
+        }
+        self.resources.takeDamage(99999); // kamikaze: sempre morre
+    };
+    return s;
+}());
+
+// Cuspe de fogo (diabrete): espelho do slime_spit em Fire.
+REGISTER_SKILL("imp_fire_spit", [] {
+    support::SkillDef s;
+    s.name = "Cuspe Ígneo";
+    s.cooldown = 2.0f;
+    s.telegraph = 0.25f;
+    s.damageType = core::DamageType::Fire;
+    s.staminaCost = 10.f;
+    s.isRanged = true;
+    s.minRange = 40.f;
+    s.maxRange = 220.f;
+    s.baseWeight = 10.f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
+        if (!ctx.player || !ctx.throws) return;
+        core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
+        core::Vec2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
+        core::Vec2f dir = to - from;
+        const float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+        if (len < 1.f) return;
+        dir /= len;
+        auto *t = ctx.throws->throwItem(from, dir * 240.f,
+                                        support::ThrowKind::Spit);
+        if (t) {
+            t->gravity = 0.f;
+            t->fuse = -1.f;
+            t->damage = 8;
+            t->damageType = def.damageType;
+            t->radius = 0.f;
+            t->tilesRadius = 0;
+        }
+    };
+    return s;
+}());
+
+// Pena da harpia: projétil físico de médio alcance (padrão spit).
+REGISTER_SKILL("harpy_feather", [] {
+    support::SkillDef s;
+    s.name = "Pena Cortante";
+    s.cooldown = 1.6f;
+    s.telegraph = 0.2f;
+    s.staminaCost = 8.f;
+    s.isMelee = false;
+    s.isRanged = true;
+    s.minRange = 60.f;
+    s.maxRange = 240.f;
+    s.baseWeight = 12.f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
+        if (!ctx.player || !ctx.throws) return;
+        core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
+        core::Vec2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
+        core::Vec2f dir = to - from;
+        const float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+        if (len < 1.f) return;
+        dir /= len;
+        auto *t = ctx.throws->throwItem(from, dir * 280.f,
+                                        support::ThrowKind::Spit);
+        if (t) {
+            t->gravity = 0.f;
+            t->fuse = -1.f;
+            t->damage = 6;
+            t->damageType = def.damageType;
+            t->radius = 0.f;
+            t->tilesRadius = 0;
+        }
+    };
+    return s;
+}());
+
+REGISTER_ENEMY_ARCHETYPE("hollow", [] {
+    support::EnemyArchetype a;
+    a.color = {150, 150, 140};
+    a.hitboxSize = {36.f, 44.f};
+    a.behaviorKind = "hollow";
+    a.kind = core::EntityKind::Hollow;
+    a.bodySchema = "dwarf";
+    a.isTrash = false;
+    a.hp = 35;
+    a.postureMax = 22.f;
+    a.postureRegen = 12.f;
+    a.postureRegenDelay = 1.0f;
+    a.staminaMax = 30.f;
+    a.staminaRegen = 20.f;
+    a.staminaRegenDelay = 0.8f;
+    a.minStratum = 1;
+    a.maxStratum = 99;
+    a.spawnWeight = 0.5f;
+    a.maxAlive = 4;
+    a.drops.entries.push_back({"iron_ore", 0.2f, 1, 1});
+    a.skills = {"soldier_slash"};
+    a.xp = 80;
+    a.frameIdle = support::SpriteFrameId::HollowIdle;
+    a.frameWalkA = support::SpriteFrameId::HollowIdle;
+    a.frameWalkB = support::SpriteFrameId::HollowWalkB;
+    a.frameMelee = support::SpriteFrameId::HollowIdle;
+    a.frameRanged = support::SpriteFrameId::HollowIdle;
+    return a;
+}());
+
+REGISTER_ENEMY_ARCHETYPE("rat", [] {
+    support::EnemyArchetype a;
+    a.color = {130, 90, 50};
+    a.hitboxSize = {28.f, 22.f};
+    a.behaviorKind = "rat";
+    a.kind = core::EntityKind::Rat;
+    a.bodySchema = "humanoid";
+    a.isTrash = true;
+    a.hp = 25;
+    a.postureMax = 12.f;
+    a.postureRegen = 10.f;
+    a.postureRegenDelay = 1.0f;
+    a.minStratum = 0;
+    a.maxStratum = 99;
+    a.spawnWeight = 0.6f;
+    a.maxAlive = 6;
+    a.drops.entries.push_back({"slime_gel", 0.4f, 1, 1});
+    a.skills = {"rat_bite"};
+    a.xp = 40;
+    a.frameIdle = support::SpriteFrameId::RatIdle;
+    a.frameWalkA = support::SpriteFrameId::RatSquash;
+    a.frameWalkB = support::SpriteFrameId::RatSquash;
+    a.frameMelee = support::SpriteFrameId::RatSquash;
+    a.frameRanged = support::SpriteFrameId::RatIdle;
+    return a;
+}());
+
+REGISTER_ENEMY_ARCHETYPE("burst", [] {
+    support::EnemyArchetype a;
+    a.color = {60, 140, 70};
+    a.hitboxSize = {36.f, 44.f};
+    a.behaviorKind = "burst";
+    a.kind = core::EntityKind::Burst;
+    a.bodySchema = "dwarf";
+    a.isTrash = false;
+    a.hp = 50;
+    a.postureMax = 20.f;
+    a.postureRegen = 10.f;
+    a.postureRegenDelay = 1.0f;
+    a.staminaMax = 30.f;
+    a.staminaRegen = 20.f;
+    a.staminaRegenDelay = 0.8f;
+    a.minStratum = 2;
+    a.maxStratum = 99;
+    a.spawnWeight = 0.3f;
+    a.maxAlive = 3;
+    a.drops.entries.push_back({"iron_ore", 0.3f, 1, 1});
+    a.drops.entries.push_back({"tnt", 0.3f, 1, 2});
+    a.skills = {"burst_detonate"};
+    a.xp = 100;
+    a.frameIdle = support::SpriteFrameId::BurstIdle;
+    a.frameWalkA = support::SpriteFrameId::BurstIdle;
+    a.frameWalkB = support::SpriteFrameId::BurstWalkB;
+    a.frameMelee = support::SpriteFrameId::BurstIdle;
+    a.frameRanged = support::SpriteFrameId::BurstIdle;
+    return a;
+}());
+
+REGISTER_ENEMY_ARCHETYPE("imp", [] {
+    support::EnemyArchetype a;
+    a.color = {180, 60, 50};
+    a.hitboxSize = {30.f, 36.f};
+    a.behaviorKind = "imp";
+    a.kind = core::EntityKind::Imp;
+    a.bodySchema = "dwarf";
+    a.isTrash = false;
+    a.hp = 40;
+    a.postureMax = 20.f;
+    a.postureRegen = 12.f;
+    a.postureRegenDelay = 1.0f;
+    a.staminaMax = 30.f;
+    a.staminaRegen = 20.f;
+    a.staminaRegenDelay = 0.8f;
+    a.minStratum = 3;
+    a.maxStratum = 99;
+    a.spawnWeight = 0.3f;
+    a.maxAlive = 3;
+    a.drops.entries.push_back({"iron_ore", 0.2f, 1, 1});
+    a.drops.entries.push_back({"soul_lost", 0.25f, 1, 1});
+    a.skills = {"imp_fire_spit"};
+    a.xp = 110;
+    a.frameIdle = support::SpriteFrameId::ImpIdle;
+    a.frameWalkA = support::SpriteFrameId::ImpIdle;
+    a.frameWalkB = support::SpriteFrameId::ImpWalkB;
+    a.frameMelee = support::SpriteFrameId::ImpIdle;
+    a.frameRanged = support::SpriteFrameId::ImpIdle;
+    return a;
+}());
+
+REGISTER_ENEMY_ARCHETYPE("elemental", [] {
+    support::EnemyArchetype a;
+    a.color = {220, 100, 40};
+    a.hitboxSize = {36.f, 44.f};
+    a.behaviorKind = "elemental";
+    a.kind = core::EntityKind::Elemental;
+    a.bodySchema = "dwarf";
+    a.isTrash = false;
+    a.hp = 55;
+    a.postureMax = 28.f;
+    a.postureRegen = 12.f;
+    a.postureRegenDelay = 1.0f;
+    a.staminaMax = 30.f;
+    a.staminaRegen = 20.f;
+    a.staminaRegenDelay = 0.8f;
+    a.resistances.set(core::DamageType::Fire, 0.5f);
+    a.resistances.set(core::DamageType::Physical, 1.2f);
+    a.minStratum = 4;
+    a.maxStratum = 99;
+    a.spawnWeight = 0.3f;
+    a.maxAlive = 2;
+    a.drops.entries.push_back({"iron_ore", 0.3f, 1, 1});
+    a.drops.entries.push_back({"soul_great", 0.1f, 1, 1});
+    a.skills = {"skeleton_flame_slash"};
+    a.xp = 130;
+    a.frameIdle = support::SpriteFrameId::ElementalIdle;
+    a.frameWalkA = support::SpriteFrameId::ElementalIdle;
+    a.frameWalkB = support::SpriteFrameId::ElementalWalkB;
+    a.frameMelee = support::SpriteFrameId::ElementalIdle;
+    a.frameRanged = support::SpriteFrameId::ElementalIdle;
+    return a;
+}());
+
+REGISTER_ENEMY_ARCHETYPE("undead", [] {
+    support::EnemyArchetype a;
+    a.color = {200, 195, 180};
+    a.hitboxSize = {36.f, 44.f};
+    a.behaviorKind = "undead";
+    a.kind = core::EntityKind::Undead;
+    a.bodySchema = "dwarf";
+    a.isTrash = false;
+    a.hp = 45;
+    a.postureMax = 25.f;
+    a.postureRegen = 12.f;
+    a.postureRegenDelay = 1.0f;
+    a.staminaMax = 30.f;
+    a.staminaRegen = 20.f;
+    a.staminaRegenDelay = 0.8f;
+    a.resistances.set(core::DamageType::Physical, 0.8f);
+    a.minStratum = 2;
+    a.maxStratum = 99;
+    a.spawnWeight = 0.4f;
+    a.maxAlive = 4;
+    a.drops.entries.push_back({"iron_ore", 0.25f, 1, 1});
+    a.skills = {"skeleton_slash"};
+    a.xp = 100;
+    a.frameIdle = support::SpriteFrameId::UndeadIdle;
+    a.frameWalkA = support::SpriteFrameId::UndeadIdle;
+    a.frameWalkB = support::SpriteFrameId::UndeadWalkB;
+    a.frameMelee = support::SpriteFrameId::UndeadIdle;
+    a.frameRanged = support::SpriteFrameId::UndeadIdle;
+    return a;
+}());
+
+REGISTER_ENEMY_ARCHETYPE("harpy", [] {
+    support::EnemyArchetype a;
+    a.color = {150, 110, 70};
+    a.hitboxSize = {36.f, 26.f};
+    a.behaviorKind = "harpy";
+    a.kind = core::EntityKind::Harpy;
+    a.bodySchema = "humanoid";
+    a.isTrash = false;
+    a.hp = 35;
+    a.postureMax = 18.f;
+    a.postureRegen = 12.f;
+    a.postureRegenDelay = 1.0f;
+    a.staminaMax = 30.f;
+    a.staminaRegen = 20.f;
+    a.staminaRegenDelay = 0.8f;
+    a.minStratum = 1;
+    a.maxStratum = 99;
+    a.spawnWeight = 0.4f;
+    a.maxAlive = 4;
+    a.drops.entries.push_back({"soul_lost", 0.3f, 1, 1});
+    a.skills = {"harpy_feather"};
+    a.xp = 90;
+    a.frameIdle = support::SpriteFrameId::HarpyIdle;
+    a.frameWalkA = support::SpriteFrameId::HarpyWalkA;
+    a.frameWalkB = support::SpriteFrameId::HarpyWalkB;
+    a.frameMelee = support::SpriteFrameId::HarpyIdle;
+    a.frameRanged = support::SpriteFrameId::HarpyIdle;
+    return a;
+}());
+
+REGISTER_ENEMY_ARCHETYPE("eye", [] {
+    support::EnemyArchetype a;
+    a.color = {220, 220, 230};
+    a.hitboxSize = {30.f, 24.f};
+    a.behaviorKind = "eye";
+    a.kind = core::EntityKind::Eye;
+    a.bodySchema = "humanoid";
+    a.isTrash = true;
+    a.hp = 30;
+    a.postureMax = 15.f;
+    a.postureRegen = 10.f;
+    a.postureRegenDelay = 1.0f;
+    a.minStratum = 0;
+    a.maxStratum = 99;
+    a.spawnWeight = 0.5f;
+    a.maxAlive = 5;
+    a.drops.entries.push_back({"slime_gel", 0.3f, 1, 1});
+    a.skills = {}; // só encosto (contato); sem skills
+    a.xp = 60;
+    a.frameIdle = support::SpriteFrameId::EyeIdle;
+    a.frameWalkA = support::SpriteFrameId::EyeIdle;
+    a.frameWalkB = support::SpriteFrameId::EyeWalkB;
+    a.frameMelee = support::SpriteFrameId::EyeIdle;
+    a.frameRanged = support::SpriteFrameId::EyeIdle;
+    return a;
+}());
+
 // Cuspe de slime: projétil linear (sem gravidade/fuse), dano no impacto.
 // Valida o mecanismo SkillRegistry; anão ganha as dele no Elite.
 REGISTER_SKILL("slime_spit", [] {

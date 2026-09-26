@@ -49,7 +49,7 @@ int main() {
     { // UnknownReturnsNull + KeysDeterministic
         assert(ArchetypeRegistry::instance().find("nope") == nullptr);
         const auto &k = ArchetypeRegistry::instance().keys();
-        assert(k.size() == 3u && k[0] == "slime" && k[1] == "dwarf" &&
+        assert(k.size() == 11u && k[0] == "slime" && k[1] == "dwarf" &&
                k[2] == "skeleton");
     }
     { // BodySchemasResolve (auto-registro; sem chamada de boot)

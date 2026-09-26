@@ -10,6 +10,7 @@
 #include "support/Enemies/EnemySystem.h"
 #include "support/Enemies/Pathfinder.h"
 #include "support/GameContext.h"
+#include "support/Skills/Skill.h"
 #include "support/Skills/SkillSystem.h"
 
 #include <cmath>
@@ -43,10 +44,21 @@ void SlimeAI::onTick(Enemy &e, float dt, GameContext &ctx) {
     }
     chasing_ = chase;
 
-    // Skill ranged: cospe entre 40 e 220px (cooldown+stamina no tryUse).
+    // Skill ranged: primeira Ranged da lista entre 40 e 220px
+    // (rato usa rat_bite; slime cai no fallback slime_spit).
     if (p) {
         const float dist = std::sqrt(dx * dx + dy * dy);
-        if (dist > 40.f && dist < 220.f) SkillSystem::tryUse(e, ctx, "slime_spit");
+        if (dist > 40.f && dist < 220.f) {
+            const char *ranged = "slime_spit";
+            for (auto &id : e.skillIds) {
+                const SkillDef *sd = SkillRegistry::instance().find(id);
+                if (sd && sd->isRanged) {
+                    ranged = id.c_str();
+                    break;
+                }
+            }
+            SkillSystem::tryUse(e, ctx, ranged);
+        }
     }
 
     float speed = chase ? CHASE_SPEED : PATROL_SPEED;

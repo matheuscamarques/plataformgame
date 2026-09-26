@@ -10,6 +10,7 @@
 #include <algorithm>
 
 #include "defines.h"
+#include "core/Coords.h"
 #include "game/SoundBank.h"
 #include "support/Skills/SkillSystem.h"
 #include "world/World.h"
@@ -116,6 +117,19 @@ void EnemySystem::separate() {
 
 void EnemySystem::physics(Enemy &s, GameContext &ctx) {
     Entity &e = s.body;
+    // Voadores: integram direto, sem gravidade/chão. Se o centro cai
+    // dentro de sólido, sobe (não atravanca em teto de caverna).
+    if (s.ai && s.ai->ignoresGravity()) {
+        e.setX(e.getX() + e.getVx());
+        e.setY(e.getY() + e.getVy());
+        s.grounded = false;
+        if (ctx.world) {
+            const core::TilePos tp = core::worldToTile(
+                {e.getCenterX(), e.getCenterY()});
+            if (ctx.world->isSolid(tp.x, tp.y)) e.setY(e.getY() - 4.f);
+        }
+        return;
+    }
     e.setVy(std::min(e.getVy() + 9.8f, 20.0f));
     e.setX(e.getX() + e.getVx());
     e.setY(e.getY() + e.getVy());
