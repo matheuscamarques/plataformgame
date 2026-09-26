@@ -32,8 +32,15 @@ public:
         lastLen_ = std::sqrt((b.x - a.x) * (b.x - a.x) +
                              (b.y - a.y) * (b.y - a.y));
     }
+    void drawPolygon(const std::vector<core::Vec2f> &pts,
+                     uint32_t) override {
+        polys_ += 1;
+        lastPolyN_ = pts.size();
+    }
     int lines_ = 0;
     float lastLen_ = 0.f;
+    int polys_ = 0;
+    std::size_t lastPolyN_ = 0;
 };
 
 } // namespace
@@ -72,6 +79,22 @@ int main() {
         assert(b.lines_ == 1 && b.lastLen_ == 5.f);
         b.drawLine({1.f, 1.f}, {1.f, 1.f}, 2.f, 0); // zero: sem crash
         assert(b.lines_ == 2); // conta, Render2D filtra no GL
+    }
+    { // VertexTPrecomputed (0 no início, 1 no fim, monotônico)
+        auto trs = traces();
+        for (const auto &tr : trs) {
+            assert(tr.vertexT.size() == tr.pts.size());
+            assert(tr.vertexT.front() == 0.f);
+            assert(tr.vertexT.back() == 1.f);
+            for (std::size_t i = 1; i < tr.vertexT.size(); ++i)
+                assert(tr.vertexT[i] >= tr.vertexT[i - 1]);
+        }
+    }
+    { // DrawPolygonRecords (silhueta do pássaro chega ao backend)
+        NullLogo b;
+        b.drawPolygon({{0.f, 0.f}, {10.f, 0.f}, {5.f, 8.f}}, 0xFFFFFFFFu);
+        assert(b.polys_ == 1 && b.lastPolyN_ == 3u);
+        assert(birdBody().size() > 40u); // contorno fechado amostrado
     }
     { // FinishWindow (6.2s; antes disso não termina)
         LogoScreen l;

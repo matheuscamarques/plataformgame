@@ -37,6 +37,10 @@ public:
                   uint32_t color) override {
         lines_.push_back({a, b, t, color});
     }
+    void drawPolygon(const std::vector<core::Vec2f> &pts,
+                     uint32_t color) override {
+        polys_.push_back({pts.size(), color});
+    }
 
     int begins_ = 0, ends_ = 0;
     uint32_t next_ = 1;
@@ -48,6 +52,11 @@ public:
         uint32_t color;
     };
     std::vector<Line> lines_;
+    struct Poly {
+        std::size_t n;
+        uint32_t color;
+    };
+    std::vector<Poly> polys_;
 };
 
 } // namespace

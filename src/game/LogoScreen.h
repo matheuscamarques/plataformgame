@@ -68,7 +68,11 @@ struct Trace {
     std::vector<core::Vec2f> pts;
     float delay = 0.f;       // desenho (drawPath 1.5s)
     float pulseDelay = 3.f;  // dataPulse infinito a partir daqui
+    std::vector<float> vertexT; // fração de arco por vértice (juntas O(1))
 };
+
+// Preenche vertexT (0..1 por comprimento de arco). Chamar após montar.
+void computeVertexT(Trace &tr);
 
 struct Node {
     core::Vec2f pos;
@@ -86,6 +90,7 @@ std::vector<core::Vec2f> birdBeak();
 
 // Cores do CSS (:root).
 inline constexpr uint32_t kBase = 0x062A1BFFu;
+inline constexpr uint32_t kBaseDark = 0x03140EFFu; // contorno do main-path
 inline constexpr uint32_t kTrace = 0xA5C7A9FFu;
 inline constexpr uint32_t kPulse = 0xE2F2E4FFu;
 inline constexpr uint32_t kBird = 0x62866DFFu;

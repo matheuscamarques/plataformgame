@@ -56,7 +56,7 @@ constexpr float kPi = 3.14159265f;
 } // namespace
 
 std::vector<Trace> traces() {
-    return {
+    std::vector<Trace> out = {
         {{{183, 425}, {290, 425}, {300, 435}, {330, 435}, {340, 425}, {485, 425}, {615, 425}}, 0.2f, 3.0f},
         {{{485, 425}, {485, 440}}, 0.4f, 3.2f},
         {{{130, 350}, {160, 350}, {170, 340}, {170, 290}, {180, 280}, {205, 280}, {215, 290}, {215, 425}}, 0.5f, 3.3f},
@@ -71,6 +71,24 @@ std::vector<Trace> traces() {
         {{{475, 380}, {475, 245}, {485, 235}, {495, 245}, {495, 380}}, 1.2f, 4.7f},
         {{{525, 425}, {525, 320}, {535, 310}, {575, 310}}, 1.3f, 4.9f},
     };
+    for (auto &tr : out) computeVertexT(tr);
+    return out;
+}
+
+void computeVertexT(Trace &tr) {
+    const std::size_t n = tr.pts.size();
+    tr.vertexT.assign(n, 0.f);
+    if (n < 2) return;
+    float total = 0.f;
+    std::vector<float> cum(n, 0.f);
+    for (std::size_t i = 1; i < n; ++i) {
+        const float dx = tr.pts[i].x - tr.pts[i - 1].x;
+        const float dy = tr.pts[i].y - tr.pts[i - 1].y;
+        total += std::sqrt(dx * dx + dy * dy);
+        cum[i] = total;
+    }
+    if (total <= 0.f) return;
+    for (std::size_t i = 0; i < n; ++i) tr.vertexT[i] = cum[i] / total;
 }
 
 std::vector<Node> nodes() {
@@ -127,6 +145,7 @@ std::vector<V> birdBeak() {
 namespace {
 
 // Desenha polilinha parcial [t0, t1] com círculos nos vértices.
+// Versão base (main-path, 1× por frame): juntas por índice.
 void drawPartial(render::RenderBackend &b,
                  const std::vector<core::Vec2f> &design,
                  float t0, float t1, float width, uint32_t color,
@@ -143,19 +162,35 @@ void drawPartial(render::RenderBackend &b,
         b.drawLine(prev, cur, width * scale, color);
         prev = cur;
     }
-    // Juntas arredondadas nos vértices atravessados.
     for (std::size_t i = 0; i < design.size(); ++i) {
-        // fração aproximada do vértice: usa busca simples
-        for (int k = 0; k <= 40; ++k) {
-            const float t = t0 + (t1 - t0) * k / 40.f;
-            const core::Vec2f c = map(polylinePointAt(design, t));
-            const core::Vec2f v = map(design[i]);
-            const float dx = c.x - v.x, dy = c.y - v.y;
-            if (dx * dx + dy * dy < width * width * scale * scale * 0.25f) {
-                b.drawCircle(v, width * 0.5f * scale, color);
-                break;
-            }
-        }
+        const float vt = static_cast<float>(i) /
+                         static_cast<float>(design.size() - 1);
+        if (vt >= t0 && vt <= t1)
+            b.drawCircle(map(design[i]), width * 0.5f * scale, color);
+    }
+}
+
+// Versão Trace: juntas por vertexT pré-computado (13 trilhas).
+void drawPartialTrace(render::RenderBackend &b, const Trace &tr,
+                      float t0, float t1, float width, uint32_t color,
+                      float scale, float ox, float oy) {
+    if (t1 <= t0 || tr.pts.size() < 2) return;
+    auto map = [&](core::Vec2f p) {
+        return core::Vec2f{ox + p.x * scale, oy + p.y * scale};
+    };
+    const int steps = 24;
+    core::Vec2f prev = map(polylinePointAt(tr.pts, t0));
+    for (int i = 1; i <= steps; ++i) {
+        const float t = t0 + (t1 - t0) * i / steps;
+        const core::Vec2f cur = map(polylinePointAt(tr.pts, t));
+        b.drawLine(prev, cur, width * scale, color);
+        prev = cur;
+    }
+    for (std::size_t i = 0; i < tr.pts.size() && i < tr.vertexT.size();
+         ++i) {
+        const float vt = tr.vertexT[i];
+        if (vt >= t0 && vt <= t1)
+            b.drawCircle(map(tr.pts[i]), width * 0.5f * scale, color);
     }
 }
 
@@ -194,12 +229,12 @@ void LogoScreen::render(render::RenderBackend &backend,
         }
     }
 
-    // Trilhas: desenho 1.5s + pulso infinito.
+    // Trilhas: desenho 1.5s + pulso infinito (glow + núcleo).
     static const std::vector<Trace> trs = traces();
     for (const auto &tr : trs) {
         const float p = progress(e, tr.delay, 1.5f);
         if (p > 0.f)
-            drawPartial(backend, tr.pts, 0.f, p, 4.f, kTrace, s, ox, oy);
+            drawPartialTrace(backend, tr, 0.f, p, 4.f, kTrace, s, ox, oy);
         if (e > tr.pulseDelay && p >= 1.f) {
             const float cyc =
                 std::fmod(e - tr.pulseDelay, 2.5f) / 2.5f; // 0..1
@@ -208,24 +243,28 @@ void LogoScreen::render(render::RenderBackend &backend,
             float alpha = 1.f;
             if (cyc < 0.1f) alpha = cyc / 0.1f;
             else if (cyc > 0.8f) alpha = (1.f - cyc) / 0.2f;
-            if (alpha > 0.f && head > tail)
-                drawPartial(backend, tr.pts, tail, head, 4.f,
-                            withAlpha(kPulse,
-                                      static_cast<uint8_t>(255.f * alpha)),
-                            s, ox, oy);
+            if (alpha > 0.f && head > tail) {
+                const uint8_t al =
+                    static_cast<uint8_t>(255.f * alpha);
+                drawPartialTrace(backend, tr, tail, head, 8.f,
+                                 withAlpha(kPulse, al / 4), s, ox, oy);
+                drawPartialTrace(backend, tr, tail, head, 3.f,
+                                 withAlpha(kPulse, al), s, ox, oy);
+            }
         }
     }
 
-    // Estrutura principal (2.5s, largura 18).
+    // Estrutura principal (2.5s): contorno escuro + interior.
     {
         const float p = progress(e, 0.f, 2.5f);
         if (p > 0.f) {
             static const std::vector<V> mp = mainPath();
-            drawPartial(backend, mp, 0.f, p, 18.f, kBase, s, ox, oy);
+            drawPartial(backend, mp, 0.f, p, 20.f, kBaseDark, s, ox, oy);
+            drawPartial(backend, mp, 0.f, p, 14.f, kBase, s, ox, oy);
         }
     }
 
-    // Nós (fade 0.5s; sólidos pulsam 3s).
+    // Nós (fade 0.5s; sólidos pulsam 3s com glow).
     static const std::vector<Node> nds = nodes();
     for (const auto &n : nds) {
         const float f = progress(e, n.delay, 0.5f);
@@ -236,10 +275,13 @@ void LogoScreen::render(render::RenderBackend &backend,
                 1.f + 0.1f * std::sin(6.2831853f * e / 3.f - 1.5707963f);
             const float opa = 0.9f + 0.1f * std::sin(6.2831853f * e / 3.f -
                                                     1.5707963f);
+            const uint8_t oa = static_cast<uint8_t>(255.f * f * opa);
+            backend.drawCircle({ox + n.pos.x * s, oy + n.pos.y * s},
+                               n.radius * 2.f * s,
+                               withAlpha(kPulse, oa / 4));
             backend.drawCircle({ox + n.pos.x * s, oy + n.pos.y * s},
                                n.radius * sc * s,
-                               withAlpha(kTrace, static_cast<uint8_t>(
-                                                    255.f * f * opa)));
+                               withAlpha(kTrace, oa));
         } else {
             backend.drawCircle({ox + n.pos.x * s, oy + n.pos.y * s},
                                n.radius * s, withAlpha(kTrace, al));
@@ -286,10 +328,9 @@ void LogoScreen::render(render::RenderBackend &backend,
                 std::vector<V> tb, tk;
                 for (auto q : body) tb.push_back(xf(q));
                 for (auto q : beak) tk.push_back(xf(q));
-                drawPartial(backend, tb, 0.f, 1.f, 10.f,
-                            withAlpha(kBird, al), 1.f, 0.f, 0.f);
-                drawPartial(backend, tk, 0.f, 1.f, 6.f,
-                            withAlpha(kBird, al), 1.f, 0.f, 0.f);
+                // Silhueta sólida (fan), não wireframe.
+                backend.drawPolygon(tb, withAlpha(kBird, al));
+                backend.drawPolygon(tk, withAlpha(kBird, al));
             }
         }
     }

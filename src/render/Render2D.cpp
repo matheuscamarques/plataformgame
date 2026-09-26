@@ -12,6 +12,7 @@
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/VertexArray.hpp>
 
 namespace render {
 
@@ -99,6 +100,19 @@ void Render2D::drawLine(core::Vec2f a, core::Vec2f b, float thickness,
     line.setRotation(std::atan2(dy, dx) * 180.f / 3.14159265f);
     line.setFillColor(toColor(color));
     target_.draw(line);
+}
+
+void Render2D::drawPolygon(const std::vector<core::Vec2f> &pts,
+                           uint32_t color) {
+    if (pts.size() < 3) return;
+    const sf::Color c = toColor(color);
+    for (std::size_t i = 1; i + 1 < pts.size(); ++i) {
+        sf::VertexArray tri(sf::Triangles, 3);
+        tri[0] = sf::Vertex({pts[0].x, pts[0].y}, c);
+        tri[1] = sf::Vertex({pts[i].x, pts[i].y}, c);
+        tri[2] = sf::Vertex({pts[i + 1].x, pts[i + 1].y}, c);
+        target_.draw(tri);
+    }
 }
 
 } // namespace render

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 
 #include "core/SpriteData.h"
 #include "core/Vec.h"
@@ -62,6 +63,11 @@ public:
     // retângulo rotacionado; extremidades ficam por conta do caller.
     virtual void drawLine(core::Vec2f a, core::Vec2f b, float thickness,
                           uint32_t color) = 0;
+    // Polígono preenchido (triangulação em fan a partir do vértice 0).
+    // Para côncavos profundos, dividir em convexos; em vinheta o
+    // artefato é mínimo.
+    virtual void drawPolygon(const std::vector<core::Vec2f> &pts,
+                             uint32_t color) = 0;
 };
 
 } // namespace render

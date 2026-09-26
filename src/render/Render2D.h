@@ -33,6 +33,8 @@ public:
                     uint32_t color) override;
     void drawLine(core::Vec2f a, core::Vec2f b, float thickness,
                   uint32_t color) override;
+    void drawPolygon(const std::vector<core::Vec2f> &pts,
+                     uint32_t color) override;
 
 private:
     static sf::Color toColor(uint32_t rgba);
