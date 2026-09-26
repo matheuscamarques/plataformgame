@@ -127,6 +127,27 @@ std::vector<V> birdBody() {
     return out;
 }
 
+// Asas como polígonos quase convexos (fan sem artefato no V central).
+// Esquerda: (440,265) → curva externa → (290,120) → curva interna →
+// (440,235) → fecha em (440,265).
+std::vector<V> birdLeft() {
+    std::vector<V> out;
+    append(out, cubic({440, 265}, {380, 265}, {330, 200}, {290, 120}, 12));
+    append(out, cubic({290, 120}, {350, 140}, {400, 210}, {440, 235}, 12));
+    out.push_back({440, 265});
+    return out;
+}
+
+std::vector<V> birdRight() {
+    // Asa direita: borda externa (440,265)->(600,120), volta pela
+    // borda interna (600,120)->(440,235), fecha em (440,265).
+    std::vector<V> out;
+    append(out, cubic({440, 265}, {480, 210}, {540, 140}, {600, 120}, 12));
+    append(out, cubic({600, 120}, {540, 140}, {480, 210}, {440, 235}, 12));
+    out.push_back({440, 265});
+    return out;
+}
+
 std::vector<V> birdBeak() {
     std::vector<V> out;
     // Quadrática M420,258 Q440,285 485,255 como duas cúbicas degeneradas.
@@ -322,7 +343,8 @@ void LogoScreen::render(render::RenderBackend &backend,
 
     // Pássaro (swoop 3.5s @1.5s + float após 5s).
     {
-        static const std::vector<V> body = birdBody();
+        static const std::vector<V> wl = birdLeft();
+        static const std::vector<V> wr = birdRight();
         static const std::vector<V> beak = birdBeak();
         const float t = (e - 1.5f) / 3.5f;
         if (t > 0.f) {
@@ -354,11 +376,13 @@ void LogoScreen::render(render::RenderBackend &backend,
                         ox + (445.f + (q.x - 445.f) * sc) * s,
                         oy + (200.f + (q.y - 200.f) * sc + dy + fy) * s};
                 };
-                std::vector<V> tb, tk;
-                for (auto q : body) tb.push_back(xf(q));
+                std::vector<V> tl, tr, tk;
+                for (auto q : wl) tl.push_back(xf(q));
+                for (auto q : wr) tr.push_back(xf(q));
                 for (auto q : beak) tk.push_back(xf(q));
-                // Silhueta sólida (fan), não wireframe.
-                backend.drawPolygon(tb, withAlpha(kBird, al));
+                // Asas separadas (convexas, sem artefato de fan) + bico.
+                backend.drawPolygon(tl, withAlpha(kBird, al));
+                backend.drawPolygon(tr, withAlpha(kBird, al));
                 backend.drawPolygon(tk, withAlpha(kBird, al));
             }
         }

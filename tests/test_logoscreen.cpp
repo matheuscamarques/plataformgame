@@ -71,6 +71,10 @@ int main() {
         assert(mainPath().size() > 20u); // com arcos amostrados
         assert(birdBody().size() > 40u); // 4 Béziers amostradas
         assert(birdBeak().size() == 17u); // 2 quadráticas (9 + 8)
+        assert(birdLeft().size() > 20u && birdRight().size() > 20u);
+        // Asas fecham no centro (primeiro == último ponto).
+        assert(birdLeft().front().x == 440.f);
+        assert(birdRight().front().x == 440.f);
         assert(traces().front().delay == 0.2f);
     }
     { // DrawLineRecords (backend recebe linhas)

@@ -85,7 +85,9 @@ struct Node {
 std::vector<Trace> traces();
 std::vector<Node> nodes();
 std::vector<core::Vec2f> mainPath();
-std::vector<core::Vec2f> birdBody();
+std::vector<core::Vec2f> birdBody();   // contorno completo (compat)
+std::vector<core::Vec2f> birdLeft();   // asa esquerda (quase convexa)
+std::vector<core::Vec2f> birdRight();  // asa direita (quase convexa)
 std::vector<core::Vec2f> birdBeak();
 
 // Cores do CSS (:root).
