@@ -63,6 +63,14 @@ Output step(const State &prev, const Input &in, float dt) {
         s.vx = 0.0f;
     }
 
+    // Rolagem: sobrescreve vx com a rajada (input ignorado no roll).
+    // Gravidade/colisão seguem normais; expira sozinha no timer.
+    if (s.rollT > 0.f) {
+        s.vx = static_cast<float>(s.rollDir >= 0 ? 1 : -1) * kRollSpeed;
+        s.rollT -= dt;
+        if (s.rollT < 0.f) s.rollT = 0.f;
+    }
+
     // Mira segue o input todo tick; o swing congela a sua (snapshot).
     s.aim = support::resolveAim(aimUp, aimDown, aimLeft, aimRight, s.facing);
 

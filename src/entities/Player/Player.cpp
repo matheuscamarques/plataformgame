@@ -204,6 +204,8 @@ void Player::tick() {
     st.throwAnimT = throwAnimT;
     st.hurtT = hurtIframes.remaining();
     st.throwT = throwCooldown.remaining();
+    st.rollT = rollTimer;
+    st.rollDir = rollDir;
 
     physics::Input in{moveUp, moveDown, moveLeft, moveRight, runFast};
     const physics::Output out =
@@ -232,6 +234,12 @@ void Player::tick() {
     } else {
         throwCooldown.reset();
     }
+    if (s.rollT > 0.f) {
+        rollTimer = s.rollT;
+    } else {
+        rollTimer = 0.f;
+    }
+    rollIframes.tick(physics::kFixedDt);
 
     // Integração já feita no step; aqui só o sync do Entity
     // (era Entity::tick sem o x += vx): posição do shape + sensores.
@@ -458,6 +466,22 @@ bool Player::attune(const std::string& defId) {
     return true;
 }
 
+bool Player::startRoll() {
+    if (hp <= 0 || rollTimer > 0.f) return false;
+    if (!jumping) return false; // só no chão (jumping=true = chão)
+    if (meleePhase == MeleePhase::Active) return false;
+    if (stamina < physics::kRollCost * computeModifiers().staminaCostMult)
+        return false; // sem fôlego: sem rolagem
+    stamina -= physics::kRollCost * computeModifiers().staminaCostMult;
+    staminaDelay.trigger();
+    rollDir = moveLeft ? -1 : (moveRight ? 1 : facing);
+    facing = rollDir;
+    rollTimer = physics::kRollDur;
+    // Fat roll (carga pesada) não dá i-frames (DS).
+    if (!heavilyLoaded()) rollIframes.trigger();
+    return true;
+}
+
 bool Player::cycleHand(core::EquipSlot hand, std::string *outName) {
     if (!canQuickSwap()) return false;
     if (hand != core::EquipSlot::RightHand &&
@@ -567,6 +591,7 @@ int Player::effectiveHpMax() const {
 
 bool Player::hurt(int dmg, core::DamageType type) {
     if (dmg <= 0 || hp <= 0 || !hurtIframes.ready()) return false;
+    if (!rollIframes.ready()) return false; // rolagem: i-frame do roll
     const int after =
         core::applyResistance(dmg, type, resistances_);
     hp -= static_cast<int>(after * computeModifiers().damageTakenMult);

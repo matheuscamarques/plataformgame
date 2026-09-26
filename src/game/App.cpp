@@ -221,6 +221,11 @@ void Game::tick() {
                 }
             }
         }
+        // LShift: rolagem DS (i-frames, custo stamina, sem pausar).
+        if (!uiOpen && input_.pressed(support::Action::Roll)) {
+            if (p->startRoll())
+                audio_.play(game::keyOf(game::Sfx::PlayerRoll));
+        }
         // Troca rápida DS (Z/X/C/V): cicla sem pausar, com toast.
         // Gates moram em canQuickSwap (morto/Active barram).
         if (!uiOpen) {

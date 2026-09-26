@@ -20,6 +20,7 @@
 #include "core/StatusModifiers.h"
 #include "core/Cooldown.h"
 #include "core/Equipment.h"
+#include "physics/PlayerPhysics.hpp"
 #include "core/Inventory.h"
 
 namespace sf { class Texture; }
@@ -239,6 +240,14 @@ class Player : public Entity
             int total = 0;
         };
         MeleeBreakdown meleeDamageBreakdown() const;
+        // Rolagem DS (LShift): rajada 0.4s com i-frames 0.35s, custo
+        // 25 stamina, só no chão e fora do golpe Active. Fat roll
+        // (carga pesada) rola sem i-frames. Direção: input ou facing.
+        float rollTimer = 0.f; // >0 = rolando
+        int rollDir = 1;
+        core::Cooldown rollIframes{physics::kRollIframes};
+        bool rolling() const { return rollTimer > 0.f; }
+        bool startRoll();
         // Troca rápida DS (Z/X/C/V, sem pausar): cicla listas da
         // mochila + equipado. Sem overlay (lista completa é o menu).
         // Gates: morto e golpe Active barram (stagger futuro barra aqui).

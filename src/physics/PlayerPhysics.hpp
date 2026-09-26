@@ -26,6 +26,11 @@ inline constexpr float kWalkSpeed = 9.8f;
 inline constexpr float kRunBonus = 5.0f;
 inline constexpr float kWalkFrameTime = 0.10f;
 inline constexpr int kWalkFrames = 4;
+// Rolagem DS: rajada horizontal com i-frames (Player decide).
+inline constexpr float kRollSpeed = 16.f; // ~1.6x o walk
+inline constexpr float kRollDur = 0.4f;
+inline constexpr float kRollIframes = 0.35f;
+inline constexpr float kRollCost = 25.f;
 
 struct Input {
     bool up = false;
@@ -51,6 +56,8 @@ struct State {
     float throwAnimT = 0.f;
     float hurtT = 0.f;  // remaining de hurtIframes
     float throwT = 0.f; // remaining de throwCooldown
+    float rollT = 0.f;  // remaining da rolagem (0 = sem roll)
+    int rollDir = 1;    // direção da rolagem (-1/+1)
 };
 
 namespace Event {
