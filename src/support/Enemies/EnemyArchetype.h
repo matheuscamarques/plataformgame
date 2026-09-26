@@ -48,6 +48,11 @@ struct EnemyArchetype {
     float spawnWeight = 1.0f;
     int maxAlive = 100;
 
+    // Matilha (Minecraft-style): quantos nascem juntos no mesmo ponto.
+    // 1/1 = solo. Rato 2-3 (caça em grupo), olho 1-2.
+    int packMin = 1;
+    int packMax = 1;
+
     // Skills disponíveis (IDs no SkillRegistry). Vazio = behavior manual.
     std::vector<std::string> skills;
 

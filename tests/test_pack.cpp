@@ -15,6 +15,7 @@
 #include "assets/SpriteFrameRegistry.h"
 #include "support/Effects/ThrowSystem.h"
 #include "support/Enemies/EnemyArchetype.h"
+#include "support/Enemies/SpawnSystem.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
 #include "support/Skills/Skill.h"
@@ -127,6 +128,22 @@ int main() {
     { // EyeHasNoSkills (só encosto; FlyingAI sem melee/ranged)
         auto e = Factory::spawnEnemy("eye", 0.f, 0.f);
         assert(e != nullptr && e->skillIds.empty());
+    }
+    { // PackSizes (solo default; rato 2-3, olho 1-2)
+        const EnemyArchetype *s =
+            ArchetypeRegistry::instance().find("slime");
+        assert(s->packMin == 1 && s->packMax == 1);
+        assert(SpawnSystem::rollPackSize(*s, 0.99f) == 1);
+        const EnemyArchetype *r =
+            ArchetypeRegistry::instance().find("rat");
+        assert(r->packMin == 2 && r->packMax == 3);
+        assert(SpawnSystem::rollPackSize(*r, 0.f) == 2);
+        assert(SpawnSystem::rollPackSize(*r, 0.99f) == 3);
+        assert(SpawnSystem::rollPackSize(*r, -5.f) == 2); // clamp baixo
+        assert(SpawnSystem::rollPackSize(*r, 99.f) == 3); // clamp alto
+        const EnemyArchetype *e =
+            ArchetypeRegistry::instance().find("eye");
+        assert(e->packMin == 1 && e->packMax == 2);
     }
 
     std::printf("pack test OK\n");

@@ -7,6 +7,7 @@
 
 #include "SpawnSystem.h"
 
+#include <algorithm>
 #include <cmath>
 #include <string>
 #include <utility>
@@ -24,6 +25,13 @@
 #include "core/Coords.h"
 
 namespace support {
+
+int SpawnSystem::rollPackSize(const EnemyArchetype &a, float roll01) {
+    if (a.packMax <= a.packMin) return a.packMin;
+    const float r = std::clamp(roll01, 0.f, 0.9999f);
+    return a.packMin +
+           static_cast<int>(r * (a.packMax - a.packMin + 1));
+}
 
 int SpawnSystem::budgetForStratum(int s) {
     // Densidade cai com a profundidade. Tabela real (era stub 100).
@@ -115,6 +123,17 @@ void SpawnSystem::tick(float dt, GameContext &ctx) {
         sy = static_cast<float>(tyy) * core::kBlockSize;
     }
     ctx.enemies->spawn(kind, sx, sy, &ctx);
+    // Matilha: companheiros do mesmo kind ao redor (respeita caps).
+    if (const EnemyArchetype *pa = ArchetypeRegistry::instance().find(kind)) {
+        const int pack =
+            rollPackSize(*pa, core::randRange(0.f, 1.f));
+        for (int i = 1; i < pack; ++i) {
+            if (ctx.enemies->count() >= kGlobalCap) break;
+            if (countAlive(*ctx.enemies, pa->kind) >= pa->maxAlive) break;
+            ctx.enemies->spawn(
+                kind, sx + core::randRange(-40.f, 40.f), sy, &ctx);
+        }
+    }
     if (ctx.debug)
         ctx.debug->pushLog("spawn " + kind + " S" +
                            std::to_string(stratum));

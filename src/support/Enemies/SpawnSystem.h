@@ -9,6 +9,7 @@
 #include <cstddef>
 
 #include "core/System.h"
+#include "support/Enemies/EnemyArchetype.h"
 
 namespace support {
 
@@ -27,6 +28,10 @@ public:
     // Budget total de vivos por estrato (densidade cai com profundidade).
     static int budgetForStratum(int s);
     static constexpr std::size_t kGlobalCap = 100;
+
+    // Tamanho da matilha p/ o arquétipo (puro, testável): interpola
+    // packMin..packMax por roll01 em [0,1].
+    static int rollPackSize(const EnemyArchetype &a, float roll01);
 
 private:
     float timer_ = 0.f;

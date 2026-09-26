@@ -391,6 +391,8 @@ REGISTER_ENEMY_ARCHETYPE("rat", [] {
     a.maxStratum = 99;
     a.spawnWeight = 0.6f;
     a.maxAlive = 6;
+    a.packMin = 2; // matilha: ratos caçam em grupo
+    a.packMax = 3;
     a.drops.entries.push_back({"slime_gel", 0.4f, 1, 1});
     a.skills = {"rat_bite"};
     a.xp = 40;
@@ -574,6 +576,8 @@ REGISTER_ENEMY_ARCHETYPE("eye", [] {
     a.maxStratum = 99;
     a.spawnWeight = 0.5f;
     a.maxAlive = 5;
+    a.packMin = 1;
+    a.packMax = 2; // pares ocasionais
     a.drops.entries.push_back({"slime_gel", 0.3f, 1, 1});
     a.skills = {}; // só encosto (contato); sem skills
     a.xp = 60;
