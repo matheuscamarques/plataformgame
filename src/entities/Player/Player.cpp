@@ -582,7 +582,38 @@ core::StatusModifiers Player::computeModifiers() const {
     core::StatusModifiers mods;
     if (bleedSlowTimer > 0.f) mods.moveSpeedMult = 0.9f;
     if (frostTimer > 0.f) mods.attackSpeedMult = kFrostSlow; // Fase 2
+    // Tarô: multiplica sobre os status (fundação v1).
+    mods.damageTakenMult *= tarotFx.damageTakenMult;
+    mods.attackSpeedMult *= tarotFx.attackSpeedMult;
+    mods.staminaRegenMult *= tarotFx.staminaRegenMult;
+    mods.staminaCostMult *= tarotFx.staminaCostMult;
+    mods.hpMaxMult *= tarotFx.hpMaxMult;
     return mods;
+}
+
+void Player::addTarotCard(core::TarotArcana a) {
+    if (!core::TarotRegistry::instance().has(a)) return;
+    tarotCards[a] += 1;
+    recomputeTarot();
+}
+
+void Player::recomputeTarot() {
+    tarotFx = core::TarotEffect{};
+    const auto addMult = [](float base, int n) {
+        return 1.f + (base - 1.f) * static_cast<float>(n);
+    };
+    for (const auto &[arcana, count] : tarotCards) {
+        const core::TarotCardDef *def =
+            core::TarotRegistry::instance().find(arcana);
+        if (!def) continue;
+        const auto &e = def->effect;
+        tarotFx.damageMult *= addMult(e.damageMult, count);
+        tarotFx.damageTakenMult *= addMult(e.damageTakenMult, count);
+        tarotFx.attackSpeedMult *= addMult(e.attackSpeedMult, count);
+        tarotFx.staminaRegenMult *= addMult(e.staminaRegenMult, count);
+        tarotFx.staminaCostMult *= addMult(e.staminaCostMult, count);
+        tarotFx.hpMaxMult *= addMult(e.hpMaxMult, count);
+    }
 }
 
 int Player::effectiveHpMax() const {
@@ -631,6 +662,9 @@ void Player::respawn(float x, float y) {
     curePoison();
     cureBleed();
     cureFrost();
+    // Tarô morre junto (permanente na run, não além da morte).
+    tarotCards.clear();
+    recomputeTarot();
     fp = fpMax; // respawn renova FP (DS)
     topUpDynamite();
     topUpStarterKit();
@@ -773,6 +807,7 @@ Player::MeleeBreakdown Player::meleeDamageBreakdown() const {
             dmg *= 0.5f;
             bd.halvedByReq = true;
         }
+        dmg *= tarotFx.damageMult; // tarô (1.0 sem cartas)
         bd.total = static_cast<int>(dmg);
     } else {
         bd.total = bd.base;

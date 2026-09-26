@@ -9,6 +9,9 @@
 
 #include "core/Config.h"
 #include "core/DropTable.h"
+#include "core/TarotCard.h"
+#include "entities/Player/Player.h"
+#include "support/Debug/DebugFeed.h"
 #include "support/Enemies/EnemyArchetype.h"
 #include "support/Progression/DropSystem.h"
 #include "support/Enemies/EnemySystem.h"
@@ -49,6 +52,24 @@ void DeathSystem::tick(float /*dt*/, GameContext &ctx) {
                 drops_->spawnItem(it.defId, it.quantity,
                                   {e.body.getCenterX(), e.body.getCenterY()});
             });
+            // Tarô (fundação v1): 1% determinístico por tile+seed;
+            // carta aleatória direto p/ o player (pickup é follow-up).
+            if (ctx.player) {
+                const uint32_t salt = core::dropSalt(tx, ty, seed);
+                if (salt % 100u == 0u) {
+                    const auto &keys =
+                        core::TarotRegistry::instance().keys();
+                    if (!keys.empty()) {
+                        const auto arcana =
+                            keys[(salt >> 8) % keys.size()];
+                        ctx.player->addTarotCard(arcana);
+                        if (ctx.debug)
+                            ctx.debug->pushLog(
+                                std::string("tarot ") +
+                                core::tarotName(arcana));
+                    }
+                }
+            }
         });
     }
     ctx.enemies->removeDead([&](Enemy &e) {

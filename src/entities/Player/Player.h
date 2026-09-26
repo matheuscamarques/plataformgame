@@ -8,6 +8,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include <SFML/Graphics/Rect.hpp>
@@ -18,6 +19,7 @@
 #include "core/Attributes.h"
 #include "core/Resistances.h"
 #include "core/StatusModifiers.h"
+#include "core/TarotCard.h"
 #include "core/Cooldown.h"
 #include "core/Equipment.h"
 #include "physics/PlayerPhysics.hpp"
@@ -260,6 +262,14 @@ class Player : public Entity
         bool cycleHand(core::EquipSlot hand, std::string *outName = nullptr);
         // Próxima magia: roda attuned (0 vai p/ o fim). <2 = false.
         bool cycleSpell(std::string *outName = nullptr);
+        // Tarô (fundação v1): cartas permanentes na run, trade-off
+        // linear por cópia (Diabo ×2 = 1.5× dano e recebido).
+        std::unordered_map<core::TarotArcana, int,
+                           core::TarotRegistry::ArcanaHash>
+            tarotCards;
+        core::TarotEffect tarotFx; // agregado recomputado no addCard
+        void addTarotCard(core::TarotArcana a);
+        void recomputeTarot();
         // MeleeSystem passa o tipo; default físico = comportamento atual.
         // Timer: 0 = permanente até trocar (frost_weapon seta 30s).
         core::DamageType weaponBuffType = core::DamageType::Physical;
