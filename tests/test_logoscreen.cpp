@@ -70,7 +70,7 @@ int main() {
         assert(nodes().size() == 15u);
         assert(mainPath().size() > 20u); // com arcos amostrados
         assert(birdBody().size() > 40u); // 4 Béziers amostradas
-        assert(birdBeak().size() == 9u);
+        assert(birdBeak().size() == 17u); // 2 quadráticas (9 + 8)
         assert(traces().front().delay == 0.2f);
     }
     { // DrawLineRecords (backend recebe linhas)

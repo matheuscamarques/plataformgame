@@ -89,7 +89,8 @@ std::vector<core::Vec2f> birdBody();
 std::vector<core::Vec2f> birdBeak();
 
 // Cores do CSS (:root).
-inline constexpr uint32_t kBase = 0x062A1BFFu;
+inline constexpr uint32_t kBase = 0x0A3D28FFu; // verde médio
+inline constexpr uint32_t kBaseMid = 0x105A3CFFu; // veia central clara
 inline constexpr uint32_t kBaseDark = 0x03140EFFu; // contorno do main-path
 inline constexpr uint32_t kTrace = 0xA5C7A9FFu;
 inline constexpr uint32_t kPulse = 0xE2F2E4FFu;

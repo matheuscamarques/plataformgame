@@ -107,13 +107,13 @@ std::vector<Node> nodes() {
 
 std::vector<V> mainPath() {
     std::vector<V> out = pts({{170, 380}, {220, 380}, {220, 310}});
-    append(out, arc({245, 310}, 25.f, kPi, 2 * kPi, 10));
+    append(out, arc({245, 310}, 25.f, kPi, 2 * kPi, 32));
     append(out, pts({{270, 380}, {300, 380}, {300, 180}}));
-    append(out, arc({325, 180}, 25.f, kPi, 2 * kPi, 10));
+    append(out, arc({325, 180}, 25.f, kPi, 2 * kPi, 32));
     append(out, pts({{350, 380}, {380, 380}, {380, 250}}));
-    append(out, arc({405, 250}, 25.f, kPi, 2 * kPi, 10));
+    append(out, arc({405, 250}, 25.f, kPi, 2 * kPi, 32));
     append(out, pts({{430, 380}, {460, 380}, {460, 180}}));
-    append(out, arc({485, 180}, 25.f, kPi, 2 * kPi, 10));
+    append(out, arc({485, 180}, 25.f, kPi, 2 * kPi, 32));
     append(out, pts({{510, 380}, {590, 380}}));
     return out;
 }
@@ -139,13 +139,30 @@ std::vector<V> birdBeak() {
         }
     };
     q({420, 258}, {440, 285}, {485, 255}, 8);
+    // Curva 2 (de volta): Q 440 265 420 258 — fecha o bico.
+    // O append pula o 1º ponto (duplicado com o fim da curva 1).
+    std::vector<V> back;
+    {
+        auto qb = [&](V p0, V p1, V p2, int n) {
+            for (int i = 0; i <= n; ++i) {
+                const float t = static_cast<float>(i) / n;
+                const float u = 1.f - t;
+                back.push_back(
+                    {u * u * p0.x + 2 * u * t * p1.x + t * t * p2.x,
+                     u * u * p0.y + 2 * u * t * p1.y + t * t * p2.y});
+            }
+        };
+        qb({485, 255}, {440, 265}, {420, 258}, 8);
+    }
+    for (std::size_t i = 1; i < back.size(); ++i) out.push_back(back[i]);
     return out;
 }
 
 namespace {
 
-// Desenha polilinha parcial [t0, t1] com círculos nos vértices.
-// Versão base (main-path, 1× por frame): juntas por índice.
+// Desenha polilinha parcial [t0, t1]. Círculos APENAS em junções
+// angulares (Δθ > 15°) — em arco denso amostrado, zero círculos
+// (fim do "colar de contas"). Steps adaptativos ao tamanho.
 void drawPartial(render::RenderBackend &b,
                  const std::vector<core::Vec2f> &design,
                  float t0, float t1, float width, uint32_t color,
@@ -154,7 +171,8 @@ void drawPartial(render::RenderBackend &b,
     auto map = [&](core::Vec2f p) {
         return core::Vec2f{ox + p.x * scale, oy + p.y * scale};
     };
-    const int steps = 24;
+    const int steps = std::max(24, std::min(128,
+        static_cast<int>(design.size()) * 3));
     core::Vec2f prev = map(polylinePointAt(design, t0));
     for (int i = 1; i <= steps; ++i) {
         const float t = t0 + (t1 - t0) * i / steps;
@@ -162,10 +180,20 @@ void drawPartial(render::RenderBackend &b,
         b.drawLine(prev, cur, width * scale, color);
         prev = cur;
     }
-    for (std::size_t i = 0; i < design.size(); ++i) {
+    for (std::size_t i = 1; i + 1 < design.size(); ++i) {
         const float vt = static_cast<float>(i) /
                          static_cast<float>(design.size() - 1);
-        if (vt >= t0 && vt <= t1)
+        if (vt < t0 || vt > t1) continue;
+        const core::Vec2f a{design[i].x - design[i - 1].x,
+                            design[i].y - design[i - 1].y};
+        const core::Vec2f c{design[i + 1].x - design[i].x,
+                            design[i + 1].y - design[i].y};
+        const float la = std::sqrt(a.x * a.x + a.y * a.y);
+        const float lc = std::sqrt(c.x * c.x + c.y * c.y);
+        if (la < 0.01f || lc < 0.01f) continue;
+        const float dot =
+            std::max(-1.f, std::min(1.f, (a.x * c.x + a.y * c.y) / (la * lc)));
+        if (std::acos(dot) > 0.26f) // > 15°: junção real
             b.drawCircle(map(design[i]), width * 0.5f * scale, color);
     }
 }
@@ -248,19 +276,20 @@ void LogoScreen::render(render::RenderBackend &backend,
                     static_cast<uint8_t>(255.f * alpha);
                 drawPartialTrace(backend, tr, tail, head, 8.f,
                                  withAlpha(kPulse, al / 4), s, ox, oy);
-                drawPartialTrace(backend, tr, tail, head, 3.f,
+                drawPartialTrace(backend, tr, tail, head, 4.f,
                                  withAlpha(kPulse, al), s, ox, oy);
             }
         }
     }
 
-    // Estrutura principal (2.5s): contorno escuro + interior.
+    // Estrutura principal (2.5s): contorno + corpo + veia central.
     {
         const float p = progress(e, 0.f, 2.5f);
         if (p > 0.f) {
             static const std::vector<V> mp = mainPath();
             drawPartial(backend, mp, 0.f, p, 20.f, kBaseDark, s, ox, oy);
-            drawPartial(backend, mp, 0.f, p, 14.f, kBase, s, ox, oy);
+            drawPartial(backend, mp, 0.f, p, 14.f, kBase,     s, ox, oy);
+            drawPartial(backend, mp, 0.f, p,  6.f, kBaseMid,  s, ox, oy);
         }
     }
 
@@ -344,7 +373,9 @@ void LogoScreen::render(render::RenderBackend &backend,
             tx.setFont(font);
             tx.setString("WEB-ENGENHARIA");
             tx.setCharacterSize(static_cast<unsigned>(28.f * s));
-            tx.setLetterSpacing(2.f);
+            // SFML: letter-spacing é FATOR (não px como no SVG).
+            // Alvo SVG: 258px + 18px×14 = 510px → fator 510/258.
+            tx.setLetterSpacing(1.98f);
             tx.setFillColor(sf::Color(0, 0, 0,
                                       static_cast<uint8_t>(255.f * a)));
             const float tw = tx.getLocalBounds().width;
