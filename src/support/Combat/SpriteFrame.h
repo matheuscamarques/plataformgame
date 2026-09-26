@@ -42,6 +42,24 @@ enum class SpriteFrameId : uint8_t {
     SkeletonWalkB,
     SkeletonMelee,
 
+    HollowIdle,
+    HollowWalkB,
+    RatIdle,
+    RatSquash,
+    BurstIdle,
+    BurstWalkB,
+    ImpIdle,
+    ImpWalkB,
+    ElementalIdle,
+    ElementalWalkB,
+    UndeadIdle,
+    UndeadWalkB,
+    HarpyIdle,
+    HarpyWalkA,
+    HarpyWalkB,
+    EyeIdle,
+    EyeWalkB,
+
     COUNT
 };
 

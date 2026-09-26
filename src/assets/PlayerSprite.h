@@ -71,6 +71,23 @@ inline const sf::Texture *textureForFrame(support::SpriteFrameId id,
         case SpriteFrameId::SkeletonWalkA: return &sp.skeletonWalkA;
         case SpriteFrameId::SkeletonWalkB: return &sp.skeletonWalkB;
         case SpriteFrameId::SkeletonMelee: return &sp.skeletonMelee;
+        case SpriteFrameId::HollowIdle: return &sp.hollowIdle;
+        case SpriteFrameId::HollowWalkB: return &sp.hollowWalkB;
+        case SpriteFrameId::RatIdle: return &sp.ratIdle;
+        case SpriteFrameId::RatSquash: return &sp.ratSquash;
+        case SpriteFrameId::BurstIdle: return &sp.burstIdle;
+        case SpriteFrameId::BurstWalkB: return &sp.burstWalkB;
+        case SpriteFrameId::ImpIdle: return &sp.impIdle;
+        case SpriteFrameId::ImpWalkB: return &sp.impWalkB;
+        case SpriteFrameId::ElementalIdle: return &sp.elementalIdle;
+        case SpriteFrameId::ElementalWalkB: return &sp.elementalWalkB;
+        case SpriteFrameId::UndeadIdle: return &sp.undeadIdle;
+        case SpriteFrameId::UndeadWalkB: return &sp.undeadWalkB;
+        case SpriteFrameId::HarpyIdle: return &sp.harpyIdle;
+        case SpriteFrameId::HarpyWalkA: return &sp.harpyWalkA;
+        case SpriteFrameId::HarpyWalkB: return &sp.harpyWalkB;
+        case SpriteFrameId::EyeIdle: return &sp.eyeIdle;
+        case SpriteFrameId::EyeWalkB: return &sp.eyeWalkB;
         case SpriteFrameId::None:
         case SpriteFrameId::COUNT:
         default: return &sp.slimeIdle;

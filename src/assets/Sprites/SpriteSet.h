@@ -43,6 +43,23 @@ struct SpriteSet {
     sf::Texture skeletonWalkA;
     sf::Texture skeletonWalkB;
     sf::Texture skeletonMelee;
+    sf::Texture hollowIdle;
+    sf::Texture hollowWalkB;
+    sf::Texture ratIdle;
+    sf::Texture ratSquash;
+    sf::Texture burstIdle;
+    sf::Texture burstWalkB;
+    sf::Texture impIdle;
+    sf::Texture impWalkB;
+    sf::Texture elementalIdle;
+    sf::Texture elementalWalkB;
+    sf::Texture undeadIdle;
+    sf::Texture undeadWalkB;
+    sf::Texture harpyIdle;
+    sf::Texture harpyWalkA;
+    sf::Texture harpyWalkB;
+    sf::Texture eyeIdle;
+    sf::Texture eyeWalkB;
 
     // Equipment — 1 textura por (peça × material).
     static constexpr int kMats = static_cast<int>(core::MaterialId::COUNT);
@@ -101,6 +118,40 @@ inline SpriteSet build() {
                                        kSkeletonPal, kSkeletonPalCount);
     s.skeletonMelee = core::makeSprite(kSkeletonMelee, kSkeletonW, kSkeletonH,
                                        kSkeletonPal, kSkeletonPalCount);
+    s.hollowIdle = core::makeSprite(kHollowIdle, 14, 18,
+                                       kHollowPal, kHollowPalCount);
+    s.hollowWalkB = core::makeSprite(kHollowWalkB, 14, 18,
+                                       kHollowPal, kHollowPalCount);
+    s.ratIdle = core::makeSprite(kRatIdle, 14, 12,
+                                       kRatPal, kRatPalCount);
+    s.ratSquash = core::makeSprite(kRatSquash, 14, 12,
+                                       kRatPal, kRatPalCount);
+    s.burstIdle = core::makeSprite(kBurstIdle, 14, 18,
+                                       kBurstPal, kBurstPalCount);
+    s.burstWalkB = core::makeSprite(kBurstWalkB, 14, 18,
+                                       kBurstPal, kBurstPalCount);
+    s.impIdle = core::makeSprite(kImpIdle, 14, 18,
+                                       kImpPal, kImpPalCount);
+    s.impWalkB = core::makeSprite(kImpWalkB, 14, 18,
+                                       kImpPal, kImpPalCount);
+    s.elementalIdle = core::makeSprite(kElementalIdle, 14, 18,
+                                       kElementalPal, kElementalPalCount);
+    s.elementalWalkB = core::makeSprite(kElementalWalkB, 14, 18,
+                                       kElementalPal, kElementalPalCount);
+    s.undeadIdle = core::makeSprite(kUndeadIdle, 14, 18,
+                                       kUndeadPal, kUndeadPalCount);
+    s.undeadWalkB = core::makeSprite(kUndeadWalkB, 14, 18,
+                                       kUndeadPal, kUndeadPalCount);
+    s.harpyIdle = core::makeSprite(kHarpyIdle, 14, 12,
+                                       kHarpyPal, kHarpyPalCount);
+    s.harpyWalkA = core::makeSprite(kHarpyWalkA, 14, 12,
+                                       kHarpyPal, kHarpyPalCount);
+    s.harpyWalkB = core::makeSprite(kHarpyWalkB, 14, 12,
+                                       kHarpyPal, kHarpyPalCount);
+    s.eyeIdle = core::makeSprite(kEyeIdle, 14, 12,
+                                       kEyePal, kEyePalCount);
+    s.eyeWalkB = core::makeSprite(kEyeWalkB, 14, 12,
+                                       kEyePal, kEyePalCount);
 
     // Paleta de equipamento por material: 5 entradas fixas (., W, w, G, E).
     for (int m = 0; m < SpriteSet::kMats; ++m) {

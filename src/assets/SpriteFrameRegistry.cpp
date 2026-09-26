@@ -102,6 +102,57 @@ SpriteFrameData frameData(support::SpriteFrameId id) {
             return {sprites::kSkeletonMelee, sprites::kSkeletonW,
                     sprites::kSkeletonH, sprites::kSkeletonPal,
                     sprites::kSkeletonPalCount};
+        case SpriteFrameId::HollowIdle:
+            return {sprites::kHollowIdle, 14, 18,
+                    sprites::kHollowPal, sprites::kHollowPalCount};
+        case SpriteFrameId::HollowWalkB:
+            return {sprites::kHollowWalkB, 14, 18,
+                    sprites::kHollowPal, sprites::kHollowPalCount};
+        case SpriteFrameId::RatIdle:
+            return {sprites::kRatIdle, 14, 12,
+                    sprites::kRatPal, sprites::kRatPalCount};
+        case SpriteFrameId::RatSquash:
+            return {sprites::kRatSquash, 14, 12,
+                    sprites::kRatPal, sprites::kRatPalCount};
+        case SpriteFrameId::BurstIdle:
+            return {sprites::kBurstIdle, 14, 18,
+                    sprites::kBurstPal, sprites::kBurstPalCount};
+        case SpriteFrameId::BurstWalkB:
+            return {sprites::kBurstWalkB, 14, 18,
+                    sprites::kBurstPal, sprites::kBurstPalCount};
+        case SpriteFrameId::ImpIdle:
+            return {sprites::kImpIdle, 14, 18,
+                    sprites::kImpPal, sprites::kImpPalCount};
+        case SpriteFrameId::ImpWalkB:
+            return {sprites::kImpWalkB, 14, 18,
+                    sprites::kImpPal, sprites::kImpPalCount};
+        case SpriteFrameId::ElementalIdle:
+            return {sprites::kElementalIdle, 14, 18,
+                    sprites::kElementalPal, sprites::kElementalPalCount};
+        case SpriteFrameId::ElementalWalkB:
+            return {sprites::kElementalWalkB, 14, 18,
+                    sprites::kElementalPal, sprites::kElementalPalCount};
+        case SpriteFrameId::UndeadIdle:
+            return {sprites::kUndeadIdle, 14, 18,
+                    sprites::kUndeadPal, sprites::kUndeadPalCount};
+        case SpriteFrameId::UndeadWalkB:
+            return {sprites::kUndeadWalkB, 14, 18,
+                    sprites::kUndeadPal, sprites::kUndeadPalCount};
+        case SpriteFrameId::HarpyIdle:
+            return {sprites::kHarpyIdle, 14, 12,
+                    sprites::kHarpyPal, sprites::kHarpyPalCount};
+        case SpriteFrameId::HarpyWalkA:
+            return {sprites::kHarpyWalkA, 14, 12,
+                    sprites::kHarpyPal, sprites::kHarpyPalCount};
+        case SpriteFrameId::HarpyWalkB:
+            return {sprites::kHarpyWalkB, 14, 12,
+                    sprites::kHarpyPal, sprites::kHarpyPalCount};
+        case SpriteFrameId::EyeIdle:
+            return {sprites::kEyeIdle, 14, 12,
+                    sprites::kEyePal, sprites::kEyePalCount};
+        case SpriteFrameId::EyeWalkB:
+            return {sprites::kEyeWalkB, 14, 12,
+                    sprites::kEyePal, sprites::kEyePalCount};
         case SpriteFrameId::None:
         case SpriteFrameId::COUNT:
         default:

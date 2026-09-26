@@ -14,8 +14,11 @@ namespace core {
 // Identidade tipada de entidade (novo). Troca os switches em string
 // (ai->name() == "DwarfAI") por comparação de enum — rename-safe e O(1).
 // Behavior::kind() é a fonte; EnemyArchetype::kind dirige SpawnSystem.
-enum class EntityKind : uint8_t { Player, Slime, Dwarf, Skeleton, TNT, Rock, COUNT };
-inline constexpr int kEntityKindCount = 6;
+enum class EntityKind : uint8_t {
+    Player, Slime, Dwarf, Skeleton, Hollow, Rat, Burst, Imp, Elemental,
+    Undead, Harpy, Eye, TNT, Rock, COUNT
+};
+inline constexpr int kEntityKindCount = 14;
 
 // Domínio legado: IDs int de Entity::getName()/Component (defines.h
 // morreu: PLAYER=0, SLIME=40...). Migração futura: getName() vira kind().
