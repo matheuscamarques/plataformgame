@@ -709,19 +709,24 @@ REGISTER_ITEM("soul_great", [] {
 // ---- Magias (F8): sintoniza no menu, conjura com G ----
 inline const core::PaletteEntry kItemArrowPal[] = {
     {'.', {0, 0, 0, 0}},
-    {'C', {120, 220, 255}},
-    {'W', {230, 250, 255}},
+    {'W', {255, 255, 255}},
+    {'C', {140, 220, 255}},
+    {'D', {60, 120, 200}},
 };
-inline constexpr std::size_t kItemArrowPalCount = 3;
+inline constexpr std::size_t kItemArrowPalCount = 4;
 inline const char* const kItemArrowSprite[] = {
-    "......CC",
-    ".....CCW",
-    "....CCW.",
-    "...CCW..",
-    "..CCW...",
-    ".CCW....",
-    "CCW.....",
-    "........",
+    "............",
+    ".........WW.",
+    "........WCC.",
+    ".......WCCC.",
+    "......WCCCC.",
+    ".....WCCCCD.",
+    "....WCCCD...",
+    "...WCCD.....",
+    "..WCD.......",
+    ".WCD........",
+    "WD..........",
+    "............",
 };
 
 inline const core::PaletteEntry kItemHealPal[] = {
@@ -746,8 +751,8 @@ REGISTER_ITEM("soul_arrow", [] {
     def.id = "soul_arrow";
     def.description = "Flecha da alma: projétil que escala com INT.";
     def.spriteRows = kItemArrowSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
+    def.spriteW = 12;
+    def.spriteH = 12;
     def.spritePal = kItemArrowPal;
     def.spritePalCount = kItemArrowPalCount;
     def.name = "Flecha da Alma";

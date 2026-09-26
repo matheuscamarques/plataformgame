@@ -41,12 +41,16 @@ sf::Color fireColor(float h) {
 } // namespace
 
 void SpellFX::burstHeal(core::Vec2f center) {
+    // Espiral subindo: velocidade com componente tangencial.
     for (int i = 0; i < 10; ++i) {
         Spark s;
         s.pos = center;
         const float a = core::randRange(0.f, 6.2831853f);
         const float sp = core::randRange(30.f, 90.f);
-        s.vel = {std::cos(a) * sp, std::sin(a) * sp - 60.f}; // sobe
+        const float tx = -std::sin(a) * sp * 0.7f; // tangente = redemoinho
+        const float ty = std::cos(a) * sp * 0.7f;
+        s.vel = {std::cos(a) * sp * 0.5f + tx,
+                 std::sin(a) * sp * 0.5f + ty - 60.f}; // + sobe
         s.life = core::randRange(0.4f, 0.7f);
         s.color = pack(120, 240, 140, 255);
         sparks_.push_back(s);

@@ -283,13 +283,16 @@ void Game::render()
             halo.setPosition(core::toSf(t.pos));
             halo.setFillColor(sf::Color(120, 220, 255, 60));
             window->draw(halo);
-            // Flecha do tamanho do slime, girada p/ velocidade.
+            // Flecha do tamanho do slime, girada p/ velocidade,
+            // com wobble mágico (instabilidade 12Hz, ±2px).
             if (const sf::Texture *tex = support::itemIconFor(arrowDef)) {
                 sf::Sprite spr(*tex);
-                const float s = 3.6f + 0.8f * pulse;
+                const float s = 2.7f + 0.6f * pulse;
                 spr.setScale(s, s);
-                spr.setOrigin(4.f, 4.f);
-                spr.setPosition(core::toSf(t.pos));
+                spr.setOrigin(6.f, 6.f);
+                const float wob =
+                    std::sin(core::Time::elapsed() * 12.f) * 2.f;
+                spr.setPosition(core::toSf(t.pos) + sf::Vector2f(0.f, wob));
                 spr.setRotation(std::atan2(t.vel.y, t.vel.x) * 180.f /
                                 3.14159265f);
                 window->draw(spr);
