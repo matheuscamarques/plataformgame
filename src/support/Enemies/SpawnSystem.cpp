@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "core/Random.h"
+#include "core/DayNightCycle.h"
 #include "defines.h"
 #include "entities/Player/Player.h"
 #include "EnemySystem.h"
@@ -72,8 +73,19 @@ void SpawnSystem::tick(float dt, GameContext &ctx) {
     if (ctx.enemies->count() >= kGlobalCap) return;
     const int ty = core::worldToTile({px, py}).y;
     const int stratum = stratumAt(ty);
+
+    // Determina orçamento efetivo considerando dia/noite no estrato 0
+    int effectiveBudget = budgetForStratum(stratum);
+    if (stratum == 0 && ctx.dayNight) {
+        const auto sample = ctx.dayNight->sample();
+        bool isNight = sample.sunIntensity < 0.20f;
+        if (!isNight) {
+            // Dia: muito poucos spawns no estrato 0
+            effectiveBudget = 2;
+        }
+    }
     if (static_cast<std::size_t>(ctx.enemies->count()) >=
-        static_cast<std::size_t>(budgetForStratum(stratum)))
+        static_cast<std::size_t>(effectiveBudget))
         return;
 
     // Candidatos data-driven: faixa + maxAlive por archetype, peso
@@ -87,7 +99,8 @@ void SpawnSystem::tick(float dt, GameContext &ctx) {
     for (const auto &key : ArchetypeRegistry::instance().keys()) {
         const EnemyArchetype *a = ArchetypeRegistry::instance().find(key);
         if (!a) continue;
-        if (stratum < a->minStratum || stratum > a->maxStratum) continue;
+        // No estrato 0 todos os inimigos podem nascer; fora dele respeita faixa
+        if (stratum != 0 && (stratum < a->minStratum || stratum > a->maxStratum)) continue;
         if (countAlive(*ctx.enemies, a->kind) >= a->maxAlive) continue;
         cands.push_back({key, a->spawnWeight});
         totalW += a->spawnWeight;
@@ -131,7 +144,7 @@ void SpawnSystem::tick(float dt, GameContext &ctx) {
         for (int i = 1; i < pack; ++i) {
             if (ctx.enemies->count() >= kGlobalCap) break;
             if (static_cast<std::size_t>(ctx.enemies->count()) >=
-                static_cast<std::size_t>(budgetForStratum(stratum)))
+                static_cast<std::size_t>(effectiveBudget))
                 break;
             if (countAlive(*ctx.enemies, pa->kind) >= pa->maxAlive) break;
             ctx.enemies->spawn(

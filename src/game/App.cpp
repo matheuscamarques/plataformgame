@@ -365,8 +365,9 @@ void Game::tick() {
                            &s.body, &s.knockbackLock});
     });
     support::GameContext ctx{getWorld(), p, &input_, enemies_,
-                             throws_, explodes_, drops_, &targets,
-                             &screenshots_, &debugFeed_, &audio_, &camera};
+                              throws_, explodes_, drops_, &targets,
+                              &screenshots_, &debugFeed_, &audio_, &camera,
+                              &dayNight_};
 
     // Sprite atual primeiro: BodySystem (scheduler) deriva hitboxes dele.
     p->currentFrameId = run_.isDead()

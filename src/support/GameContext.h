@@ -13,6 +13,7 @@ class Player;
 
 namespace core {
 class AudioSystem;
+class DayNightCycle;
 }
 
 namespace support {
@@ -56,6 +57,9 @@ struct GameContext {
     // Câmera p/ screen shake (item 23). Nulo = sem shake. Anexado no fim
     // p/ não quebrar inits posicionais existentes.
     Camera *camera = nullptr;
+
+    // Ciclo dia/noite para sistemas que dependem de horário.
+    core::DayNightCycle *dayNight = nullptr;
 };
 
 } // namespace support
