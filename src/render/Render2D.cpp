@@ -7,6 +7,8 @@
 
 #include "render/Render2D.h"
 
+#include <cmath>
+
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -83,6 +85,20 @@ void Render2D::drawCircle(core::Vec2f center, float radius, uint32_t color) {
     c.setPosition(center.x, center.y);
     c.setFillColor(toColor(color));
     target_.draw(c);
+}
+
+void Render2D::drawLine(core::Vec2f a, core::Vec2f b, float thickness,
+                        uint32_t color) {
+    const float dx = b.x - a.x;
+    const float dy = b.y - a.y;
+    const float len = std::sqrt(dx * dx + dy * dy);
+    if (len <= 0.f || thickness <= 0.f) return;
+    sf::RectangleShape line({len, thickness});
+    line.setOrigin(0.f, thickness * 0.5f);
+    line.setPosition(a.x, a.y);
+    line.setRotation(std::atan2(dy, dx) * 180.f / 3.14159265f);
+    line.setFillColor(toColor(color));
+    target_.draw(line);
 }
 
 } // namespace render

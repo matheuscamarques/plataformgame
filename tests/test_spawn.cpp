@@ -28,11 +28,11 @@ int main() {
     using namespace support;
 
     { // BudgetTable (densidade cai com profundidade)
-        assert(SpawnSystem::budgetForStratum(0) == 3);
-        assert(SpawnSystem::budgetForStratum(1) == 4);
-        assert(SpawnSystem::budgetForStratum(2) == 4);
-        assert(SpawnSystem::budgetForStratum(5) == 2);
-        assert(SpawnSystem::budgetForStratum(10) == 2);
+        assert(SpawnSystem::budgetForStratum(0) == 30);
+        assert(SpawnSystem::budgetForStratum(1) == 28);
+        assert(SpawnSystem::budgetForStratum(2) == 26);
+        assert(SpawnSystem::budgetForStratum(5) == 20);
+        assert(SpawnSystem::budgetForStratum(10) == 18);
     }
     { // SpawnsUpToBudgetThenStops (mundo real, com chão)
         Player p;
@@ -46,13 +46,13 @@ int main() {
         ctx.enemies = &enemies;
         ctx.world = &world;
 
-        // Budget real S0=3: roda até encher (scan tem sorte; tabela é lei).
-        for (int i = 0; i < 2400 && enemies.count() < 3u; ++i)
+        // Budget real S0=30: roda até encher (scan tem sorte; tabela é lei).
+        for (int i = 0; i < 24000 && enemies.count() < 30u; ++i)
             ss.tick(1.f / 30.f, ctx);
-        // S0 budget 3 (parte de 0) → exatamente 3.
-        assert(enemies.count() == 3u);
+        // S0 budget 30 (parte de 0) → exatamente 30 (pack respeita).
+        assert(enemies.count() == 30u);
         for (int i = 0; i < 200; ++i) ss.tick(1.f / 30.f, ctx);
-        assert(enemies.count() == 3u); // não passa do budget
+        assert(enemies.count() == 30u); // não passa do budget
     }
     { // SpawnedOnGroundNotInsideRock
         Player p;

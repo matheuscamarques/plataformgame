@@ -15,6 +15,7 @@
 #include "core/System.h"
 #include "render/Render2D.h"
 #include "render/RenderBackend.h"
+#include "game/LogoScreen.h"
 #include "../support/Camera/Camera.h"
 #include "../support/Debug/DebugOverlay.h"
 #include "../support/Debug/DebugFeed.h"
@@ -116,6 +117,9 @@ private:
     bool charView_ = false; // F3: ASCII por char, sem textura
     int tickCount_ = 0; // p/ animação walk do anão
     bool running = false;
+    // Vinheta de boot (logo WEB-ENGENHARIA); atrás dela o jogo já existe.
+    std::unique_ptr<game::logo::LogoScreen> splash_;
+    bool splashDone_ = false;
     void render();
     void pollEvents(); // loop SFML + edges por frame (run() chama 1x)
     void tick();

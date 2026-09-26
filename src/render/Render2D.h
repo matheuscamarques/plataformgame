@@ -31,6 +31,8 @@ public:
     void drawRect(core::Vec2f pos, core::Vec2f size, uint32_t color) override;
     void drawCircle(core::Vec2f center, float radius,
                     uint32_t color) override;
+    void drawLine(core::Vec2f a, core::Vec2f b, float thickness,
+                  uint32_t color) override;
 
 private:
     static sf::Color toColor(uint32_t rgba);

@@ -33,11 +33,21 @@ public:
     void drawCircle(core::Vec2f, float, uint32_t color) override {
         circles_.push_back(color);
     }
+    void drawLine(core::Vec2f a, core::Vec2f b, float t,
+                  uint32_t color) override {
+        lines_.push_back({a, b, t, color});
+    }
 
     int begins_ = 0, ends_ = 0;
     uint32_t next_ = 1;
     std::vector<render::SpriteDrawCmd> sprites_;
     std::vector<uint32_t> rects_, circles_, destroyed_;
+    struct Line {
+        core::Vec2f a, b;
+        float t;
+        uint32_t color;
+    };
+    std::vector<Line> lines_;
 };
 
 } // namespace

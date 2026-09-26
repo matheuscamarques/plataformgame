@@ -125,6 +125,33 @@ void Game::run()
 
     while (running && window->isOpen())
     {
+        // Vinheta de boot: logo animado ~6s, pulável com qualquer tecla.
+        // O jogo já foi montado (mundo/jogador/sistemas); só segura o
+        // primeiro frame real até a vinheta acabar.
+        if (!splashDone_) {
+            if (!splash_)
+                splash_ = std::make_unique<game::logo::LogoScreen>();
+            pollEvents();
+            static sf::Clock splashClock;
+            splash_->update(splashClock.restart().asSeconds());
+            // Pula com tecla, clique ou fim.
+            bool skip = splash_->isFinished() ||
+                        sf::Mouse::isButtonPressed(sf::Mouse::Left) ||
+                        sf::Keyboard::isKeyPressed(sf::Keyboard::Escape) ||
+                        sf::Keyboard::isKeyPressed(sf::Keyboard::Space) ||
+                        sf::Keyboard::isKeyPressed(sf::Keyboard::Return);
+            {
+                render::Render2D backend(*window);
+                splash_->render(backend, *window, font);
+            }
+            window->display();
+            if (skip) {
+                splashDone_ = true;
+                splash_.reset(); // libera; próximo boot reconstrói
+                splashClock.restart();
+            }
+            continue;
+        }
         // Ordem: beginFrame ANTES do pollEvent, senão o edge morre
         // antes do primeiro tick ler (e há N ticks por frame).
         pollEvents();

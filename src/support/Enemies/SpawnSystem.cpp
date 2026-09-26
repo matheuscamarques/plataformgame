@@ -34,15 +34,15 @@ int SpawnSystem::rollPackSize(const EnemyArchetype &a, float roll01) {
 }
 
 int SpawnSystem::budgetForStratum(int s) {
-    // Densidade cai com a profundidade. Tabela real (era stub 100).
+    // Densidade aumentada para horda: até 30 inimigos por estrato.
     switch (s) {
-        case 0: return 3;
-        case 1: return 4;
-        case 2: return 4;
-        case 3: return 3;
-        case 4: return 3;
-        case 5: return 2;
-        default: return 2;
+        case 0: return 30;
+        case 1: return 28;
+        case 2: return 26;
+        case 3: return 24;
+        case 4: return 22;
+        case 5: return 20;
+        default: return 18;
     }
 }
 
@@ -123,12 +123,16 @@ void SpawnSystem::tick(float dt, GameContext &ctx) {
         sy = static_cast<float>(tyy) * core::kBlockSize;
     }
     ctx.enemies->spawn(kind, sx, sy, &ctx);
-    // Matilha: companheiros do mesmo kind ao redor (respeita caps).
+    // Matilha: companheiros do mesmo kind ao redor (respeita caps
+    // e o budget do estrato — senão o budget vira enfeite).
     if (const EnemyArchetype *pa = ArchetypeRegistry::instance().find(kind)) {
         const int pack =
             rollPackSize(*pa, core::randRange(0.f, 1.f));
         for (int i = 1; i < pack; ++i) {
             if (ctx.enemies->count() >= kGlobalCap) break;
+            if (static_cast<std::size_t>(ctx.enemies->count()) >=
+                static_cast<std::size_t>(budgetForStratum(stratum)))
+                break;
             if (countAlive(*ctx.enemies, pa->kind) >= pa->maxAlive) break;
             ctx.enemies->spawn(
                 kind, sx + core::randRange(-40.f, 40.f), sy, &ctx);

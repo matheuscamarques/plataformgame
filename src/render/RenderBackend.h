@@ -58,6 +58,10 @@ public:
                           uint32_t color) = 0;
     virtual void drawCircle(core::Vec2f center, float radius,
                             uint32_t color) = 0;
+    // Linha com espessura (trilhas, polilinhas). Implementação típica:
+    // retângulo rotacionado; extremidades ficam por conta do caller.
+    virtual void drawLine(core::Vec2f a, core::Vec2f b, float thickness,
+                          uint32_t color) = 0;
 };
 
 } // namespace render
