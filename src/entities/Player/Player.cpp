@@ -207,7 +207,8 @@ void Player::tick() {
     st.rollT = rollTimer;
     st.rollDir = rollDir;
 
-    physics::Input in{moveUp, moveDown, moveLeft, moveRight, runFast};
+    physics::Input in{moveUp, moveDown, moveLeft, moveRight, runFast,
+                      computeModifiers().moveSpeedMult};
     const physics::Output out =
         physics::step(st, in, physics::kFixedDt);
     const physics::State &s = out.state;
@@ -267,11 +268,15 @@ void Player::tick() {
             weaponBuffType = core::DamageType::Physical;
     }
 
-    // HP nunca acima do máximo efetivo (Curse futura reduz).
+    // HP nunca acima do máximo efetivo (tarô + maldição reduzem).
     if (hp > effectiveHpMax()) hp = effectiveHpMax();
 
-    // Regen de FP: 8/s, sem delay (magia F8).
-    if (fp < fpMax) fp = std::min(fpMax, fp + 8.f / 30.0f);
+    // Regen de FP: 8/s × tarô, sem delay (magia F8).
+    if (fp < fpMax)
+        fp = std::min(fpMax, fp + 8.f / 30.0f * tarotFx.fpRegenMult);
+
+    // Tarô: vinheta, killstacks, conversão e maldição do peso.
+    tickTarot(physics::kFixedDt);
 
     // Veneno ativo: DoT direto (fura i-frame, pode matar). hp é int:
     // acumula a fração e desconta os inteiros (3/s = 1 a cada 10 ticks).
@@ -396,7 +401,9 @@ bool Player::castAttuned(support::ThrowSystem &throws) {
     }
     if (def->spellKind == core::SpellKind::Heal) {
         if (fp < kHealCost) return false;
-        hp = std::min(hpMax, hp + static_cast<int>(kHealBase + fai * 2));
+        hp = std::min(effectiveHpMax(),
+                      hp + static_cast<int>((kHealBase + fai * 2) *
+                                            tarotFx.healingReceivedMult));
         fp -= kHealCost;
         throwCooldown.trigger();
         return true;
@@ -582,23 +589,151 @@ core::StatusModifiers Player::computeModifiers() const {
     core::StatusModifiers mods;
     if (bleedSlowTimer > 0.f) mods.moveSpeedMult = 0.9f;
     if (frostTimer > 0.f) mods.attackSpeedMult = kFrostSlow; // Fase 2
-    // Tarô: multiplica sobre os status (fundação v1).
+
+    // Atributos: Destreza aumenta velocidade de caminhada
+    int dex = attrs.get(core::Attr::Dexterity);
+    float dexBonus = 1.0f + std::max(0, dex - 10) * 0.01f; // +1% por ponto acima de 10
+    mods.moveSpeedMult *= dexBonus;
+
+    // Atributos: Resistência reduz custo de stamina em ataques
+    int res = attrs.get(core::Attr::Resistance);
+    float resBonus = 1.0f - std::max(0, res - 10) * 0.005f; // -0.5% por ponto acima de 10
+    if (resBonus < 0.5f) resBonus = 0.5f; // limite inferior
+    mods.staminaCostMult *= resBonus;
+
+    // Tarô: multiplica sobre os status + maldição do peso.
+    mods.moveSpeedMult *= tarotFx.moveSpeedMult * curseMoveMult_;
     mods.damageTakenMult *= tarotFx.damageTakenMult;
     mods.attackSpeedMult *= tarotFx.attackSpeedMult;
     mods.staminaRegenMult *= tarotFx.staminaRegenMult;
     mods.staminaCostMult *= tarotFx.staminaCostMult;
-    mods.hpMaxMult *= tarotFx.hpMaxMult;
+    mods.hpMaxMult *= tarotFx.hpMaxMult * curseHpMaxMult_;
     return mods;
+}
+
+float Player::takenMult() const {
+    // Recebido = taken ÷ defesa ÷ maldição (defesa <1 = apanha mais).
+    const float def = tarotFx.defenseMult * curseDefMult_;
+    if (def <= 0.f) return computeModifiers().damageTakenMult;
+    return computeModifiers().damageTakenMult / def;
+}
+
+void Player::showTarotReveal(core::TarotArcana a) {
+    tarotRevealActive_ = true;
+    tarotRevealArcana_ = a;
+    tarotRevealAge_ = 0.f;
+}
+
+void Player::addKillStack() {
+    if (tarotFx.killStackMax <= 0) return;
+    if (killStacks_ < tarotFx.killStackMax) ++killStacks_;
+    killTimer_ = 30.f;
+}
+
+void Player::tickTarot(float dt) {
+    // Vinheta do fado: 1.5s, some sozinha (jogo não pausa).
+    if (tarotRevealActive_) {
+        tarotRevealAge_ += dt;
+        if (tarotRevealAge_ >= kTarotRevealLife) tarotRevealActive_ = false;
+    }
+    if (tarotRecentAge_ < 30.f) tarotRecentAge_ += dt;
+    // Morte: janela de 30s sem matar zera os stacks.
+    if (killTimer_ > 0.f) {
+        killTimer_ -= dt;
+        if (killTimer_ <= 0.f) {
+            killTimer_ = 0.f;
+            killStacks_ = 0;
+        }
+    }
+    // Enforcado: bônus convertido expira em 10s.
+    if (convTimer_ > 0.f) {
+        convTimer_ -= dt;
+        if (convTimer_ <= 0.f) {
+            convTimer_ = 0.f;
+            convBonus_ = 0.f;
+        }
+    }
+    applyTarotCurse(dt);
+}
+
+void Player::applyTarotCurse(float dt) {
+    // Peso do destino por faixa (só acima de 100 cobra). Mults
+    // recompostos do zero a cada tick; DoT trava HP em 1 (nunca mata).
+    const int w = tarotWeight_;
+    curseHpMaxMult_ = 1.f;
+    curseMoveMult_ = 1.f;
+    curseDefMult_ = 1.f;
+    if (w > 100) curseHpMaxMult_ *= 0.95f;
+    if (w > 150) curseMoveMult_ *= 0.90f;
+    if (w > 200) curseDefMult_ *= 0.95f;
+    if (w > 300) {
+        curseDotT_ += dt;
+        if (curseDotT_ >= 20.f) {
+            curseDotT_ = 0.f;
+            hp = std::max(1, hp - 1);
+        }
+    } else {
+        curseDotT_ = 0.f;
+    }
+    if (w > 400) {
+        curseDotT_ += dt;
+        if (curseDotT_ >= 15.f) {
+            curseDotT_ = 0.f;
+            hp = std::max(1, hp - 2);
+        }
+    }
+    if (w > 500) {
+        cursePoisonT_ += dt;
+        if (cursePoisonT_ >= 1.f) {
+            cursePoisonT_ -= 1.f;
+            hp = std::max(1, hp - 1);
+        }
+    } else {
+        cursePoisonT_ = 0.f;
+    }
+    if (hp > effectiveHpMax()) hp = effectiveHpMax();
+}
+
+void Player::deleteCharacter() {
+    // Única saída do fado: apaga TUDO (nível, cartas, bens, souls).
+    attrs = core::Attributes{};
+    tarotCards.clear();
+    recomputeTarot();
+    tarotRevivesUsed_ = 0;
+    killStacks_ = 0;
+    killTimer_ = 0.f;
+    convBonus_ = 0.f;
+    convTimer_ = 0.f;
+    tarotRevealActive_ = false;
+    tarotRecentCount_ = 0;
+    tarotRecentAge_ = 999.f;
+    inventory = core::Inventory{};
+    equipment = core::Equipment{};
+    attuned.clear();
+    souls = 0;
+    refreshDerived();
+    hp = hpMax;
+    stamina = staminaMax;
+    fp = fpMax;
+    curePoison();
+    cureBleed();
+    cureFrost();
 }
 
 void Player::addTarotCard(core::TarotArcana a) {
     if (!core::TarotRegistry::instance().has(a)) return;
     tarotCards[a] += 1;
+    // Anel das últimas 3 (HUD compacto, fade 30s no tickTarot).
+    tarotRecent_[tarotRecentCount_ % 3] = a;
+    ++tarotRecentCount_;
+    tarotRecentAge_ = 0.f;
     recomputeTarot();
 }
 
 void Player::recomputeTarot() {
     tarotFx = core::TarotEffect{};
+    totalTarotCards_ = 0;
+    tarotWeight_ = 0;
     const auto addMult = [](float base, int n) {
         return 1.f + (base - 1.f) * static_cast<float>(n);
     };
@@ -608,12 +743,51 @@ void Player::recomputeTarot() {
         if (!def) continue;
         const auto &e = def->effect;
         tarotFx.damageMult *= addMult(e.damageMult, count);
-        tarotFx.damageTakenMult *= addMult(e.damageTakenMult, count);
+        tarotFx.magicDamageMult *= addMult(e.magicDamageMult, count);
+        tarotFx.physicalDamageMult *= addMult(e.physicalDamageMult, count);
+        tarotFx.critDamageMult *= addMult(e.critDamageMult, count);
         tarotFx.attackSpeedMult *= addMult(e.attackSpeedMult, count);
+        tarotFx.hpMaxMult *= addMult(e.hpMaxMult, count);
+        tarotFx.defenseMult *= addMult(e.defenseMult, count);
+        tarotFx.postureMaxMult *= addMult(e.postureMaxMult, count);
+        tarotFx.statusResistMult *= addMult(e.statusResistMult, count);
+        tarotFx.healingReceivedMult *=
+            addMult(e.healingReceivedMult, count);
+        tarotFx.moveSpeedMult *= addMult(e.moveSpeedMult, count);
         tarotFx.staminaRegenMult *= addMult(e.staminaRegenMult, count);
         tarotFx.staminaCostMult *= addMult(e.staminaCostMult, count);
-        tarotFx.hpMaxMult *= addMult(e.hpMaxMult, count);
+        tarotFx.fpRegenMult *= addMult(e.fpRegenMult, count);
+        tarotFx.soulsGainMult *= addMult(e.soulsGainMult, count);
+        tarotFx.xpGainMult *= addMult(e.xpGainMult, count);
+        tarotFx.itemDropChanceMult *=
+            addMult(e.itemDropChanceMult, count);
+        tarotFx.damageTakenMult *= addMult(e.damageTakenMult, count);
+        tarotFx.fireResistMult *= addMult(e.fireResistMult, count);
+        tarotFx.magicResistMult *= addMult(e.magicResistMult, count);
+        tarotFx.lowHpDamageMult *= addMult(e.lowHpDamageMult, count);
+        tarotFx.highHpDamageMult *= addMult(e.highHpDamageMult, count);
+        tarotFx.fullHpDamageMult *= addMult(e.fullHpDamageMult, count);
+        tarotFx.aloneDamageMult *= addMult(e.aloneDamageMult, count);
+        // Especiais (somam, não multiplicam).
+        if (e.reviveOnce) {
+            tarotFx.reviveOnce = true;
+            tarotFx.maxRevives += e.maxRevives * count;
+            tarotFx.reviveHpPercent =
+                std::min(1.f, tarotFx.reviveHpPercent +
+                                  e.reviveHpPercent * count);
+        }
+        tarotFx.damageConversionRate += e.damageConversionRate * count;
+        if (e.killStackMax > 0) {
+            tarotFx.killStackMax =
+                std::max(tarotFx.killStackMax, e.killStackMax);
+            tarotFx.killStackBonus += e.killStackBonus * count;
+        }
+        totalTarotCards_ += count;
+        tarotWeight_ +=
+            core::weightOf(core::tierOf(arcana)) * count;
     }
+    // Derivados que dependem do tarô (resists de fogo/magia, tetos).
+    refreshDerived();
 }
 
 int Player::effectiveHpMax() const {
@@ -625,7 +799,22 @@ bool Player::hurt(int dmg, core::DamageType type) {
     if (!rollIframes.ready()) return false; // rolagem: i-frame do roll
     const int after =
         core::applyResistance(dmg, type, resistances_);
-    hp -= static_cast<int>(after * computeModifiers().damageTakenMult);
+    const int finalDmg = static_cast<int>(after * takenMult());
+    // Enforcado: fração do recebido vira bônus plano por 10s.
+    if (tarotFx.damageConversionRate > 0.f && finalDmg > 0) {
+        convBonus_ += finalDmg * tarotFx.damageConversionRate;
+        convTimer_ = 10.f;
+    }
+    // Julgamento: nega a morte (1x por cópia), volta com fração do máx.
+    if (hp - finalDmg <= 0 && tarotFx.reviveOnce &&
+        tarotRevivesUsed_ < tarotFx.maxRevives) {
+        ++tarotRevivesUsed_;
+        hp = static_cast<int>(effectiveHpMax() * tarotFx.reviveHpPercent);
+        if (hp < 1) hp = 1;
+        hurtIframes.trigger(0.6f);
+        return true;
+    }
+    hp -= finalDmg;
     if (hp < 0) hp = 0;
     hurtIframes.trigger(0.6f);
     return true;
@@ -645,8 +834,10 @@ core::Resistances Player::computeResistances() const {
     const float fth = static_cast<float>(attrs.get(Attr::Faith) - 10);
     r.set(DamageType::Physical, uni - end * 0.005f);
     r.set(DamageType::Frost, uni - end * 0.003f);
-    r.set(DamageType::Fire, uni - vit * 0.003f);
-    r.set(DamageType::Lightning, uni - fth * 0.004f);
+    r.set(DamageType::Fire,
+          (uni - vit * 0.003f) * tarotFx.fireResistMult);
+    r.set(DamageType::Lightning,
+          (uni - fth * 0.004f) * tarotFx.magicResistMult);
     return r;
 }
 
@@ -665,6 +856,12 @@ void Player::respawn(float x, float y) {
     // Tarô morre junto (permanente na run, não além da morte).
     tarotCards.clear();
     recomputeTarot();
+    tarotRevivesUsed_ = 0;
+    killStacks_ = 0;
+    killTimer_ = 0.f;
+    convBonus_ = 0.f;
+    convTimer_ = 0.f;
+    tarotRevealActive_ = false;
     fp = fpMax; // respawn renova FP (DS)
     topUpDynamite();
     topUpStarterKit();
@@ -784,6 +981,11 @@ sf::FloatRect Player::meleeHitbox() {
 }
 
 Player::MeleeBreakdown Player::meleeDamageBreakdown() const {
+    return meleeDamageBreakdownVs(false, false);
+}
+
+Player::MeleeBreakdown Player::meleeDamageBreakdownVs(bool targetFullHp,
+                                                      bool alone) const {
     MeleeBreakdown bd;
     bd.base = kLight[meleeCombo].damage;
     if (const core::ItemDef* off = offHandDef()) bd.base += off->damage;
@@ -807,7 +1009,31 @@ Player::MeleeBreakdown Player::meleeDamageBreakdown() const {
             dmg *= 0.5f;
             bd.halvedByReq = true;
         }
-        dmg *= tarotFx.damageMult; // tarô (1.0 sem cartas)
+        // Tarô ofensivo (1.0 sem cartas = intacto).
+        dmg *= tarotFx.damageMult;
+        // Buff elemental (frost_weapon etc.) puxa a via mágica.
+        dmg *= (weaponBuffType == core::DamageType::Physical)
+                   ? tarotFx.physicalDamageMult
+                   : tarotFx.magicDamageMult;
+        // Condicionais do próprio HP (Amantes).
+        const float hpFrac = effectiveHpMax() > 0
+                                 ? static_cast<float>(hp) /
+                                       effectiveHpMax()
+                                 : 1.f;
+        dmg *= (hpFrac < 0.5f) ? tarotFx.lowHpDamageMult
+                               : tarotFx.highHpDamageMult;
+        // Contexto do alvo (Justiça/Eremita, só via MeleeSystem).
+        if (targetFullHp) dmg *= tarotFx.fullHpDamageMult;
+        if (alone) dmg *= tarotFx.aloneDamageMult;
+        // Morte: stacks dentro da janela de 30s.
+        if (killStacks_ > 0 && tarotFx.killStackBonus != 0.f)
+            dmg *= 1.f + tarotFx.killStackBonus * killStacks_;
+        // Crítico do fado: sem carta de crítico, sem crítico (jogo base
+        // intacto). Com carta, todo 10º swing ×1.5×agregado.
+        if (tarotFx.critDamageMult != 1.f && meleeSwingId % 10 == 0)
+            dmg *= 1.5f * tarotFx.critDamageMult;
+        // Enforcado: bônus plano convertido da dor (10s).
+        dmg += convBonus_;
         bd.total = static_cast<int>(dmg);
     } else {
         bd.total = bd.base;
@@ -817,6 +1043,10 @@ Player::MeleeBreakdown Player::meleeDamageBreakdown() const {
 
 int Player::meleeDamage() const {
     return meleeDamageBreakdown().total;
+}
+
+int Player::meleeDamageVs(bool targetFullHp, bool alone) const {
+    return meleeDamageBreakdownVs(targetFullHp, alone).total;
 }
 
 float Player::meleePosture() const { return kLight[meleeCombo].posture; }
