@@ -204,23 +204,101 @@ inline const char* const kItemKeySprite[] = {
 
 // Fase 4d: 1 arma + 1 armadura p/ exercitar o painel (dano/defesa)
 // e as abas Arma/Armadura. Sem onEquip: equipa via verbo futuro.
+
+// Armas 12x12 (hero items): lamina 4px com highlight W,
+// guarda simetrica, pomo visivel; ouro com joia R.
+inline const char* const kItemSword12[] = {
+    "....BBBB....",
+    "....BBBW....",
+    "....BBBW....",
+    "....BBBW....",
+    "....BBBW....",
+    "....BBBW....",
+    "....BBBW....",
+    "....BBBW....",
+    "..HHHHHHHH..",
+    ".....HH.....",
+    ".....HH.....",
+    "....H..H....",
+};
+inline const char* const kItemSwordGold12[] = {
+    "....BBBB....",
+    "....BBBW....",
+    "....BBBW....",
+    "....BBBW....",
+    "....BBBW....",
+    "....BBBW....",
+    "....BBBW....",
+    "....BBBW....",
+    "..RHHHHHHR..",
+    ".....HH.....",
+    ".....HH.....",
+    "....H..H....",
+};
+inline const char* const kItemAxe12[] = {
+    "..SSSSSS....",
+    ".SSSSSSSS...",
+    ".SSSSSSSSS..",
+    ".SSSSSSSS...",
+    ".SSSSSSS....",
+    "..SSSSS.....",
+    "...SSS......",
+    "...HH.......",
+    "...HH.......",
+    "...HH.......",
+    "...HH.......",
+    "..HHHH......",
+};
+inline const char* const kItemAxeGold12[] = {
+    "..SSSSSS....",
+    ".SSSSSSSS...",
+    ".SSSSSSSSS..",
+    ".SSSSSSSSS..",
+    ".SSSSSSS....",
+    "..SSSSSS....",
+    "...SSS......",
+    "...HHH......",
+    "...HHH......",
+    "...HHH......",
+    "...HHH......",
+    "..HHHHH.....",
+};
+inline const char* const kItemStaff12[] = {
+    "....CCCC....",
+    "...CCCCCC...",
+    "...CCCCCC...",
+    "....CCCC....",
+    ".....WW.....",
+    ".....WW.....",
+    ".....WW.....",
+    ".....WW.....",
+    ".....WW.....",
+    ".....WW.....",
+    ".....WW.....",
+    "....WWWW....",
+};
+inline const char* const kItemBell12[] = {
+    "......W.....",
+    "......W.....",
+    ".....WWW....",
+    "....WWWWW...",
+    "..WWWWWWWW..",
+    "..WWWWWWWW..",
+    ".WWWWWWWWWW.",
+    ".WWWWWWWWWW.",
+    "WWWWWWWWWWWW",
+    "WWWWWWWWWWWW",
+    "..WWWWWWWW..",
+    "............",
+};
 inline const core::PaletteEntry kItemSwordPal[] = {
     {'.', {0, 0, 0, 0}},
     {'B', {200, 205, 215}},
     {'b', {140, 145, 155}},
+    {'W', {255, 255, 255}},
     {'H', {110, 75, 45}},
 };
-inline constexpr std::size_t kItemSwordPalCount = 4;
-inline const char* const kItemSwordSprite[] = {
-    "...BB...",
-    "...BB...",
-    "...BB...",
-    "...Bb...",
-    "...Bb...",
-    ".HHHHH..",
-    "...H....",
-    "...H....",
-};
+inline constexpr std::size_t kItemSwordPalCount = 5;
 
 inline const core::PaletteEntry kItemHelmPal[] = {
     {'.', {0, 0, 0, 0}},
@@ -246,19 +324,10 @@ inline const core::PaletteEntry kItemAxePal[] = {
     {'.', {0, 0, 0, 0}},
     {'S', {150, 155, 165}},
     {'s', {105, 110, 120}},
+    {'W', {255, 255, 255}},
     {'H', {110, 75, 45}},
 };
-inline constexpr std::size_t kItemAxePalCount = 4;
-inline const char* const kItemAxeSprite[] = {
-    "..SSSS..",
-    "..SSSs..",
-    "...SS...",
-    "...SS...",
-    "...HS...",
-    "..HH....",
-    "..H.....",
-    ".HH.....",
-};
+inline constexpr std::size_t kItemAxePalCount = 5;
 
 inline const core::PaletteEntry kItemChestPal[] = {
     {'.', {0, 0, 0, 0}},
@@ -326,45 +395,53 @@ inline const core::PaletteEntry kItemGoldSwordPal[] = {
     {'.', {0, 0, 0, 0}},
     {'B', {240, 200, 80}},
     {'b', {170, 140, 50}},
+    {'W', {255, 250, 220}},
     {'H', {110, 75, 45}},
+    {'R', {200, 60, 60}},
 };
-inline constexpr std::size_t kItemGoldSwordPalCount = 4;
+inline constexpr std::size_t kItemGoldSwordPalCount = 6;
 inline const core::PaletteEntry kItemDiamondSwordPal[] = {
     {'.', {0, 0, 0, 0}},
     {'B', {180, 220, 240}},
     {'b', {100, 150, 190}},
+    {'W', {255, 255, 255}},
     {'H', {60, 65, 75}},
 };
-inline constexpr std::size_t kItemDiamondSwordPalCount = 4;
+inline constexpr std::size_t kItemDiamondSwordPalCount = 5;
 inline const core::PaletteEntry kItemLeatherSwordPal[] = {
     {'.', {0, 0, 0, 0}},
     {'B', {160, 110, 70}},
     {'b', {100, 70, 45}},
+    {'W', {240, 220, 190}},
     {'H', {80, 55, 35}},
 };
-inline constexpr std::size_t kItemLeatherSwordPalCount = 4;
+inline constexpr std::size_t kItemLeatherSwordPalCount = 5;
 
 inline const core::PaletteEntry kItemGoldAxePal[] = {
     {'.', {0, 0, 0, 0}},
     {'S', {240, 200, 80}},
     {'s', {170, 140, 50}},
+    {'W', {255, 250, 220}},
     {'H', {110, 75, 45}},
+    {'R', {200, 60, 60}},
 };
-inline constexpr std::size_t kItemGoldAxePalCount = 4;
+inline constexpr std::size_t kItemGoldAxePalCount = 6;
 inline const core::PaletteEntry kItemDiamondAxePal[] = {
     {'.', {0, 0, 0, 0}},
     {'S', {180, 220, 240}},
     {'s', {100, 150, 190}},
+    {'W', {255, 255, 255}},
     {'H', {60, 65, 75}},
 };
-inline constexpr std::size_t kItemDiamondAxePalCount = 4;
+inline constexpr std::size_t kItemDiamondAxePalCount = 5;
 inline const core::PaletteEntry kItemLeatherAxePal[] = {
     {'.', {0, 0, 0, 0}},
     {'S', {160, 110, 70}},
     {'s', {100, 70, 45}},
+    {'W', {240, 220, 190}},
     {'H', {80, 55, 35}},
 };
-inline constexpr std::size_t kItemLeatherAxePalCount = 4;
+inline constexpr std::size_t kItemLeatherAxePalCount = 5;
 
 inline const core::PaletteEntry kItemGoldArmorPal[] = {
     {'.', {0, 0, 0, 0}},
@@ -779,47 +856,29 @@ REGISTER_ITEM("frost_weapon", [] {
 
 // ---- Catalisadores DS (Fase 3b): staff p/ magias, sino p/ milagres ----
 // Armas equipáveis (mão dir/esq); dano baixo, escala com INT/FÉ.
-inline const char* const kItemStaffSprite[] = {
-    "...WW...",
-    "...WW...",
-    "...WW...",
-    "...WW...",
-    "...WW...",
-    "...WW...",
-    "..WWWW..",
-    "........",
-};
 
 inline const core::PaletteEntry kItemStaffPal[] = {
     {'.', {0, 0, 0, 0}},
+    {'C', {140, 200, 255}},
     {'W', {150, 110, 70}},
 };
-inline constexpr std::size_t kItemStaffPalCount = 2;
+inline constexpr std::size_t kItemStaffPalCount = 3;
 
-inline const char* const kItemBellSprite[] = {
-    "..WWWW..",
-    ".WWWWWW.",
-    ".WWWWWW.",
-    "..WWWW..",
-    "...WW...",
-    "...WW...",
-    "........",
-    "........",
-};
 
 inline const core::PaletteEntry kItemBellPal[] = {
     {'.', {0, 0, 0, 0}},
     {'W', {220, 190, 120}},
+    {'w', {150, 125, 70}},
 };
-inline constexpr std::size_t kItemBellPalCount = 2;
+inline constexpr std::size_t kItemBellPalCount = 3;
 
 REGISTER_ITEM("wooden_staff", [] {
     core::ItemDef def;
     def.id = "wooden_staff";
     def.description = "Cajado de madeira: conjura magias de INT.";
-    def.spriteRows = kItemStaffSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
+    def.spriteRows = kItemStaff12;
+    def.spriteW = 12;
+    def.spriteH = 12;
     def.spritePal = kItemStaffPal;
     def.spritePalCount = kItemStaffPalCount;
     def.name = "Cajado de Madeira";
@@ -839,9 +898,9 @@ REGISTER_ITEM("priest_bell", [] {
     core::ItemDef def;
     def.id = "priest_bell";
     def.description = "Sino de sacerdote: conjura milagres de FÉ.";
-    def.spriteRows = kItemBellSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
+    def.spriteRows = kItemBell12;
+    def.spriteW = 12;
+    def.spriteH = 12;
     def.spritePal = kItemBellPal;
     def.spritePalCount = kItemBellPalCount;
     def.name = "Sino Sacerdotal";
@@ -877,9 +936,9 @@ REGISTER_ITEM("iron_sword", [] {
     core::ItemDef def;
     def.id = "iron_sword";
     def.description = "Espada de ferro. Corta slime.";
-    def.spriteRows = kItemSwordSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
+    def.spriteRows = kItemSword12;
+    def.spriteW = 12;
+    def.spriteH = 12;
     def.spritePal = kItemSwordPal;
     def.spritePalCount = kItemSwordPalCount;
     def.name = "Espada de Ferro";
@@ -901,9 +960,9 @@ REGISTER_ITEM("iron_axe", [] {
     core::ItemDef def;
     def.id = "iron_axe";
     def.description = "Machado de ferro. Lento e brutal.";
-    def.spriteRows = kItemAxeSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
+    def.spriteRows = kItemAxe12;
+    def.spriteW = 12;
+    def.spriteH = 12;
     def.spritePal = kItemAxePal;
     def.spritePalCount = kItemAxePalCount;
     def.name = "Machado de Ferro";
@@ -1045,9 +1104,9 @@ REGISTER_ITEM("gold_sword", [] {
     core::ItemDef def;
     def.id = "gold_sword";
     def.description = "Espada de ouro. Brilha mais do que corta.";
-    def.spriteRows = kItemSwordSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
+    def.spriteRows = kItemSwordGold12;
+    def.spriteW = 12;
+    def.spriteH = 12;
     def.spritePal = kItemGoldSwordPal;
     def.spritePalCount = kItemGoldSwordPalCount;
     def.name = "Espada de Ouro";
@@ -1069,9 +1128,9 @@ REGISTER_ITEM("gold_axe", [] {
     core::ItemDef def;
     def.id = "gold_axe";
     def.description = "Machado de ouro. Pesado e vistoso.";
-    def.spriteRows = kItemAxeSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
+    def.spriteRows = kItemAxeGold12;
+    def.spriteW = 12;
+    def.spriteH = 12;
     def.spritePal = kItemGoldAxePal;
     def.spritePalCount = kItemGoldAxePalCount;
     def.name = "Machado de Ouro";
@@ -1152,9 +1211,9 @@ REGISTER_ITEM("diamond_sword", [] {
     core::ItemDef def;
     def.id = "diamond_sword";
     def.description = "Espada de diamante. Corta quase tudo.";
-    def.spriteRows = kItemSwordSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
+    def.spriteRows = kItemSword12;
+    def.spriteW = 12;
+    def.spriteH = 12;
     def.spritePal = kItemDiamondSwordPal;
     def.spritePalCount = kItemDiamondSwordPalCount;
     def.name = "Espada de Diamante";
@@ -1176,9 +1235,9 @@ REGISTER_ITEM("diamond_axe", [] {
     core::ItemDef def;
     def.id = "diamond_axe";
     def.description = "Machado de diamante. Fim de conversa.";
-    def.spriteRows = kItemAxeSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
+    def.spriteRows = kItemAxe12;
+    def.spriteW = 12;
+    def.spriteH = 12;
     def.spritePal = kItemDiamondAxePal;
     def.spritePalCount = kItemDiamondAxePalCount;
     def.name = "Machado de Diamante";
@@ -1259,9 +1318,9 @@ REGISTER_ITEM("leather_sword", [] {
     core::ItemDef def;
     def.id = "leather_sword";
     def.description = "Espada de treino em couro. Não corta, ensina.";
-    def.spriteRows = kItemSwordSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
+    def.spriteRows = kItemSword12;
+    def.spriteW = 12;
+    def.spriteH = 12;
     def.spritePal = kItemLeatherSwordPal;
     def.spritePalCount = kItemLeatherSwordPalCount;
     def.name = "Espada de Couro";
@@ -1283,9 +1342,9 @@ REGISTER_ITEM("leather_axe", [] {
     core::ItemDef def;
     def.id = "leather_axe";
     def.description = "Machado de treino em couro. Pesa pouco.";
-    def.spriteRows = kItemAxeSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
+    def.spriteRows = kItemAxe12;
+    def.spriteW = 12;
+    def.spriteH = 12;
     def.spritePal = kItemLeatherAxePal;
     def.spritePalCount = kItemLeatherAxePalCount;
     def.name = "Machado de Couro";
