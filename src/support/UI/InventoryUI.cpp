@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <sstream>
 #include <string>
 
@@ -877,7 +878,36 @@ void InventoryUI::renderEquipTab(sf::RenderTarget& t, float sw, float sh,
                 const float scale = (ss - 16.f) / def->spriteW;
                 spr.setScale(scale, scale);
                 spr.setPosition(pos[i].x + 8.f, pos[i].y + 8.f);
+                // Draw flash: branco 0.15s ao equipar (mesmo estado
+                // do contorno dourado acima).
+                if (flashTab_ == MainTab::Equipment && i == flashSlot_) {
+                    const float age = core::Time::elapsed() - flashTime_;
+                    if (age >= 0.f && age < 0.15f) {
+                        const uint8_t a = static_cast<uint8_t>(
+                            200.f * (1.f - age / 0.15f));
+                        spr.setColor(sf::Color(255, 255, 255, a));
+                    }
+                }
                 t.draw(spr);
+                // Aura épica: 3 pixels orbitando item Epic/Rare.
+                if (def->rarity == core::ItemRarity::Epic ||
+                    def->rarity == core::ItemRarity::Rare) {
+                    const float now = core::Time::elapsed();
+                    const sf::Color ac =
+                        def->rarity == core::ItemRarity::Epic
+                            ? sf::Color(200, 240, 255)
+                            : sf::Color(200, 180, 100);
+                    const float cx = pos[i].x + ss * 0.5f;
+                    const float cy = pos[i].y + ss * 0.5f;
+                    for (int k = 0; k < 3; ++k) {
+                        const float ang = now * 2.f + 6.2831853f / 3.f * k;
+                        sf::RectangleShape px({2.f, 2.f});
+                        px.setPosition(cx + std::cos(ang) * (ss * 0.5f + 3.f),
+                                       cy + std::sin(ang) * (ss * 0.5f + 3.f));
+                        px.setFillColor(ac);
+                        t.draw(px);
+                    }
+                }
             }
         }
     }

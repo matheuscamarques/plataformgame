@@ -12,6 +12,7 @@
 #include <cmath>
 
 #include "core/ItemDef.h"
+#include "core/Time.h"
 #include "core/VecSfml.h"
 #include "core/Random.h"
 #include "entities/Player/Player.h"
@@ -167,7 +168,10 @@ void DropSystem::render(sf::RenderTarget &target) {
         r.setFillColor(col);
         r.setOutlineColor(sf::Color::Black);
         r.setOutlineThickness(1.f);
-        r.setPosition(o.pos.x - 3.5f, o.pos.y - 3.5f);
+        // Idle bob visual (física intacta: pos real não muda).
+        const float bob =
+            std::sin(core::Time::elapsed() * 2.f + o.pos.x * 0.1f) * 2.f;
+        r.setPosition(o.pos.x - 3.5f, o.pos.y - 3.5f + bob);
         target.draw(r);
     });
 }

@@ -1145,6 +1145,27 @@ void Game::drawPlayerWeapon() {
     spr.setPosition(handX, handY);
     spr.setScale(s, s);
     spr.setRotation(angle);
+    // Trail do swing: 2 fantasmas em ângulos passados (só no Active).
+    // Cor herda o buff (frost azul, fogo laranja, senão branco).
+    if (p->meleePhase == MeleePhase::Active) {
+        sf::Color ghostCol(255, 255, 255);
+        if (p->weaponBuffType == core::DamageType::Frost)
+            ghostCol = sf::Color(140, 200, 255);
+        else if (p->weaponBuffType == core::DamageType::Fire)
+            ghostCol = sf::Color(255, 140, 40);
+        for (int g = 1; g <= 2; ++g) {
+            sf::Sprite gh;
+            gh.setTexture(*tex);
+            gh.setOrigin(originX, originY);
+            gh.setPosition(handX, handY);
+            gh.setScale(s, s);
+            gh.setRotation(angle - static_cast<float>(g) * 15.f *
+                                   static_cast<float>(p->facing));
+            ghostCol.a = static_cast<sf::Uint8>(120 / g);
+            gh.setColor(ghostCol);
+            window->draw(gh);
+        }
+    }
     window->draw(spr);
     // Aura frost: cristais orbitando a mão com buff ativo (Fase 3).
     if (p->weaponBuffType == core::DamageType::Frost)

@@ -7,7 +7,10 @@
 
 #include "support/UI/HotbarUI.h"
 
+#include <cmath>
+
 #include "core/ItemDef.h"
+#include "core/Time.h"
 #include "support/Input/InputMap.h"
 #include "support/UI/ItemIcon.h"
 #include "entities/Player/Player.h"
@@ -89,6 +92,25 @@ void HotbarUI::renderBelt(sf::RenderTarget& target, const ::Player& player,
             spr.setScale(scale, scale);
             spr.setPosition(x + 6.f, y0 + 6.f);
             target.draw(spr);
+        }
+        // Aura épica/rara também no cinto (mesma regra do menu).
+        if (def->rarity == core::ItemRarity::Epic ||
+            def->rarity == core::ItemRarity::Rare) {
+            const float now = core::Time::elapsed();
+            const sf::Color ac =
+                def->rarity == core::ItemRarity::Epic
+                    ? sf::Color(200, 240, 255)
+                    : sf::Color(200, 180, 100);
+            const float cx = x + kSlotSize * 0.5f;
+            const float cy = y0 + kSlotSize * 0.5f;
+            for (int k = 0; k < 3; ++k) {
+                const float ang = now * 2.f + 6.2831853f / 3.f * k;
+                sf::RectangleShape px({2.f, 2.f});
+                px.setPosition(cx + std::cos(ang) * (kSlotSize * 0.5f + 2.f),
+                               cy + std::sin(ang) * (kSlotSize * 0.5f + 2.f));
+                px.setFillColor(ac);
+                target.draw(px);
+            }
         }
         if (qty > 1 || !sub.empty()) {
             sf::Text t;
