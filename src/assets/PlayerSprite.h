@@ -90,6 +90,11 @@ inline const sf::Texture *textureForFrame(support::SpriteFrameId id,
         case SpriteFrameId::HarpyWalkB: return &sp.harpyWalkB;
         case SpriteFrameId::EyeIdle: return &sp.eyeIdle;
         case SpriteFrameId::EyeWalkB: return &sp.eyeWalkB;
+        case SpriteFrameId::InsectIdle: return &sp.insectIdle;
+        case SpriteFrameId::SerpentIdle: return &sp.serpentIdle;
+        case SpriteFrameId::SpecterIdle: return &sp.specterIdle;
+        case SpriteFrameId::ConstructIdle: return &sp.constructIdle;
+        case SpriteFrameId::PureElementalIdle: return &sp.pureElementalIdle;
         case SpriteFrameId::None:
         case SpriteFrameId::COUNT:
         default: return &sp.slimeIdle;

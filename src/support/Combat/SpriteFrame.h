@@ -61,6 +61,11 @@ enum class SpriteFrameId : uint8_t {
     HarpyWalkB,
     EyeIdle,
     EyeWalkB,
+    InsectIdle,
+    SerpentIdle,
+    SpecterIdle,
+    ConstructIdle,
+    PureElementalIdle,
 
     COUNT
 };

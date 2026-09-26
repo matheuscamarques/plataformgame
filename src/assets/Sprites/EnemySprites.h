@@ -769,4 +769,169 @@ inline const char *const kEyeWalkB[] = {
     "..............",
 };
 
+
+// ---- 5 sprites base (wave arte): inseto, serpentino, espectro, construto, elemental puro ----
+inline constexpr int kInsectW = 16;
+inline constexpr int kInsectH = 12;
+
+inline const core::PaletteEntry kInsectPal[] = {
+    {'.', {0, 0, 0, 0}, core::BodyPartId::None},
+    {'O', {20, 15, 25}, core::BodyPartId::None},
+    {'L', {180, 160, 200}, core::BodyPartId::Torso},
+    {'B', {110, 90, 140}, core::BodyPartId::Torso},
+    {'S', {60, 45, 80}, core::BodyPartId::Torso},
+    {'E', {220, 60, 60}, core::BodyPartId::Head},
+    {'K', {255, 240, 200}, core::BodyPartId::Weapon},
+};
+inline constexpr std::size_t kInsectPalCount = 7;
+
+inline const char *const kInsectIdle[] = {
+    "..O..........O..",
+    "..O..........O..",
+    "...O........O...",
+    "...O........O...",
+    "....OOOOOOOO....",
+    "...OBBBBBBBBO...",
+    "..OBLLBBBBLLBO..",
+    "..OBLLBEEBLLBO..",
+    "..OBBBKKKKBBBO..",
+    "...OBBBBBBBBO...",
+    "....O.O..O.O....",
+    "...O..O..O..O...",
+};
+
+inline constexpr int kSerpentW = 24;
+inline constexpr int kSerpentH = 10;
+
+inline const core::PaletteEntry kSerpentPal[] = {
+    {'.', {0, 0, 0, 0}, core::BodyPartId::None},
+    {'O', {15, 30, 15}, core::BodyPartId::None},
+    {'L', {140, 200, 120}, core::BodyPartId::Torso},
+    {'B', {70, 130, 60}, core::BodyPartId::Torso},
+    {'S', {35, 70, 30}, core::BodyPartId::Torso},
+    {'E', {220, 220, 40}, core::BodyPartId::Head},
+    {'K', {255, 255, 240}, core::BodyPartId::Weapon},
+};
+inline constexpr std::size_t kSerpentPalCount = 7;
+
+inline const char *const kSerpentIdle[] = {
+    "........................",
+    "..OOOO..................",
+    ".OLLLLOO................",
+    "OLBEELLLOOOOOOOO........",
+    "OLBLLBLLLLLLLLLLOOOO....",
+    "OLBLLBLLLLLLLLLLLLLLO...",
+    ".OLBLLBLLLLLLLLLLLLLLO..",
+    "..OOLBLLBLLLLLLLLLLLO...",
+    "....OOOLLOOLLLLLLLOO....",
+    ".......OOOOOOOOOOO......",
+};
+
+inline constexpr int kSpecterW = 14;
+inline constexpr int kSpecterH = 18;
+
+inline const core::PaletteEntry kSpecterPal[] = {
+    {'.', {0, 0, 0, 0}, core::BodyPartId::None},
+    {'O', {30, 40, 70}, core::BodyPartId::None},
+    {'L', {180, 200, 240}, core::BodyPartId::Torso},
+    {'B', {120, 140, 200}, core::BodyPartId::Torso},
+    {'S', {70, 80, 140}, core::BodyPartId::Torso},
+    {'E', {20, 10, 40}, core::BodyPartId::Head},
+};
+inline constexpr std::size_t kSpecterPalCount = 6;
+
+inline const char *const kSpecterIdle[] = {
+    "....OOOOOO....",
+    "..OOLLLLLLOO..",
+    ".OLLLLLLLLLLO.",
+    ".OLBEELLEEBLO.",
+    ".OLLLLLLLLLLO.",
+    ".OLLLLLLLLLLO.",
+    ".OLLLLLLLLLLO.",
+    "OLLLLLLLLLLLLO",
+    "OLLLLLLLLLLLLO",
+    "OLLLLLLLLLLLLO",
+    "OLLBLLLLLLBLLO",
+    "OLLLLLLLLLLLLO",
+    ".OLLLLLLLLLLO.",
+    ".OLLLLLLLLLLO.",
+    "..OOLLLLLLOO..",
+    "....O.OO.O....",
+    "....O.O.O.....",
+    "......O.......",
+};
+
+inline constexpr int kConstructW = 16;
+inline constexpr int kConstructH = 20;
+
+inline const core::PaletteEntry kConstructPal[] = {
+    {'.', {0, 0, 0, 0}, core::BodyPartId::None},
+    {'O', {30, 35, 45}, core::BodyPartId::None},
+    {'L', {200, 205, 215}, core::BodyPartId::Torso},
+    {'B', {140, 145, 165}, core::BodyPartId::Torso},
+    {'S', {85, 90, 115}, core::BodyPartId::Torso},
+    {'E', {100, 220, 255}, core::BodyPartId::Head},
+    {'R', {220, 130, 60}, core::BodyPartId::Weapon},
+};
+inline constexpr std::size_t kConstructPalCount = 7;
+
+inline const char *const kConstructIdle[] = {
+    "....OOOOOOO.....",
+    "...OOLLLLLOO....",
+    "..OOLLLLLLLOO...",
+    "..OLLEELLEELLO..",
+    "..OLLLLLLLLLLO..",
+    "..OOLLLLLLLLOO..",
+    "...OOLLLLLLOO...",
+    "....OOOOOOOO....",
+    "..OOOOOOOOOOOO..",
+    ".OOLLLLRRLLLLOO.",
+    "OOLLLLLRRLLLLLOO",
+    "OOLLLLLLLLLLLLOO",
+    "OOLLLLRRRRLLLLOO",
+    "OOLLLLLLLLLLLLOO",
+    "OOLLLLLLLLLLLLOO",
+    ".OOLLLLLLLLLLOO.",
+    "..OOLLLLLLLLOO..",
+    "...OOLLOOLLOO...",
+    "...OOO..OOO.....",
+    "...OO....OO.....",
+};
+
+inline constexpr int kPureElementalW = 14;
+inline constexpr int kPureElementalH = 20;
+
+inline const core::PaletteEntry kPureElementalPal[] = {
+    {'.', {0, 0, 0, 0}, core::BodyPartId::None},
+    {'O', {80, 20, 10}, core::BodyPartId::None},
+    {'L', {255, 200, 100}, core::BodyPartId::Torso},
+    {'B', {240, 130, 40}, core::BodyPartId::Torso},
+    {'S', {180, 60, 20}, core::BodyPartId::Torso},
+    {'H', {255, 255, 220}, core::BodyPartId::Head},
+};
+inline constexpr std::size_t kPureElementalPalCount = 6;
+
+inline const char *const kPureElementalIdle[] = {
+    "....OOOOOO....",
+    "..OOLLLLLLOO..",
+    ".OLLLLLLLLLLO.",
+    ".OLLLLLLLLLLO.",
+    "OLLBLLLLLLBLLO",
+    "OLLBHHHHHHLBLO",
+    "OLLBHHHHHHLBLO",
+    "OLLBHHHHHHLBLO",
+    "OLLBHHHHHHLBLO",
+    "OLLBLLLLLLBLLO",
+    "OLLLLLLLLLLLLO",
+    "OLLLLLLLLLLLLO",
+    ".OLLLLLLLLLLO.",
+    ".OLLLLLLLLLLO.",
+    "..OOLLLLLLOO..",
+    "...OOLLLLOO...",
+    "....OOLLOO....",
+    ".....OOOO.....",
+    "......OO......",
+    "......OO......",
+};
+
 } // namespace sprites

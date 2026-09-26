@@ -62,6 +62,11 @@ struct SpriteSet {
     sf::Texture harpyWalkB;
     sf::Texture eyeIdle;
     sf::Texture eyeWalkB;
+    sf::Texture insectIdle;
+    sf::Texture serpentIdle;
+    sf::Texture specterIdle;
+    sf::Texture constructIdle;
+    sf::Texture pureElementalIdle;
 
     // Equipment — 1 textura por (peça × material).
     static constexpr int kMats = static_cast<int>(core::MaterialId::COUNT);
@@ -158,6 +163,16 @@ inline SpriteSet build() {
                                        kEyePal, kEyePalCount);
     s.eyeWalkB = core::makeSprite(kEyeWalkB, 14, 12,
                                        kEyePal, kEyePalCount);
+    s.insectIdle = core::makeSprite(kInsectIdle, kInsectW, kInsectH,
+                                       kInsectPal, kInsectPalCount);
+    s.serpentIdle = core::makeSprite(kSerpentIdle, kSerpentW, kSerpentH,
+                                       kSerpentPal, kSerpentPalCount);
+    s.specterIdle = core::makeSprite(kSpecterIdle, kSpecterW, kSpecterH,
+                                       kSpecterPal, kSpecterPalCount);
+    s.constructIdle = core::makeSprite(kConstructIdle, kConstructW, kConstructH,
+                                       kConstructPal, kConstructPalCount);
+    s.pureElementalIdle = core::makeSprite(kPureElementalIdle, kPureElementalW, kPureElementalH,
+                                       kPureElementalPal, kPureElementalPalCount);
 
     // Paleta de equipamento por material: 5 entradas fixas (., W, w, G, E).
     for (int m = 0; m < SpriteSet::kMats; ++m) {

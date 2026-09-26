@@ -159,6 +159,21 @@ SpriteFrameData frameData(support::SpriteFrameId id) {
         case SpriteFrameId::EyeWalkB:
             return {sprites::kEyeWalkB, 14, 12,
                     sprites::kEyePal, sprites::kEyePalCount};
+        case SpriteFrameId::InsectIdle:
+            return {sprites::kInsectIdle, sprites::kInsectW, sprites::kInsectH,
+                    sprites::kInsectPal, sprites::kInsectPalCount};
+        case SpriteFrameId::SerpentIdle:
+            return {sprites::kSerpentIdle, sprites::kSerpentW, sprites::kSerpentH,
+                    sprites::kSerpentPal, sprites::kSerpentPalCount};
+        case SpriteFrameId::SpecterIdle:
+            return {sprites::kSpecterIdle, sprites::kSpecterW, sprites::kSpecterH,
+                    sprites::kSpecterPal, sprites::kSpecterPalCount};
+        case SpriteFrameId::ConstructIdle:
+            return {sprites::kConstructIdle, sprites::kConstructW, sprites::kConstructH,
+                    sprites::kConstructPal, sprites::kConstructPalCount};
+        case SpriteFrameId::PureElementalIdle:
+            return {sprites::kPureElementalIdle, sprites::kPureElementalW, sprites::kPureElementalH,
+                    sprites::kPureElementalPal, sprites::kPureElementalPalCount};
         case SpriteFrameId::None:
         case SpriteFrameId::COUNT:
         default:
