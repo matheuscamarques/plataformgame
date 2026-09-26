@@ -6,14 +6,19 @@
  */
 
 #include "BehaviorRegistry.h"
+#include "BlazeAI.h"
 #include "BurstAI.h"
 #include "DemonEyeAI.h"
 #include "ElementalAI.h"
+#include "GolemAI.h"
 #include "HarpyAI.h"
 #include "HollowAI.h"
 #include "ImpAI.h"
 #include "RatAI.h"
+#include "SerpentAI.h"
+#include "SpiderAI.h"
 #include "UndeadAI.h"
+#include "WraithAI.h"
 
 namespace support {
 
@@ -25,5 +30,10 @@ SUPPORT_REGISTER_BEHAVIOR("elemental", ElementalAI);
 SUPPORT_REGISTER_BEHAVIOR("undead", UndeadAI);
 SUPPORT_REGISTER_BEHAVIOR("harpy", HarpyAI);
 SUPPORT_REGISTER_BEHAVIOR("eye", DemonEyeAI);
+SUPPORT_REGISTER_BEHAVIOR("spider", SpiderAI);
+SUPPORT_REGISTER_BEHAVIOR("serpent", SerpentAI);
+SUPPORT_REGISTER_BEHAVIOR("wraith", WraithAI);
+SUPPORT_REGISTER_BEHAVIOR("golem", GolemAI);
+SUPPORT_REGISTER_BEHAVIOR("blaze", BlazeAI);
 
 } // namespace support

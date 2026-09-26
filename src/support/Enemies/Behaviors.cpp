@@ -747,6 +747,260 @@ REGISTER_ENEMY_ARCHETYPE("elder_slime", [] {
     return a;
 }());
 
+// Mordida aracnídea: físico 8 + veneno 15 (padrão frost_touch).
+REGISTER_SKILL("spider_bite", [] {
+    support::SkillDef s;
+    s.name = "Mordida Aracnídea";
+    s.cooldown = 1.2f;
+    s.telegraph = 0.2f;
+    s.staminaCost = 10.f;
+    s.isMelee = true;
+    s.minRange = 0.f;
+    s.maxRange = 40.f;
+    s.baseWeight = 14.f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
+        if (!ctx.player) return;
+        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
+        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
+        if (dx * dx + dy * dy < 48.f * 48.f) {
+            ctx.player->hurt(static_cast<int>(8.f * self.damageMult),
+                             def.damageType);
+            ctx.player->addPoison(15.f);
+        }
+    };
+    return s;
+}());
+
+// Mordida de serpente: físico 12, cooldown médio.
+REGISTER_SKILL("serpent_bite", [] {
+    support::SkillDef s;
+    s.name = "Bote";
+    s.cooldown = 1.4f;
+    s.telegraph = 0.25f;
+    s.staminaCost = 12.f;
+    s.isMelee = true;
+    s.minRange = 0.f;
+    s.maxRange = 44.f;
+    s.baseWeight = 14.f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
+        if (!ctx.player) return;
+        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
+        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
+        if (dx * dx + dy * dy < 52.f * 52.f)
+            ctx.player->hurt(static_cast<int>(12.f * self.damageMult),
+                             def.damageType);
+    };
+    return s;
+}());
+
+// Dreno vital (espectro): 10 de dano + cura 5 em si.
+REGISTER_SKILL("life_drain", [] {
+    support::SkillDef s;
+    s.name = "Dreno Vital";
+    s.cooldown = 2.0f;
+    s.telegraph = 0.3f;
+    s.staminaCost = 12.f;
+    s.isMelee = true;
+    s.minRange = 0.f;
+    s.maxRange = 44.f;
+    s.baseWeight = 12.f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
+        if (!ctx.player) return;
+        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
+        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
+        if (dx * dx + dy * dy < 52.f * 52.f) {
+            ctx.player->hurt(static_cast<int>(10.f * self.damageMult),
+                             def.damageType);
+            self.resources.hp = std::min(
+                self.resources.hpMax, self.resources.hp + 5);
+        }
+    };
+    return s;
+}());
+
+// Esmagamento (golem): físico 18, lento (cooldown longo).
+REGISTER_SKILL("golem_slam", [] {
+    support::SkillDef s;
+    s.name = "Esmagamento";
+    s.cooldown = 2.5f;
+    s.telegraph = 0.5f;
+    s.staminaCost = 20.f;
+    s.isMelee = true;
+    s.minRange = 0.f;
+    s.maxRange = 48.f;
+    s.baseWeight = 16.f;
+    s.execute = [](support::Enemy &self, support::GameContext &ctx,
+                    const support::SkillDef &def) {
+        if (!ctx.player) return;
+        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
+        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
+        if (dx * dx + dy * dy < 56.f * 56.f)
+            ctx.player->hurt(static_cast<int>(18.f * self.damageMult),
+                             def.damageType);
+    };
+    return s;
+}());
+
+REGISTER_ENEMY_ARCHETYPE("spider", [] {
+    support::EnemyArchetype a;
+    a.color = {110, 90, 140};
+    a.hitboxSize = {32.f, 24.f};
+    a.behaviorKind = "spider";
+    a.kind = core::EntityKind::Spider;
+    a.bodySchema = "dwarf";
+    a.isTrash = false;
+    a.hp = 30;
+    a.postureMax = 18.f;
+    a.postureRegen = 12.f;
+    a.postureRegenDelay = 1.0f;
+    a.staminaMax = 30.f;
+    a.staminaRegen = 20.f;
+    a.staminaRegenDelay = 0.8f;
+    a.minStratum = 1;
+    a.maxStratum = 99;
+    a.spawnWeight = 0.4f;
+    a.maxAlive = 4;
+    a.packMin = 1;
+    a.packMax = 2;
+    a.drops.entries.push_back({"slime_gel", 0.3f, 1, 1});
+    a.skills = {"spider_bite"};
+    a.xp = 70;
+    a.frameIdle = support::SpriteFrameId::InsectIdle;
+    a.frameWalkA = support::SpriteFrameId::InsectIdle;
+    a.frameWalkB = support::SpriteFrameId::InsectIdle;
+    a.frameMelee = support::SpriteFrameId::InsectIdle;
+    a.frameRanged = support::SpriteFrameId::InsectIdle;
+    return a;
+}());
+
+REGISTER_ENEMY_ARCHETYPE("serpent", [] {
+    support::EnemyArchetype a;
+    a.color = {70, 130, 60};
+    a.hitboxSize = {48.f, 20.f};
+    a.behaviorKind = "serpent";
+    a.kind = core::EntityKind::Serpent;
+    a.bodySchema = "dwarf";
+    a.isTrash = false;
+    a.hp = 50;
+    a.postureMax = 24.f;
+    a.postureRegen = 12.f;
+    a.postureRegenDelay = 1.0f;
+    a.staminaMax = 30.f;
+    a.staminaRegen = 20.f;
+    a.staminaRegenDelay = 0.8f;
+    a.minStratum = 2;
+    a.maxStratum = 99;
+    a.spawnWeight = 0.3f;
+    a.maxAlive = 3;
+    a.drops.entries.push_back({"slime_gel", 0.3f, 1, 1});
+    a.skills = {"serpent_bite"};
+    a.xp = 90;
+    a.frameIdle = support::SpriteFrameId::SerpentIdle;
+    a.frameWalkA = support::SpriteFrameId::SerpentIdle;
+    a.frameWalkB = support::SpriteFrameId::SerpentIdle;
+    a.frameMelee = support::SpriteFrameId::SerpentIdle;
+    a.frameRanged = support::SpriteFrameId::SerpentIdle;
+    return a;
+}());
+
+REGISTER_ENEMY_ARCHETYPE("wraith", [] {
+    support::EnemyArchetype a;
+    a.color = {120, 140, 200};
+    a.hitboxSize = {36.f, 44.f};
+    a.behaviorKind = "wraith";
+    a.kind = core::EntityKind::Wraith;
+    a.bodySchema = "humanoid";
+    a.isTrash = false;
+    a.hp = 40;
+    a.postureMax = 20.f;
+    a.postureRegen = 12.f;
+    a.postureRegenDelay = 1.0f;
+    a.staminaMax = 30.f;
+    a.staminaRegen = 20.f;
+    a.staminaRegenDelay = 0.8f;
+    a.resistances.set(core::DamageType::Physical, 0.6f);
+    a.resistances.set(core::DamageType::Fire, 1.2f);
+    a.minStratum = 3;
+    a.maxStratum = 99;
+    a.spawnWeight = 0.3f;
+    a.maxAlive = 3;
+    a.drops.entries.push_back({"soul_lost", 0.3f, 1, 1});
+    a.skills = {"life_drain"};
+    a.xp = 100;
+    a.frameIdle = support::SpriteFrameId::SpecterIdle;
+    a.frameWalkA = support::SpriteFrameId::SpecterIdle;
+    a.frameWalkB = support::SpriteFrameId::SpecterIdle;
+    a.frameMelee = support::SpriteFrameId::SpecterIdle;
+    a.frameRanged = support::SpriteFrameId::SpecterIdle;
+    return a;
+}());
+
+REGISTER_ENEMY_ARCHETYPE("golem", [] {
+    support::EnemyArchetype a;
+    a.color = {140, 145, 165};
+    a.hitboxSize = {40.f, 50.f};
+    a.behaviorKind = "golem";
+    a.kind = core::EntityKind::Golem;
+    a.bodySchema = "dwarf";
+    a.isTrash = false;
+    a.hp = 80;
+    a.postureMax = 40.f;
+    a.postureRegen = 8.f;
+    a.postureRegenDelay = 1.5f;
+    a.staminaMax = 40.f;
+    a.staminaRegen = 15.f;
+    a.staminaRegenDelay = 1.0f;
+    a.resistances.set(core::DamageType::Physical, 0.6f);
+    a.minStratum = 4;
+    a.maxStratum = 99;
+    a.spawnWeight = 0.25f;
+    a.maxAlive = 2;
+    a.drops.entries.push_back({"iron_ore", 0.4f, 1, 2});
+    a.skills = {"golem_slam"};
+    a.xp = 140;
+    a.frameIdle = support::SpriteFrameId::ConstructIdle;
+    a.frameWalkA = support::SpriteFrameId::ConstructIdle;
+    a.frameWalkB = support::SpriteFrameId::ConstructIdle;
+    a.frameMelee = support::SpriteFrameId::ConstructIdle;
+    a.frameRanged = support::SpriteFrameId::ConstructIdle;
+    return a;
+}());
+
+REGISTER_ENEMY_ARCHETYPE("blaze", [] {
+    support::EnemyArchetype a;
+    a.color = {240, 130, 40};
+    a.hitboxSize = {36.f, 48.f};
+    a.behaviorKind = "blaze";
+    a.kind = core::EntityKind::Blaze;
+    a.bodySchema = "dwarf";
+    a.isTrash = false;
+    a.hp = 60;
+    a.postureMax = 25.f;
+    a.postureRegen = 12.f;
+    a.postureRegenDelay = 1.0f;
+    a.staminaMax = 30.f;
+    a.staminaRegen = 20.f;
+    a.staminaRegenDelay = 0.8f;
+    a.resistances.set(core::DamageType::Fire, 0.5f);
+    a.resistances.set(core::DamageType::Frost, 1.3f);
+    a.minStratum = 5;
+    a.maxStratum = 99;
+    a.spawnWeight = 0.25f;
+    a.maxAlive = 2;
+    a.drops.entries.push_back({"soul_great", 0.15f, 1, 1});
+    a.skills = {"skeleton_flame_slash"};
+    a.xp = 150;
+    a.frameIdle = support::SpriteFrameId::PureElementalIdle;
+    a.frameWalkA = support::SpriteFrameId::PureElementalIdle;
+    a.frameWalkB = support::SpriteFrameId::PureElementalIdle;
+    a.frameMelee = support::SpriteFrameId::PureElementalIdle;
+    a.frameRanged = support::SpriteFrameId::PureElementalIdle;
+    return a;
+}());
+
 // Cuspe de slime: projétil linear (sem gravidade/fuse), dano no impacto.
 // Valida o mecanismo SkillRegistry; anão ganha as dele no Elite.
 REGISTER_SKILL("slime_spit", [] {

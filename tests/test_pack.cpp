@@ -129,6 +129,80 @@ int main() {
         auto e = Factory::spawnEnemy("eye", 0.f, 0.f);
         assert(e != nullptr && e->skillIds.empty());
     }
+    { // WaveBases (5 sprites base viram 5 jogáveis)
+        struct W {
+            const char *id;
+            core::EntityKind kind;
+            const char *behavior;
+            int hp;
+            SpriteFrameId idle;
+            int w, h;
+        };
+        const W cases[] = {
+            {"spider", core::EntityKind::Spider, "spider", 30,
+             SpriteFrameId::InsectIdle, 16, 12},
+            {"serpent", core::EntityKind::Serpent, "serpent", 50,
+             SpriteFrameId::SerpentIdle, 24, 10},
+            {"wraith", core::EntityKind::Wraith, "wraith", 40,
+             SpriteFrameId::SpecterIdle, 14, 18},
+            {"golem", core::EntityKind::Golem, "golem", 80,
+             SpriteFrameId::ConstructIdle, 16, 20},
+            {"blaze", core::EntityKind::Blaze, "blaze", 60,
+             SpriteFrameId::PureElementalIdle, 14, 20},
+        };
+        for (const auto &c : cases) {
+            const EnemyArchetype *a =
+                ArchetypeRegistry::instance().find(c.id);
+            assert(a != nullptr);
+            assert(a->behaviorKind == c.behavior && a->kind == c.kind);
+            assert(a->frameIdle == c.idle);
+            const auto f = assets::frameData(c.idle);
+            assert(f.rows != nullptr && f.w == c.w && f.h == c.h);
+            auto e = Factory::spawnEnemy(c.id, 0.f, 0.f);
+            assert(e != nullptr && e->resources.hp == c.hp);
+            assert(e->ai && e->ai->kind() == c.kind);
+        }
+        // Resists próprias: wraith físico 0.6, golem físico 0.6.
+        const EnemyArchetype *w =
+            ArchetypeRegistry::instance().find("wraith");
+        assert(w->resistances.get(core::DamageType::Physical) == 0.6f);
+        assert(w->resistances.get(core::DamageType::Fire) == 1.2f);
+    }
+    { // SpiderBitesPoison (mordida + veneno) e WraithDrains
+        const SkillDef *sb = SkillRegistry::instance().find("spider_bite");
+        assert(sb != nullptr && sb->isMelee);
+        Player p;
+        p.setX(100.f);
+        p.setY(100.f);
+        p.hp = 100;
+        EnemySystem enemies;
+        enemies.spawn("spider", 100.f, 100.f);
+        GameContext ctx{};
+        ctx.player = &p;
+        ctx.enemies = &enemies;
+        bool ran = false;
+        enemies.forEach([&](Enemy &e) {
+            ran = SkillSystem::tryUse(e, ctx, "spider_bite");
+        });
+        assert(ran && p.hp < 100 && p.poisonBuildup > 0.f);
+        const SkillDef *ld = SkillRegistry::instance().find("life_drain");
+        assert(ld != nullptr);
+        Player q;
+        q.setX(100.f);
+        q.setY(100.f);
+        q.hp = 100;
+        EnemySystem en2;
+        en2.spawn("wraith", 100.f, 100.f);
+        GameContext ctx2{};
+        ctx2.player = &q;
+        ctx2.enemies = &en2;
+        en2.forEach([&](Enemy &e) {
+            e.resources.hp = 10; // ferido: dreno cura
+            assert(SkillSystem::tryUse(e, ctx2, "life_drain"));
+            assert(e.resources.hp == 15); // +5 limitado ao max
+        });
+        assert(q.hp < 100);
+    }
     { // DwarfWalkCycle4 (C/D resolvem 14x18; arquetipo aponta)
         for (auto id : {SpriteFrameId::DwarfWalkC,
                         SpriteFrameId::DwarfWalkD}) {

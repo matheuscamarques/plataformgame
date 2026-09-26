@@ -16,9 +16,10 @@ namespace core {
 // Behavior::kind() é a fonte; EnemyArchetype::kind dirige SpawnSystem.
 enum class EntityKind : uint8_t {
     Player, Slime, Dwarf, Skeleton, Hollow, Rat, Burst, Imp, Elemental,
-    Undead, Harpy, Eye, TNT, Rock, COUNT
+    Undead, Harpy, Eye, Spider, Serpent, Wraith, Golem, Blaze, TNT, Rock,
+    COUNT
 };
-inline constexpr int kEntityKindCount = 14;
+inline constexpr int kEntityKindCount = 19;
 
 // Domínio legado: IDs int de Entity::getName()/Component (defines.h
 // morreu: PLAYER=0, SLIME=40...). Migração futura: getName() vira kind().
