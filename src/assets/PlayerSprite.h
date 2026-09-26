@@ -65,6 +65,8 @@ inline const sf::Texture *textureForFrame(support::SpriteFrameId id,
         case SpriteFrameId::DwarfIdle: return &sp.dwarfIdle;
         case SpriteFrameId::DwarfWalkA: return &sp.dwarfWalkA;
         case SpriteFrameId::DwarfWalkB: return &sp.dwarfWalkB;
+        case SpriteFrameId::DwarfWalkC: return &sp.dwarfWalkC;
+        case SpriteFrameId::DwarfWalkD: return &sp.dwarfWalkD;
         case SpriteFrameId::DwarfThrow: return &sp.dwarfThrow;
         case SpriteFrameId::DwarfMelee: return &sp.dwarfMelee;
         case SpriteFrameId::SkeletonIdle: return &sp.skeletonIdle;

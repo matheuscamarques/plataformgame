@@ -129,6 +129,39 @@ int main() {
         auto e = Factory::spawnEnemy("eye", 0.f, 0.f);
         assert(e != nullptr && e->skillIds.empty());
     }
+    { // DwarfWalkCycle4 (C/D resolvem 14x18; arquetipo aponta)
+        for (auto id : {SpriteFrameId::DwarfWalkC,
+                        SpriteFrameId::DwarfWalkD}) {
+            const auto f = assets::frameData(id);
+            assert(f.rows != nullptr && f.w == 14 && f.h == 18);
+        }
+        const EnemyArchetype *d =
+            ArchetypeRegistry::instance().find("dwarf");
+        assert(d->frameWalkC == SpriteFrameId::DwarfWalkC);
+        assert(d->frameWalkD == SpriteFrameId::DwarfWalkD);
+    }
+    { // PackBodiesDiffer (5 corpos distintos, não só paleta)
+        const char *ids[] = {"hollow", "burst", "imp", "elemental",
+                             "undead"};
+        const char *bodies[5][18];
+        for (int i = 0; i < 5; ++i) {
+            const EnemyArchetype *a =
+                ArchetypeRegistry::instance().find(ids[i]);
+            assert(a != nullptr);
+            const auto f = assets::frameData(a->frameIdle);
+            for (int r = 0; r < 18; ++r) bodies[i][r] = f.rows[r];
+        }
+        for (int i = 0; i < 5; ++i)
+            for (int j = i + 1; j < 5; ++j) {
+                bool same = true;
+                for (int r = 0; r < 18; ++r)
+                    if (std::string(bodies[i][r]) != bodies[j][r]) {
+                        same = false;
+                        break;
+                    }
+                assert(!same); // corpos diferentes, não só cor
+            }
+    }
     { // PackSizes (solo default; rato 2-3, olho 1-2)
         const EnemyArchetype *s =
             ArchetypeRegistry::instance().find("slime");

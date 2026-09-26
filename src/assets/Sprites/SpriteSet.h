@@ -37,6 +37,8 @@ struct SpriteSet {
     sf::Texture dwarfIdle;
     sf::Texture dwarfWalkA;
     sf::Texture dwarfWalkB;
+    sf::Texture dwarfWalkC;
+    sf::Texture dwarfWalkD;
     sf::Texture dwarfThrow;
     sf::Texture dwarfMelee;
     sf::Texture skeletonIdle;
@@ -105,6 +107,10 @@ inline SpriteSet build() {
     s.dwarfWalkA = core::makeSprite(kDwarfWalkA, kDwarfW, kDwarfH,
                                     kDwarfPal, kDwarfPalCount);
     s.dwarfWalkB = core::makeSprite(kDwarfWalkB, kDwarfW, kDwarfH,
+                                    kDwarfPal, kDwarfPalCount);
+    s.dwarfWalkC = core::makeSprite(kDwarfWalkC, kDwarfW, kDwarfH,
+                                    kDwarfPal, kDwarfPalCount);
+    s.dwarfWalkD = core::makeSprite(kDwarfWalkD, kDwarfW, kDwarfH,
                                     kDwarfPal, kDwarfPalCount);
     s.dwarfThrow = core::makeSprite(kDwarfThrow, kDwarfW, kDwarfH,
                                     kDwarfPal, kDwarfPalCount);

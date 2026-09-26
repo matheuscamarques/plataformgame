@@ -66,9 +66,12 @@ struct EnemyArchetype {
     // idle = parado; walkA/B = andando (alterna por tick); melee =
     // ataque corpo-a-corpo; ranged = telegraph de arremesso.
     // Slime: walkA/B = Squash, melee/ranged = Idle (não tem).
+    // Dwarf: walkC/D completam o ciclo de 4 (None = repete A/B).
     support::SpriteFrameId frameIdle = support::SpriteFrameId::None;
     support::SpriteFrameId frameWalkA = support::SpriteFrameId::None;
     support::SpriteFrameId frameWalkB = support::SpriteFrameId::None;
+    support::SpriteFrameId frameWalkC = support::SpriteFrameId::None;
+    support::SpriteFrameId frameWalkD = support::SpriteFrameId::None;
     support::SpriteFrameId frameMelee = support::SpriteFrameId::None;
     support::SpriteFrameId frameRanged = support::SpriteFrameId::None;
 

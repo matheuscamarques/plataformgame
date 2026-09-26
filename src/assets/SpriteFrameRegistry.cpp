@@ -80,6 +80,12 @@ SpriteFrameData frameData(support::SpriteFrameId id) {
         case SpriteFrameId::DwarfWalkB:
             return {sprites::kDwarfWalkB, sprites::kDwarfW, sprites::kDwarfH,
                     sprites::kDwarfPal, sprites::kDwarfPalCount};
+        case SpriteFrameId::DwarfWalkC:
+            return {sprites::kDwarfWalkC, sprites::kDwarfW, sprites::kDwarfH,
+                    sprites::kDwarfPal, sprites::kDwarfPalCount};
+        case SpriteFrameId::DwarfWalkD:
+            return {sprites::kDwarfWalkD, sprites::kDwarfW, sprites::kDwarfH,
+                    sprites::kDwarfPal, sprites::kDwarfPalCount};
         case SpriteFrameId::DwarfThrow:
             return {sprites::kDwarfThrow, sprites::kDwarfW, sprites::kDwarfH,
                     sprites::kDwarfPal, sprites::kDwarfPalCount};

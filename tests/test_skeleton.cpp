@@ -49,7 +49,15 @@ int main() {
     }
     { // FramesResolve12x40 (reflexo do player, paleta osso)
         assert(sprites::kSkeletonW == 12 && sprites::kSkeletonH == 40);
-        assert(sprites::kSkeletonPalCount == 8u);
+        assert(sprites::kSkeletonPalCount == 13u); // hue shifting
+        // Anatomia: sombra (k) e costelas (r) presentes no idle.
+        bool hasK = false, hasR = false;
+        for (int r = 0; r < 40; ++r) {
+            const std::string row(sprites::kSkeletonIdle[r]);
+            if (row.find('k') != std::string::npos) hasK = true;
+            if (row.find('r') != std::string::npos) hasR = true;
+        }
+        assert(hasK && hasR);
         for (auto id :
              {SpriteFrameId::SkeletonIdle, SpriteFrameId::SkeletonWalkA,
               SpriteFrameId::SkeletonWalkB, SpriteFrameId::SkeletonMelee}) {

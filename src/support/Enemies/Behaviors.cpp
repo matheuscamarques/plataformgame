@@ -85,6 +85,8 @@ REGISTER_ENEMY_ARCHETYPE("dwarf", [] {
     a.frameIdle = support::SpriteFrameId::DwarfIdle;
     a.frameWalkA = support::SpriteFrameId::DwarfWalkA;
     a.frameWalkB = support::SpriteFrameId::DwarfWalkB;
+    a.frameWalkC = support::SpriteFrameId::DwarfWalkC;
+    a.frameWalkD = support::SpriteFrameId::DwarfWalkD;
     a.frameMelee = support::SpriteFrameId::DwarfMelee;
     a.frameRanged = support::SpriteFrameId::DwarfThrow;
     return a;

@@ -34,6 +34,8 @@ enum class SpriteFrameId : uint8_t {
     DwarfIdle,
     DwarfWalkA,
     DwarfWalkB,
+    DwarfWalkC,
+    DwarfWalkD,
     DwarfThrow,
     DwarfMelee,
 

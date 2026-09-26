@@ -363,6 +363,14 @@ void Game::tick() {
             arch ? arch->frameWalkA : support::SpriteFrameId::SlimeSquash;
         const auto walkB =
             arch ? arch->frameWalkB : support::SpriteFrameId::SlimeSquash;
+        const auto walkC =
+            arch && arch->frameWalkC != support::SpriteFrameId::None
+                ? arch->frameWalkC
+                : walkA;
+        const auto walkD =
+            arch && arch->frameWalkD != support::SpriteFrameId::None
+                ? arch->frameWalkD
+                : walkB;
         const auto melee =
             arch ? arch->frameMelee : support::SpriteFrameId::SlimeIdle;
         const auto ranged =
@@ -378,9 +386,13 @@ void Game::tick() {
                     break;
                 default:
                     if (std::fabs(s.body.getVx()) > 0.5f) {
-                        s.currentFrameId = ((tickCount_ / 10) % 2 == 0)
-                            ? walkA
-                            : walkB;
+                        // Ciclo de 4 (contact, passing, back, lunge).
+                        switch ((tickCount_ / 8) % 4) {
+                            case 0: s.currentFrameId = walkA; break;
+                            case 1: s.currentFrameId = walkB; break;
+                            case 2: s.currentFrameId = walkC; break;
+                            default: s.currentFrameId = walkD; break;
+                        }
                     } else {
                         s.currentFrameId = idle;
                     }
