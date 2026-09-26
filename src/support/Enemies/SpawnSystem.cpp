@@ -34,15 +34,15 @@ int SpawnSystem::rollPackSize(const EnemyArchetype &a, float roll01) {
 }
 
 int SpawnSystem::budgetForStratum(int s) {
-    // Densidade aumentada para horda: até 30 inimigos por estrato.
+    // Horda grande: até 100 inimigos por estrato.
     switch (s) {
-        case 0: return 30;
-        case 1: return 28;
-        case 2: return 26;
-        case 3: return 24;
-        case 4: return 22;
-        case 5: return 20;
-        default: return 18;
+        case 0: return 100;
+        case 1: return 100;
+        case 2: return 100;
+        case 3: return 100;
+        case 4: return 100;
+        case 5: return 100;
+        default: return 100;
     }
 }
 
