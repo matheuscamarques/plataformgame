@@ -218,13 +218,7 @@ std::vector<InventoryUI::TarotModLine> InventoryUI::tarotModLines() const {
             {"Slots magia +" + std::to_string(e.spellSlots), 0, 1});
     }
     if (e.bloodMoon) out.push_back({"Lua de sangue", 0, 0});
-    // Fardo: peso do destino na carga (empurra p/ fat roll).
-    if (player_->totalTarotCards() > 0) {
-        out.push_back(
-            {"Fardo +" +
-             std::to_string(static_cast<int>(player_->tarotLoad())),
-             0, -1});
-    }
+    // Maldição do peso (fonte única: Player::tarotCurse).
     // Maldição do peso (fonte única: Player::tarotCurse).
     const Player::CurseInfo c = player_->tarotCurse();
     if (c.cursed) {
@@ -1356,15 +1350,10 @@ void InventoryUI::renderStatusTab(sf::RenderTarget& t, float sw, float sh,
                      std::to_string((int)player_->fpMax),
          14, sf::Color(150, 200, 255));
     const bool heavy = player_->heavilyLoaded();
-    const int fateLoad = static_cast<int>(player_->tarotLoad());
-    std::string loadStr = "Carga: " +
-                          std::to_string((int)player_->equipLoad()) + "/" +
-                          std::to_string((int)player_->maxEquipLoad()) +
-                          (heavy ? " (pesada)" : " (leve)");
-    if (fateLoad > 0)
-        loadStr += "  fado +" + std::to_string(fateLoad);
-    line(xR, yR, loadStr, 14,
-         heavy ? sf::Color(240, 120, 120) : sf::Color(170, 170, 180));
+    line(xR, yR, "Carga: " + std::to_string((int)player_->equipLoad()) +
+                     "/" + std::to_string((int)player_->maxEquipLoad()) +
+                     (heavy ? " (pesada)" : " (leve)"),
+         14, heavy ? sf::Color(240, 120, 120) : sf::Color(170, 170, 180));
 
     yR += 8.f;
     sep(xR, yR);

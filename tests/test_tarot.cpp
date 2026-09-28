@@ -333,19 +333,15 @@ int main() {
         p.hurt(10);
         assert(p.hp <= hpBefore);
     }
-    { // BurdenFate (fardo = peso/4 na carga; sem carta = zero)
+    { // NoBurden (1000 cartas não pesam: só debuffs cobram)
         Player p;
         const float bare = p.equipLoad();
-        assert(p.tarotLoad() == 0.f);
-        p.addTarotCard(core::TarotArcana::Devil); // peso 25
-        assert(p.tarotLoad() == 6.25f);
-        assert(p.equipLoad() == bare + 6.25f);
-        p.addTarotCard(core::TarotArcana::WandsTwo); // peso +1
-        assert(p.tarotLoad() == 6.5f);
-        p.respawn(0.f, 0.f); // morte não alivia o fardo
-        assert(p.tarotLoad() == 6.5f);
-        p.deleteCharacter();
-        assert(p.tarotLoad() == 0.f);
+        for (int i = 0; i < 100; ++i)
+            p.addTarotCard(core::TarotArcana::Devil);
+        assert(p.totalTarotCards() == 100);
+        assert(p.equipLoad() == bare); // carga intacta
+        assert(p.tarotWeight() == 2500);
+        assert(p.tarotCurse().cursed); // maldição sim, fardo não
     }
     { // DeleteCharacter (apaga tudo: única saída do fado)
         Player p;
