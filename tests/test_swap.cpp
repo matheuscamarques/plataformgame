@@ -13,7 +13,10 @@
 
 int main() {
     { // CycleRightHand (espada -> cajado -> sino, ordem do registry)
-        Player p; // seed: iron_sword na direita
+        Player p;
+        p.equipment.equip(core::Item{"iron_sword", 1});
+        p.inventory.add(core::Item{"wooden_staff", 1});
+        p.inventory.add(core::Item{"priest_bell", 1});
         assert(p.equipment.get(core::EquipSlot::RightHand).defId ==
                "iron_sword");
         std::string name;
@@ -77,8 +80,7 @@ int main() {
         assert(p.cycleSpell());
         assert(p.attuned[0] == "soul_arrow");
         Player solo;
-        solo.attuned.clear(); // seed vem com 2
-        assert(!solo.cycleSpell()); // <2 = false
+        assert(!solo.cycleSpell()); // vazio = false
     }
 
     std::printf("swap test OK\n");

@@ -90,6 +90,7 @@ int main() {
     }
     { // ArremessoConsomePilha (migração TNT: sem campo avulso)
         Player p;
+        p.topUpDynamite();
         ThrowSystem ts;
         assert(p.inventory.count("dynamite") == 999);
         assert(p.tryThrow(ts));

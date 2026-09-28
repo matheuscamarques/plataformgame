@@ -163,7 +163,7 @@ int main() {
             ran = support::SkillSystem::tryUse(e, ctx, "skeleton_flame_slash");
         });
         assert(ran);
-        assert(p.hp == 89); // 12 × universal Nv15 (0.972) = 11
+        assert(p.hp == 88); // 12 × universal Nv1 (1.0) = 12
     }
 
     std::printf("skeleton test OK\n");

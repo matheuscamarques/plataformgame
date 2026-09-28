@@ -34,8 +34,8 @@ int main() {
         for (int i = 0; i < 5; ++i) { recol(enemies); cs.tick(1.f / 30.f, ctx); }
         assert(p.hp == 100); // windup (~0.18s) ainda não esgotou
         for (int i = 0; i < 6; ++i) { recol(enemies); cs.tick(1.f / 30.f, ctx); }
-        // Contato 10 × universal Nv15 (0.972) = 9
-        assert(p.hp == 91 && p.getX() == -6.f);
+        // Contato 10 × universal Nv1 (1.0) = 10
+        assert(p.hp == 90 && p.getX() == -6.f);
     }
     { // DeadSlimeNoDamage + NoOverlapNoDamage
         Player p;

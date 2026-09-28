@@ -33,8 +33,8 @@ int main() {
         std::printf("test_buy_vit_changes_hp OK\n");
     }
     { // test_equip_weapon_changes_damage
-        Player p;
-        // Seed nasce equipado: desequipa p/ medir soco antes.
+        Player p; // desarmado: mede soco antes
+        // (Sem arma a espada soma +0: bônus escala de attrs 10 é zero.
         // (No seed a espada soma +0: bônus escala de attrs 10 é zero.
         // Com FOR 20 o bônus aparece e a espada supera o soco.)
         int souls = 1000000;

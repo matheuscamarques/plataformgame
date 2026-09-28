@@ -16,6 +16,7 @@ int main() {
 
     { // ThrowsWhenReady (inventário cai, cooldown arma, spawn ativo)
         Player p;
+        p.topUpDynamite();
         ThrowSystem ts;
         assert(p.inventory.count("dynamite") == 999 && p.throwCooldown.ready());
         assert(p.tryThrow(ts));
@@ -25,6 +26,7 @@ int main() {
     }
     { // CooldownBlocksDoubleThrow (2º imediato falha sem gastar)
         Player p;
+        p.topUpDynamite();
         ThrowSystem ts;
         assert(p.tryThrow(ts));
         assert(!p.tryThrow(ts));
@@ -32,6 +34,7 @@ int main() {
     }
     { // ReadyAfterHalfSecond (14 ticks de 1/30 bloqueiam; folga libera)
         Player p;
+        p.topUpDynamite();
         ThrowSystem ts;
         assert(p.tryThrow(ts));
         for (int i = 0; i < 14; ++i) p.throwCooldown.tick(1.f / 30.f);
@@ -49,6 +52,7 @@ int main() {
     }
     { // FullPoolKeepsInventory (pool cheio: sem spawn, sem gasto)
         Player p;
+        p.topUpDynamite();
         ThrowSystem ts;
         for (int i = 0; i < 64; ++i) ts.throwItem({0.f, 0.f}, {0.f, 0.f});
         assert(ts.activeCount() == 64u);
@@ -57,6 +61,7 @@ int main() {
     }
     { // FacingDirectsThrow (esquerda = vx negativo)
         Player p;
+        p.topUpDynamite();
         ThrowSystem ts;
         p.facing = -1;
         assert(p.tryThrow(ts));

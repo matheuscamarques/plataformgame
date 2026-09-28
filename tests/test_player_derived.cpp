@@ -73,8 +73,9 @@ int main() {
         assert(p.hpMax > hp);
     }
     { // DexScalesIronSword (grade B rende mais que D)
-        Player p; // seed: espada, tudo 10
-        const int base = p.meleeDamage();
+        Player p;
+        p.equipment.equip(core::Item{"iron_sword", 1});
+        const int base = p.meleeDamage(); // tudo 10: só base
         buyN(p, Attr::Dexterity, 10); // DEX 20
         const int dex = p.meleeDamage();
         assert(dex > base);

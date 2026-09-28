@@ -123,7 +123,14 @@ int main() {
     }
     { // StatusTab (HP/arma/DEF/ouro do player; zeros sem player)
         InventoryUI ui;
-        Player p; // seed ferro: espada 12, defesas 4+6+4+3+2 (luvas)
+        Player p; // set ferro manual: espada 12, defesas 4+6+4+3+2
+        p.equipment.equip(core::Item{"iron_sword", 1});
+        p.equipment.equip(core::Item{"iron_helm", 1});
+        p.equipment.equip(core::Item{"iron_chest", 1});
+        p.equipment.equip(core::Item{"iron_legs", 1});
+        p.equipment.equip(core::Item{"iron_boots", 1});
+        p.equipment.equip(core::Item{"iron_gloves", 1});
+        p.refreshDerived();
         ui.setPlayer(&p);
         ui.setEquipment(&p.equipment);
         ui.setInventory(&p.inventory);
@@ -184,7 +191,7 @@ int main() {
     { // LevelUpBuysAttr (F na Status: souls -> +1 VIT, hpMax sobe)
         InventoryUI ui;
         InputMap in;
-        Player p; // seed Nv15 (apresentação): compra sobe p/ 16
+        Player p; // base Nv1: compra sobe p/ 2
         p.souls = 100000;
         ui.setPlayer(&p);
         ui.setInventory(&p.inventory);
@@ -199,12 +206,12 @@ int main() {
         ui.handleInput(in);
         release(in, sf::Keyboard::Up);
         assert(ui.attrCursor() == 0);
-        const int cost = core::Attributes::costForLevel(15);
+        const int cost = core::Attributes::costForLevel(1);
         press(in, sf::Keyboard::F);
         ui.handleInput(in);
         release(in, sf::Keyboard::F);
         assert(p.attrs.get(core::Attr::Vitality) == 11);
-        assert(p.attrs.level() == 16);
+        assert(p.attrs.level() == 2);
         assert(p.souls == 100000 - cost);
         assert(p.hpMax == 102); // refreshDerived no buy (80+11*2)
     }
@@ -212,7 +219,7 @@ int main() {
         InventoryUI ui;
         InputMap in;
         Player p;
-        p.souls = 0; // seed dá 100k: zera p/ testar a falta
+        p.souls = 0; // sem souls: compra falha
         ui.setPlayer(&p);
         ui.setInventory(&p.inventory);
         ui.open();
@@ -221,7 +228,7 @@ int main() {
         ui.handleInput(in);
         release(in, sf::Keyboard::F);
         assert(p.attrs.get(core::Attr::Vitality) == 10);
-        assert(p.attrs.level() == 15 && p.souls == 0); // seed Nv15
+        assert(p.attrs.level() == 1 && p.souls == 0); // base Nv1
         assert(ui.feedback().find("insuficientes") != std::string::npos);
     }
     { // SystemTab (volume A/D, Save em breve, Sair pede quit)
@@ -668,8 +675,14 @@ int main() {
         core::Equipment bare;
         assert(bare.weight() == 0.f);
     }
-    { // HeavilyLoaded (seed ferro corre; ouro não)
-        Player seed; // set ferro: 30/60 = leve (luvas +2)
+    { // HeavilyLoaded (ferro corre; ouro não)
+        Player seed; // set ferro manual: 30/60 = leve (luvas +2)
+        seed.equipment.equip(core::Item{"iron_sword", 1});
+        seed.equipment.equip(core::Item{"iron_helm", 1});
+        seed.equipment.equip(core::Item{"iron_chest", 1});
+        seed.equipment.equip(core::Item{"iron_legs", 1});
+        seed.equipment.equip(core::Item{"iron_boots", 1});
+        seed.equipment.equip(core::Item{"iron_gloves", 1});
         assert(seed.equipLoad() == 30.f);
         assert(!seed.heavilyLoaded());
         Player heavy;
@@ -682,8 +695,14 @@ int main() {
         assert(heavy.equipLoad() == 37.f);
         assert(heavy.heavilyLoaded()); // >30: sem correr
     }
-    { // SeedEquipped (player nasce com o set de ferro)
+    { // EquipIronSet (set de ferro via API de equipamento)
         Player p;
+        assert(p.equipment.equip(core::Item{"iron_sword", 1}));
+        assert(p.equipment.equip(core::Item{"iron_helm", 1}));
+        assert(p.equipment.equip(core::Item{"iron_chest", 1}));
+        assert(p.equipment.equip(core::Item{"iron_legs", 1}));
+        assert(p.equipment.equip(core::Item{"iron_boots", 1}));
+        assert(p.equipment.equip(core::Item{"iron_gloves", 1}));
         assert(p.equipment.get(core::EquipSlot::RightHand).defId ==
                "iron_sword");
         assert(p.equipment.get(core::EquipSlot::Head).defId == "iron_helm");
@@ -696,6 +715,8 @@ int main() {
     }
     { // StarterKit (1 pilha cheia de cada item do registry)
         Player p;
+        p.topUpDynamite();
+        p.topUpStarterKit();
         assert(p.inventory.count("dynamite") == 999);
         assert(p.inventory.count("slime_gel") == 99);
         assert(p.inventory.count("stone") == 99);

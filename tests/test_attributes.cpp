@@ -73,7 +73,7 @@ int main() {
         assert(scaleMult(ScaleGrade::D) == 0.2f);
         assert(scaleMult(ScaleGrade::E) == 0.1f);
         assert(scaleMult(ScaleGrade::None) == 0.f);
-        assert(scaleFactor(10) == 0.f); // seed não muda dano
+        assert(scaleFactor(10) == 0.f); // base 10 contribui zero
         assert(scaleFactor(40) == 1.0f);
         assert(scaleFactor(25) == 0.75f); // rampa íngreme: 20 já dá metade
         assert(scaleFactor(20) == 0.5f);

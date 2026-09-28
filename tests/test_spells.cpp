@@ -12,16 +12,15 @@
 // F8b: G conjura sintonizada — Arrow vira Bolt, Heal cura, FP paga.
 namespace {
 void attuneAll(Player& p) {
-    p.unattune("soul_arrow"); // seed vem sintonizado: limpa p/ teste
-    p.unattune("heal_light");
     int souls = 1000000000;
-    p.attrs.buy(core::Attr::Intelligence, souls);
-    p.attrs.buy(core::Attr::Intelligence, souls); // seed 14 + 2 = 16
-    p.attrs.buy(core::Attr::Faith, souls);
-    p.attrs.buy(core::Attr::Faith, souls); // seed 12 + 2 = 14
-    p.attrs.buy(core::Attr::Attunement, souls);
-    p.attrs.buy(core::Attr::Attunement, souls); // seed 18 + 2 = 20
+    for (int i = 0; i < 6; ++i)
+        assert(p.attrs.buy(core::Attr::Intelligence, souls)); // → 16
+    for (int i = 0; i < 4; ++i)
+        assert(p.attrs.buy(core::Attr::Faith, souls)); // → 14
+    for (int i = 0; i < 8; ++i)
+        assert(p.attrs.buy(core::Attr::Attunement, souls)); // → 18
     p.refreshDerived();
+    p.fp = p.fpMax; // 280
     // Cajado na esquerda p/ magias (cura troca p/ sino no bloco dela).
     p.equipment.equipTo(core::EquipSlot::LeftHand,
                         core::Item{"wooden_staff", 1});
@@ -83,8 +82,10 @@ int main() {
         assert(!p.castAttuned(ts)); // sem FP
         assert(p.fp == 10.f);
         Player weak;
-        // Seed INT 14 cumpre todos os reqs: req-fail coberto em
-        // test_player (attune). Aqui: cooldown bloqueia recast.
+        // INT 10 não cumpre req 12: compra 2 p/ passar (cooldown recast).
+        int weakSouls = 1000000000;
+        assert(weak.attrs.buy(core::Attr::Intelligence, weakSouls));
+        assert(weak.attrs.buy(core::Attr::Intelligence, weakSouls));
         weak.attuned.push_back("soul_arrow");
         weak.equipment.equipTo(core::EquipSlot::LeftHand,
                                core::Item{"wooden_staff", 1});

@@ -17,7 +17,7 @@ int main() {
         assert(p.hurtIframes.running());   // arrancou
         for (int i = 0; i < 20; ++i) p.tick(); // ~0.66s > 0.6s
         assert(!p.hurtIframes.running());  // expirou
-        assert(p.hp == 91); // 10 × universal Nv15 (0.972)
+        assert(p.hp == 90); // 10 × universal Nv1 (1.0)
     }
     { // ThrowCooldownTicksInPlayerTick (1 só lugar, sem Game)
         Player p;
@@ -78,11 +78,20 @@ int main() {
         for (int i = 0; i < 30; ++i) p.tick();
         assert(p.stamina > 100.f); // voltou a regenar
     }
-    { // AttuneRules (req, slots, dup, remove) — seed ATT 18/INT 14
+    { // AttuneRules (req, slots, dup, remove) — ATT 18/INT 14/FÉ 12
         Player p;
+        int souls = 1000000000;
+        for (int i = 0; i < 8; ++i)
+            assert(p.attrs.buy(core::Attr::Attunement, souls));
+        for (int i = 0; i < 4; ++i)
+            assert(p.attrs.buy(core::Attr::Intelligence, souls));
+        for (int i = 0; i < 2; ++i)
+            assert(p.attrs.buy(core::Attr::Faith, souls));
         assert(p.spellSlots() == 2); // ATT 18
-        assert(p.attuned.size() == 2); // seed sintonizado
-        assert(!p.attune("soul_arrow")); // dup (já vem sintonizada)
+        assert(p.attune("soul_arrow"));
+        assert(p.attune("heal_light"));
+        assert(p.attuned.size() == 2); // sintonizado
+        assert(!p.attune("soul_arrow")); // dup (já sintonizada)
         assert(!p.attune("pedra_que_nao_existe"));
         assert(!p.attune("stone")); // não é magia
         assert(!p.attune("fireball")); // INT 14 ok, mas sem slots (2/2)
@@ -94,13 +103,17 @@ int main() {
         assert(p.unattune("fireball"));
         assert(p.attuned.empty());
     }
-    { // FpPool (teto, regen, refresh no buy) — seed ATT 18
+    { // FpPool (teto, regen, refresh no buy) — ATT 18
         Player p;
+        int souls = 1000000000;
+        for (int i = 0; i < 8; ++i)
+            assert(p.attrs.buy(core::Attr::Attunement, souls));
+        p.refreshDerived();
+        p.fp = p.fpMax;
         assert(p.fpMax == 280.f && p.fp == 280.f);
         p.fp = 100.f;
         p.tick();
         assert(p.fp > 100.f && p.fp <= 280.f); // 8/s
-        int souls = 1000000000;
         assert(p.attrs.buy(core::Attr::Attunement, souls)); // ATT 19
         p.refreshDerived();
         assert(p.fpMax == 290.f);

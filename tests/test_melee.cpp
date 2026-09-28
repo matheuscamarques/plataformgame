@@ -126,18 +126,19 @@ int main() {
         assert(p.startSwing());
         assert(!p.startSwing()); // ainda em Windup
     }
-    { // HurtGatesOnIframes (seed Nv15: universal 0.972 filtra)
+    { // HurtGatesOnIframes (Nv1: universal 1.0 não filtra)
         Player p;
         assert(p.hp == 100);
-        assert(p.hurt(10) && p.hp == 91); // 10 × 0.972 = 9
-        assert(!p.hurt(10) && p.hp == 91); // i-frame segurou
+        assert(p.hurt(10) && p.hp == 90); // 10 × 1.0 = 10
+        assert(!p.hurt(10) && p.hp == 90); // i-frame segurou
         p.hurtIframes.tick(1.f);
-        assert(p.hurt(100) && p.hp == 0); // 100 × 0.972 = 97, mata
+        assert(p.hurt(100) && p.hp == 0); // 100 esmaga, mata
         assert(!p.hurt(10)); // já em 0, sem efeito
     }
     { // ScalingStrDex (espada ferro: D FOR + B DES; base 8 intacta)
-        Player p; // seed: espada, STR/DEX 10 → bônus 0
+        Player p; // desarmado: bônus 0, total = base
         assert(p.meleeDamage() == 8);
+        p.equipment.equip(core::Item{"iron_sword", 1});
         int souls = 1000000000;
         for (int i = 0; i < 10; ++i)
             assert(p.attrs.buy(core::Attr::Strength, souls));
@@ -161,7 +162,8 @@ int main() {
     }
 
     { // BreakdownMatchesDamage (UI mostra o mesmo numero do combate)
-        Player p; // seed: espada ferro
+        Player p;
+        p.equipment.equip(core::Item{"iron_sword", 1});
         auto bd = p.meleeDamageBreakdown();
         assert(bd.total == p.meleeDamage());
         assert(!bd.halvedByReq); // seed cumpre req (FOR 5/DES 8)

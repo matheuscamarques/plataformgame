@@ -21,8 +21,9 @@ int main() {
 
     { // SwingFreezesDirection (snapshot: input posterior não move o golpe)
         Player p;
+        p.equipment.equip(core::Item{"iron_sword", 1});
         p.meleePhase = MeleePhase::Idle;
-        assert(p.hasWeapon()); // seed: espada de ferro
+        assert(p.hasWeapon());
         p.aimDir = AimDir::N;
 
         assert(p.startSwing());
@@ -33,7 +34,8 @@ int main() {
     }
     { // HitboxUsesSwingAim (N = 20px acima do centro)
         Player p;
-        assert(p.hasWeapon()); // seed: espada de ferro
+        p.equipment.equip(core::Item{"iron_sword", 1});
+        assert(p.hasWeapon());
         p.meleePhase = MeleePhase::Active;
         p.meleeCombo = 0;
         p.swingAim = AimDir::N;

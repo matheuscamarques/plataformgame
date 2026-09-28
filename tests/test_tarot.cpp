@@ -88,6 +88,7 @@ int main() {
     }
     { // HooksAlive (melee, taken/defesa, stamina, hpMax respondem)
         Player p;
+        p.equipment.equip(core::Item{"iron_sword", 1});
         const int bare = p.meleeDamage();
         p.addTarotCard(TarotArcana::Devil);
         assert(p.meleeDamage() > bare); // dano entra no breakdown
@@ -128,7 +129,7 @@ int main() {
         assert(m.tarotFx.spellSlots == 0); // 1 cópia: sem slot
         m.addTarotCard(TarotArcana::Magician);
         assert(m.tarotFx.spellSlots == 1); // 2 cópias: +1 slot
-        assert(m.spellSlots() == 3);       // base 2 (ATT18) + 1
+        assert(m.spellSlots() == 1);       // base 0 (ATT10) + 1
         Player f;
         const float fireBare =
             f.computeResistances().get(core::DamageType::Fire);
@@ -146,6 +147,7 @@ int main() {
     }
     { // HooksConditional (Amantes/Justiça/Eremita por contexto)
         Player p;
+        p.equipment.equip(core::Item{"iron_sword", 1});
         p.addTarotCard(TarotArcana::Lovers);
         p.hp = p.effectiveHpMax(); // cheio: highHp 1.10
         const int full = p.meleeDamage();
@@ -153,10 +155,12 @@ int main() {
         const int low = p.meleeDamage();
         assert(low < full);
         Player j;
+        j.equipment.equip(core::Item{"iron_sword", 1});
         j.addTarotCard(TarotArcana::Justice);
         assert(j.meleeDamageVs(1.f, false) > j.meleeDamageVs(0.5f, false));
         assert(j.meleeDamageVs(0.1f, false) < j.meleeDamageVs(0.5f, false));
         Player h;
+        h.equipment.equip(core::Item{"iron_sword", 1});
         h.addTarotCard(TarotArcana::Hermit);
         assert(h.meleeDamageVs(1.f, true) > h.meleeDamageVs(1.f, false));
         // 9 de Paus: defesa com HP<25% (hurt real, sem movimento).
@@ -188,22 +192,28 @@ int main() {
     }
     { // HooksFinisher (Estrela pesa, investida empurra, Roda roça)
         Player st; // mesmo combo 2, com e sem carta
+        st.equipment.equip(core::Item{"iron_sword", 1});
         st.addTarotCard(TarotArcana::Star);
         st.meleeCombo = 2;
         Player stBare;
+        stBare.equipment.equip(core::Item{"iron_sword", 1});
         stBare.meleeCombo = 2;
         assert(st.meleeDamage() < stBare.meleeDamage()); // heavy 0.85
         Player cg;
+        cg.equipment.equip(core::Item{"iron_sword", 1});
         cg.addTarotCard(TarotArcana::Chariot);
         cg.meleeCombo = 2;
         Player cgBare;
+        cgBare.equipment.equip(core::Item{"iron_sword", 1});
         cgBare.meleeCombo = 2;
         assert(cg.meleeDamage() > cgBare.meleeDamage()); // investida 1.10
         Player wh;
+        wh.equipment.equip(core::Item{"iron_sword", 1});
         wh.addTarotCard(TarotArcana::WheelOfFortune);
         assert(near(wh.tarotFx.precisionMult, 0.95f));
         // swingId 0: roça (período 20) — sem carta não roça.
         Player bare;
+        bare.equipment.equip(core::Item{"iron_sword", 1});
         assert(wh.meleeDamage() < bare.meleeDamage());
         wh.startSwing(); // id 1: fora do graze
         assert(wh.meleeDamage() == bare.meleeDamage());
@@ -254,12 +264,14 @@ int main() {
         assert(p.hurt(9999)); // revive gasto...
         assert(p.hp == 0);    // ...morre
         Player c;
+        c.equipment.equip(core::Item{"iron_sword", 1});
         c.addTarotCard(TarotArcana::HangedMan);
         c.hp = c.effectiveHpMax();
         const int dmg = c.meleeDamage();
         c.hurt(20);
         assert(c.meleeDamage() > dmg); // dor virou bônus
         Player k;
+        k.equipment.equip(core::Item{"iron_sword", 1});
         k.addTarotCard(TarotArcana::Death);
         assert(k.tarotFx.killStackMax == 5);
         const int kBare = k.meleeDamage();
@@ -316,6 +328,7 @@ int main() {
     }
     { // NeverZeroOrNegative (pilha de penalidades: dano > 0)
         Player p;
+        p.equipment.equip(core::Item{"iron_sword", 1});
         for (int i = 0; i < 2; ++i) {
             p.addTarotCard(TarotArcana::Lovers);   // lowHp 0.85
             p.addTarotCard(TarotArcana::Justice);  // wounded 0.85

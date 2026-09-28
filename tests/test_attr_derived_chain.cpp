@@ -35,7 +35,7 @@ int main() {
         Player p;
         int slotsBefore = p.spellSlots();
         int souls = 1000000;
-        // seed ATT 18 (2 slots): leva a 24 (3 slots)
+        // ATT 10 (0 slots) + 6 compras = 16 (2 slots)
         for (int i = 0; i < 6; ++i) {
             assert(p.attrs.buy(Attr::Attunement, souls));
         }

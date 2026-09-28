@@ -27,29 +27,10 @@ Entity(core::kIdPlayer,0,0,60,100) // AABB 2 blocos (sprite 12x40 a 2.5x)
     // câmera concordam entre si. Visual fino (30px) centrado na caixa.
     static auto schema = support::BodySchema::humanoid(100.f, 60.f);
     body.attach(&schema);
-    topUpDynamite();
-    topUpStarterKit();
-    // Nasce equipado (set de ferro): render idêntico ao Loadout antigo.
-    // Direto no equipment (não passa pelo inventário, sem sobra).
-    equipment.equip(core::Item{"iron_sword", 1});
-    equipment.equip(core::Item{"iron_helm", 1});
-    equipment.equip(core::Item{"iron_chest", 1});
-    equipment.equip(core::Item{"iron_legs", 1});
-    equipment.equip(core::Item{"iron_boots", 1});
-    equipment.equip(core::Item{"iron_gloves", 1});
-    // Seed de apresentação: INT 14 / FÉ 12 / ATT 18 (Nv 15) com
-    // soul_arrow + heal_light sintonizadas (C mostra magia no cinto).
-    // HP/Stamina intactos (sem VIT/END); souls iniciam com 100k.
-    {
-        int seedSouls = 1000000000;
-        for (int i = 0; i < 4; ++i) attrs.buy(core::Attr::Intelligence, seedSouls);
-        for (int i = 0; i < 2; ++i) attrs.buy(core::Attr::Faith, seedSouls);
-        for (int i = 0; i < 8; ++i) attrs.buy(core::Attr::Attunement, seedSouls);
-        souls = 100000;
-    }
-    refreshDerived(); // hpMax/stamina/carga dos attrs base (10)
-    attune("soul_arrow");
-    attune("heal_light");
+    // Sem seed: nasce Desprovido (base 10, 1 poção, sem souls);
+    // menu de criação aplica a classe via applyClass (#3).
+    // Kit generoso e set de ferro morreram com o seed.
+    applyClass(core::PlayerClass::Deprived);
     stamina = staminaMax;
     fp = fpMax;
     //this->setGravity(9.8f);

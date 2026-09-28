@@ -23,7 +23,8 @@ bool near(float a, float b) { return std::fabs(a - b) < 0.01f; }
 int main() {
     { // MeleeHitboxFromSwingAim (arma + Active = rect E por snapshot)
         Player p; // (0,0,30,50), centro (15,25), facing 1, swingAim E
-        assert(p.hasWeapon()); // seed: espada de ferro
+        p.equipment.equip(core::Item{"iron_sword", 1});
+        assert(p.hasWeapon());
         p.meleePhase = MeleePhase::Active;
         BodySchema s = BodySchema::humanoid(50.f, 50.f);
         p.body.attach(&s);
@@ -46,7 +47,8 @@ int main() {
     }
     { // NoHitboxOutsideActive (só Active acerta)
         Player p;
-        assert(p.hasWeapon()); // seed: espada de ferro
+        p.equipment.equip(core::Item{"iron_sword", 1});
+        assert(p.hasWeapon());
         p.meleePhase = MeleePhase::Windup;
         BodySchema s = BodySchema::humanoid(50.f, 50.f);
         p.body.attach(&s);

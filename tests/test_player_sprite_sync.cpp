@@ -65,7 +65,8 @@ int main() {
         assert(resolveFor(p) == SpriteFrameId::PlayerPunchUp);
     }
     { // HitboxAndSpriteReadSameAim (money test: N divergente de E)
-        Player p; // equipped=true, sword: hitbox direcional por swingAim
+        Player p; // espada: hitbox direcional por swingAim
+        p.equipment.equip(core::Item{"iron_sword", 1});
         p.meleePhase = MeleePhase::Active;
         p.swingAim = AimDir::N;
         p.aimDir = AimDir::E; // divergente de propósito
