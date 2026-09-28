@@ -131,9 +131,10 @@ private:
     void render();
     void pollEvents(); // loop SFML + edges por frame (run() chama 1x)
     void tick();
-    void drawPlayerSprite();
-    void drawPlayerEquipment();
-    void drawPlayerWeapon();
+    // Boneco paramétrico: player real ou preview da criação.
+    void drawPlayerSprite(Player *p);
+    void drawPlayerEquipment(Player *p);
+    void drawPlayerWeapon(Player *p);
     void drawEnemiesSprites();
 
     // Tamanho da viewport. Futuro: AssetManager é dono de font;

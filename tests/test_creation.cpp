@@ -66,12 +66,30 @@ int main() {
         s.handleBackspace();
         assert(s.name().size() ==
                CharacterCreationScreen::kMaxName - 1);
-        // Fora do Nome: texto não edita.
+        // Fora do Nome: digitar puxa o foco e edita.
         nav(in, s, sf::Keyboard::Down); // classe 0
-        const std::string frozen = s.name();
+        assert(s.cursor() == 1);
         s.handleText('Z');
+        assert(s.cursor() == 0);
+        assert(s.name().back() == 'Z');
         s.handleBackspace();
-        assert(s.name() == frozen);
+        assert(s.name().back() != 'Z');
+    }
+    { // PreviewFollowsSelection (boneco veste a selecionada)
+        CharacterCreationScreen s;
+        InputMap in;
+        assert(s.preview().weaponDef() &&
+               s.preview().weaponDef()->id == "iron_sword"); // Knight
+        nav(in, s, sf::Keyboard::Down);
+        nav(in, s, sf::Keyboard::Down);
+        nav(in, s, sf::Keyboard::Down); // Mago
+        nav(in, s, sf::Keyboard::Return); // seleciona
+        assert(s.klass() == core::PlayerClass::Mage);
+        assert(s.preview().weaponDef() &&
+               s.preview().weaponDef()->id == "wooden_staff");
+        assert(s.preview().attuned.size() == 1u);
+        s.reset();
+        assert(s.preview().weaponDef()->id == "iron_sword");
     }
     { // SelectClassJumpsToStart (Enter na classe marca e avança)
         CharacterCreationScreen s;
@@ -97,6 +115,34 @@ int main() {
         assert(s.consumeAction() == MenuAct::None);
         assert(s.name() == "A");
         assert(s.klass() == core::PlayerClass::Knight);
+    }
+    { // LettersDontNavigate (WASD digitam, setas navegam)
+        CharacterCreationScreen s;
+        InputMap in;
+        // 's' digita (não desce), 'w' digita (não sobe).
+        press(in, sf::Keyboard::S);
+        s.handleInput(in);
+        release(in, sf::Keyboard::S);
+        s.handleText('s');
+        press(in, sf::Keyboard::W);
+        s.handleInput(in);
+        release(in, sf::Keyboard::W);
+        s.handleText('w');
+        assert(s.cursor() == 0);
+        assert(s.name() == "sw");
+        // 'u' digita (não confirma): sem disparo, segue no Nome.
+        press(in, sf::Keyboard::U);
+        s.handleInput(in);
+        release(in, sf::Keyboard::U);
+        s.handleText('u');
+        assert(s.cursor() == 0);
+        assert(s.consumeAction() == MenuAct::None);
+        assert(s.name() == "swu");
+        // Seta física ainda navega.
+        press(in, sf::Keyboard::Down);
+        s.handleInput(in);
+        release(in, sf::Keyboard::Down);
+        assert(s.cursor() == 1);
     }
     { // BackToMenu (Esc volta sem concluir)
         CharacterCreationScreen s;

@@ -16,6 +16,7 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 
 #include "core/PlayerClass.h"
+#include "entities/Player/Player.h"
 #include "support/Input/InputMap.h"
 
 namespace game {
@@ -26,8 +27,9 @@ enum class Action : uint8_t { None, Done, Back };
 
 class CharacterCreationScreen {
 public:
-    static constexpr int kNameRow = 0;
-    static constexpr int kClassFirst = 1;
+    CharacterCreationScreen(); // reset() inicial (preview = Cavaleiro)
+
+    static constexpr int kNameRow = 0;    static constexpr int kClassFirst = 1;
     static constexpr int kClassCount =
         static_cast<int>(core::PlayerClass::COUNT);
     static constexpr int kStartRow = kClassFirst + kClassCount;
@@ -41,6 +43,7 @@ public:
     // COMEÇAR conclui. Esc volta ao menu.
     void handleInput(support::InputMap &in);
     // Texto digitado (TextEntered) e Backspace, via pollEvents.
+    // Digitar com o cursor fora do Nome puxa o foco p/ o Nome.
     void handleText(std::uint32_t unicode);
     void handleBackspace();
 
@@ -49,6 +52,10 @@ public:
     int cursor() const { return cursor_; }
     const std::string &name() const { return name_; }
     core::PlayerClass klass() const { return selected_; }
+    // Boneco de preview (App desenha): equipamento da selecionada.
+    const Player &preview() const { return preview_; }
+    Player &preview() { return preview_; }
+    void rebuildPreview() { preview_.applyClass(selected_); }
 
     void render(sf::RenderTarget &target, const sf::Font &font, float sw,
                 float sh) const;
@@ -57,6 +64,7 @@ private:
     int cursor_ = kNameRow; // começa no Nome (digita direto)
     std::string name_;
     core::PlayerClass selected_ = core::PlayerClass::Knight;
+    Player preview_; // boneco: rebuild no reset/seleção
     Action pending_ = Action::None;
 };
 

@@ -180,9 +180,9 @@ void Game::render()
         entity->draw(window);
     });
 
-    drawPlayerSprite();
-    drawPlayerEquipment(); // elmo, peitoral, perneiras
-    drawPlayerWeapon();    // espada por cima
+    drawPlayerSprite(player.get());
+    drawPlayerEquipment(player.get()); // elmo, peitoral, perneiras
+    drawPlayerWeapon(player.get());    // espada por cima
     drawEnemiesSprites();
 
     // Status F7 flutuante (DS): acima do player, só quando aplicado.
@@ -1055,8 +1055,8 @@ void Game::render()
     window->display();
 }
 
-void Game::drawPlayerSprite() {
-    Player *p = player.get();
+void Game::drawPlayerSprite(Player *p) {
+    if (!p) return;
     // Escala p/ altura da entidade (100px), aspecto preservado.
     const float s = p->getH() / static_cast<float>(sprites::kPlayerH);
     // 4 partes; se Boots equipada, ela SUBSTITUI o feet (não sobrepõe).
@@ -1097,8 +1097,8 @@ void Game::drawPlayerSprite() {
     }
 }
 
-void Game::drawPlayerEquipment() {
-    Player *p = player.get();
+void Game::drawPlayerEquipment(Player *p) {
+    if (!p) return;
     if (run_.isDead()) return;
     const float s = p->getH() / static_cast<float>(sprites::kPlayerH);
     const int f = p->facing;
@@ -1182,8 +1182,8 @@ static const sf::Texture *weaponIdleTex(const sprites::SpriteSet &s,
     return &s.swordIdle[m];
 }
 
-void Game::drawPlayerWeapon() {
-    Player *p = player.get();
+void Game::drawPlayerWeapon(Player *p) {
+    if (!p) return;
     if (run_.isDead()) return;
     const float s = p->getH() / static_cast<float>(sprites::kPlayerH);
     // Direção pela rotação, não pelo flip: flip + rotação espelharia

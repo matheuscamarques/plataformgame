@@ -93,6 +93,17 @@ public:
         latch_[static_cast<std::size_t>(a)] = false;
     }
 
+    // Tecla física (criação de personagem): navega por setas/Enter/Esc
+    // sem passar pelos binds — letras digitadas (WASD...) nunca movem
+    // o cursor. Mesmo latch de pressed(), mesmo beginFrame/onTickEnd.
+    bool pressedKey(sf::Keyboard::Key k) const;
+    void consumeKey(sf::Keyboard::Key k);
+
+    // Zera tudo (transições splash/menu/criação/gameplay): nenhum edge
+    // velho vaza (Enter do splash não confirma o menu, 'E' digitado
+    // não abre o inventário no spawn, etc).
+    void clearAll();
+
     // Eixos para movimento e IA.
     // Retorna -1, 0 ou 1. Combina Left/Right e Up/Down.
     float axisX() const;
@@ -105,11 +116,23 @@ public:
 
 private:
     static constexpr std::size_t kCount = static_cast<std::size_t>(Action::COUNT);
+    static constexpr std::size_t kKeys =
+        static_cast<std::size_t>(sf::Keyboard::KeyCount);
+
+    static std::size_t keyIndex(sf::Keyboard::Key k) {
+        return static_cast<std::size_t>(k);
+    }
+    bool keyValid(sf::Keyboard::Key k) const {
+        return keyIndex(k) < kKeys;
+    }
 
     std::array<std::vector<sf::Keyboard::Key>, kCount> keys_{};
     std::array<bool, kCount> curr_{};
     std::array<bool, kCount> prev_{};
     std::array<bool, kCount> latch_{}; // edge pegajoso até tick/consume
+    std::array<bool, kKeys> rawCurr_{};
+    std::array<bool, kKeys> rawPrev_{};
+    std::array<bool, kKeys> rawLatch_{}; // física: mesma regra do latch_
 
     bool pollingMode_ = false;
     bool enabled_     = true;

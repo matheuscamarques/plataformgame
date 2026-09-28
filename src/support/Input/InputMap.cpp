@@ -109,6 +109,12 @@ void InputMap::handleEvent(const sf::Event& e) {
             }
         }
     }
+    // Tecla física (criação): rastreia cru, sem binds.
+    if (keyValid(e.key.code)) {
+        const std::size_t ki = keyIndex(e.key.code);
+        rawCurr_[ki] = down;
+        if (down) rawLatch_[ki] = true;
+    }
 }
 
 void InputMap::beginFrame() {
@@ -118,9 +124,11 @@ void InputMap::beginFrame() {
         }
     }
     prev_ = curr_;
+    rawPrev_ = rawCurr_;
     // Só expira o latch se algum tick observou (0-tick frames preservam).
     if (ticksRan_) {
         latch_.fill(false);
+        rawLatch_.fill(false);
         ticksRan_ = false;
     }
 }
@@ -133,6 +141,27 @@ bool InputMap::held(Action a) const {
 bool InputMap::pressed(Action a) const {
     if (!enabled_ || !indexValid(a)) return false;
     return latch_[static_cast<std::size_t>(a)];
+}
+
+bool InputMap::pressedKey(sf::Keyboard::Key k) const {
+    if (!enabled_ || !keyValid(k)) return false;
+    return rawLatch_[keyIndex(k)];
+}
+
+void InputMap::consumeKey(sf::Keyboard::Key k) {
+    if (!keyValid(k)) return;
+    const std::size_t ki = keyIndex(k);
+    rawCurr_[ki] = false;
+    rawLatch_[ki] = false;
+}
+
+void InputMap::clearAll() {
+    curr_.fill(false);
+    prev_.fill(false);
+    latch_.fill(false);
+    rawCurr_.fill(false);
+    rawPrev_.fill(false);
+    rawLatch_.fill(false);
 }
 
 bool InputMap::released(Action a) const {

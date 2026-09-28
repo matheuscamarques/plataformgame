@@ -110,6 +110,30 @@ int main() {
     in.beginFrame();
     assert(!in.pressed(Action::UseItem));
 
+    // Tecla física: mesma semântica de latch, sem binds.
+    in.beginFrame();
+    in.handleEvent(keyEvent(sf::Event::KeyPressed, sf::Keyboard::F1));
+    assert(in.pressedKey(sf::Keyboard::F1));
+    in.consumeKey(sf::Keyboard::F1);
+    assert(!in.pressedKey(sf::Keyboard::F1));
+    in.handleEvent(keyEvent(sf::Event::KeyPressed, sf::Keyboard::F1));
+    assert(in.pressedKey(sf::Keyboard::F1));
+    in.onTickEnd(); // sem beginFrame: latch sobrevive
+    assert(in.pressedKey(sf::Keyboard::F1));
+    in.beginFrame(); // com tick: expira
+    assert(!in.pressedKey(sf::Keyboard::F1));
+
+    // clearAll zera tudo (transições de tela não vazam edges).
+    in.beginFrame();
+    in.handleEvent(keyEvent(sf::Event::KeyPressed, sf::Keyboard::E));
+    in.handleEvent(keyEvent(sf::Event::KeyPressed, sf::Keyboard::R));
+    assert(in.pressed(Action::ToggleInventory));
+    assert(in.pressedKey(sf::Keyboard::R));
+    in.clearAll();
+    assert(!in.pressed(Action::ToggleInventory));
+    assert(!in.pressedKey(sf::Keyboard::R));
+    assert(!in.held(Action::ToggleInventory));
+
     std::printf("inputmap test OK\n");
     return 0;
 }

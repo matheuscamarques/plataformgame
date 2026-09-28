@@ -149,6 +149,7 @@ void Game::run()
                 splashDone_ = true;
                 splash_.reset(); // libera; próximo boot reconstrói
                 splashClock.restart();
+                input_.clearAll(); // tecla do skip não confirma o menu
             }
             continue;
         }
@@ -158,6 +159,21 @@ void Game::run()
             pollEvents();
             creation_.handleInput(input_);
             creation_.render(*window, font, viewW_, viewH_);
+            // Boneco de preview: corpo rebuildado em coords de tela.
+            // Esquerda da lista (área livre); idle de frente.
+            {
+                Player &pv = creation_.preview();
+                const float dollX = 40.f; // esquerda da lista, área livre
+                const float dollTop = viewH_ * 0.5f - 50.f;
+                pv.setX(dollX);
+                pv.setY(dollTop);
+                pv.facing = 1;
+                pv.currentFrameId = support::SpriteFrameId::PlayerIdle;
+                pv.body.rebuild({dollX, dollTop}, 1);
+                drawPlayerSprite(&pv);
+                drawPlayerEquipment(&pv);
+                drawPlayerWeapon(&pv);
+            }
             window->display();
             const auto act = creation_.consumeAction();
             if (act == game::creation::Action::Done) {
@@ -167,8 +183,10 @@ void Game::run()
                 }
                 creationActive_ = false;
                 menuDone_ = true;
+                input_.clearAll(); // letras digitadas não vazam p/ o jogo
             } else if (act == game::creation::Action::Back) {
                 creationActive_ = false; // menu reaparece (menuDone_ segue)
+                input_.clearAll();
             }
             continue;
         }
@@ -183,6 +201,7 @@ void Game::run()
             if (act == game::menu::Action::NewGame) {
                 creation_.reset();
                 creationActive_ = true; // criação decide a classe
+                input_.clearAll();
             } else if (act == game::menu::Action::Quit) {
                 window->close();
             }

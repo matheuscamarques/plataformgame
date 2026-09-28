@@ -24,38 +24,45 @@ void CharacterCreationScreen::reset() {
     name_.clear();
     selected_ = core::PlayerClass::Knight;
     pending_ = Action::None;
+    rebuildPreview();
 }
 
+CharacterCreationScreen::CharacterCreationScreen() { reset(); }
+
 void CharacterCreationScreen::handleInput(support::InputMap &in) {
-    using support::Action;
-    if (in.pressed(Action::Up)) {
-        in.consume(Action::Up);
+    // Teclas FÍSICAS (setas/Enter/Esc): letras digitadas (WASD, U...)
+    // nunca movem o cursor nem confirmam — TextEntered cuida do nome.
+    using K = sf::Keyboard;
+    if (in.pressedKey(K::Up)) {
+        in.consumeKey(K::Up);
         cursor_ = (cursor_ + kRowCount - 1) % kRowCount;
     }
-    if (in.pressed(Action::Down)) {
-        in.consume(Action::Down);
+    if (in.pressedKey(K::Down)) {
+        in.consumeKey(K::Down);
         cursor_ = (cursor_ + 1) % kRowCount;
     }
-    if (in.pressed(Action::UseItem)) {
-        in.consume(Action::UseItem);
+    if (in.pressedKey(K::Return)) {
+        in.consumeKey(K::Return);
         if (cursor_ == kNameRow || (cursor_ >= kClassFirst &&
                                     cursor_ < kStartRow)) {
-            if (cursor_ >= kClassFirst)
+            if (cursor_ >= kClassFirst) {
                 selected_ = static_cast<core::PlayerClass>(cursor_ -
                                                            kClassFirst);
+                rebuildPreview();
+            }
             cursor_ = kStartRow; // Enter avança p/ COMEÇAR
         } else if (cursor_ == kStartRow) {
             pending_ = game::creation::Action::Done;
         }
     }
-    if (in.pressed(Action::Pause)) {
-        in.consume(Action::Pause);
+    if (in.pressedKey(K::Escape)) {
+        in.consumeKey(K::Escape);
         pending_ = game::creation::Action::Back;
     }
 }
 
 void CharacterCreationScreen::handleText(std::uint32_t unicode) {
-    if (cursor_ != kNameRow) return; // digita só no Nome
+    if (cursor_ != kNameRow) cursor_ = kNameRow; // digitar foca o Nome
     if (name_.size() >= kMaxName) return;
     if (unicode < 32 || unicode > 126) return; // ASCII visível
     name_.push_back(static_cast<char>(unicode));
