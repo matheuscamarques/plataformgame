@@ -32,8 +32,8 @@ public:
 
     static const char *rowLabel(Screen s, int row);
 
-    // Up/Down movem, UseItem (U/Enter) confirma, Pause (Esc) volta.
-    // Consome os edges lidos (sem vazar p/ o gameplay).
+    // Up/Down movem, UseItem (U/Enter) ou Espaço confirma,
+    // Pause (Esc) volta. Consome os edges lidos (sem vazar p/ o jogo).
     void handleInput(support::InputMap &in);
 
     // Disparo único: None até a próxima confirmação de Novo/Sair.
@@ -49,6 +49,7 @@ public:
                 float sh) const;
 
 private:
+    void confirm(); // Enter/Espaço na linha atual
     Screen screen_ = Screen::Main;
     int cursor_ = 0;
     Action pending_ = Action::None;

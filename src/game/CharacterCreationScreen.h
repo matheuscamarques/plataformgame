@@ -61,6 +61,7 @@ public:
                 float sh) const;
 
 private:
+    void confirm(); // Enter/Espaço na linha atual
     int cursor_ = kNameRow; // começa no Nome (digita direto)
     std::string name_;
     core::PlayerClass selected_ = core::PlayerClass::Knight;

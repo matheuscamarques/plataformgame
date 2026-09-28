@@ -74,6 +74,21 @@ int main() {
         assert(m.consumeAction() == MenuAction::NewGame);
         assert(m.consumeAction() == MenuAction::None); // disparo único
     }
+    { // SpaceConfirmsToo (Espaço pula o splash e confirma)
+        MainMenuScreen m;
+        InputMap in;
+        press(in, sf::Keyboard::Down);
+        m.handleInput(in);
+        release(in, sf::Keyboard::Down);
+        press(in, sf::Keyboard::Down);
+        m.handleInput(in);
+        release(in, sf::Keyboard::Down);
+        assert(m.cursor() == 2); // Sair
+        press(in, sf::Keyboard::Space);
+        m.handleInput(in);
+        release(in, sf::Keyboard::Space);
+        assert(m.consumeAction() == MenuAction::Quit);
+    }
     { // QuitFires (Sair no cursor 2)
         MainMenuScreen m;
         InputMap in;

@@ -43,21 +43,30 @@ void CharacterCreationScreen::handleInput(support::InputMap &in) {
     }
     if (in.pressedKey(K::Return)) {
         in.consumeKey(K::Return);
-        if (cursor_ == kNameRow || (cursor_ >= kClassFirst &&
-                                    cursor_ < kStartRow)) {
-            if (cursor_ >= kClassFirst) {
-                selected_ = static_cast<core::PlayerClass>(cursor_ -
-                                                           kClassFirst);
-                rebuildPreview();
-            }
-            cursor_ = kStartRow; // Enter avança p/ COMEÇAR
-        } else if (cursor_ == kStartRow) {
-            pending_ = game::creation::Action::Done;
-        }
+        confirm();
+    }
+    // Espaço confirma fora do Nome (no Nome, digita espaço via texto).
+    if (cursor_ != kNameRow && in.pressedKey(K::Space)) {
+        in.consumeKey(K::Space);
+        confirm();
     }
     if (in.pressedKey(K::Escape)) {
         in.consumeKey(K::Escape);
         pending_ = game::creation::Action::Back;
+    }
+}
+
+void CharacterCreationScreen::confirm() {
+    if (cursor_ == kNameRow || (cursor_ >= kClassFirst &&
+                                cursor_ < kStartRow)) {
+        if (cursor_ >= kClassFirst) {
+            selected_ =
+                static_cast<core::PlayerClass>(cursor_ - kClassFirst);
+            rebuildPreview();
+        }
+        cursor_ = kStartRow; // confirma avança p/ COMEÇAR
+    } else if (cursor_ == kStartRow) {
+        pending_ = game::creation::Action::Done;
     }
 }
 
@@ -179,7 +188,7 @@ void CharacterCreationScreen::render(sf::RenderTarget &target,
     if (kit.empty()) kit = "(nada)";
     textAt("Kit: " + kit, xR, yr, 14, sf::Color(150, 200, 255));
 
-    centerText("Setas navegam - letras digitam o nome - Enter confirma",
+    centerText("Setas navegam - letras digitam - Enter/Espaço confirma",
                sh - 60.f, 13, sf::Color(120, 120, 130));
 }
 

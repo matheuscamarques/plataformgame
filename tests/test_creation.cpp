@@ -144,6 +144,34 @@ int main() {
         release(in, sf::Keyboard::Down);
         assert(s.cursor() == 1);
     }
+    { // SpaceConfirmsOffName (Espaço confirma fora do Nome)
+        CharacterCreationScreen s;
+        InputMap in;
+        press(in, sf::Keyboard::Down);
+        s.handleInput(in);
+        release(in, sf::Keyboard::Down);
+        assert(s.cursor() == 1);
+        press(in, sf::Keyboard::Space);
+        s.handleInput(in);
+        release(in, sf::Keyboard::Space);
+        assert(s.klass() == core::PlayerClass::Knight); // selecionou
+        assert(s.cursor() == kStart); // pulou p/ COMEÇAR
+        press(in, sf::Keyboard::Space);
+        s.handleInput(in);
+        release(in, sf::Keyboard::Space);
+        assert(s.consumeAction() == MenuAct::Done); // começou
+    }
+    { // SpaceTypesOnName (no Nome, Espaço digita sem pular)
+        CharacterCreationScreen s;
+        InputMap in;
+        press(in, sf::Keyboard::Space);
+        s.handleInput(in);
+        release(in, sf::Keyboard::Space);
+        s.handleText(' ');
+        assert(s.cursor() == 0); // ficou no Nome
+        assert(s.name() == " ");
+        assert(s.consumeAction() == MenuAct::None);
+    }
     { // BackToMenu (Esc volta sem concluir)
         CharacterCreationScreen s;
         InputMap in;

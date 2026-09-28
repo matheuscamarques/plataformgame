@@ -45,20 +45,12 @@ void MainMenuScreen::handleInput(support::InputMap &in) {
     }
     if (in.pressed(Action::UseItem)) {
         in.consume(Action::UseItem);
-        if (screen_ == Screen::Main) {
-            if (cursor_ == 0) pending_ = game::menu::Action::NewGame;
-            else if (cursor_ == 1) {
-                screen_ = Screen::Load;
-                cursor_ = 0;
-            } else if (cursor_ == 2)
-                pending_ = game::menu::Action::Quit;
-        } else {
-            // Load: slots vazios são no-op (SaveSystem vem no #6).
-            if (cursor_ == kSlots) {
-                screen_ = Screen::Main;
-                cursor_ = 1; // volta no Carregar
-            }
-        }
+        confirm();
+    }
+    // Espaço também confirma (pulou o splash com ele; sem texto aqui).
+    if (in.pressedKey(sf::Keyboard::Space)) {
+        in.consumeKey(sf::Keyboard::Space);
+        confirm();
     }
     if (in.pressed(Action::Pause)) {
         in.consume(Action::Pause);
@@ -67,6 +59,23 @@ void MainMenuScreen::handleInput(support::InputMap &in) {
             cursor_ = 1;
         }
         // No Main, Esc não faz nada (sair é explícito).
+    }
+}
+
+void MainMenuScreen::confirm() {
+    if (screen_ == Screen::Main) {
+        if (cursor_ == 0) pending_ = game::menu::Action::NewGame;
+        else if (cursor_ == 1) {
+            screen_ = Screen::Load;
+            cursor_ = 0;
+        } else if (cursor_ == 2)
+            pending_ = game::menu::Action::Quit;
+    } else {
+        // Load: slots vazios são no-op (SaveSystem vem no #6).
+        if (cursor_ == kSlots) {
+            screen_ = Screen::Main;
+            cursor_ = 1; // volta no Carregar
+        }
     }
 }
 
@@ -111,7 +120,7 @@ void MainMenuScreen::render(sf::RenderTarget &target, const sf::Font &font,
                    sel ? sf::Color(255, 220, 100)
                        : sf::Color(170, 170, 180));
     }
-    centerText("Setas navegam - Enter confirma - Esc volta",
+    centerText("Setas navegam - Enter/Espaço confirma - Esc volta",
                sh - 60.f, 13, sf::Color(120, 120, 130));
 }
 
