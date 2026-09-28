@@ -1169,6 +1169,19 @@ void Game::drawPlayerEquipment() {
     }
 }
 
+// Textura idle da arma pelo defId (fonte única, Telas direita+esquerda).
+// Cajado/sino: arte fixa (paleta própria); machado: idle sem fases;
+// resto: espada do material. Sem textura nula (sempre cai na espada).
+static const sf::Texture *weaponIdleTex(const sprites::SpriteSet &s,
+                                        const std::string &id, int m) {
+    if (id == "wooden_staff") return &s.staffIdle[m];
+    if (id == "priest_bell") return &s.bellIdle[m];
+    const support::WeaponDef *wd =
+        support::WeaponRegistry::instance().find(id);
+    if (wd && !wd->hasSwingPhases) return &s.axeIdle[m];
+    return &s.swordIdle[m];
+}
+
 void Game::drawPlayerWeapon() {
     Player *p = player.get();
     if (run_.isDead()) return;
@@ -1205,20 +1218,14 @@ void Game::drawPlayerWeapon() {
     if (!arm) return;
     const float handX = arm->worldBox.left + arm->worldBox.width * 0.5f;
     const float handY = arm->worldBox.top + arm->worldBox.height;
-    const sf::Texture *tex = &sprites_.swordIdle[m];
+    const sf::Texture *tex = weaponIdleTex(sprites_, wdef->id, m);
     float originX = 4.f, originY = 20.f;
-    // Machado só tem idle: mesma textura em toda fase (dado no registry).
-    // Cajado/sino: arte própria (não herdada do machado).
+    // Espada tem fases de swing (dado no registry); machado/cajado/sino
+    // usam idle em toda fase. Cajado/sino: arte própria fixa.
     const support::WeaponDef *wd =
         support::WeaponRegistry::instance().find(wdef->id);
     const bool phased = !wd || wd->hasSwingPhases;
-    if (wdef->id == "wooden_staff") {
-        tex = &sprites_.staffIdle[m];
-    } else if (wdef->id == "priest_bell") {
-        tex = &sprites_.bellIdle[m];
-    } else if (!phased) {
-        tex = &sprites_.axeIdle[m];
-    } else {
+    if (phased) {
         switch (p->meleePhase) {
             case MeleePhase::Windup:
                 tex = &sprites_.swordWindup[m];
@@ -1268,16 +1275,14 @@ void Game::drawPlayerWeapon() {
 
     // Off-hand (LeftHand): pose idle na mão esquerda, sem fases e sem
     // hitbox. Desenha mesmo sem arma na direita (soco + espada funciona).
+    // Mesma seleção da direita (cajado/sino têm arte própria).
     if (const core::ItemDef* off = p->offHandDef()) {
         const int mo = static_cast<int>(off->material);
         if (const auto *armL = p->body.find(support::BodyPartId::ArmL)) {
             const float hx =
                 armL->worldBox.left + armL->worldBox.width * 0.5f;
             const float hy = armL->worldBox.top + armL->worldBox.height;
-            const support::WeaponDef *wod =
-                support::WeaponRegistry::instance().find(off->id);
-            const sf::Texture *otex = &sprites_.swordIdle[mo];
-            if (wod && !wod->hasSwingPhases) otex = &sprites_.axeIdle[mo];
+            const sf::Texture *otex = weaponIdleTex(sprites_, off->id, mo);
             sf::Sprite ospr;
             ospr.setTexture(*otex);
             ospr.setOrigin(4.f, 20.f);

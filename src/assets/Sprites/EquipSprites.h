@@ -95,7 +95,8 @@ inline const char *const kIronAxeIdle[] = {
 };
 
 // Cajado (8x20, vertical como o machado): cristal W no topo,
-// haste G embaixo. Cor vem do material (W=main, G=accent).
+// haste G embaixo. Paleta FIXA abaixo (catalisador único: se fosse
+// no material, o cajado de ferro sairia cinza igual espada).
 inline constexpr int kStaffW = 8;
 inline constexpr int kStaffH = 20;
 
@@ -145,6 +146,24 @@ inline const char *const kBellIdle[] = {
     "........",
     "........",
 };
+
+// Paletas fixas dos catalisadores (espelham os ícones do inventário).
+// Fora do loop de material no build: cajado é madeira+cristal e sino
+// é ouro em qualquer mão, senão viram "espada de outra cor".
+inline const core::PaletteEntry kStaffFixedPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'W', {140, 200, 255}}, // cristal
+    {'G', {150, 110, 70}},  // haste de madeira
+};
+inline constexpr std::size_t kStaffFixedPalCount = 3;
+
+inline const core::PaletteEntry kBellFixedPal[] = {
+    {'.', {0, 0, 0, 0}},
+    {'W', {220, 190, 120}}, // copa dourada
+    {'w', {150, 125, 70}},  // sombra
+    {'G', {120, 95, 50}},   // cabo de bronze
+};
+inline constexpr std::size_t kBellFixedPalCount = 4;
 
 inline const char *const kIronSwordWindup[] = {
     "........",

@@ -195,8 +195,11 @@ inline SpriteSet build() {
         s.swordWindup[m] = core::makeSprite(kIronSwordWindup, kSwordW, kSwordH, pal, 5);
         s.swordSwing[m] = core::makeSprite(kIronSwordSwing, kSwordSwingW, kSwordSwingH, pal, 5);
         s.axeIdle[m] = core::makeSprite(kIronAxeIdle, kSwordW, kSwordH, pal, 5);
-        s.staffIdle[m] = core::makeSprite(kStaffIdle, kStaffW, kStaffH, pal, 5);
-        s.bellIdle[m] = core::makeSprite(kBellIdle, kStaffW, kStaffH, pal, 5);
+        // Catalisadores: paleta fixa (não material), igual em todo m.
+        s.staffIdle[m] = core::makeSprite(kStaffIdle, kStaffW, kStaffH,
+                                          kStaffFixedPal, kStaffFixedPalCount);
+        s.bellIdle[m] = core::makeSprite(kBellIdle, kStaffW, kStaffH,
+                                         kBellFixedPal, kBellFixedPalCount);
         s.helm[m] = core::makeSprite(kIronHelmIdle, kHelmW, kHelmH, pal, 5);
         s.chest[m] = core::makeSprite(kIronChestIdle, kChestW, kChestH, pal, 5);
         s.legs[m] = core::makeSprite(kIronLegsIdle, kLegsW, kLegsH, pal, 5);

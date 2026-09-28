@@ -12,6 +12,7 @@
 
 #include "assets/Sprites/PlayerSprites.h"
 #include "assets/Sprites/EnemySprites.h"
+#include "assets/Sprites/EquipSprites.h"
 #include "assets/SpriteFrameRegistry.h"
 
 // Sanity de palette: 1 char = 1 parte (S ambíguo morreu aqui).
@@ -136,6 +137,38 @@ int main() {
             auto face = bboxForChar(f, kDwarfH, 'F');
             assert(separated(hand, face));
             assert(bboxForChar(f, kDwarfH, 'R').valid); // barba sempre
+        }
+    }
+    { // CatalystFixedPal (cajado/sino: paleta própria, não material)
+        // Cajado de madeira+cristal em qualquer material: W azul,
+        // G marrom. Sino: W/w ouro, G bronze. Senão viram "espada".
+        auto colorOf = [](const core::PaletteEntry *pal, std::size_t n,
+                          char ch) {
+            for (std::size_t i = 0; i < n; ++i)
+                if (pal[i].ch == ch) return pal[i].color;
+            return sf::Color(0, 0, 0, 0);
+        };
+        assert(noDuplicateChars(kStaffFixedPal, kStaffFixedPalCount));
+        assert(noDuplicateChars(kBellFixedPal, kBellFixedPalCount));
+        const sf::Color crystal =
+            colorOf(kStaffFixedPal, kStaffFixedPalCount, 'W');
+        assert(crystal.b > crystal.r + 30); // cristal azul, não cinza
+        const sf::Color shaft =
+            colorOf(kStaffFixedPal, kStaffFixedPalCount, 'G');
+        assert(shaft.r > shaft.b + 30); // madeira marrom, não cinza
+        const sf::Color cup =
+            colorOf(kBellFixedPal, kBellFixedPalCount, 'W');
+        assert(cup.r > 200 && cup.g > 150); // ouro, não aço
+        // Arte só usa chars da paleta fixa.
+        for (int y = 0; y < kStaffH; ++y) {
+            for (int x = 0; x < kStaffW; ++x) {
+                assert(colorOf(kStaffFixedPal, kStaffFixedPalCount,
+                               kStaffIdle[y][x]).a > 0 ||
+                       kStaffIdle[y][x] == '.');
+                assert(colorOf(kBellFixedPal, kBellFixedPalCount,
+                               kBellIdle[y][x]).a > 0 ||
+                       kBellIdle[y][x] == '.');
+            }
         }
     }
 
