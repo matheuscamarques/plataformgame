@@ -303,14 +303,16 @@ int main() {
         assert(p.tarotFx.damageMult == 1.f);
         assert(p.tarotWeight() == 0);
     }
-    { // DeathClears (morreu, zerou; morte limpa run)
+    { // DeathKeeps (fado sobrevive: cartas, peso e revive gasto ficam)
         Player p;
         p.addTarotCard(TarotArcana::Devil);
+        p.addKillStack();
         assert(p.tarotFx.damageMult == 1.25f);
         p.respawn(0.f, 0.f);
-        assert(p.tarotCards.empty());
-        assert(p.tarotFx.damageMult == 1.f);
-        assert(p.tarotWeight() == 0);
+        assert(p.tarotCards[TarotArcana::Devil] == 1);
+        assert(p.tarotFx.damageMult == 1.25f);
+        assert(p.tarotWeight() == 25);
+        assert(p.killStacks() == 0); // momento de combate zera
     }
     { // NeverZeroOrNegative (pilha de penalidades: dano > 0)
         Player p;

@@ -905,10 +905,10 @@ void Player::respawn(float x, float y) {
     curePoison();
     cureBleed();
     cureFrost();
-    // Tarô morre junto (permanente na run, não além da morte).
-    tarotCards.clear();
+    // Tarô sobrevive à morte (fado da run, não da vida): cartas,
+    // peso e revives gastos persistem; só o momento de combate
+    // zera (stacks, conversão, vinheta). Só deleteCharacter limpa.
     recomputeTarot();
-    tarotRevivesUsed_ = 0;
     killStacks_ = 0;
     killTimer_ = 0.f;
     convBonus_ = 0.f;
