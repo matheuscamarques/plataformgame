@@ -152,6 +152,23 @@ void Game::run()
             }
             continue;
         }
+        // Tela inicial: Novo/Carregar/Sair antes do gameplay.
+        // O mundo já existe mas não tica (congelado atrás do menu).
+        if (!menuDone_) {
+            pollEvents();
+            menu_.handleInput(input_);
+            menu_.render(*window, font, viewW_, viewH_);
+            window->display();
+            const auto act = menu_.consumeAction();
+            if (act == game::menu::Action::NewGame) {
+                // TEMP-MenuSemCriacao: Cavaleiro até a tela de criação.
+                if (player) player->applyClass(core::PlayerClass::Knight);
+                menuDone_ = true;
+            } else if (act == game::menu::Action::Quit) {
+                window->close();
+            }
+            continue;
+        }
         // Ordem: beginFrame ANTES do pollEvent, senão o edge morre
         // antes do primeiro tick ler (e há N ticks por frame).
         pollEvents();

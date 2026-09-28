@@ -16,6 +16,7 @@
 #include "render/Render2D.h"
 #include "render/RenderBackend.h"
 #include "game/LogoScreen.h"
+#include "game/MainMenuScreen.h"
 #include "../support/Camera/Camera.h"
 #include "../support/Debug/DebugOverlay.h"
 #include "../support/Debug/DebugFeed.h"
@@ -120,6 +121,9 @@ private:
     // Vinheta de boot (logo WEB-ENGENHARIA); atrás dela o jogo já existe.
     std::unique_ptr<game::logo::LogoScreen> splash_;
     bool splashDone_ = false;
+    // Tela inicial (menu) antes do gameplay; atrás, o mundo congelado.
+    game::menu::MainMenuScreen menu_;
+    bool menuDone_ = false;
     void render();
     void pollEvents(); // loop SFML + edges por frame (run() chama 1x)
     void tick();
