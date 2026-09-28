@@ -14,6 +14,7 @@
 #include <utility>
 
 #include "core/Config.h"
+#include "core/TarotSprites.h"
 #include "core/VecSfml.h"
 #include "render/Render2D.h"
 #include "render/SpriteConvert.h"
@@ -891,6 +892,13 @@ void Game::render()
                     p->tarotRecent()[(p->tarotRecentTotal() - 1) % 3];
                 text(std::string(core::tarotName(last)), 16.f, 196.f, 12,
                      sf::Color(200, 180, 120));
+                // Ícone 1.5× (18×30) abaixo do texto: mesma carta.
+                const int uIdx =
+                    core::tarot_sprites::uniqueIndexOf(last);
+                sf::Sprite icon(sprites_.tarotTex[uIdx]);
+                icon.setScale(1.5f, 1.5f);
+                icon.setPosition(16.f, 214.f);
+                window->draw(icon);
             }
         }
         // FP (F8b): barra azul no canto superior direito.
@@ -975,16 +983,31 @@ void Game::render()
             if (age >= 0.3f) {
                 const core::TarotArcana a = p->tarotRevealArcana();
                 centerText(std::string(core::tarotName(a)),
-                           viewH_ * 0.5f - 60.f, 28,
+                           viewH_ * 0.5f + 60.f, 28,
                            sf::Color(240, 220, 140));
                 if (const core::TarotCardDef *def =
                         core::TarotRegistry::instance().find(a)) {
-                    centerText(def->flavor, viewH_ * 0.5f - 10.f, 14,
+                    centerText(def->flavor, viewH_ * 0.5f + 100.f, 14,
                                sf::Color(200, 200, 200));
                 }
                 centerText("O destino nao pergunta.",
-                           viewH_ * 0.5f + 20.f, 14,
+                           viewH_ * 0.5f + 124.f, 14,
                            sf::Color(240, 120, 120));
+            }
+            // Carta 4× com pop (0.2s→0.5s) sobre o dim, some com o fade.
+            if (age >= 0.2f) {
+                const float popU = std::min(
+                    1.f, (age - 0.2f) / 0.3f);
+                const float ease = 1.f - (1.f - popU) * (1.f - popU);
+                const float scale = 0.5f + 3.5f * ease; // 0.5× → 4.0×
+                const int uIdx = core::tarot_sprites::uniqueIndexOf(
+                    p->tarotRevealArcana());
+                sf::Sprite card(sprites_.tarotTex[uIdx]);
+                card.setOrigin(6.f, 10.f); // centro do 12×20
+                card.setPosition(viewW_ * 0.5f, viewH_ * 0.5f - 30.f);
+                card.setScale(scale, scale);
+                card.setColor(sf::Color(255, 255, 255, alpha));
+                window->draw(card);
             }
         }
     }

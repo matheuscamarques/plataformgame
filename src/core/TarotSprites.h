@@ -1008,13 +1008,33 @@ inline const char* const* majorSprite(TarotArcana a) {
 }
 
 // 4 naipes × 4 ranks visuais.
-inline const char* const* minorSprite(int suit, int pos) {
-    // pos: 0=Ás, 1-9=Número (2-10), 10=Pajem, 11-13=Corte
-    const int rank = (pos == 0) ? 0
-                   : (pos <= 9)  ? 1
-                   : (pos == 10) ? 2
-                   : 3;
-    // suits: 0=Wands, 1=Cups, 2=Swords, 3=Pentacles
+//
+// 78 arcanos → 38 sprites únicos. Mapa:
+//   [0..21]  = Maiores (1:1)
+//   [22..37] = 4 naipes × 4 ranks (Ás / Número / Pajem / Corte)
+inline constexpr int kUniqueSpriteCount = 38;
+
+inline std::uint8_t uniqueIndexOf(TarotArcana a) {
+    const int i = static_cast<int>(a);
+    if (i < 22) return static_cast<std::uint8_t>(i);
+    const int local = i - static_cast<int>(TarotArcana::WandsAce);
+    const int suit = local / 14;
+    const int pos = local % 14;
+    const int rank = (pos == 0)    ? 0   // Ás
+                     : (pos <= 9)  ? 1   // Número (2-10)
+                     : (pos == 10) ? 2   // Pajem
+                                   : 3;  // Corte (Knight/Queen/King)
+    return static_cast<std::uint8_t>(22 + suit * 4 + rank);
+}
+
+// SpriteRef de um índice único u∈[0,38). Fora da faixa = rows nulo.
+inline SpriteRef uniqueSprite(int u) {
+    if (u < 0 || u >= kUniqueSpriteCount)
+        return {nullptr, 12, 20, kFramePal, kFramePalCount};
+    if (u < 22) return makeRef(majorSprite(static_cast<TarotArcana>(u)));
+    const int local = u - 22;
+    const int suit = local / 4;
+    const int rank = local % 4;
     static const char* const* table[4][4] = {
         {kWandsAceSprite, kWandsNumberSprite, kWandsPageSprite,
          kWandsCourtSprite},
@@ -1025,8 +1045,18 @@ inline const char* const* minorSprite(int suit, int pos) {
         {kPentaclesAceSprite, kPentaclesNumberSprite, kPentaclesPageSprite,
          kPentaclesCourtSprite},
     };
-    if (suit < 0 || suit > 3 || rank < 0 || rank > 3) return nullptr;
-    return table[suit][rank];
+    return makeRef(table[suit][rank]);
+}
+
+inline const char* const* minorSprite(int suit, int pos) {
+    // pos: 0=Ás, 1-9=Número (2-10), 10=Pajem, 11-13=Corte
+    if (suit < 0 || suit > 3 || pos < 0 || pos > 13) return nullptr;
+    const int rank = (pos == 0) ? 0
+                   : (pos <= 9)  ? 1
+                   : (pos == 10) ? 2
+                   : 3;
+    // Tabela única: delega p/ uniqueSprite (sem duplicar arte).
+    return uniqueSprite(22 + suit * 4 + rank).rows;
 }
 
 // Ponto de entrada: mapeia qualquer TarotArcana para o sprite.

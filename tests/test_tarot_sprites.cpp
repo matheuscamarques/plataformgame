@@ -97,6 +97,40 @@ int main() {
     { // RegistryComplete (78 defs com flavor)
         assert(core::TarotRegistry::instance().keys().size() == 78u);
     }
+    { // UniqueIndex (78 → 38: Maiores 1:1, Menores por rank)
+        using core::tarot_sprites::uniqueIndexOf;
+        using core::tarot_sprites::uniqueSprite;
+        using core::tarot_sprites::kUniqueSpriteCount;
+        for (int i = 0; i < kCount; ++i) {
+            const auto u =
+                uniqueIndexOf(static_cast<TarotArcana>(i));
+            assert(u < kUniqueSpriteCount);
+        }
+        assert(uniqueIndexOf(TarotArcana::Fool) == 0);
+        assert(uniqueIndexOf(TarotArcana::World) == 21);
+        assert(uniqueIndexOf(TarotArcana::WandsAce) == 22);
+        assert(uniqueIndexOf(TarotArcana::WandsTwo) == 23);
+        assert(uniqueIndexOf(TarotArcana::WandsTen) == 23);
+        assert(uniqueIndexOf(TarotArcana::WandsPage) == 24);
+        assert(uniqueIndexOf(TarotArcana::WandsKnight) == 25);
+        assert(uniqueIndexOf(TarotArcana::WandsQueen) == 25);
+        assert(uniqueIndexOf(TarotArcana::WandsKing) == 25);
+        assert(uniqueIndexOf(TarotArcana::PentaclesKing) == 37);
+        // spriteFor concorda com uniqueSprite via índice.
+        for (int i = 0; i < kCount; ++i) {
+            const auto a = static_cast<TarotArcana>(i);
+            assert(spriteFor(a).rows ==
+                   uniqueSprite(uniqueIndexOf(a)).rows);
+        }
+        // uniqueSprite cobre os 38 e rejeita fora da faixa.
+        for (int u = 0; u < kUniqueSpriteCount; ++u) {
+            const auto ref = uniqueSprite(u);
+            assert(ref.rows != nullptr);
+            assert(ref.w == 12 && ref.h == 20);
+        }
+        assert(uniqueSprite(-1).rows == nullptr);
+        assert(uniqueSprite(38).rows == nullptr);
+    }
 
     std::printf("tarot sprites test OK\n");
     return 0;

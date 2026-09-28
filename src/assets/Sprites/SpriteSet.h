@@ -9,9 +9,11 @@
  */
 
 #pragma once
+#include <array>
 #include <cstddef>
 
 #include "core/Material.h"
+#include "core/TarotSprites.h"
 #include "core/sprite_from_ascii.h"
 
 #include "assets/Sprites/PlayerSprites.h"
@@ -84,6 +86,11 @@ struct SpriteSet {
 
     // Throwables — 1 textura por frame (fresh/burning/critical), sem material.
     sf::Texture tnt[3];
+
+    // Tarô — 38 texturas únicas indexadas por uniqueIndexOf()
+    // (22 Maiores + 16 Menores; 40 Menores compartilham por rank).
+    std::array<sf::Texture, core::tarot_sprites::kUniqueSpriteCount>
+        tarotTex;
 };
 
 // Roda 1x no boot (precisa de contexto GL — nunca em teste headless).
@@ -199,6 +206,13 @@ inline SpriteSet build() {
     s.tnt[0] = core::makeSprite(kTntFresh, kTntW, kTntH, kTntPal, kTntPalCount);
     s.tnt[1] = core::makeSprite(kTntBurning, kTntW, kTntH, kTntPal, kTntPalCount);
     s.tnt[2] = core::makeSprite(kTntCritical, kTntW, kTntH, kTntPal, kTntPalCount);
+    // Tarô: 38 texturas (makeSprite aceita palCount 24, sem teto).
+    for (int u = 0; u < core::tarot_sprites::kUniqueSpriteCount; ++u) {
+        const auto ref = core::tarot_sprites::uniqueSprite(u);
+        const auto pal = core::toLegacyPal(ref.pal, ref.palCount);
+        s.tarotTex[u] = core::makeSprite(ref.rows, ref.w, ref.h,
+                                         pal.data(), pal.size());
+    }
     return s;
 }
 

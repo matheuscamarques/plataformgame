@@ -10,8 +10,11 @@
 #include <SFML/Graphics/Image.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <cstddef>
+#include <cstdint>
+#include <vector>
 
 #include "core/BodyPart.h"
+#include "core/SpriteData.h"
 
 namespace core {
 
@@ -46,6 +49,27 @@ inline sf::Texture makeSprite(const char *const *rows, int w, int h,
     t.loadFromImage(img);
     t.setSmooth(false); // pixel art: sem interpolação no upscale
     return t;
+}
+
+// Converte paleta neutra (SpritePalEntry, RGBA uint32) p/ legada
+// (PaletteEntry, sf::Color). Ordem: (c >> 24) = R (0xRRGGBBAA).
+// P/ sprites de tarô no SpriteSet (GL); headless usa toSpriteData.
+inline std::vector<PaletteEntry> toLegacyPal(const SpritePalEntry *src,
+                                             std::size_t n) {
+    std::vector<PaletteEntry> out;
+    out.reserve(n);
+    for (std::size_t i = 0; i < n; ++i) {
+        PaletteEntry e;
+        e.ch = src[i].ch;
+        e.color = sf::Color(
+            static_cast<sf::Uint8>((src[i].color >> 24) & 0xFF),
+            static_cast<sf::Uint8>((src[i].color >> 16) & 0xFF),
+            static_cast<sf::Uint8>((src[i].color >> 8) & 0xFF),
+            static_cast<sf::Uint8>(src[i].color & 0xFF));
+        e.part = src[i].part;
+        out.push_back(e);
+    }
+    return out;
 }
 
 } // namespace core
