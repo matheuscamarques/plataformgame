@@ -63,7 +63,12 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
     const sf::FloatRect box = p->meleeHitbox();
     if (box.width <= 0.f) return;
 
-    const int dmgBase = p->meleeDamage();
+    // Eremita: "sozinho" = 1 inimigo vivo (conta 1x por swing).
+    int aliveCount = 0;
+    ctx.enemies->forEach([&](Enemy &s) {
+        if (!s.resources.isDead()) ++aliveCount;
+    });
+    const bool alone = aliveCount <= 1;
     const float postureBase = p->meleePosture();
     ctx.enemies->forEach([&](Enemy &s) {
         if (s.resources.isDead()) return;
@@ -118,7 +123,13 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
         } else if (s.bodyParts.schema) {
             return; // whiff: dentro do AABB, fora das partes
         }
-        const int dmg = static_cast<int>(dmgBase * dmgMult);
+        // Justiça: dano com contexto do alvo (cheio/ferido) + Eremita.
+        const float targetFrac = s.resources.hpMax > 0
+                                     ? static_cast<float>(s.resources.hp) /
+                                           s.resources.hpMax
+                                     : 1.f;
+        const int dmg = static_cast<int>(
+            p->meleeDamageVs(targetFrac, alone) * dmgMult);
         const int applied =
             s.resources.takeDamage(dmg, p->weaponBuffType);
         // SFX hit (só com dano; sem ctx.audio em teste = sem custo).

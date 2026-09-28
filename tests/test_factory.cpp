@@ -8,7 +8,9 @@
 #include <cassert>
 #include <cmath>
 #include <cstdio>
+#include "entities/Player/Player.h"
 #include "support/Enemies/EnemySystem.h"
+#include "support/GameContext.h"
 #include "defines.h"
 
 // Factory cria slime 40x30 verde nomeado; kind inválido dá null.
@@ -30,6 +32,23 @@ int main() {
 
     auto none = Factory::spawnEnemy("dragon", 0.0f, 0.0f);
     assert(none == nullptr);
+
+    // Tarô híbrido: Diabo engorda o HP dos nascidos (sem mundo = sem
+    // elite, só o mult). Mesmas coords = mesma variante/equip.
+    {
+        Player bare;
+        GameContext ctxB{};
+        ctxB.player = &bare;
+        auto eBare = Factory::spawnEnemy("slime", 100.0f, 0.0f, &ctxB);
+        Player devil;
+        devil.addTarotCard(core::TarotArcana::Devil);
+        GameContext ctxD{};
+        ctxD.player = &devil;
+        auto eDevil = Factory::spawnEnemy("slime", 100.0f, 0.0f, &ctxD);
+        assert(eBare && eDevil);
+        assert(eDevil->resources.hpMax > eBare->resources.hpMax);
+        assert(eDevil->resources.hp == eDevil->resources.hpMax);
+    }
 
     std::printf("factory test OK\n");
     return 0;

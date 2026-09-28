@@ -14,7 +14,11 @@
 
 #include "defines.h"
 #include "BehaviorRegistry.h"
+#include "core/DayNightCycle.h"
+#include "core/DropTable.h"
+#include "entities/Player/Player.h"
 #include "support/Combat/BodySchemaRegistry.h"
+#include "world/World.h"
 #include "EnemyArchetype.h"
 #include "SlimeAI.h"
 #include "VariantRegistry.h"
@@ -44,8 +48,20 @@ std::unique_ptr<Enemy> Factory::spawnEnemy(const std::string &kind,
         e->bodyParts.attach(s);
 
     e->resources.isTrash = a->isTrash;
-    e->resources.hp = static_cast<int>(a->hp * a->scale);
-    e->resources.hpMax = static_cast<int>(a->hp * a->scale);
+    // Tarô híbrido: Diabo engorda o HP dos nascidos; lua de sangue
+    // (+25%) soma. Sem player no ctx = intacto (teste/fallback).
+    float foeHpMult = 1.f;
+    float eliteMult = 1.f;
+    bool bloodNight = false;
+    if (ctx && ctx->player) {
+        foeHpMult = ctx->player->tarotFx.enemyHpMult;
+        eliteMult = ctx->player->tarotFx.eliteChanceMult;
+        bloodNight = ctx->player->tarotFx.bloodMoon && ctx->dayNight &&
+                     ctx->dayNight->sample().sunIntensity < 0.20f;
+        if (bloodNight) foeHpMult *= 1.25f;
+    }
+    e->resources.hp = static_cast<int>(a->hp * a->scale * foeHpMult);
+    e->resources.hpMax = static_cast<int>(a->hp * a->scale * foeHpMult);
     e->resources.posture = a->postureMax;
     e->resources.postureMax = a->postureMax;
     e->resources.postureRegen = a->postureRegen;
@@ -80,8 +96,22 @@ std::unique_ptr<Enemy> Factory::spawnEnemy(const std::string &kind,
 
     // Variante por profundidade (dano/hp/skills extras). Slime não tem
     // variantes: forDepth retorna null e nada muda.
+    // Elite do fado (Torre): 5% base × eliteChanceMult de subir +1 nível
+    // (teto 5), rolado no salt de (tile, seed) — sem mundo = sem elite.
     const int stratum = stratumAt(core::worldToTile({x, y}).y);
-    if (const VariantDef *v = VariantRegistry::instance().forDepth(kind, stratum)) {
+    const VariantDef *baseVar =
+        VariantRegistry::instance().forDepth(kind, stratum);
+    const VariantDef *v = baseVar;
+    if (ctx && ctx->world && baseVar && baseVar->level < 5) {
+        const core::TilePos tp = core::worldToTile({x, y});
+        const uint32_t salt =
+            core::dropSalt(tp.x, tp.y, ctx->world->getSeed());
+        if ((salt % 100u) < 5u * eliteMult)
+            v = VariantRegistry::instance().forLevel(kind,
+                                                     baseVar->level + 1);
+        if (!v) v = baseVar;
+    }
+    if (v) {
         e->variantLevel = v->level;
         e->damageMult = v->damageMult;
         e->resources.hp += v->hpBonus;

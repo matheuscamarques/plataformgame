@@ -73,9 +73,12 @@ void DropSystem::tick(float dt, GameContext &ctx) {
             const float d2 = dx * dx + dy * dy;
 
             if (d2 < kCollectRadius * kCollectRadius) {
-                collected_ += o.value;
+                // Roda da Fortuna: souls da coleta × agregado.
+                const int gain = static_cast<int>(
+                    o.value * ctx.player->tarotFx.soulsGainMult);
+                collected_ += gain;
                 // Souls (F1): XP coletado credita a carteira do player.
-                ctx.player->souls += o.value;
+                ctx.player->souls += gain;
                 // SFX coleta (sem ctx.audio em teste = mudo).
                 if (ctx.audio)
                     ctx.audio->play(game::keyOf(game::Sfx::XpCollect), 0.6f);

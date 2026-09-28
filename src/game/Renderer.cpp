@@ -127,6 +127,16 @@ void Game::render()
     float vx0 = camPos.x - 60.0f, vy0 = camPos.y - 60.0f;
     float vx1 = camPos.x + viewW_ + 60.0f, vy1 = camPos.y + viewH_ + 60.0f;
     // Céu dinâmico do ciclo dia/noite (superfície) ou fundo temático
+    // Tarô cósmico (Sol/Lua/Mundo, por frame): raio = 180 × luz ×
+    // visão; névoa come o luar; Mundo tinge a noite de sangue.
+    {
+        const auto &fx = player.get()->tarotFx;
+        const bool night =
+            dayNight_.sample().sunIntensity < 0.20f;
+        lighting_.setPlayerRadius(180.f * fx.lightMult * fx.visionMult);
+        lighting_.setFogMult(fx.fogMult);
+        lighting_.setBloodMoon(fx.bloodMoon && night);
+    }
     // por estrato (subterrâneo: o chapado pré-dia/noite, 9325d6d tirou).
     // Anti-flap + anti-pop na travessia (era o "estoura e reseta"):
     // - deadband 25px: raspando a superfície mostra céu (cabeça pra fora
@@ -853,12 +863,13 @@ void Game::render()
         stFg.setFillColor(sf::Color(80, 200, 80));
         window->draw(stFg);
 
-        auto text = [&](const std::string &s, float x, float y, int size = 18) {
+        auto text = [&](const std::string &s, float x, float y, int size = 18,
+                          sf::Color c = sf::Color::White) {
             sf::Text t;
             t.setFont(font);
             t.setString(support::utf8(s));
             t.setCharacterSize(size);
-            t.setFillColor(sf::Color::White);
+            t.setFillColor(c);
             t.setOutlineColor(sf::Color::Black);
             t.setOutlineThickness(1);
             t.setPosition(x, y);
@@ -866,6 +877,22 @@ void Game::render()
         };
         text("HP " + std::to_string(p->hp) + "/" + std::to_string(p->hpMax), 16.f, 48.f);
         text("Souls: " + std::to_string(p->souls), 16.f, 158.f);
+        // Tarô (fado): HUD compacto — total, peso e última carta.
+        // Peso >100 = vermelho (a maldição cobra); sem carta = sem linha.
+        if (p->totalTarotCards() > 0) {
+            const int w = p->tarotWeight();
+            const sf::Color wc = (w > 100) ? sf::Color(240, 90, 90)
+                                           : sf::Color(240, 220, 140);
+            text("TARO: " + std::to_string(p->totalTarotCards()) +
+                     " cartas  Peso: " + std::to_string(w) + "/100",
+                 16.f, 178.f, 14, wc);
+            if (p->tarotRecentTotal() > 0 && p->tarotRecentAge() < 30.f) {
+                const core::TarotArcana last =
+                    p->tarotRecent()[(p->tarotRecentTotal() - 1) % 3];
+                text(std::string(core::tarotName(last)), 16.f, 196.f, 12,
+                     sf::Color(200, 180, 120));
+            }
+        }
         // FP (F8b): barra azul no canto superior direito.
         {
             const float fx = viewW_ - 140.f;
@@ -916,6 +943,49 @@ void Game::render()
             text("R para renascer no checkpoint", viewW_ * 0.5f - 170.f, viewH_ * 0.5f + 10.f, 20);
         } else if (run_.isPaused()) {
             text("PAUSADO (ESC)", viewW_ * 0.5f - 110.f, viewH_ * 0.5f - 20.f, 28);
+        }
+        // Vinheta do fado: 1.5s sem pausar (0-0.3 escurece, 0.3-0.9
+        // nome+flavor, 1.3-1.5 some). O destino não pergunta.
+        // Textos centralizados por bounds (view redimensiona).
+        if (p->tarotRevealActive()) {
+            const float age = p->tarotRevealAge();
+            const float inA =
+                age < 0.3f ? age / 0.3f * 180.f : 180.f;
+            const float outA =
+                age > 1.3f ? (1.5f - age) / 0.2f * 180.f : inA;
+            const auto alpha = static_cast<uint8_t>(
+                std::max(0.f, std::min(180.f, outA)));
+            sf::RectangleShape dim(sf::Vector2f(viewW_, viewH_));
+            dim.setFillColor(sf::Color(0, 0, 0, alpha));
+            window->draw(dim);
+            auto centerText = [&](const std::string &s, float y, int size,
+                                  sf::Color c) {
+                sf::Text t;
+                t.setFont(font);
+                t.setString(support::utf8(s));
+                t.setCharacterSize(size);
+                t.setFillColor(c);
+                t.setOutlineColor(sf::Color::Black);
+                t.setOutlineThickness(1);
+                const auto b = t.getLocalBounds();
+                t.setPosition(viewW_ * 0.5f - (b.left + b.width * 0.5f),
+                              y);
+                window->draw(t);
+            };
+            if (age >= 0.3f) {
+                const core::TarotArcana a = p->tarotRevealArcana();
+                centerText(std::string(core::tarotName(a)),
+                           viewH_ * 0.5f - 60.f, 28,
+                           sf::Color(240, 220, 140));
+                if (const core::TarotCardDef *def =
+                        core::TarotRegistry::instance().find(a)) {
+                    centerText(def->flavor, viewH_ * 0.5f - 10.f, 14,
+                               sf::Color(200, 200, 200));
+                }
+                centerText("O destino nao pergunta.",
+                           viewH_ * 0.5f + 20.f, 14,
+                           sf::Color(240, 120, 120));
+            }
         }
     }
 

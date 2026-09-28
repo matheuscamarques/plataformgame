@@ -28,6 +28,11 @@ public:
     // Budget total de vivos por estrato (densidade cai com profundidade).
     static int budgetForStratum(int s);
     static constexpr std::size_t kGlobalCap = 100;
+    // Orçamento com o fado aplicado (puro, testável): base × spawn ×
+    // dia/noite (×2 em lua de sangue). Teto global manda no tick.
+    static int scaledBudget(int base, float spawnMult, float dayNightMult) {
+        return static_cast<int>(base * spawnMult * dayNightMult);
+    }
 
     // Tamanho da matilha p/ o arquétipo (puro, testável): interpola
     // packMin..packMax por roll01 em [0,1].

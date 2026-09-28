@@ -38,6 +38,9 @@ struct Input {
     bool left = false;
     bool right = false;
     bool run = false;
+    // Tarô (Carro etc.): multiplica as velocidades horizontais
+    // (walk + roll). 1.0 = intacto (testes de física bit-idênticos).
+    float speedMult = 1.f;
 };
 
 // Estado completo que Player::tick lia/escrevia (mais nada).

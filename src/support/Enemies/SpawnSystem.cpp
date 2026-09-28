@@ -84,6 +84,20 @@ void SpawnSystem::tick(float dt, GameContext &ctx) {
             effectiveBudget = 2;
         }
     }
+    // Tarô cósmico: Diabo/Mundo engordam o orçamento; Sol de dia,
+    // Lua de noite; lua de sangue dobra a noite. Teto global manda.
+    if (ctx.player) {
+        const auto &fx = ctx.player->tarotFx;
+        float dayNightMult = 1.f;
+        if (ctx.dayNight) {
+            const bool night =
+                ctx.dayNight->sample().sunIntensity < 0.20f;
+            dayNightMult = night ? fx.nightSpawnMult : fx.daySpawnMult;
+            if (night && fx.bloodMoon) dayNightMult *= 2.f;
+        }
+        effectiveBudget =
+            scaledBudget(effectiveBudget, fx.spawnRateMult, dayNightMult);
+    }
     if (static_cast<std::size_t>(ctx.enemies->count()) >=
         static_cast<std::size_t>(effectiveBudget))
         return;

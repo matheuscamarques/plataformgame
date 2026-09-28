@@ -47,6 +47,17 @@ public:
         return nullptr;
     }
 
+    // Elite do fado (Torre): sobe 1 nível de variante (teto 5).
+    // Determinístico por chamador (Factory rola o salt).
+    const VariantDef *forLevel(const std::string &archetype,
+                               int level) const {
+        auto it = byArch_.find(archetype);
+        if (it == byArch_.end()) return nullptr;
+        for (auto &v : it->second)
+            if (v.level == level) return &v;
+        return nullptr;
+    }
+
 private:
     std::unordered_map<std::string, std::vector<VariantDef>> byArch_;
 };

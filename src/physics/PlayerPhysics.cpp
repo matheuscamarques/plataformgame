@@ -55,9 +55,9 @@ Output step(const State &prev, const Input &in, float dt) {
     }
 
     if (s.moveLeft) {
-        s.vx = -kWalkSpeed - vxRunSpeed;
+        s.vx = (-kWalkSpeed - vxRunSpeed) * in.speedMult;
     }
-    if (s.moveRight) s.vx = kWalkSpeed + vxRunSpeed;
+    if (s.moveRight) s.vx = (kWalkSpeed + vxRunSpeed) * in.speedMult;
 
     if (!s.moveLeft && !s.moveRight) {
         s.vx = 0.0f;
@@ -66,7 +66,8 @@ Output step(const State &prev, const Input &in, float dt) {
     // Rolagem: sobrescreve vx com a rajada (input ignorado no roll).
     // Gravidade/colisão seguem normais; expira sozinha no timer.
     if (s.rollT > 0.f) {
-        s.vx = static_cast<float>(s.rollDir >= 0 ? 1 : -1) * kRollSpeed;
+        s.vx = static_cast<float>(s.rollDir >= 0 ? 1 : -1) * kRollSpeed *
+               in.speedMult;
         s.rollT -= dt;
         if (s.rollT < 0.f) s.rollT = 0.f;
     }

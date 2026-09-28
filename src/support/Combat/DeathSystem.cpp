@@ -7,6 +7,8 @@
 
 #include "DeathSystem.h"
 
+#include <vector>
+
 #include "core/Config.h"
 #include "core/DropTable.h"
 #include "core/TarotCard.h"
@@ -52,21 +54,41 @@ void DeathSystem::tick(float /*dt*/, GameContext &ctx) {
                 drops_->spawnItem(it.defId, it.quantity,
                                   {e.body.getCenterX(), e.body.getCenterY()});
             });
-            // Tarô (fundação v1): 1% determinístico por tile+seed;
-            // carta aleatória direto p/ o player (pickup é follow-up).
+            // Tarô (fado forçado, 78 arcanos): chance determinística por
+            // tile+seed; elite (variante nv4+, aura/flama) ×5; carta
+            // sorteada por tier dentro do salt (sem pickup, sem escolha).
+            // Aplica direto + vinheta + log; Morte credita killstack.
             if (ctx.player) {
                 const uint32_t salt = core::dropSalt(tx, ty, seed);
-                if (salt % 100u == 0u) {
-                    const auto &keys =
-                        core::TarotRegistry::instance().keys();
-                    if (!keys.empty()) {
+                const float eliteMult =
+                    (e.variantLevel >= 4) ? 5.f : 1.f;
+                const float chance = core::kTarotBaseChance * eliteMult *
+                    ctx.player->tarotFx.itemDropChanceMult;
+                if ((salt % 10000u) <
+                    static_cast<uint32_t>(chance * 10000.f)) {
+                    const float u =
+                        ((salt >> 8) % 1000u) / 1000.f;
+                    const core::TarotTier tier = core::rollTier(u);
+                    std::vector<core::TarotArcana> pool;
+                    for (int i = 0;
+                         i < static_cast<int>(core::TarotArcana::COUNT);
+                         ++i) {
+                        const auto a =
+                            static_cast<core::TarotArcana>(i);
+                        if (core::tierOf(a) == tier) pool.push_back(a);
+                    }
+                    if (!pool.empty()) {
                         const auto arcana =
-                            keys[(salt >> 8) % keys.size()];
+                            pool[(salt >> 16) % pool.size()];
                         ctx.player->addTarotCard(arcana);
+                        ctx.player->showTarotReveal(arcana);
                         if (ctx.debug)
                             ctx.debug->pushLog(
                                 std::string("tarot ") +
-                                core::tarotName(arcana));
+                                core::tarotName(arcana) + " (peso " +
+                                std::to_string(
+                                    ctx.player->tarotWeight()) +
+                                ")");
                     }
                 }
             }
@@ -75,6 +97,8 @@ void DeathSystem::tick(float /*dt*/, GameContext &ctx) {
     ctx.enemies->removeDead([&](Enemy &e) {
         const core::Vec2f pos{e.body.getCenterX(), e.body.getCenterY()};
         if (particles_) particles_->spawnTileBreak(pos, 0, 0, 0);
+        // Morte: cada abate alimenta o killstack do player (janela 30s).
+        if (ctx.player) ctx.player->addKillStack();
         if (!drops_) return;
         // XP por arquétipo (slime 100, anão 150); sem archetype = 1.
         int xp = 1;

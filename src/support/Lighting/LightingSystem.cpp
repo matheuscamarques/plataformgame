@@ -47,7 +47,9 @@ void LightingSystem::drawPlayerLight(sf::RenderTarget& target,
     float darkness = 1.f;
     if (cycle_) {
         const auto s = cycle_->sample();
-        darkness = darknessOf(s.sunIntensity, s.moonIntensity);
+        const auto fated =
+            fatefulNight(s.sunIntensity, s.moonIntensity, fogMult_, false);
+        darkness = darknessOf(fated.sun, fated.moon);
     }
     const auto a = static_cast<sf::Uint8>(
         255.f * glowAlphaScale(darkness) * std::clamp(master_, 0.f, 1.f));
@@ -58,6 +60,10 @@ void LightingSystem::drawPlayerLight(sf::RenderTarget& target,
 sf::Color LightingSystem::skyColor() const {
     if (!cycle_) return sf::Color(135, 206, 235);
     const auto s = cycle_->sample();
+    const auto fated =
+        fatefulNight(s.sunIntensity, s.moonIntensity, 1.f, bloodMoon_);
+    // Lua de sangue: céu noturno vira brasa (Mundo).
+    if (fated.blood) return sf::Color(120, 25, 35);
     return sf::Color(s.skyR, s.skyG, s.skyB);
 }
 
@@ -75,6 +81,11 @@ sf::Color LightingSystem::lightTint() const {
     // some (meia-noite 0.72 ≈ dia). Contraste dia/noite: 1.0 → 0.39.
     // Subsolo selado continua preto (grid 0 × qualquer tint = 0).
     const float b = std::clamp(s.sunIntensity + s.moonIntensity, 0.55f, 1.f);
+    // Lua de sangue: tint quente sobre o lightmap (Mundo).
+    if (bloodMoon_ && s.sunIntensity < 0.20f)
+        return sf::Color(static_cast<sf::Uint8>(255 * b),
+                         static_cast<sf::Uint8>(140 * b),
+                         static_cast<sf::Uint8>(140 * b));
     return sf::Color(static_cast<sf::Uint8>(s.tintR * b),
                      static_cast<sf::Uint8>(s.tintG * b),
                      static_cast<sf::Uint8>(s.tintB * b));

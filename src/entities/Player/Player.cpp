@@ -428,10 +428,10 @@ bool Player::castAttuned(support::ThrowSystem &throws) {
         return true;
     }
     if (def->spellKind == core::SpellKind::FrostWeapon) {
-        // Arma Gélida (Fase 3): melee vira Frost por 30s (timer expira).
+        // Arma Gélida (Fase 3): melee vira Frost (Temperança encurta).
         if (fp < kFrostWeaponCost) return false;
         weaponBuffType = core::DamageType::Frost;
-        weaponBuffTimer = kFrostWeaponDur;
+        weaponBuffTimer = kFrostWeaponDur * tarotFx.buffDurationMult;
         fp -= kFrostWeaponCost;
         throwCooldown.trigger();
         return true;
@@ -451,9 +451,13 @@ bool Player::tryThrow(support::ThrowSystem &throws) {    if (!throwCooldown.read
 }
 
 void Player::refreshDerived() {
-    hpMax = core::Attributes::maxHP(attrs.get(core::Attr::Vitality));
-    staminaMax = static_cast<float>(
-        core::Attributes::maxStamina(attrs.get(core::Attr::Endurance)));
+    // Mundo: atributos contam +10% nos vitais (VIT→HP, END→fôlego).
+    const int vit =
+        static_cast<int>(attrs.get(core::Attr::Vitality) * tarotFx.attrMult);
+    const int end =
+        static_cast<int>(attrs.get(core::Attr::Endurance) * tarotFx.attrMult);
+    hpMax = core::Attributes::maxHP(vit);
+    staminaMax = static_cast<float>(core::Attributes::maxStamina(end));
     fpMax = 100.f + attrs.get(core::Attr::Attunement) * 10.f;
     resistances_ = computeResistances();
     if (hp > hpMax) hp = hpMax;
@@ -613,6 +617,7 @@ core::StatusModifiers Player::computeModifiers() const {
 
 float Player::takenMult() const {
     // Recebido = taken ÷ defesa ÷ maldição (defesa <1 = apanha mais).
+    // Condicionais (9 de Paus, Carro) vivem no hurt(), não aqui.
     const float def = tarotFx.defenseMult * curseDefMult_;
     if (def <= 0.f) return computeModifiers().damageTakenMult;
     return computeModifiers().damageTakenMult / def;
@@ -764,10 +769,31 @@ void Player::recomputeTarot() {
         tarotFx.damageTakenMult *= addMult(e.damageTakenMult, count);
         tarotFx.fireResistMult *= addMult(e.fireResistMult, count);
         tarotFx.magicResistMult *= addMult(e.magicResistMult, count);
+        tarotFx.physicalResistMult *= addMult(e.physicalResistMult, count);
         tarotFx.lowHpDamageMult *= addMult(e.lowHpDamageMult, count);
         tarotFx.highHpDamageMult *= addMult(e.highHpDamageMult, count);
         tarotFx.fullHpDamageMult *= addMult(e.fullHpDamageMult, count);
+        tarotFx.woundedTargetDamageMult *=
+            addMult(e.woundedTargetDamageMult, count);
         tarotFx.aloneDamageMult *= addMult(e.aloneDamageMult, count);
+        tarotFx.heavyDamageMult *= addMult(e.heavyDamageMult, count);
+        tarotFx.chargeDamageMult *= addMult(e.chargeDamageMult, count);
+        tarotFx.precisionMult *= addMult(e.precisionMult, count);
+        tarotFx.lowHpDefenseMult *= addMult(e.lowHpDefenseMult, count);
+        tarotFx.movingDefenseMult *= addMult(e.movingDefenseMult, count);
+        tarotFx.buffDurationMult *= addMult(e.buffDurationMult, count);
+        tarotFx.attrMult *= addMult(e.attrMult, count);
+        tarotFx.spawnRateMult *= addMult(e.spawnRateMult, count);
+        tarotFx.daySpawnMult *= addMult(e.daySpawnMult, count);
+        tarotFx.nightSpawnMult *= addMult(e.nightSpawnMult, count);
+        tarotFx.enemyHpMult *= addMult(e.enemyHpMult, count);
+        tarotFx.eliteChanceMult *= addMult(e.eliteChanceMult, count);
+        tarotFx.lightMult *= addMult(e.lightMult, count);
+        tarotFx.visionMult *= addMult(e.visionMult, count);
+        tarotFx.fogMult *= addMult(e.fogMult, count);
+        if (e.bloodMoon) tarotFx.bloodMoon = true;
+        // Mago: +N slots a cada 2 cópias (genérico, não linear).
+        tarotFx.spellSlots += e.spellSlots * (count / 2);
         // Especiais (somam, não multiplicam).
         if (e.reviveOnce) {
             tarotFx.reviveOnce = true;
@@ -799,7 +825,18 @@ bool Player::hurt(int dmg, core::DamageType type) {
     if (!rollIframes.ready()) return false; // rolagem: i-frame do roll
     const int after =
         core::applyResistance(dmg, type, resistances_);
-    const int finalDmg = static_cast<int>(after * takenMult());
+    // Defesa condicional: 9 de Paus (HP<25%), Carro (em movimento).
+    float def = tarotFx.defenseMult * curseDefMult_;
+    const float hpFrac = effectiveHpMax() > 0
+                             ? static_cast<float>(hp) / effectiveHpMax()
+                             : 1.f;
+    if (hpFrac < 0.25f) def *= tarotFx.lowHpDefenseMult;
+    if ((moveLeft || moveRight) && tarotFx.movingDefenseMult != 1.f)
+        def *= tarotFx.movingDefenseMult;
+    const float taken = (def <= 0.f)
+                            ? computeModifiers().damageTakenMult
+                            : computeModifiers().damageTakenMult / def;
+    const int finalDmg = static_cast<int>(after * taken);
     // Enforcado: fração do recebido vira bônus plano por 10s.
     if (tarotFx.damageConversionRate > 0.f && finalDmg > 0) {
         convBonus_ += finalDmg * tarotFx.damageConversionRate;
@@ -832,7 +869,8 @@ core::Resistances Player::computeResistances() const {
     const float end = static_cast<float>(attrs.get(Attr::Endurance) - 10);
     const float vit = static_cast<float>(attrs.get(Attr::Vitality) - 10);
     const float fth = static_cast<float>(attrs.get(Attr::Faith) - 10);
-    r.set(DamageType::Physical, uni - end * 0.005f);
+    r.set(DamageType::Physical,
+          (uni - end * 0.005f) * tarotFx.physicalResistMult);
     r.set(DamageType::Frost, uni - end * 0.003f);
     r.set(DamageType::Fire,
           (uni - vit * 0.003f) * tarotFx.fireResistMult);
@@ -981,27 +1019,32 @@ sf::FloatRect Player::meleeHitbox() {
 }
 
 Player::MeleeBreakdown Player::meleeDamageBreakdown() const {
-    return meleeDamageBreakdownVs(false, false);
+    return meleeDamageBreakdownVs(1.f, false);
 }
 
-Player::MeleeBreakdown Player::meleeDamageBreakdownVs(bool targetFullHp,
+Player::MeleeBreakdown Player::meleeDamageBreakdownVs(float targetHpFrac,
                                                       bool alone) const {
     MeleeBreakdown bd;
     bd.base = kLight[meleeCombo].damage;
     if (const core::ItemDef* off = offHandDef()) bd.base += off->damage;
     if (const core::ItemDef* wdef = weaponDef()) {
+        // Mundo: +10% em todos os atributos (entradas de scaling).
+        const float attrMul = tarotFx.attrMult;
+        const auto effAttr = [&](core::Attr a) {
+            return static_cast<int>(attrs.get(a) * attrMul);
+        };
         bd.strBonus = wdef->damage *
             core::scaleMult(wdef->strScale) *
-            core::scaleFactor(attrs.get(core::Attr::Strength));
+            core::scaleFactor(effAttr(core::Attr::Strength));
         bd.dexBonus = wdef->damage *
             core::scaleMult(wdef->dexScale) *
-            core::scaleFactor(attrs.get(core::Attr::Dexterity));
+            core::scaleFactor(effAttr(core::Attr::Dexterity));
         bd.intBonus = wdef->damage *
             core::scaleMult(wdef->intScale) *
-            core::scaleFactor(attrs.get(core::Attr::Intelligence));
+            core::scaleFactor(effAttr(core::Attr::Intelligence));
         bd.faiBonus = wdef->damage *
             core::scaleMult(wdef->faiScale) *
-            core::scaleFactor(attrs.get(core::Attr::Faith));
+            core::scaleFactor(effAttr(core::Attr::Faith));
         float dmg = static_cast<float>(bd.base) + bd.strBonus +
             bd.dexBonus + bd.intBonus + bd.faiBonus;
         if (attrs.get(core::Attr::Strength) < wdef->strReq ||
@@ -1022,9 +1065,15 @@ Player::MeleeBreakdown Player::meleeDamageBreakdownVs(bool targetFullHp,
                                  : 1.f;
         dmg *= (hpFrac < 0.5f) ? tarotFx.lowHpDamageMult
                                : tarotFx.highHpDamageMult;
-        // Contexto do alvo (Justiça/Eremita, só via MeleeSystem).
-        if (targetFullHp) dmg *= tarotFx.fullHpDamageMult;
+        // Contexto do alvo, só via MeleeSystem (Justiça/Eremita).
+        if (targetHpFrac >= 1.f) dmg *= tarotFx.fullHpDamageMult;
+        if (targetHpFrac < 0.25f) dmg *= tarotFx.woundedTargetDamageMult;
         if (alone) dmg *= tarotFx.aloneDamageMult;
+        // Finalizador do combo: Estrela pesa, investida empurra.
+        if (meleeCombo == 2) {
+            dmg *= tarotFx.heavyDamageMult;
+            dmg *= tarotFx.chargeDamageMult;
+        }
         // Morte: stacks dentro da janela de 30s.
         if (killStacks_ > 0 && tarotFx.killStackBonus != 0.f)
             dmg *= 1.f + tarotFx.killStackBonus * killStacks_;
@@ -1032,6 +1081,12 @@ Player::MeleeBreakdown Player::meleeDamageBreakdownVs(bool targetFullHp,
         // intacto). Com carta, todo 10º swing ×1.5×agregado.
         if (tarotFx.critDamageMult != 1.f && meleeSwingId % 10 == 0)
             dmg *= 1.5f * tarotFx.critDamageMult;
+        // Roda: sem precisão, o golpe roça (determinístico, sem RNG).
+        if (tarotFx.precisionMult < 1.f) {
+            const int period = std::max(
+                2, static_cast<int>(1.f / (1.f - tarotFx.precisionMult)));
+            if (meleeSwingId % period == 0) dmg *= 0.5f;
+        }
         // Enforcado: bônus plano convertido da dor (10s).
         dmg += convBonus_;
         bd.total = static_cast<int>(dmg);
@@ -1045,8 +1100,8 @@ int Player::meleeDamage() const {
     return meleeDamageBreakdown().total;
 }
 
-int Player::meleeDamageVs(bool targetFullHp, bool alone) const {
-    return meleeDamageBreakdownVs(targetFullHp, alone).total;
+int Player::meleeDamageVs(float targetHpFrac, bool alone) const {
+    return meleeDamageBreakdownVs(targetHpFrac, alone).total;
 }
 
 float Player::meleePosture() const { return kLight[meleeCombo].posture; }

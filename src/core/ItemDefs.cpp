@@ -20,7 +20,9 @@ using core::SpellKind;
 using core::CatalystKind;
 
 void heal30(Player& p) {
-    p.hp = std::min(p.hpMax, p.hp + 30);
+    p.hp = std::min(p.effectiveHpMax(),
+                    p.hp + static_cast<int>(
+                               30 * p.tarotFx.healingReceivedMult));
 }
 
 void curePoisonUse(Player& p) {
@@ -32,11 +34,13 @@ void cureBleedUse(Player& p) {
 }
 
 void soulLostUse(Player& p) {
-    p.addSouls(50);
+    p.addSouls(
+        static_cast<int>(50 * p.tarotFx.xpGainMult));
 }
 
 void soulGreatUse(Player& p) {
-    p.addSouls(200);
+    p.addSouls(
+        static_cast<int>(200 * p.tarotFx.xpGainMult));
 }
 
 } // namespace

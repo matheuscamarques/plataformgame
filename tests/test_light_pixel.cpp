@@ -99,6 +99,22 @@ int main() {
         assert(z.scale == 1.f); // sem div0
     }
 
+    { // BloodMoonReddensNightSky (Mundo: meia-noite vira brasa)
+        core::DayNightCycle cycle;
+        cycle.setHour(0.f); // meia-noite: sol 0, lua 0.3
+        support::LightingSystem plain;
+        plain.setDayNight(&cycle);
+        const sf::Color normal = plain.skyColor();
+        assert(normal.b > normal.r); // noite azul, sem sangue
+        support::LightingSystem blood;
+        blood.setDayNight(&cycle);
+        blood.setBloodMoon(true);
+        const sf::Color red = blood.skyColor();
+        assert(red.r > red.b); // brasa
+        cycle.setHour(12.f); // meio-dia: sangue não pega de dia
+        assert(blood.skyColor().b > blood.skyColor().r);
+    }
+
     std::printf("light pixel test OK\n");
     return 0;
 }

@@ -83,6 +83,24 @@ public:
 
     void setPlayerRadius(float px)   { playerRadius_ = px; }
     void setMasterIntensity(float v) { master_ = v; }
+    // Tarô cósmico (Lua/Mundo, setado por frame no Renderer):
+    // fogMult divide o luar (névoa come a lua); bloodMoon tinge a
+    // noite de vermelho. Defaults = intacto (testes bit-idênticos).
+    void setFogMult(float f)   { fogMult_ = f; }
+    void setBloodMoon(bool on) { bloodMoon_ = on; }
+    // Pura p/ teste: noite com o fado aplicado (sol, lua, céu).
+    struct NightSky {
+        float sun;
+        float moon;
+        bool blood;
+    };
+    static NightSky fatefulNight(float sunIntensity, float moonIntensity,
+                                 float fogMult, bool bloodMoon) {
+        const float moon =
+            fogMult > 0.f ? moonIntensity / fogMult : moonIntensity;
+        const bool night = sunIntensity < 0.20f;
+        return {sunIntensity, moon, bloodMoon && night};
+    }
 
     // Matemática do fade de profundidade (pura, testável). Mantida p/
     // compat de teste; o render por tile usa LightPropagator.
@@ -93,6 +111,8 @@ private:
     sf::Texture       playerTex_;
     float             playerRadius_ = 90.f;
     float             master_       = 1.f;
+    float             fogMult_      = 1.f;
+    bool              bloodMoon_    = false;
     const core::DayNightCycle* cycle_ = nullptr;
     bool              ready_        = false;
 };

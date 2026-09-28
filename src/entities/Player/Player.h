@@ -86,7 +86,8 @@ class Player : public Entity
         std::vector<std::string> attuned; // defIds, ordem de sintonia
         int spellSlots() const {
             return core::Attributes::spellSlots(
-                attrs.get(core::Attr::Attunement));
+                       attrs.get(core::Attr::Attunement)) +
+                   tarotFx.spellSlots; // Mago: +1 a cada 2 cópias
         }
         // Sintonia: def Spell com req cumprido e espaço livre.
         bool attune(const std::string& defId);
@@ -118,8 +119,9 @@ class Player : public Entity
         static constexpr float kDwarfBleed = 30.f;  // por golpe
         float statusThreshold() const {
             return core::Attributes::statusThreshold(
-                attrs.get(core::Attr::Resistance),
-                attrs.get(core::Attr::Attunement));
+                       attrs.get(core::Attr::Resistance),
+                       attrs.get(core::Attr::Attunement)) *
+                   tarotFx.statusResistMult;
         }
         void addPoison(float amt);
         void addBleed(float amt);
@@ -242,6 +244,10 @@ class Player : public Entity
             int total = 0;
         };
         MeleeBreakdown meleeDamageBreakdown() const;
+        // Variante com contexto do alvo (MeleeSystem): fração de HP do
+        // alvo (Justiça cheia/ferida) + alone (Eremita).
+        MeleeBreakdown meleeDamageBreakdownVs(float targetHpFrac,
+                                              bool alone) const;
         // Rolagem DS (LShift): rajada 0.4s com i-frames 0.35s, custo
         // 25 stamina, só no chão e fora do golpe Active. Fat roll
         // (carga pesada) rola sem i-frames. Direção: input ou facing.
@@ -262,14 +268,68 @@ class Player : public Entity
         bool cycleHand(core::EquipSlot hand, std::string *outName = nullptr);
         // Próxima magia: roda attuned (0 vai p/ o fim). <2 = false.
         bool cycleSpell(std::string *outName = nullptr);
-        // Tarô (fundação v1): cartas permanentes na run, trade-off
-        // linear por cópia (Diabo ×2 = 1.5× dano e recebido).
+        // Tarô (fado forçado, 78 arcanos): cartas permanentes na run,
+        // trade-off linear por cópia (Diabo ×2 = 1.5× dano e recebido).
+        // Sem pickup, sem escolha, sem descarte: aplica direto na morte
+        // (DeathSystem) e só zera morrendo (respawn) ou apagando tudo
+        // (deleteCharacter). Peso do destino amaldiçoa por faixa.
         std::unordered_map<core::TarotArcana, int,
                            core::TarotRegistry::ArcanaHash>
             tarotCards;
         core::TarotEffect tarotFx; // agregado recomputado no addCard
         void addTarotCard(core::TarotArcana a);
         void recomputeTarot();
+        // Contadores derivados (recompute): cartas e peso do destino.
+        int totalTarotCards_ = 0;
+        int tarotWeight_ = 0;
+        int totalTarotCards() const { return totalTarotCards_; }
+        int tarotWeight() const { return tarotWeight_; }
+        // Maldição do peso (applyTarotCurse no tick): mults extras sobre
+        // o agregado; DoT nunca mata (trava em 1). Só peso >100 cobra.
+        float curseHpMaxMult_ = 1.f;
+        float curseMoveMult_ = 1.f;
+        float curseDefMult_ = 1.f;
+        float curseDotT_ = 0.f;
+        float cursePoisonT_ = 0.f;
+        void applyTarotCurse(float dt);
+        // Morte (killStack): stacks com janela de 30s, somem no respawn.
+        int killStacks_ = 0;
+        float killTimer_ = 0.f;
+        void addKillStack();
+        // Julgamento: quantos revives já gastou nesta run.
+        int tarotRevivesUsed_ = 0;
+        // Enforcado: bônus plano de dano por 10s após apanhar.
+        float convBonus_ = 0.f;
+        float convTimer_ = 0.f;
+        // Vinheta do fado: estado p/ o Renderer desenhar 1.5s sem pausar.
+        // recent_ = anel das últimas 3 cartas (HUD compacto, fade 30s).
+        bool tarotRevealActive_ = false;
+        core::TarotArcana tarotRevealArcana_ = core::TarotArcana::Fool;
+        float tarotRevealAge_ = 0.f;
+        static constexpr float kTarotRevealLife = 1.5f;
+        core::TarotArcana tarotRecent_[3] = {};
+        int tarotRecentCount_ = 0;
+        float tarotRecentAge_ = 999.f;
+        void showTarotReveal(core::TarotArcana a);
+        bool tarotRevealActive() const { return tarotRevealActive_; }
+        core::TarotArcana tarotRevealArcana() const {
+            return tarotRevealArcana_;
+        }
+        float tarotRevealAge() const { return tarotRevealAge_; }
+        // Anel das últimas 3 (HUD): índice = (total-1-i) % 3, i=0 última.
+        const core::TarotArcana *tarotRecent() const { return tarotRecent_; }
+        int tarotRecentTotal() const { return tarotRecentCount_; }
+        float tarotRecentAge() const { return tarotRecentAge_; }
+        void tickTarot(float dt);
+        // Apaga o personagem inteiro (única saída do fado): attrs,
+        // tarô, inventário, equipamento, souls. Sem meio-termo.
+        void deleteCharacter();
+        // Dano com contexto do alvo (MeleeSystem): fração de HP do
+        // alvo (Justiça cheia/ferida) + alone (Eremita).
+        // meleeDamage() = sem contexto (UI/teste).
+        int meleeDamageVs(float targetHpFrac, bool alone) const;
+        // Multiplicador efetivo de dano recebido (taken ÷ defesa ÷ curse).
+        float takenMult() const;
         // MeleeSystem passa o tipo; default físico = comportamento atual.
         // Timer: 0 = permanente até trocar (frost_weapon seta 30s).
         core::DamageType weaponBuffType = core::DamageType::Physical;
