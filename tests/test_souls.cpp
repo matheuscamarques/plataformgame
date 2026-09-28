@@ -15,6 +15,7 @@ int main() {
 
     { // CollectCreditsSouls (orbe no pé: carteira + estatística)
         Player p;
+        p.souls = 0; // seed dá 100k: zera p/ medir só a coleta
         DropSystem drops;
         GameContext ctx{};
         ctx.player = &p;
@@ -42,6 +43,7 @@ int main() {
     }
     { // DeathBrokeNoStain (liso: sem orbe)
         Player p;
+        p.souls = 0; // seed dá 100k: liso de verdade
         DropSystem drops;
         RunManager run;
         p.hp = 0;
@@ -117,6 +119,7 @@ int main() {
     }
     { // SoulUse (almas consumíveis viram souls na hora)
         Player p;
+        p.souls = 0; // seed dá 100k: zera p/ medir o consumível
         const core::ItemDef* lost =
             core::ItemRegistry::instance().find("soul_lost");
         const core::ItemDef* great =

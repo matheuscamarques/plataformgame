@@ -47,6 +47,7 @@ int main() {
         InputMap in;
 
         p.hp = 0;
+        p.souls = 0; // seed dá 100k: zera p/ não gerar mancha no restart
         p.setX(999.f);
         enemies.spawn("slime", 0.f, 0.f);
         throws.throwItem({0.f, 0.f}, {0.f, 0.f});

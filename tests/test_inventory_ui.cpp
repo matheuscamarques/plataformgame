@@ -168,6 +168,7 @@ int main() {
         InventoryUI ui;
         InputMap in;
         Player p;
+        p.souls = 0; // seed dá 100k: zera p/ testar a falta
         ui.setPlayer(&p);
         ui.setInventory(&p.inventory);
         ui.open();
