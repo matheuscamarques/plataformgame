@@ -92,6 +92,13 @@ struct Attributes {
 
     int get(Attr a) const { return v_[static_cast<int>(a)]; }
 
+    // Escrita direta com clamp (criação de personagem; buy é a via normal).
+    void set(Attr a, int v) {
+        if (v < 1) v = 1;
+        if (v > kMax) v = kMax;
+        v_[static_cast<int>(a)] = v;
+    }
+
     int spent() const {
         int total = 0;
         for (int x : v_) total += x - kBase;

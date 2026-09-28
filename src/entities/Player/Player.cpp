@@ -322,6 +322,43 @@ void Player::topUpStarterKit() {
     }
 }
 
+void Player::applyClass(core::PlayerClass klass) {
+    // Personagem novo: zera bens, carteira e magias do seed/kit.
+    // Tarô começa vazio (morre-se sem fado); deleteCharacter noutro.
+    const core::ClassDef def = core::classDef(klass);
+    for (int i = 0; i < core::kAttrCount; ++i) {
+        attrs.set(static_cast<core::Attr>(i),
+                  def.base[i] <= 0 ? 10 : def.base[i]);
+    }
+    equipment = core::Equipment{};
+    inventory = core::Inventory{};
+    attuned.clear();
+    souls = 0;
+    for (const auto& id : def.equipment) {
+        if (core::ItemRegistry::instance().find(id))
+            equipment.equip(core::Item{id, 1});
+    }
+    for (const auto& [id, qty] : def.items) {
+        if (!core::ItemRegistry::instance().find(id)) continue;
+        int left = qty;
+        while (left > 0) {
+            const int put = std::min(left, 99);
+            if (inventory.add(core::Item{
+                    id, static_cast<uint16_t>(put)}) > 0)
+                break; // cheio: fica com o que coube
+            left -= put;
+        }
+    }
+    for (const auto& id : def.spells) attune(id); // cabe ou fica p/ depois
+    refreshDerived();
+    hp = hpMax;
+    stamina = staminaMax;
+    fp = fpMax;
+    curePoison();
+    cureBleed();
+    cureFrost();
+}
+
 bool Player::tryThrowSlot(support::ThrowSystem &throws, int slot) {
     if (!throwCooldown.ready()) return false;
     if (slot < 0 || slot >= core::Inventory::kCapacity) return false;

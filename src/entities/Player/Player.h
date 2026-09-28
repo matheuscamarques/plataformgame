@@ -17,6 +17,7 @@
 #include "support/Combat/Body.h"
 #include "support/Combat/SpriteFrame.h"
 #include "core/Attributes.h"
+#include "core/PlayerClass.h"
 #include "core/Resistances.h"
 #include "core/StatusModifiers.h"
 #include "core/TarotCard.h"
@@ -234,6 +235,11 @@ class Player : public Entity
         // Kit inicial: 1 pilha cheia de cada item do registry.
         // Mesmo padrão generoso da dinamite (ctor + respawn).
         void topUpStarterKit();
+
+        // Criação de personagem (menu futuro): zera tudo e aplica a
+        // classe (attrs, equipamento, itens, magias). Seed do ctor
+        // continua até o menu existir (TEMP-SeedForMenu).
+        void applyClass(core::PlayerClass klass);
 
         // Decomposição do dano p/ UI (mesma matemática do combate).
         struct MeleeBreakdown {
