@@ -1356,10 +1356,15 @@ void InventoryUI::renderStatusTab(sf::RenderTarget& t, float sw, float sh,
                      std::to_string((int)player_->fpMax),
          14, sf::Color(150, 200, 255));
     const bool heavy = player_->heavilyLoaded();
-    line(xR, yR, "Carga: " + std::to_string((int)player_->equipLoad()) +
-                     "/" + std::to_string((int)player_->maxEquipLoad()) +
-                     (heavy ? " (pesada)" : " (leve)"),
-         14, heavy ? sf::Color(240, 120, 120) : sf::Color(170, 170, 180));
+    const int fateLoad = static_cast<int>(player_->tarotLoad());
+    std::string loadStr = "Carga: " +
+                          std::to_string((int)player_->equipLoad()) + "/" +
+                          std::to_string((int)player_->maxEquipLoad()) +
+                          (heavy ? " (pesada)" : " (leve)");
+    if (fateLoad > 0)
+        loadStr += "  fado +" + std::to_string(fateLoad);
+    line(xR, yR, loadStr, 14,
+         heavy ? sf::Color(240, 120, 120) : sf::Color(170, 170, 180));
 
     yR += 8.f;
     sep(xR, yR);
