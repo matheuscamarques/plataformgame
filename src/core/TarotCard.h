@@ -192,7 +192,7 @@ inline int weightOf(TarotTier t) {
 
 // Chance base de fado por morte (1%). Elite (variante nv4+) ×5;
 // sem boss no jogo ainda (×50 reservado p/ quando existir).
-inline constexpr float kTarotBaseChance = 0.01f;
+inline constexpr float kTarotBaseChance = 1.01f;
 
 // Sorteio de tier por u∈[0,1): Comum 70 / Incomum 20 / Raro 7 /
 // Épico 2.5 / Lendário 0.5. Puro (chamador deriva u do salt).
