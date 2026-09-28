@@ -333,6 +333,20 @@ int main() {
         p.hurt(10);
         assert(p.hp <= hpBefore);
     }
+    { // BurdenFate (fardo = peso/4 na carga; sem carta = zero)
+        Player p;
+        const float bare = p.equipLoad();
+        assert(p.tarotLoad() == 0.f);
+        p.addTarotCard(core::TarotArcana::Devil); // peso 25
+        assert(p.tarotLoad() == 6.25f);
+        assert(p.equipLoad() == bare + 6.25f);
+        p.addTarotCard(core::TarotArcana::WandsTwo); // peso +1
+        assert(p.tarotLoad() == 6.5f);
+        p.respawn(0.f, 0.f); // morte não alivia o fardo
+        assert(p.tarotLoad() == 6.5f);
+        p.deleteCharacter();
+        assert(p.tarotLoad() == 0.f);
+    }
     { // DeleteCharacter (apaga tudo: única saída do fado)
         Player p;
         p.addTarotCard(TarotArcana::Devil);

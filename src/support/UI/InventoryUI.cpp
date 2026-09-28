@@ -218,6 +218,13 @@ std::vector<InventoryUI::TarotModLine> InventoryUI::tarotModLines() const {
             {"Slots magia +" + std::to_string(e.spellSlots), 0, 1});
     }
     if (e.bloodMoon) out.push_back({"Lua de sangue", 0, 0});
+    // Fardo: peso do destino na carga (empurra p/ fat roll).
+    if (player_->totalTarotCards() > 0) {
+        out.push_back(
+            {"Fardo +" +
+             std::to_string(static_cast<int>(player_->tarotLoad())),
+             0, -1});
+    }
     // Maldição do peso (fonte única: Player::tarotCurse).
     const Player::CurseInfo c = player_->tarotCurse();
     if (c.cursed) {

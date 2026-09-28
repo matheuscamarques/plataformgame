@@ -147,8 +147,16 @@ class Player : public Entity
         // Segunda arma (LeftHand): dano soma no melee. nullptr = sem.
         const core::ItemDef* offHandDef() const;
 
-        // Carga equipada (mochila não pesa). Pesada = sem correr.
-        float equipLoad() const { return equipment.weight(); }
+        // Carga equipada (mochila não pesa) + fardo do fado.
+        // Fardo = peso do destino / 4 (Diabo pesa 1 espada de ferro;
+        // maldição e corpo pesado chegam juntos aos 100). Pesada =
+        // sem correr e rolagem sem i-frames (fat roll).
+        float tarotLoad() const {
+            return static_cast<float>(tarotWeight_) * 0.25f;
+        }
+        float equipLoad() const {
+            return equipment.weight() + tarotLoad();
+        }
         float maxEquipLoad() const {
             return core::Attributes::maxLoad(
                 attrs.get(core::Attr::Endurance));
