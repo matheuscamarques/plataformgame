@@ -95,7 +95,7 @@ float Entity::getGravity()
     return this->gravity;
 }
 
-const int Entity::getName()
+int Entity::getName() const
 {
     return name;
 }

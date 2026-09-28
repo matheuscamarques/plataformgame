@@ -52,8 +52,10 @@ int HotbarUI::realSlot(const core::Inventory& inv, int active) {
 }
 
 void HotbarUI::renderBelt(sf::RenderTarget& target, const ::Player& player,
-                       int activeSlot, float screenW, float screenH,
-                       const sf::Font& font) const {
+                        int activeSlot, float screenW, float screenH,
+                        const sf::Font& font) const {
+    (void)screenW;
+    (void)screenH;
     // Cinto DS abaixo do Souls/HP (topo-esquerda, zona visível
     // comprovada; fundo usa viewH_ fora da dobra em algumas views).
     const core::Inventory& inv = player.inventory;

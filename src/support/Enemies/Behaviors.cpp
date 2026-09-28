@@ -140,7 +140,7 @@ REGISTER_SKILL("skeleton_slash", [] {
     s.maxRange = 40.f;
     s.baseWeight = 15.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.player) return;
         const float dx = ctx.player->getCenterX() - self.body.getCenterX();
         const float dy = ctx.player->getCenterY() - self.body.getCenterY();
@@ -165,7 +165,7 @@ REGISTER_SKILL("frost_touch", [] {
     s.maxRange = 40.f;
     s.baseWeight = 12.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.player) return;
         const float dx = ctx.player->getCenterX() - self.body.getCenterX();
         const float dy = ctx.player->getCenterY() - self.body.getCenterY();
@@ -192,7 +192,7 @@ REGISTER_SKILL("skeleton_flame_slash", [] {
     s.maxRange = 40.f;
     s.baseWeight = 15.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.player) return;
         const float dx = ctx.player->getCenterX() - self.body.getCenterX();
         const float dy = ctx.player->getCenterY() - self.body.getCenterY();
@@ -215,7 +215,7 @@ REGISTER_SKILL("soldier_slash", [] {
     s.maxRange = 40.f;
     s.baseWeight = 12.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.player) return;
         const float dx = ctx.player->getCenterX() - self.body.getCenterX();
         const float dy = ctx.player->getCenterY() - self.body.getCenterY();
@@ -238,7 +238,7 @@ REGISTER_SKILL("rat_bite", [] {
     s.maxRange = 36.f;
     s.baseWeight = 14.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.player) return;
         const float dx = ctx.player->getCenterX() - self.body.getCenterX();
         const float dy = ctx.player->getCenterY() - self.body.getCenterY();
@@ -262,7 +262,7 @@ REGISTER_SKILL("burst_detonate", [] {
     s.maxRange = 44.f;
     s.baseWeight = 20.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.player) return;
         const float dx = ctx.player->getCenterX() - self.body.getCenterX();
         const float dy = ctx.player->getCenterY() - self.body.getCenterY();
@@ -291,7 +291,7 @@ REGISTER_SKILL("imp_fire_spit", [] {
     s.maxRange = 220.f;
     s.baseWeight = 10.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.player || !ctx.throws) return;
         core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
         core::Vec2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
@@ -326,7 +326,7 @@ REGISTER_SKILL("harpy_feather", [] {
     s.maxRange = 240.f;
     s.baseWeight = 12.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.player || !ctx.throws) return;
         core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
         core::Vec2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
@@ -605,7 +605,7 @@ REGISTER_SKILL("slime_frost_spit", [] {
     s.maxRange = 220.f;
     s.baseWeight = 10.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.player || !ctx.throws) return;
         core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
         core::Vec2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
@@ -759,7 +759,7 @@ REGISTER_SKILL("spider_bite", [] {
     s.maxRange = 40.f;
     s.baseWeight = 14.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.player) return;
         const float dx = ctx.player->getCenterX() - self.body.getCenterX();
         const float dy = ctx.player->getCenterY() - self.body.getCenterY();
@@ -784,7 +784,7 @@ REGISTER_SKILL("serpent_bite", [] {
     s.maxRange = 44.f;
     s.baseWeight = 14.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.player) return;
         const float dx = ctx.player->getCenterX() - self.body.getCenterX();
         const float dy = ctx.player->getCenterY() - self.body.getCenterY();
@@ -807,7 +807,7 @@ REGISTER_SKILL("life_drain", [] {
     s.maxRange = 44.f;
     s.baseWeight = 12.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.player) return;
         const float dx = ctx.player->getCenterX() - self.body.getCenterX();
         const float dy = ctx.player->getCenterY() - self.body.getCenterY();
@@ -833,7 +833,7 @@ REGISTER_SKILL("golem_slam", [] {
     s.maxRange = 48.f;
     s.baseWeight = 16.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.player) return;
         const float dx = ctx.player->getCenterX() - self.body.getCenterX();
         const float dy = ctx.player->getCenterY() - self.body.getCenterY();
@@ -1013,7 +1013,7 @@ REGISTER_SKILL("slime_spit", [] {
     s.maxRange = 220.f;
     s.baseWeight = 1.0f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.player || !ctx.throws) return;
         core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
         core::Vec2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
@@ -1045,7 +1045,7 @@ REGISTER_SKILL("dwarf_dynamite", [] {
     s.maxRange = 128.f;
     s.baseWeight = 10.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.player || !ctx.throws) return;
         core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
         core::Vec2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
@@ -1074,7 +1074,7 @@ REGISTER_SKILL("dwarf_melee", [] {
     s.maxRange = 40.f;
     s.baseWeight = 15.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.player) return;
         const float dx = ctx.player->getCenterX() - self.body.getCenterX();
         const float dy = ctx.player->getCenterY() - self.body.getCenterY();
@@ -1099,7 +1099,7 @@ REGISTER_SKILL("dwarf_smoke", [] {
     s.maxRange = 200.f;
     s.baseWeight = 6.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.player) return;
         const float dir =
             (ctx.player->getCenterX() < self.body.getCenterX()) ? 1.f : -1.f;
@@ -1122,7 +1122,7 @@ REGISTER_SKILL("dwarf_barrel", [] {
     s.maxRange = 240.f;
     s.baseWeight = 8.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.throws || !ctx.player) return;
         core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
         const float dir = (ctx.player->getCenterX() < from.x) ? -1.f : 1.f;
@@ -1152,7 +1152,7 @@ REGISTER_SKILL("dwarf_dig", [] {
     s.maxRange = 400.f;
     s.baseWeight = 4.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.player || !ctx.world) return;
         const float dir = (ctx.player->getCenterX() < self.body.getCenterX())
                               ? -1.f
@@ -1194,7 +1194,7 @@ REGISTER_SKILL("dwarf_collapse", [] {
     s.maxRange = 300.f;
     s.baseWeight = 5.f;
     s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    const support::SkillDef &def) {
+                    [[maybe_unused]] const support::SkillDef &def) {
         if (!ctx.world || !ctx.player) return;
         const float dir = (ctx.player->getCenterX() < self.body.getCenterX())
                               ? -1.f

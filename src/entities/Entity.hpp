@@ -44,7 +44,7 @@ class Entity : public Component
         Component getBoundsRight();
         std::map<std::string,Component> getBounds();
 
-        const int getName();
+        int getName() const;
 
         bool isColide(Entity entity);
         float getCenterX();

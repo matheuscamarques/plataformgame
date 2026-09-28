@@ -607,6 +607,7 @@ void InventoryUI::handleConfirmDrop(const InputMap& input) {
 core::Vec2f InventoryUI::gridOrigin(float sw, float sh) const {
     const float gw = kCols * kSlotSize + (kCols - 1) * kPad;
     const float gh = kRows * kSlotSize + (kRows - 1) * kPad;
+    (void)gh;
     // Bloco grid + vão + painel centralizado, com respiro mínimo de 24px
     // (em 800px o centrado daria 19px — apertado).
     const float totalW = gw + 16.f + kDetailW;
