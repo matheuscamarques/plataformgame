@@ -81,6 +81,9 @@ class Player : public Entity
         int souls = 0;
         void addSouls(int v) { souls += v; }
 
+        // Nome do personagem (criação; save futuro). Vazio = sem nome.
+        std::string name;
+
         // Magia (F8): FP + magias sintonizadas (cap = spellSlots(ATT)).
         float fp = 200.f;
         float fpMax = 200.f;

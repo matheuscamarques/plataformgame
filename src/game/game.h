@@ -17,6 +17,7 @@
 #include "render/RenderBackend.h"
 #include "game/LogoScreen.h"
 #include "game/MainMenuScreen.h"
+#include "game/CharacterCreationScreen.h"
 #include "../support/Camera/Camera.h"
 #include "../support/Debug/DebugOverlay.h"
 #include "../support/Debug/DebugFeed.h"
@@ -124,6 +125,9 @@ private:
     // Tela inicial (menu) antes do gameplay; atrás, o mundo congelado.
     game::menu::MainMenuScreen menu_;
     bool menuDone_ = false;
+    // Criação de personagem (menu Novo -> criação -> gameplay).
+    game::creation::CharacterCreationScreen creation_;
+    bool creationActive_ = false;
     void render();
     void pollEvents(); // loop SFML + edges por frame (run() chama 1x)
     void tick();

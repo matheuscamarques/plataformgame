@@ -152,6 +152,26 @@ void Game::run()
             }
             continue;
         }
+        // Criação de personagem (menu Novo -> criação -> gameplay).
+        // Mundo congelado atrás; texto/Backspace chegam via pollEvents.
+        if (creationActive_) {
+            pollEvents();
+            creation_.handleInput(input_);
+            creation_.render(*window, font, viewW_, viewH_);
+            window->display();
+            const auto act = creation_.consumeAction();
+            if (act == game::creation::Action::Done) {
+                if (player) {
+                    player->name = creation_.name();
+                    player->applyClass(creation_.klass());
+                }
+                creationActive_ = false;
+                menuDone_ = true;
+            } else if (act == game::creation::Action::Back) {
+                creationActive_ = false; // menu reaparece (menuDone_ segue)
+            }
+            continue;
+        }
         // Tela inicial: Novo/Carregar/Sair antes do gameplay.
         // O mundo já existe mas não tica (congelado atrás do menu).
         if (!menuDone_) {
@@ -161,9 +181,8 @@ void Game::run()
             window->display();
             const auto act = menu_.consumeAction();
             if (act == game::menu::Action::NewGame) {
-                // TEMP-MenuSemCriacao: Cavaleiro até a tela de criação.
-                if (player) player->applyClass(core::PlayerClass::Knight);
-                menuDone_ = true;
+                creation_.reset();
+                creationActive_ = true; // criação decide a classe
             } else if (act == game::menu::Action::Quit) {
                 window->close();
             }

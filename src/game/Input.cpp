@@ -31,6 +31,15 @@ void Game::pollEvents() {
         }
 
         input_.handleEvent(event);
+        // Criação de personagem: texto e Backspace (menu consome o resto).
+        if (creationActive_ && !menuDone_) {
+            if (event.type == sf::Event::TextEntered) {
+                creation_.handleText(event.text.unicode);
+            } else if (event.type == sf::Event::KeyPressed &&
+                       event.key.code == sf::Keyboard::BackSpace) {
+                creation_.handleBackspace();
+            }
+        }
     }
     if (input_.pressed(support::Action::ToggleDebug)) overlay_.toggle();
     if (input_.pressed(support::Action::ToggleCharView)) charView_ = !charView_;
