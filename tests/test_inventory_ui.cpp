@@ -132,10 +132,54 @@ int main() {
         assert(st.weaponName == "Espada de Ferro" && st.damage == 12);
         assert(st.defense == 4 + 6 + 4 + 3 + 2);
         assert(st.gold == 0);
+        assert(st.tarotCards == 0 && st.tarotWeight == 0);
+        assert(ui.tarotModLines().empty());
+        assert(ui.tarotCardLines().empty());
         InventoryUI bare;
         const auto z = bare.status();
         assert(z.hp == 0 && z.damage == 0 && z.defense == 0);
         assert(z.weaponName == "Soco");
+        assert(z.tarotCards == 0 && z.tarotWeight == 0);
+    }
+    { // StatusTarot (fado aparece: contagem, peso, mods, cartas)
+        InventoryUI ui;
+        Player p;
+        p.addTarotCard(core::TarotArcana::Devil);
+        p.addTarotCard(core::TarotArcana::Devil);
+        p.addTarotCard(core::TarotArcana::Chariot);
+        ui.setPlayer(&p);
+        ui.setEquipment(&p.equipment);
+        ui.setInventory(&p.inventory);
+        const auto st = ui.status();
+        assert(st.tarotCards == 3 && st.tarotWeight == 25 + 25 + 10);
+        // Mods: dano e recebido do Diabo + move do Carro.
+        bool dmg = false, taken = false, move = false;
+        for (const auto& m : ui.tarotModLines()) {
+            if (m.label == "Dano" && m.pct == 50 && m.kind == 1)
+                dmg = true;
+            if (m.label == "Dano recebido" && m.pct == 50 && m.kind == -1)
+                taken = true;
+            if (m.label == "Vel. movimento" && m.pct == 15 && m.kind == 1)
+                move = true;
+        }
+        assert(dmg && taken && move);
+        // Cartas ordenadas por arcana, com contagem.
+        const auto cards = ui.tarotCardLines();
+        assert(cards.size() == 2u);
+        assert(cards[0].first == "O Carro" && cards[0].second == 1);
+        assert(cards[1].first == "O Diabo" && cards[1].second == 2);
+        // Maldição: peso 60, sem maldição.
+        assert(!p.tarotCurse().cursed);
+        for (int i = 0; i < 4; ++i)
+            p.addTarotCard(core::TarotArcana::Devil); // peso 160
+        assert(p.tarotCurse().cursed);
+        bool curseLine = false;
+        for (const auto& m : ui.tarotModLines()) {
+            if (m.label == "Maldicao: HP max" && m.kind == -1)
+                curseLine = true;
+        }
+        assert(curseLine);
+        assert(ui.status().tarotWeight == 160);
     }
     { // LevelUpBuysAttr (F na Status: souls -> +1 VIT, hpMax sobe)
         InventoryUI ui;

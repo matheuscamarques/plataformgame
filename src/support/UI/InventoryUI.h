@@ -136,8 +136,21 @@ public:
         int damage = 0;  // DMG da arma (0 = soco)
         int defense = 0; // soma das armaduras
         int gold = 0;
+        int tarotCards = 0;  // cartas do fado na run
+        int tarotWeight = 0; // peso do destino
     };
     StatusInfo status() const;
+
+    // Uma linha de modificador do tarô p/ a aba Status (puro, sem GL).
+    // kind: +1 bônus (verde), -1 penalidade (vermelho), 0 mundo (dourado).
+    struct TarotModLine {
+        std::string label;
+        int pct = 0; // pontos percentuais (ex: +25, -10)
+        int kind = 0;
+    };
+    std::vector<TarotModLine> tarotModLines() const;
+    // Cartas ativas (nome, cópias), ordenadas por arcana. Puro, sem GL.
+    std::vector<std::pair<std::string, int>> tarotCardLines() const;
 
     // Aba System: volume 0..100 (dono é a UI; empurra p/ audio/music).
     int volumePct() const { return volumePct_; }

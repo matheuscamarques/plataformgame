@@ -18,6 +18,7 @@
 
 #include "core/ItemDef.h"
 #include "core/Material.h"
+#include "core/TarotCard.h"
 #include "core/AudioSystem.h"
 #include "core/MusicSystem.h"
 #include "core/Time.h"
@@ -126,6 +127,125 @@ InventoryUI::StatusInfo InventoryUI::status() const {
             if (it.isEmpty()) continue;
             if (const core::ItemDef* d = it.def()) out.defense += d->defense;
         }
+    }
+    if (player_) {
+        out.tarotCards = player_->totalTarotCards();
+        out.tarotWeight = player_->tarotWeight();
+    }
+    return out;
+}
+
+std::vector<InventoryUI::TarotModLine> InventoryUI::tarotModLines() const {
+    std::vector<TarotModLine> out;
+    if (!player_) return out;
+    const core::TarotEffect& e = player_->tarotFx;
+    // Mult comum: pct = (mult-1)*100; bom se (pct>0)==goodWhenHigh.
+    // kind: +1 bônus, -1 penalidade, 0 mundo (neutro).
+    auto add = [&](const char* label, float mult, bool goodWhenHigh,
+                   int forceKind = 2) {
+        const int pct =
+            static_cast<int>(std::round((mult - 1.f) * 100.f));
+        if (pct == 0) return;
+        int kind = forceKind;
+        if (kind == 2) kind = ((pct > 0) == goodWhenHigh) ? 1 : -1;
+        out.push_back({label, pct, kind});
+    };
+    add("Dano", e.damageMult, true);
+    add("Dano magico", e.magicDamageMult, true);
+    add("Dano fisico", e.physicalDamageMult, true);
+    add("Critico", e.critDamageMult, true);
+    add("Vel. ataque", e.attackSpeedMult, true);
+    add("HP max", e.hpMaxMult, true);
+    add("Defesa", e.defenseMult, true);
+    add("Resist. status", e.statusResistMult, true);
+    add("Cura recebida", e.healingReceivedMult, true);
+    add("Vel. movimento", e.moveSpeedMult, true);
+    add("Regen stamina", e.staminaRegenMult, true);
+    add("Regen FP", e.fpRegenMult, true);
+    add("Souls", e.soulsGainMult, true);
+    add("XP (almas)", e.xpGainMult, true);
+    add("Drop fado", e.itemDropChanceMult, true);
+    add("Dano HP>50%", e.highHpDamageMult, true);
+    add("Dano HP<50%", e.lowHpDamageMult, true);
+    add("Dano alvo cheio", e.fullHpDamageMult, true);
+    add("Dano alvo ferido", e.woundedTargetDamageMult, true);
+    add("Dano sozinho", e.aloneDamageMult, true);
+    add("Finalizador", e.heavyDamageMult, true);
+    add("Investida", e.chargeDamageMult, true);
+    add("Defesa HP<25%", e.lowHpDefenseMult, true);
+    add("Defesa em movimento", e.movingDefenseMult, true);
+    add("Atributos", e.attrMult, true);
+    add("Luz", e.lightMult, true);
+    add("Dano recebido", e.damageTakenMult, false);
+    add("Resist. fogo", e.fireResistMult, false);
+    add("Resist. magia", e.magicResistMult, false);
+    add("Resist. fisica", e.physicalResistMult, false);
+    add("Custo stamina", e.staminaCostMult, false);
+    add("Precisao", e.precisionMult, false);
+    add("Duracao buff", e.buffDurationMult, false);
+    add("Visao", e.visionMult, false);
+    add("Nevoa", e.fogMult, false);
+    // Mundo (neutro): afetam spawn/inimigos, não o corpo.
+    add("Spawn mundo", e.spawnRateMult, true, 0);
+    add("Spawn dia", e.daySpawnMult, true, 0);
+    add("Spawn noite", e.nightSpawnMult, true, 0);
+    add("HP inimigo", e.enemyHpMult, true, 0);
+    add("Elite", e.eliteChanceMult, true, 0);
+    // Especiais (sem pct: magnitude na label).
+    if (e.maxRevives > 0) {
+        out.push_back({"Reviver x" +
+                           std::to_string(player_->tarotRevivesUsed()) +
+                           "/" + std::to_string(e.maxRevives),
+                       0, 1});
+    }
+    if (e.killStackMax > 0) {
+        out.push_back(
+            {"Morte +" +
+                 std::to_string(static_cast<int>(e.killStackBonus * 100)) +
+                 "%/kill",
+             0, 1});
+    }
+    if (e.damageConversionRate > 0.f) {
+        out.push_back(
+            {"Dor->dano " +
+             std::to_string(
+                 static_cast<int>(e.damageConversionRate * 100)) +
+             "%",
+             0, 1});
+    }
+    if (e.spellSlots > 0) {
+        out.push_back(
+            {"Slots magia +" + std::to_string(e.spellSlots), 0, 1});
+    }
+    if (e.bloodMoon) out.push_back({"Lua de sangue", 0, 0});
+    // Maldição do peso (fonte única: Player::tarotCurse).
+    const Player::CurseInfo c = player_->tarotCurse();
+    if (c.cursed) {
+        out.push_back({"Maldicao: HP max", -5, -1});
+        if (c.moveMult < 1.f) out.push_back({"Maldicao: movimento", -10, -1});
+        if (c.defMult < 1.f) out.push_back({"Maldicao: defesa", -5, -1});
+        if (c.dot20) out.push_back({"Maldicao: -1 vida/20s", 0, -1});
+        if (c.dot15) out.push_back({"Maldicao: -2 vidas/15s", 0, -1});
+        if (c.poison) out.push_back({"Maldicao: veneno", 0, -1});
+    }
+    return out;
+}
+
+std::vector<std::pair<std::string, int>>
+InventoryUI::tarotCardLines() const {
+    std::vector<std::pair<std::string, int>> out;
+    if (!player_) return out;
+    std::vector<core::TarotArcana> keys;
+    for (const auto& [a, n] : player_->tarotCards) {
+        if (n > 0) keys.push_back(a);
+    }
+    std::sort(keys.begin(), keys.end(), [](core::TarotArcana l,
+                                           core::TarotArcana r) {
+        return static_cast<int>(l) < static_cast<int>(r);
+    });
+    for (auto a : keys) {
+        out.emplace_back(core::tarotName(a),
+                         player_->tarotCards.at(a));
     }
     return out;
 }
@@ -1166,6 +1286,55 @@ void InventoryUI::renderStatusTab(sf::RenderTarget& t, float sw, float sh,
                      std::to_string(player_->spellSlots()),
          13, sf::Color(150, 200, 255));
 
+    // Fado: modificadores do tarô (ativos) + cartas (até 10 + resto).
+    yL += 8.f;
+    sep(xL, yL);
+    const StatusInfo tinfo = status();
+    line(xL, yL, "FADO - TARO", 15, sf::Color(200, 180, 120));
+    sep(xL, yL);
+    const bool cursed = player_->tarotCurse().cursed;
+    line(xL, yL,
+         "Cartas: " + std::to_string(tinfo.tarotCards) + "   Peso: " +
+             std::to_string(tinfo.tarotWeight) + "/100",
+         14, cursed ? sf::Color(240, 90, 90) : sf::Color(240, 220, 140));
+    const auto mods = tarotModLines();
+    constexpr std::size_t kMaxMods = 16;
+    for (std::size_t i = 0; i < mods.size() && i < kMaxMods; ++i) {
+        const auto& m = mods[i];
+        std::string s = m.label + " ";
+        if (m.pct != 0) {
+            s += (m.pct > 0 ? "+" : "") + std::to_string(m.pct) + "%";
+        }
+        const sf::Color c =
+            m.kind > 0 ? sf::Color(120, 220, 120)
+                       : (m.kind < 0 ? sf::Color(240, 120, 120)
+                                     : sf::Color(200, 180, 120));
+        line(xL, yL, s, 12, c);
+    }
+    if (mods.size() > kMaxMods) {
+        line(xL, yL,
+             "+" + std::to_string(mods.size() - kMaxMods) + " efeitos",
+             12, sf::Color(150, 150, 150));
+    }
+    const auto cards = tarotCardLines();
+    constexpr std::size_t kMaxCards = 10;
+    for (std::size_t i = 0; i < cards.size() && i < kMaxCards; ++i) {
+        std::string s = (cards[i].second > 1)
+                            ? "x" + std::to_string(cards[i].second) + " " +
+                                  cards[i].first
+                            : cards[i].first;
+        line(xL, yL, s, 12, sf::Color(170, 170, 180));
+    }
+    if (cards.size() > kMaxCards) {
+        line(xL, yL,
+             "+" + std::to_string(cards.size() - kMaxCards) + " cartas",
+             12, sf::Color(150, 150, 150));
+    }
+    if (tinfo.tarotCards == 0) {
+        line(xL, yL, "(nenhuma carta: o destino espera)", 12,
+             sf::Color(150, 150, 150));
+    }
+
     // Coluna direita: derivados.
     float yR = py + 16.f;
     line(xR, yR, "DERIVADOS", 15, sf::Color(200, 180, 120));
@@ -1239,6 +1408,14 @@ void InventoryUI::renderStatusTab(sf::RenderTarget& t, float sw, float sh,
         line(xR, yR,
              "TOTAL ............... " + std::to_string(bd.total),
              14, sf::Color(255, 200, 100));
+        // Fator do fado no dano (1.0 = sem carta ofensiva).
+        if (player_->tarotFx.damageMult != 1.f) {
+            char tbuf[32];
+            std::snprintf(tbuf, sizeof(tbuf), "Tarô ×%.2f",
+                          static_cast<double>(
+                              player_->tarotFx.damageMult));
+            line(xR, yR, tbuf, 12, sf::Color(200, 180, 120));
+        }
     } else {
         line(xR, yR, "(sem arma equipada)", 13, sf::Color(150, 150, 150));
     }

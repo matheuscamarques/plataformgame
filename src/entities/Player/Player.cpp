@@ -629,6 +629,20 @@ void Player::showTarotReveal(core::TarotArcana a) {
     tarotRevealAge_ = 0.f;
 }
 
+Player::CurseInfo Player::tarotCurse() const {
+    CurseInfo c;
+    const int w = tarotWeight_;
+    if (w <= 100) return c;
+    c.cursed = true;
+    c.hpMaxMult = 0.95f;
+    if (w > 150) c.moveMult = 0.90f;
+    if (w > 200) c.defMult = 0.95f;
+    if (w > 300) c.dot20 = true;
+    if (w > 400) c.dot15 = true;
+    if (w > 500) c.poison = true;
+    return c;
+}
+
 void Player::addKillStack() {
     if (tarotFx.killStackMax <= 0) return;
     if (killStacks_ < tarotFx.killStackMax) ++killStacks_;

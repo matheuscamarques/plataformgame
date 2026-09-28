@@ -298,6 +298,20 @@ class Player : public Entity
         void addKillStack();
         // Julgamento: quantos revives já gastou nesta run.
         int tarotRevivesUsed_ = 0;
+        int tarotRevivesUsed() const { return tarotRevivesUsed_; }
+        int killStacks() const { return killStacks_; }
+        // Maldição do peso em palavras (puro, p/ UI): espelha os
+        // limiares de applyTarotCurse sem os timers.
+        struct CurseInfo {
+            bool cursed = false;
+            float hpMaxMult = 1.f;
+            float moveMult = 1.f;
+            float defMult = 1.f;
+            bool dot20 = false;   // -1 vida / 20s
+            bool dot15 = false;   // -2 vidas / 15s
+            bool poison = false;  // veneno permanente
+        };
+        CurseInfo tarotCurse() const;
         // Enforcado: bônus plano de dano por 10s após apanhar.
         float convBonus_ = 0.f;
         float convTimer_ = 0.f;
