@@ -23,6 +23,7 @@ int main() {
         assert(std::string(core::damageTypeName(DamageType::Lightning)) ==
                "lightning");
         assert(static_cast<int>(DamageType::COUNT) == 4);
+        assert(std::string(core::damageTypeName(DamageType::COUNT)) == "?");
     }
     { // DefaultNeutral (tudo 1.0)
         core::Resistances r;

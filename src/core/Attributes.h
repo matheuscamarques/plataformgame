@@ -23,45 +23,46 @@ enum class Attr : uint8_t {
 inline constexpr int kAttrCount = static_cast<int>(Attr::COUNT);
 
 inline const char* attrName(Attr a) {
-    switch (a) {
-        case Attr::Vitality:     return "Vitalidade";
-        case Attr::Attunement:   return "Conhecimento";
-        case Attr::Endurance:    return "Fortitude";
-        case Attr::Strength:     return "Força";
-        case Attr::Dexterity:    return "Destreza";
-        case Attr::Resistance:   return "Resistência";
-        case Attr::Intelligence: return "Inteligência";
-        case Attr::Faith:        return "Fé";
-        default:                 return "?";
-    }
+    static constexpr const char* kNames[] = {
+        "Vitalidade", "Conhecimento", "Fortitude", "Força",
+        "Destreza", "Resistência", "Inteligência", "Fé",
+    };
+    static_assert(sizeof(kNames) / sizeof(kNames[0]) ==
+                      static_cast<std::size_t>(kAttrCount),
+                  "attrName: tabela fora de sincronia com o enum");
+    const int i = static_cast<int>(a);
+    if (i < 0 || i >= kAttrCount) return "?";
+    return kNames[i];
 }
 
 // Bônus de arma por atributo, letra S (melhor) a E (pior).
 // Multiplicadores DS adaptados; "-" (None) = sem bônus.
-enum class ScaleGrade : uint8_t { None, E, D, C, B, A, S };
+enum class ScaleGrade : uint8_t { None, E, D, C, B, A, S, COUNT };
+
+inline constexpr int kScaleGradeCount = static_cast<int>(ScaleGrade::COUNT);
 
 inline float scaleMult(ScaleGrade s) {
-    switch (s) {
-        case ScaleGrade::S: return 1.0f;
-        case ScaleGrade::A: return 0.8f;
-        case ScaleGrade::B: return 0.6f;
-        case ScaleGrade::C: return 0.4f;
-        case ScaleGrade::D: return 0.2f;
-        case ScaleGrade::E: return 0.1f;
-        default:       return 0.f;
-    }
+    static constexpr float kMults[] = {
+        0.f, 0.1f, 0.2f, 0.4f, 0.6f, 0.8f, 1.0f, // None,E,D,C,B,A,S
+    };
+    static_assert(sizeof(kMults) / sizeof(kMults[0]) ==
+                      static_cast<std::size_t>(kScaleGradeCount),
+                  "scaleMult: tabela fora de sincronia com o enum");
+    const int i = static_cast<int>(s);
+    if (i < 0 || i >= kScaleGradeCount) return 0.f;
+    return kMults[i];
 }
 
 inline char scaleLetter(ScaleGrade s) {
-    switch (s) {
-        case ScaleGrade::S: return 'S';
-        case ScaleGrade::A: return 'A';
-        case ScaleGrade::B: return 'B';
-        case ScaleGrade::C: return 'C';
-        case ScaleGrade::D: return 'D';
-        case ScaleGrade::E: return 'E';
-        default:       return '-';
-    }
+    static constexpr char kLetters[] = {
+        '-', 'E', 'D', 'C', 'B', 'A', 'S',
+    };
+    static_assert(sizeof(kLetters) / sizeof(kLetters[0]) ==
+                      static_cast<std::size_t>(kScaleGradeCount),
+                  "scaleLetter: tabela fora de sincronia com o enum");
+    const int i = static_cast<int>(s);
+    if (i < 0 || i >= kScaleGradeCount) return '-';
+    return kLetters[i];
 }
 
 // Fator do atributo no scaling: 0 na base 10, 1.0 aos 30 (soft cap;

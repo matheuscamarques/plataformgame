@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <string>
 #include "assets/Sprites/EquipSprites.h"
 #include "core/Material.h"
 
@@ -40,6 +41,7 @@ int main() {
         for (int i = 0; i < static_cast<int>(core::MaterialId::COUNT); ++i) {
             assert(std::strlen(core::materialName(static_cast<core::MaterialId>(i))) > 0);
         }
+        assert(std::string(core::materialName(core::MaterialId::COUNT)) == "?");
     }
     { // EquipWidths (sword 8x20, swing 16x8, helm 12x5, chest 12x8, legs 12x6)
         for (int y = 0; y < kSwordH; ++y) {

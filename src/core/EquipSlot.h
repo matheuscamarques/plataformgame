@@ -28,16 +28,16 @@ enum class EquipSlot : uint8_t {
 inline constexpr int kEquipSlotCount = static_cast<int>(EquipSlot::COUNT);
 
 inline const char* equipSlotName(EquipSlot s) {
-    switch (s) {
-        case EquipSlot::RightHand: return "Right Hand";
-        case EquipSlot::LeftHand:  return "Left Hand";
-        case EquipSlot::Head:      return "Head";
-        case EquipSlot::Chest:     return "Chest";
-        case EquipSlot::Legs:      return "Legs";
-        case EquipSlot::Boots:     return "Boots";
-        case EquipSlot::Gloves:    return "Gloves";
-        default:                   return "";
-    }
+    static constexpr const char* kNames[] = {
+        "", "Right Hand", "Left Hand", "Head",
+        "Chest", "Legs", "Boots", "Gloves",
+    };
+    static_assert(sizeof(kNames) / sizeof(kNames[0]) ==
+                      static_cast<std::size_t>(EquipSlot::COUNT),
+                  "equipSlotName: tabela fora de sincronia com o enum");
+    const int i = static_cast<int>(s);
+    if (i < 0 || i >= static_cast<int>(EquipSlot::COUNT)) return "";
+    return kNames[i];
 }
 
 // Ordem de exibição na aba Equipment (mãos primeiro).

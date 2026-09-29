@@ -38,13 +38,15 @@ inline const MaterialColors &materialColors(MaterialId m) {
 }
 
 inline const char *materialName(MaterialId m) {
-    switch (m) {
-        case MaterialId::Iron: return "Iron";
-        case MaterialId::Leather: return "Leather";
-        case MaterialId::Gold: return "Gold";
-        case MaterialId::Diamond: return "Diamond";
-        default: return "?";
-    }
+    static constexpr const char *kNames[] = {
+        "Iron", "Leather", "Gold", "Diamond",
+    };
+    static_assert(sizeof(kNames) / sizeof(kNames[0]) ==
+                      static_cast<std::size_t>(MaterialId::COUNT),
+                  "materialName: tabela fora de sincronia com o enum");
+    const int i = static_cast<int>(m);
+    if (i < 0 || i >= static_cast<int>(MaterialId::COUNT)) return "?";
+    return kNames[i];
 }
 
 } // namespace core

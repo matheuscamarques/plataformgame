@@ -1,5 +1,6 @@
 #include <cassert>
 #include <cstdio>
+#include <string>
 
 #include "core/Attributes.h"
 
@@ -48,6 +49,7 @@ int main() {
             const char* n = attrName(static_cast<Attr>(i));
             assert(n != nullptr && n[0] != '?' && n[0] != '\0');
         }
+        assert(std::string(attrName(Attr::COUNT)) == "?");
     }
     { // DerivedFormulas (VIT10 = 100; soft cap 40; END10 = 150/60)
         assert(Attributes::maxHP(10) == 100);
@@ -80,6 +82,8 @@ int main() {
         assert(scaleFactor(1) == 0.f); // clamp, sem negativo
         assert(scaleLetter(ScaleGrade::B) == 'B' &&
                scaleLetter(ScaleGrade::None) == '-');
+        assert(scaleMult(ScaleGrade::COUNT) == 0.f); // fora do range: neutro
+        assert(scaleLetter(ScaleGrade::COUNT) == '-');
     }
     { // SpellSlots (limiares 12..76, teto 8)
         assert(Attributes::spellSlots(10) == 0);

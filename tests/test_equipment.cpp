@@ -57,6 +57,9 @@ int main() {
         assert(d->defense == 2);
         assert(std::string(core::equipSlotName(core::EquipSlot::Gloves)) ==
                "Gloves");
+        assert(std::string(core::equipSlotName(core::EquipSlot::None)) == "");
+        assert(std::string(core::equipSlotName(core::EquipSlot::COUNT)) ==
+               "");
         assert(core::equipDisplaySlot(6) == core::EquipSlot::Gloves);
         assert(core::equipDisplaySlot(7) == core::EquipSlot::None);
         core::Equipment eq;

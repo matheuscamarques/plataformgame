@@ -22,13 +22,15 @@ enum class DamageType : uint8_t {
 };
 
 inline const char *damageTypeName(DamageType t) {
-    switch (t) {
-        case DamageType::Physical:  return "physical";
-        case DamageType::Fire:      return "fire";
-        case DamageType::Frost:     return "frost";
-        case DamageType::Lightning: return "lightning";
-        default:                    return "?";
-    }
+    static constexpr const char *kNames[] = {
+        "physical", "fire", "frost", "lightning",
+    };
+    static_assert(sizeof(kNames) / sizeof(kNames[0]) ==
+                      static_cast<std::size_t>(DamageType::COUNT),
+                  "damageTypeName: tabela fora de sincronia com o enum");
+    const int i = static_cast<int>(t);
+    if (i < 0 || i >= static_cast<int>(DamageType::COUNT)) return "?";
+    return kNames[i];
 }
 
 } // namespace core
