@@ -25,17 +25,17 @@ public:
     void setY(float y);
     void setW(float w);
     void setH(float h);
-    float getX();
-    float getY();
-    float getW();
-    float getH();
+    float getX() const;
+    float getY() const;
+    float getW() const;
+    float getH() const;
 
     float getRight() const;
     float getBottom() const;
     core::Vec2f getTopLeft() const;
     core::Vec2f getCenter() const;
 
-    int getName();
+    int getName() const;
 
 private:
     int name;

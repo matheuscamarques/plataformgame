@@ -52,19 +52,19 @@ void Component::setW(float w) {
     this->w = w;
 }
 
-float Component::getX() {
+float Component::getX() const {
     return this->x;
 }
 
-float Component::getY() {
+float Component::getY() const {
     return this->y;
 }
 
-float Component::getW() {
+float Component::getW() const {
     return this->w;
 }
 
-float Component::getH() {
+float Component::getH() const {
    return this->h;
 }
 
@@ -83,7 +83,7 @@ core::Vec2f Component::getCenter() const {
     return {left + w/2, top + h/2};
 }
 
-int Component::getName() {
+int Component::getName() const {
     return this->name;
 }
 

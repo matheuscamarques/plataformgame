@@ -46,7 +46,7 @@ class Entity : public Component
 
         int getName() const;
 
-        bool isColide(Entity entity);
+        bool isColide(const Entity& entity);
         float getCenterX();
         float getCenterY();
     float x;

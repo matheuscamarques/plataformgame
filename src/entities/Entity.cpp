@@ -181,7 +181,7 @@ std::map<std::string, Component> Entity::getBounds() {
     return this->bounds;
 }
 
-bool Entity::isColide(Entity entity) {
+bool Entity::isColide(const Entity& entity) {
     if (getBoundsTop().intersects(entity)) {
        return true;
     }

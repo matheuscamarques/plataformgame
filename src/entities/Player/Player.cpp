@@ -40,7 +40,7 @@ Entity(core::kIdPlayer,0,0,60,100) // AABB 2 blocos (sprite 12x40 a 2.5x)
     //this->setGravity(9.8f);
 }
 
-void Player::collide(Entity bloco)
+void Player::collide(const Entity& bloco)
 {
     if(
         bloco.getName() == core::kIdWater
@@ -119,7 +119,7 @@ void Player::collide(Entity bloco)
 
 }
 
-void Player::collide(Component bloco)
+void Player::collide(const Component& bloco)
 {
     // Mesma doutrina do overload Entity: rect do bloco (FloatRect, sempre
     // válido — getX()/getW() do Component são lixo p/ cópias fatiadas).

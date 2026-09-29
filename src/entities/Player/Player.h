@@ -272,8 +272,8 @@ class Player : public Entity
         }
 
         Player();
-        void collide(Entity entity);
-        void collide(Component bloco);
+        void collide(const Entity& entity);
+        void collide(const Component& bloco);
 
         void tick();
 
