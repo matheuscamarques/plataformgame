@@ -34,6 +34,8 @@ enum class Sfx : uint8_t {
     SkeletonDeath,
     // UI
     UiSelect, UiMove, UiConfirm, UiCancel, UiEquip, UiDrop,
+    // Parry (combate; no fim p/ não deslocar ids usados como int)
+    Parry,
     COUNT
 };
 
@@ -46,6 +48,7 @@ inline const char* keyOf(Sfx s) {
         case Sfx::PlayerDeath:   return "player_death";
         case Sfx::MeleeSwing:    return "melee_swing";
         case Sfx::MeleeHit:      return "melee_hit";
+        case Sfx::Parry:         return "parry";
         case Sfx::ThrowDyn:      return "throw_dyn";
         case Sfx::DynFuse:       return "dyn_fuse";
         case Sfx::Explosion:     return "explosion";
@@ -131,6 +134,11 @@ inline void buildSoundBank(core::AudioSystem& a) {
         nz(0.10f, 0.30f, {0.001f,0.02f,0.1f,0.06f}, 0xA3));
     a.registerSound("melee_hit",
         sq(320.f, 0.06f, 0.45f, {0.001f,0.01f,0.3f,0.03f}));
+    // Parry: clang metálico (parciais inarmônicas, decay rápido).
+    a.registerSound("parry",
+        tone({{1244.f, 0.f, 0.18f, 1.f}, {1866.f, 0.f, 0.12f, 0.6f},
+              {830.f, 0.01f, 0.15f, 0.4f}},
+             0.20f, Wave::Triangle, {0.001f,0.02f,0.2f,0.12f}, 0.45f));
 
     // ── Dynamite ──
     a.registerSound("throw_dyn",

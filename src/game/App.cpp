@@ -572,6 +572,13 @@ void Game::tick() {
         if (phaseBefore == 0 && static_cast<int>(p->meleePhase) == 1 &&
             (swooshMode_ == 0 || swooshMode_ == 1))
             audio_.play(game::keyOf(game::Sfx::MeleeSwing));
+        // Parry (Fase 2.2): clang + faísca no centro (dano foi negado).
+        if (p->consumeParryFx()) {
+            audio_.play(game::keyOf(game::Sfx::Parry));
+            if (particles_)
+                particles_->spawnHitSpark(
+                    {p->getCenterX(), p->getCenterY()});
+        }
         if (p->hp < hpBefore) {
             if (p->hp <= 0) {
                 audio_.play(game::keyOf(game::Sfx::PlayerDeath));

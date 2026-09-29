@@ -271,6 +271,11 @@ void Player::tick() {
         landAnimT -= 1.f / 30.0f;
         if (landAnimT < 0.f) landAnimT = 0.f;
     }
+    // Riposte do parry decai sozinho (3s de bônus).
+    if (riposteT_ > 0.f) {
+        riposteT_ -= 1.f / 30.0f;
+        if (riposteT_ < 0.f) riposteT_ = 0.f;
+    }
     // Buff da arma expira sozinho (timer 0 = permanente até trocar).
     if (weaponBuffTimer > 0.f) {
         weaponBuffTimer -= 1.f / 30.0f;
@@ -882,6 +887,14 @@ int Player::effectiveHpMax() const {
 }
 
 bool Player::hurt(int dmg, core::DamageType type) {
+    // Parry (Fase 2.2): swing no Windup rebate dano FÍSICO — sem dano,
+    // sem i-frame; arma riposte (×1.5, 3s) + vinheta p/ o App tocar.
+    if (dmg > 0 && type == core::DamageType::Physical &&
+        parryWindowActive()) {
+        riposteT_ = kRiposteDur;
+        parriedFx_ = true;
+        return false;
+    }
     if (dmg <= 0 || hp <= 0 || !hurtIframes.ready()) return false;
     if (!rollIframes.ready()) return false; // rolagem: i-frame do roll
     const int after =
@@ -973,6 +986,8 @@ void Player::respawn(float x, float y) {
     targetHandR_ = targetHandL_ = {0.f, 0.f};
     handTargetsLive_ = false; // próximo tick recalcula (repouso)
     hitstopT = 0;
+    riposteT_ = 0.f; // parry não atravessa a morte
+    parriedFx_ = false;
     jumping = false;
     inWater = false;
     jumpingRecharge = 0.f;
@@ -1254,6 +1269,10 @@ Player::MeleeBreakdown Player::meleeDamageBreakdownVs(float targetHpFrac,
     } else {
         bd.total = bd.base;
     }
+    // Riposte do parry (3s): ×1.5 no total final (vale p/ soco também).
+    if (riposteT_ > 0.f)
+        bd.total =
+            static_cast<int>(static_cast<float>(bd.total) * kRiposteMult);
     return bd;
 }
 

@@ -23,12 +23,12 @@ int main() {
             const char* k = game::keyOf(static_cast<Sfx>(i));
             assert(k != nullptr && std::string(k) != "?");
         }
-        assert(static_cast<int>(Sfx::COUNT) == 32);
+        assert(static_cast<int>(Sfx::COUNT) == 33);
     }
     { // BankCoversEnum (build registra 1 buffer por key)
         core::AudioSystem a;
         game::buildSoundBank(a);
-        assert(a.soundCount() == 32u);
+        assert(a.soundCount() == 33u);
         assert(a.has("player_jump"));
         assert(a.has("melee_hit"));
         assert(a.has("explosion"));

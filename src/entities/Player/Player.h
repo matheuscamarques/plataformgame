@@ -253,13 +253,23 @@ class Player : public Entity
             return inMeleeSwing() ? swingAim : aimDir;
         }
 
-        // Seam para parry (sem chamador ainda — CombatSystem consome
-        // quando rebate existir). Janela = início do Active.
+        // Janela de parry (Fase 2.2): o Windup inteiro (~2-3 ticks).
+        // Rebate dano físico (magia/projétil não); whiff paga com o
+        // Active vulnerável. Stun no agressor fica p/ CombatSystem (v2):
+        // sem contexto do atacante no hurt(), só negação + riposte.
         bool parryWindowActive() const {
-            return meleePhase == MeleePhase::Active
-                && meleeTimer > kParryWindowStart;
+            return meleePhase == MeleePhase::Windup;
         }
-        static constexpr float kParryWindowStart = 0.06f;
+        // Riposte do parry: ×1.5 no dano por 3s. Vinheta p/ o App.
+        float riposteT_ = 0.f;
+        static constexpr float kRiposteDur = 3.f;
+        static constexpr float kRiposteMult = 1.5f;
+        bool parriedFx_ = false;
+        bool consumeParryFx() {
+            const bool v = parriedFx_;
+            parriedFx_ = false;
+            return v;
+        }
 
         Player();
         void collide(Entity entity);
