@@ -21,6 +21,7 @@ WeaponDef swordGeo() {
     d.originY = 5.f;
     d.handOffsetX = 4.f;
     d.handOffsetY = 8.f;
+    d.hitstopTicks = 2; // leve: 66ms de impacto
     return d;
 }
 
@@ -35,6 +36,7 @@ WeaponDef axeGeo() {
     d.handOffsetY = 8.f;
     d.hasSwingPhases = false;
     d.trauma = 0.3f; // pesado: chacoalha o dobro da espada
+    d.hitstopTicks = 5; // 166ms: o peso se sente
     return d;
 }
 
@@ -42,6 +44,7 @@ WeaponDef axeGeo() {
 WeaponDef catalystGeo() {
     WeaponDef d = axeGeo();
     d.trauma = 0.1f;
+    d.hitstopTicks = 1;
     return d;
 }
 } // namespace

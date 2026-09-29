@@ -169,13 +169,17 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
         }
         s.resources.damagePosture(postureBase * postureMult);
         if (applied > 0) {
-            // Fase F: shake pelo peso da arma (soco = default 0.15).
+            // Fase F: shake e hitstop pelo peso da arma (soco = default).
             float trauma = 0.15f;
+            int hitstop = 2;
             if (const core::ItemDef* wdef = p->weaponDef()) {
                 if (const WeaponDef* wd =
-                        WeaponRegistry::instance().find(wdef->id))
+                        WeaponRegistry::instance().find(wdef->id)) {
                     trauma = wd->trauma;
+                    hitstop = wd->hitstopTicks;
+                }
             }
+            p->triggerHitstop(hitstop); // max: sem acumular multi-hit
             if (ctx.camera) ctx.camera->addTrauma(trauma); // hit conecta
             if (s.ai) s.ai->onTakeHit(s, applied, ctx);
         }

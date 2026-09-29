@@ -37,6 +37,7 @@ int main() {
         int hp = -1;
         enemies.forEach([&](Enemy &s) { hp = s.resources.hp; });
         assert(hp == 24); // head 8*2.0: 40 - 16
+        assert(p.hitstopT == 2); // soco conecta: congela 2 slots
     }
     { // HitsSlimeBehindWhenFacingLeft (regressão: W ia p/ direita)
         Player p; // (100,0) 30x50, centro (115,25)
@@ -63,6 +64,29 @@ int main() {
         enemies.forEach([&](Enemy &s) { hp = s.resources.hp; });
         assert(hp == 24); // head 8*2.0: 40 - 16
     }
+    { // AxeHitstopHeavier (machado conecta: 5 slots, não 2)
+        Player p;
+        p.equipment.equip(core::Item{"iron_axe", 1});
+        EnemySystem enemies;
+        enemies.spawn("slime", 62.f, 35.f);
+        enemies.forEach([](Enemy &s) {
+            s.bodyParts.rebuild({s.body.getX(), s.body.getY()}, 1);
+        });
+
+        MeleeSystem ms;
+        GameContext ctx{};
+        ctx.player = &p;
+        ctx.enemies = &enemies;
+
+        assert(p.startSwing());
+        for (int i = 0; i < 6; ++i) ms.tick(1.f / 30.f, ctx);
+        int hp = -1;
+        enemies.forEach([&](Enemy &s) { hp = s.resources.hp; });
+        assert(hp < 40); // conectou
+        assert(p.hitstopT == 5); // pesado: congela 5 slots
+        p.triggerHitstop(2); // max: não rebaixa em dobro-hit
+        assert(p.hitstopT == 5);
+    }
     { // WhiffsWhenFar
         Player p;
         EnemySystem enemies;
@@ -78,6 +102,7 @@ int main() {
         int hp = -1;
         enemies.forEach([&](Enemy &s) { hp = s.resources.hp; });
         assert(hp == 40);
+        assert(p.hitstopT == 0); // whiff: sem congelamento
     }
     { // ChainsComboInRecovery (combo 0 → 1 → 2 mata slime 40)
         Player p;

@@ -35,6 +35,10 @@ struct WeaponDef {
 
     // Screen shake ao conectar o golpe (Fase F): leve 0.15, pesado 0.3.
     float trauma = 0.15f;
+
+    // Hitstop ao conectar (slots de 1/30 congelados): espada 2,
+    // machado 5, catalisador 1. Soco usa o default 2.
+    int hitstopTicks = 2;
 };
 
 } // namespace support

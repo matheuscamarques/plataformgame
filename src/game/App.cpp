@@ -234,6 +234,12 @@ void Game::run()
 void Game::tick() {
     tickCount_++;
     Player *p = player.get();
+    // Hitstop (Fase F): consome o slot sem simular (tempo congelado,
+    // render segue, edges do input acumulam — buffer natural ao sair).
+    if (p->hitstopT > 0) {
+        p->hitstopT--;
+        return;
+    }
     // DS-style sem freeze: com o menu aberto o input vai p/ a UI ou p/
     // nada — o player não anda, pula, mira, corre, arremessa ou golpeia
     // (o mundo segue rodando). Zera aqui em cima p/ valer no tick inteiro;

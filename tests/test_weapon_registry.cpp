@@ -62,6 +62,18 @@ int main() {
         assert(WeaponRegistry::instance().find("priest_bell")->trauma ==
                0.1f);
     }
+    { // HitstopPorPeso (Fase F/hitstop: espada 2, machado 5, cajado 1)
+        assert(WeaponRegistry::instance().find("sword")->hitstopTicks ==
+               2);
+        assert(WeaponRegistry::instance().find("iron_sword")->hitstopTicks ==
+               2);
+        assert(WeaponRegistry::instance().find("diamond_axe")->hitstopTicks ==
+               5);
+        assert(WeaponRegistry::instance().find("wooden_staff")->hitstopTicks ==
+               1);
+        assert(WeaponRegistry::instance().find("priest_bell")->hitstopTicks ==
+               1);
+    }
 
     std::printf("weapon registry test OK\n");
     return 0;

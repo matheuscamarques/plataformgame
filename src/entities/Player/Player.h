@@ -204,6 +204,14 @@ class Player : public Entity
         // (relógio único = meleeTimer). MeleeSystem lê liveEvents().
         support::AnimPlayer anim;
 
+        // Hitstop (Fase F): slots de 1/30 congelados restantes.
+        // MeleeSystem arma no connect (max, sem acumular); Game::tick
+        // consome sem simular. Zera no respawn.
+        int hitstopT = 0;
+        void triggerHitstop(int ticks) {
+            if (ticks > hitstopT) hitstopT = ticks;
+        }
+
         // Braços articulados (B.2): comprimentos canônicos em sprite-rows
         // (3+3, medidos na arte atual); Renderer calibra o alcance por
         // frame contra o box legado (B.3 dirige os alvos).

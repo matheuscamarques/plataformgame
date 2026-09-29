@@ -957,6 +957,7 @@ void Player::respawn(float x, float y) {
     setFacing8(support::Facing::E);
     targetHandR_ = targetHandL_ = {0.f, 0.f};
     handTargetsLive_ = false; // próximo tick recalcula (repouso)
+    hitstopT = 0;
     jumping = false;
     inWater = false;
     jumpingRecharge = 0.f;
