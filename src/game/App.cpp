@@ -30,6 +30,7 @@
 #include "game/SoundBank.h"
 #include "support/Combat/ExplosionSystem.h"
 #include "support/Combat/SpriteFrame.h"
+#include "support/Effects/ParticleSystem.h"
 #include "support/Enemies/DwarfAI.h"
 #include "support/Enemies/EnemyArchetype.h"
 #include "support/Enemies/EnemySystem.h"
@@ -555,8 +556,14 @@ void Game::tick() {
     // Screen shake (item 23) pega carona aqui: 0.3 no dano, 0.8 na morte.
     camera.tickTrauma(1.f / 30.f);
     if (!frozen) {
-        if (!wasGrounded && p->jumping)
+        if (!wasGrounded && p->jumping) {
             audio_.play(game::keyOf(game::Sfx::PlayerLand));
+            // Poeira no pouso (juice): 10 grãos nos pés; landAnimT o
+            // squash corre no collide, aqui só o visual de poeira.
+            if (particles_)
+                particles_->emitDust(
+                    {p->getCenterX(), p->getY() + p->getH()}, 10, 30.f);
+        }
         if (phaseBefore == 0 && static_cast<int>(p->meleePhase) == 1 &&
             (swooshMode_ == 0 || swooshMode_ == 1))
             audio_.play(game::keyOf(game::Sfx::MeleeSwing));

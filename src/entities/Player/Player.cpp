@@ -87,10 +87,12 @@ void Player::collide(Entity bloco)
     }
 
     if (getBoundsBottom().intersects(bloco)) {
+        const bool wasAirborne = !jumping; // borda de descida: pousou
         setY(bloco.top - getH());
         moveDown = false;
         jumping = true;
         setVy(0.f); // pouso mata a queda (gravidade reacumula se sair)
+        if (wasAirborne) landAnimT = kLandAnimDur; // squash + poeira
     } else if(jumping){
          moveDown = true;
     }
@@ -131,10 +133,12 @@ void Player::collide(Component bloco)
     }
 
     if (getBoundsBottom().intersects(bloco)) {
+        const bool wasAirborne = !jumping; // borda de descida: pousou
         setY(bloco.top - getH());
         moveDown = false;
         jumping = true;
         setVy(0.f); // pouso mata a queda (gravidade reacumula se sair)
+        if (wasAirborne) landAnimT = kLandAnimDur; // squash + poeira
     } else if(jumping){
          moveDown = true;
     }
@@ -256,6 +260,11 @@ void Player::tick() {
     // Slow do bleed decai aqui (0.3s de micro-stagger).
     if (bleedSlowTimer > 0.f) bleedSlowTimer -= 1.f / 30.0f;
     if (frostTimer > 0.f) frostTimer -= 1.f / 30.0f; // swing lento expira
+    // Squash de pouso decai sozinho (0.12s; Renderer lê o restante).
+    if (landAnimT > 0.f) {
+        landAnimT -= 1.f / 30.0f;
+        if (landAnimT < 0.f) landAnimT = 0.f;
+    }
     // Buff da arma expira sozinho (timer 0 = permanente até trocar).
     if (weaponBuffTimer > 0.f) {
         weaponBuffTimer -= 1.f / 30.0f;

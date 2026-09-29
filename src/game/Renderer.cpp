@@ -1100,6 +1100,25 @@ void Game::drawPlayerSprite(Player *p) {
     // B.4: poses resolvidas no Player (verbatim): mesma fonte da bbox
     // e da arma. Sem live (preview) = overlay legado.
     const bool procArms = p->handTargetsLive_;
+    // Juice (Fase 5): respiração idle, bounce de marcha, squash de
+    // pouso e stretch de queda. A escala pivota na origem de cada
+    // parte — como todas ancoram em (centerX, y+h), equivale a squash
+    // sobre os pés. Braços/arma usam geometria rígida (boxes).
+    float bobY = 0.f;
+    float kx = 1.f, ky = 1.f;
+    if (p->landAnimT > 0.f) {
+        const auto sq = game::landSquash(p->landAnimT);
+        kx = sq.kx;
+        ky = sq.ky;
+    } else if (!p->jumping) {
+        const auto st = game::fallStretch(p->getVy());
+        kx = st.kx;
+        ky = st.ky;
+    } else if (std::fabs(p->getVx()) > 5.f) {
+        bobY = game::walkBobY(p->walkFrame) * s;
+    } else {
+        bobY = game::idleBobY(tickCount_, 1.f) * s;
+    }
     for (int k = 0; k < 5; ++k) {
         const int i = order[k];
         // Feet com botas: pula o pé base (a bota entra abaixo).
@@ -1113,8 +1132,8 @@ void Game::drawPlayerSprite(Player *p) {
                       static_cast<float>(
                           sprites::kPlayerH -
                           parts[sprites::partIndexForTex(i)].offY));
-        spr.setPosition(p->getCenterX(), p->getY() + p->getH());
-        spr.setScale(flip * s, s);
+        spr.setPosition(p->getCenterX(), p->getY() + p->getH() + bobY);
+        spr.setScale(flip * s * kx, s * ky);
         window->draw(spr);
     }
     // Bota no slot do feet (12x6, mesma origem do pé que substitui).
@@ -1124,8 +1143,8 @@ void Game::drawPlayerSprite(Player *p) {
         spr.setOrigin(sprites::kPlayerW * 0.5f,
                       static_cast<float>(sprites::kPlayerH -
                                          parts[3].offY));
-        spr.setPosition(p->getCenterX(), p->getY() + p->getH());
-        spr.setScale(flip * s, s);
+        spr.setPosition(p->getCenterX(), p->getY() + p->getH() + bobY);
+        spr.setScale(flip * s * kx, s * ky);
         window->draw(spr);
     }
     // B.4: desenha a pose resolvida no Player, verbatim (ombro,

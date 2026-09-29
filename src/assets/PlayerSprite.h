@@ -143,4 +143,35 @@ inline DirectedPose directedPose(sprites::PlayerPose pose,
     return {pose, artDirFor(f), support::isMirrored(f)};
 }
 
+// Juice procedural (Fase 5, testável): respiração, bounce e squash.
+// Unidades em sprite-px (Renderer multiplica por s); Y+ = baixo.
+inline float idleBobY(int tickCount, float amplitude = 1.f) {
+    constexpr float kPi = 3.14159265f;
+    return std::sin(static_cast<float>(tickCount) * 2.f * kPi / 30.f) *
+           amplitude; // 1Hz a 30 ticks/s
+}
+
+// Marcha: frame de contato (ímpar) afunda 1.5px.
+inline float walkBobY(int walkFrame) {
+    return (walkFrame % 2 == 1) ? 1.5f : 0.f;
+}
+
+struct Squash {
+    float kx = 1.f, ky = 1.f;
+};
+
+// Pouso: 0.12s comprimindo 18% (1→0); fora disso, identidade.
+inline Squash landSquash(float landAnimT) {
+    constexpr float kDur = 0.12f; // == Player::kLandAnimDur
+    if (landAnimT <= 0.f) return {};
+    const float t = landAnimT >= kDur ? 1.f : landAnimT / kDur;
+    return {1.f + 0.18f * t, 1.f - 0.18f * t};
+}
+
+// Queda rápida: estica (largo -10%, alto +10%).
+inline Squash fallStretch(float vy) {
+    if (vy > 12.f) return {0.9f, 1.1f};
+    return {};
+}
+
 } // namespace game

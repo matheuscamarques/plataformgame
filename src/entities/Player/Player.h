@@ -49,6 +49,9 @@ class Player : public Entity
         float walkTimer = 0.f;
         float throwAnimT = 0.f; // >0 = frame throw (0.4s)
         static constexpr float kThrowAnimDur = 0.40f;
+        // Squash de pouso (juice): collide arma no pouso, tick decai.
+        float landAnimT = 0.f; // >0 = comprimindo (0.12s)
+        static constexpr float kLandAnimDur = 0.12f;
 
         support::Body body; // hitboxes por parte (rebuild via BodySystem)
 
