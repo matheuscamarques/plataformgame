@@ -8,6 +8,7 @@
 #include "Player.h"
 #include <algorithm>
 #include <iostream>
+#include "assets/PlayerClips.h"
 #include "defines.h"
 #include "physics/PlayerPhysics.hpp"
 #include "support/Combat/WeaponRegistry.h"
@@ -1005,6 +1006,7 @@ bool Player::startSwing() {
     meleeTimer = kLight[meleeCombo].windup;
     meleeSwingId++;
     swingAim = aimDir; // congela direção do próximo golpe
+    anim.play(game::attackClipFor(swingAim), true); // clip do zero
     return true;
 }
 
@@ -1017,9 +1019,11 @@ MeleePhase Player::updateMelee(float dt) {
     if (meleePhase == MeleePhase::Windup) {
         meleePhase = MeleePhase::Active;
         meleeTimer = d.active;
+        anim.gotoFrame(1); // frame do Active (Hitbox viva)
     } else if (meleePhase == MeleePhase::Active) {
         meleePhase = MeleePhase::Recovery;
         meleeTimer = d.recovery;
+        anim.gotoFrame(2); // Hitbox apaga junto com a fase
     } else { // Recovery esgotou: volta ao Idle
         meleePhase = MeleePhase::Idle;
         meleeCombo = 0;

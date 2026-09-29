@@ -60,6 +60,14 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
 
     if (p->updateMelee(dt) != MeleePhase::Active) return;
 
+    // Fase C: hitbox viva vem do clip (janela Active). Sem clip
+    // tocando (fase setada à mão), vale o legado. Drena borda aqui
+    // para Sfx/Shake não vazarem para o próximo swing (Fase F).
+    p->anim.consumeEvents();
+    if (p->anim.playing() &&
+        !(p->anim.liveEvents() & support::AnimEvent::Hitbox))
+        return;
+
     const sf::FloatRect box = p->meleeHitbox();
     if (box.width <= 0.f) return;
 

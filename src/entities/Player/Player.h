@@ -14,6 +14,7 @@
 #include <SFML/Graphics/Rect.hpp>
 #include "entities/Entity.hpp"
 #include "support/Combat/AimDir.h"
+#include "support/Combat/AnimPlayer.h"
 #include "support/Combat/Facing.h"
 #include "support/Combat/Body.h"
 #include "support/Combat/SpriteFrame.h"
@@ -194,6 +195,11 @@ class Player : public Entity
         bool inMeleeSwing() const {
             return meleePhase != MeleePhase::Idle;
         }
+
+        // Player do clip de ataque (Fase C): startSwing toca o clip do
+        // grupo da mira; updateMelee avança o frame nas transições
+        // (relógio único = meleeTimer). MeleeSystem lê liveEvents().
+        support::AnimPlayer anim;
 
         // Mira efetiva da arma: fora do swing segue o input (aimDir);
         // no swing congela no snapshot (swingAim). Sem isto, idle após
