@@ -20,11 +20,14 @@ namespace {
 // mesma mão, mesma origem, mesma escala). Fonte única de verdade
 // para hitbox (MeleeSystem) e desenho.
 sf::FloatRect computeWeaponBbox(Player &p) {
+    // Mão = espelho exato de drawPlayerWeapon (doutrina B.4): fonte
+    // única em Player::weaponHand (pose IK ou box legado).
     const PartState *arm = p.body.find(BodyPartId::ArmR);
-    if (!arm) return {0.f, 0.f, 0.f, 0.f};
+    if (!p.handTargetsLive_ && !arm) return {0.f, 0.f, 0.f, 0.f};
+    const core::Vec2f hand = p.weaponHand();
     const float s = p.getH() / 40.f; // kPlayerH (era 20: sprite dobrou)
-    const float handX = arm->worldBox.left + arm->worldBox.width * 0.5f;
-    const float handY = arm->worldBox.top + arm->worldBox.height;
+    const float handX = hand.x;
+    const float handY = hand.y;
     // Offsets por arma via registry (mesma matemática de antes).
     float handOX = 4.f, handOY = 8.f;
     if (const core::ItemDef* wdef = p.weaponDef()) {

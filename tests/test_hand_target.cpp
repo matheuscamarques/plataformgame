@@ -91,7 +91,7 @@ int main() {
         p.body.rebuild({0.f, 0.f}, 1);
         p.setVx(0.f);
         p.setVy(0.f);
-        p.updateHandTargets();
+        p.updateLimbs();
         assert(p.handTargetsLive_);
         const core::Vec2f sh = shoulderR(p);
         assert(near(p.targetHandR_.x, sh.x + 3.5f * kRow, 1e-3f) &&

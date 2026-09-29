@@ -245,7 +245,7 @@ void Player::tick() {
         setFacing8(support::facingFromVelocity(getVx(), getVy(), facing8));
     }
     // Mãos procedurais fora do swing (no swing, updateMelee dirige).
-    if (!inMeleeSwing()) updateHandTargets();
+    if (!inMeleeSwing()) updateLimbs();
 
     // Regen de estamina: 30/s × mult, só com delay pronto.
     staminaDelay.tick(1.f / 30.0f);
@@ -1014,7 +1014,7 @@ bool Player::startSwing() {
     meleeSwingId++;
     swingAim = aimDir; // congela direção do próximo golpe
     anim.play(game::attackClipFor(swingAim), true); // clip do zero
-    updateHandTargets(); // mão recua no eixo do golpe
+    updateLimbs(); // mão recua no eixo do golpe
     return true;
 }
 
@@ -1028,21 +1028,21 @@ MeleePhase Player::updateMelee(float dt) {
         meleePhase = MeleePhase::Active;
         meleeTimer = d.active;
         anim.gotoFrame(1); // frame do Active (Hitbox viva)
-        updateHandTargets(); // mão estende no eixo do golpe
+        updateLimbs(); // mão estende no eixo do golpe
     } else if (meleePhase == MeleePhase::Active) {
         meleePhase = MeleePhase::Recovery;
         meleeTimer = d.recovery;
         anim.gotoFrame(2); // Hitbox apaga junto com a fase
-        updateHandTargets(); // mão assenta
+        updateLimbs(); // mão assenta
     } else { // Recovery esgotou: volta ao Idle
         meleePhase = MeleePhase::Idle;
         meleeCombo = 0;
-        updateHandTargets(); // repouso/marcha pela velocidade atual
+        updateLimbs(); // repouso/marcha pela velocidade atual
     }
     return meleePhase;
 }
 
-void Player::updateHandTargets() {
+void Player::updateLimbs() {
     const support::PartState* torso =
         body.find(support::BodyPartId::Torso);
     const support::PartState* armR =
@@ -1088,6 +1088,23 @@ void Player::updateHandTargets() {
             targetHandL_.y += std::sin(ph + kPi) * row;
         }
     }
+    // Resolve poses (B.4, era no Renderer B.2): alcance calibrado por
+    // frame (25% de folga: cotovelo visível, sem dobrar nem esticar).
+    // Renderer desenha verbatim; bbox e arma leem a mesma pose.
+    auto solve = [&](support::Limb& limb, support::LimbPose& pose,
+                     core::Vec2f sh, core::Vec2f hand) {
+        const float dx = hand.x - sh.x;
+        const float dy = hand.y - sh.y;
+        const float dist = std::sqrt(dx * dx + dy * dy);
+        const float half = support::limbReach(dist, row) * 0.5f;
+        support::Limb l = limb; // calibra sem sujar o canônico 3+3
+        l.upper.length = half;
+        l.lower.length = half;
+        pose = support::solveIK(l, sh, hand, true, facing);
+        support::applyPose(limb, pose); // ângulos persistem
+    };
+    solve(limbR_, poseR_, shR, targetHandR_);
+    solve(limbL_, poseL_, shL, targetHandL_);
     handTargetsLive_ = true;
 }
 

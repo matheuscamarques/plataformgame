@@ -213,7 +213,21 @@ class Player : public Entity
         // live=false (preview/respawn) = Renderer usa o box legado.
         core::Vec2f targetHandR_{0.f, 0.f}, targetHandL_{0.f, 0.f};
         bool handTargetsLive_ = false;
-        void updateHandTargets();
+        // Poses resolvidas (B.4, mundo, como desenhadas): fonte única
+        // para drawLimb, weaponHand e computeWeaponBbox. Sem lag de
+        // fase além do já existente (transição corre no MeleeSystem).
+        support::LimbPose poseR_, poseL_;
+        void updateLimbs();
+        // Mão da arma em mundo (B.4, espelho exato draw↔bbox): pose IK
+        // quando live; box do ArmR senão; {0,0} sem fonte alguma.
+        core::Vec2f weaponHand() const {
+            if (handTargetsLive_) return poseR_.handWorld;
+            const support::PartState* arm =
+                body.find(support::BodyPartId::ArmR);
+            if (!arm) return {0.f, 0.f};
+            return {arm->worldBox.left + arm->worldBox.width * 0.5f,
+                    arm->worldBox.top + arm->worldBox.height};
+        }
 
         // Mira efetiva da arma: fora do swing segue o input (aimDir);
         // no swing congela no snapshot (swingAim). Sem isto, idle após

@@ -1096,15 +1096,9 @@ void Game::drawPlayerSprite(Player *p) {
                                   &pp.feet};
     // Ordem: torso antes dos braços (overlay transparente de pele G/H).
     const int order[5] = {0, 1, 4, 2, 3};
-    // B.2: braços procedurais calibrados nos boxes (placeholder). Sem
-    // boxes = overlay legado (segurança, nunca crasha).
-    const support::PartState* armR =
-        p->body.find(support::BodyPartId::ArmR);
-    const support::PartState* armL =
-        p->body.find(support::BodyPartId::ArmL);
-    const support::PartState* torso =
-        p->body.find(support::BodyPartId::Torso);
-    const bool procArms = armR && armL && torso;
+    // B.4: poses resolvidas no Player (verbatim): mesma fonte da bbox
+    // e da arma. Sem live (preview) = overlay legado.
+    const bool procArms = p->handTargetsLive_;
     for (int k = 0; k < 5; ++k) {
         const int i = order[k];
         // Feet com botas: pula o pé base (a bota entra abaixo).
@@ -1133,42 +1127,19 @@ void Game::drawPlayerSprite(Player *p) {
         spr.setScale(static_cast<float>(p->facing) * s, s);
         window->draw(spr);
     }
-    // B.2: dois segmentos por braço, ombro→cotovelo (IK)→mão. Alvo =
-    // posição antiga do box (calibragem: dano/draw da arma intocados).
+    // B.4: desenha a pose resolvida no Player, verbatim (ombro,
+    // cotovelo e mão são a mesma fonte de computeWeaponBbox).
     if (procArms) {
         const sf::Color skin = playerSkinColor();
         const float thick = 2.f * s; // 2 sprite-px de pele
-        const float row = s;         // 1 row do sprite em mundo
-        auto drawArm = [&](const support::PartState* arm,
-                           support::Limb& limb, core::Vec2f target) {
-            const float cx =
-                arm->worldBox.left + arm->worldBox.width * 0.5f;
-            const core::Vec2f shoulder = support::limbShoulder(
-                {torso->worldBox.left, torso->worldBox.top},
-                {torso->worldBox.width, torso->worldBox.height}, cx);
-            // B.3: alvo procedural; sem live (preview) = box legado.
-            const core::Vec2f hand =
-                p->handTargetsLive_
-                    ? target
-                    : support::limbHand(
-                          cx, arm->worldBox.top + arm->worldBox.height);
-            const float dx = hand.x - shoulder.x;
-            const float dy = hand.y - shoulder.y;
-            const float dist = std::sqrt(dx * dx + dy * dy);
-            const float half = support::limbReach(dist, row) * 0.5f;
-            support::Limb l = limb; // calibra sem sujar o canônico
-            l.upper.length = half;
-            l.lower.length = half;
-            const support::LimbPose pose =
-                support::solveIK(l, shoulder, hand, true, p->facing);
-            support::applyPose(limb, pose); // ângulos persistem p/ B.3
+        auto drawArm = [&](const support::LimbPose& pose) {
             drawLimbSeg(*window, pose.shoulderWorld, pose.elbowWorld,
                         thick, skin);
             drawLimbSeg(*window, pose.elbowWorld, pose.handWorld, thick,
                         skin);
         };
-        drawArm(armR, p->limbR_, p->targetHandR_);
-        drawArm(armL, p->limbL_, p->targetHandL_);
+        drawArm(p->poseR_);
+        drawArm(p->poseL_);
     }
 }
 
@@ -1289,10 +1260,13 @@ void Game::drawPlayerWeapon(Player *p) {
     // Mão = base do ArmR (onde o pixel de pele termina, row 9 no idle).
     // Espelho de computeWeaponBbox em BodySystem — mudar um sem o outro
     // desalinha desenho e hitbox.
+    // Mão = espelho exato de computeWeaponBbox (doutrina B.4):
+    // fonte única em Player::weaponHand (pose IK ou box legado).
     const auto *arm = p->body.find(support::BodyPartId::ArmR);
-    if (!arm) return;
-    const float handX = arm->worldBox.left + arm->worldBox.width * 0.5f;
-    const float handY = arm->worldBox.top + arm->worldBox.height;
+    if (!p->handTargetsLive_ && !arm) return; // sem fonte alguma
+    const core::Vec2f hand = p->weaponHand();
+    const float handX = hand.x;
+    const float handY = hand.y;
     const sf::Texture *tex = weaponIdleTex(sprites_, wdef->id, m);
     float originX = 4.f, originY = 20.f;
     // Espada tem fases de swing (dado no registry); machado/cajado/sino
