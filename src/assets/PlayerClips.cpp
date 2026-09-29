@@ -3,7 +3,8 @@
  * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
  * @brief Define os clips de ataque do player (Fase C).
  * @details Único TU com as tabelas; header só declara. Frame 0 =
- * Windup, 1 = Active (Hitbox viva), 2 = Recovery.
+ * Windup, 1 = Active (Hitbox viva + Sfx de swoosh na borda), 2 =
+ * Recovery.
  */
 
 #include "assets/PlayerClips.h"
@@ -17,17 +18,17 @@ using support::SpriteFrameId;
 
 constexpr AnimKeyframe kSideFrames[3] = {
     {SpriteFrameId::PlayerPunch, 0.f, 0},
-    {SpriteFrameId::PlayerPunch, 0.f, support::AnimEvent::Hitbox},
+    {SpriteFrameId::PlayerPunch, 0.f, support::AnimEvent::Hitbox | support::AnimEvent::Sfx},
     {SpriteFrameId::PlayerPunch, 0.f, 0},
 };
 constexpr AnimKeyframe kUpFrames[3] = {
     {SpriteFrameId::PlayerPunchUp, 0.f, 0},
-    {SpriteFrameId::PlayerPunchUp, 0.f, support::AnimEvent::Hitbox},
+    {SpriteFrameId::PlayerPunchUp, 0.f, support::AnimEvent::Hitbox | support::AnimEvent::Sfx},
     {SpriteFrameId::PlayerPunchUp, 0.f, 0},
 };
 constexpr AnimKeyframe kDownFrames[3] = {
     {SpriteFrameId::PlayerPunchDown, 0.f, 0},
-    {SpriteFrameId::PlayerPunchDown, 0.f, support::AnimEvent::Hitbox},
+    {SpriteFrameId::PlayerPunchDown, 0.f, support::AnimEvent::Hitbox | support::AnimEvent::Sfx},
     {SpriteFrameId::PlayerPunchDown, 0.f, 0},
 };
 

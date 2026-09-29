@@ -50,6 +50,18 @@ int main() {
         assert(bl && bl->spriteW == 8 && bl->spriteH == 20 &&
                !bl->hasSwingPhases);
     }
+    { // TraumaPorPeso (Fase F: leve 0.15, pesado 0.3, catalisador 0.1)
+        assert(WeaponRegistry::instance().find("sword")->trauma == 0.15f);
+        assert(WeaponRegistry::instance().find("iron_sword")->trauma ==
+               0.15f);
+        assert(WeaponRegistry::instance().find("axe")->trauma == 0.3f);
+        assert(WeaponRegistry::instance().find("diamond_axe")->trauma ==
+               0.3f);
+        assert(WeaponRegistry::instance().find("wooden_staff")->trauma ==
+               0.1f);
+        assert(WeaponRegistry::instance().find("priest_bell")->trauma ==
+               0.1f);
+    }
 
     std::printf("weapon registry test OK\n");
     return 0;

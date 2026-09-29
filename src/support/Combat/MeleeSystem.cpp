@@ -15,6 +15,7 @@
 #include "game/SoundBank.h"
 #include "support/Camera/Camera.h"
 #include "support/Combat/Body.h"
+#include "support/Combat/WeaponRegistry.h"
 #include "support/Debug/DebugFeed.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
@@ -63,7 +64,10 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
     // Fase C: hitbox viva vem do clip (janela Active). Sem clip
     // tocando (fase setada à mão), vale o legado. Drena borda aqui
     // para Sfx/Shake não vazarem para o próximo swing (Fase F).
-    p->anim.consumeEvents();
+    // Fase F: swoosh no Impact (edge Sfx do clip, mesmo no whiff).
+    const uint32_t animEdge = p->anim.consumeEvents();
+    if ((animEdge & support::AnimEvent::Sfx) && ctx.audio)
+        ctx.audio->play(game::keyOf(game::Sfx::MeleeSwing), 0.5f);
     if (p->anim.playing() &&
         !(p->anim.liveEvents() & support::AnimEvent::Hitbox))
         return;
@@ -150,7 +154,14 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
         }
         s.resources.damagePosture(postureBase * postureMult);
         if (applied > 0) {
-            if (ctx.camera) ctx.camera->addTrauma(0.15f); // hit conecta
+            // Fase F: shake pelo peso da arma (soco = default 0.15).
+            float trauma = 0.15f;
+            if (const core::ItemDef* wdef = p->weaponDef()) {
+                if (const WeaponDef* wd =
+                        WeaponRegistry::instance().find(wdef->id))
+                    trauma = wd->trauma;
+            }
+            if (ctx.camera) ctx.camera->addTrauma(trauma); // hit conecta
             if (s.ai) s.ai->onTakeHit(s, applied, ctx);
         }
         s.lastHitSwing = p->meleeSwingId;

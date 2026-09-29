@@ -32,6 +32,9 @@ struct WeaponDef {
     // (sem texture registry ainda) — este bool ao menos tira o if
     // por id do render.
     bool hasSwingPhases = true;
+
+    // Screen shake ao conectar o golpe (Fase F): leve 0.15, pesado 0.3.
+    float trauma = 0.15f;
 };
 
 } // namespace support

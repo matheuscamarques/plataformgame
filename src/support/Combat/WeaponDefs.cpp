@@ -34,6 +34,14 @@ WeaponDef axeGeo() {
     d.handOffsetX = 4.f;
     d.handOffsetY = 8.f;
     d.hasSwingPhases = false;
+    d.trauma = 0.3f; // pesado: chacoalha o dobro da espada
+    return d;
+}
+
+// Catalisadores: mesma forma do machado, trauma leve (sem impacto).
+WeaponDef catalystGeo() {
+    WeaponDef d = axeGeo();
+    d.trauma = 0.1f;
     return d;
 }
 } // namespace
@@ -50,5 +58,5 @@ REGISTER_WEAPON("leather_sword", swordGeo);
 REGISTER_WEAPON("leather_axe", axeGeo);
 
 // Catalisadores (Fase 3b): verticais como o machado, sem swing.
-REGISTER_WEAPON("wooden_staff", axeGeo);
-REGISTER_WEAPON("priest_bell", axeGeo);
+REGISTER_WEAPON("wooden_staff", catalystGeo);
+REGISTER_WEAPON("priest_bell", catalystGeo);

@@ -113,6 +113,16 @@ int main() {
             assert(a.liveEvents() == 0);
         }
     }
+    { // SwooshNaBorda (Fase F: frame 1 emite Sfx 1x, sem repetir)
+        AnimPlayer a;
+        a.play(game::attackClipSide(), true);
+        assert(a.consumeEvents() == 0); // Windup: silencioso
+        a.gotoFrame(1);                 // Active: swoosh
+        assert(a.consumeEvents() == Sfx);
+        assert(a.consumeEvents() == 0); // drenou, sem eco
+        a.gotoFrame(2);
+        assert(a.consumeEvents() == 0);
+    }
     { // SwingTocaClipESincroniza (Player: startSwing→play, fases→goto)
         Player p;
         assert(p.startSwing()); // aim E: clip side
