@@ -17,6 +17,7 @@
 #include "support/Combat/AnimPlayer.h"
 #include "support/Combat/Facing.h"
 #include "support/Combat/Limb.h"
+#include "support/Combat/SweepArc.h"
 #include "support/Combat/Body.h"
 #include "support/Combat/SpriteFrame.h"
 #include "core/Attributes.h"
@@ -149,7 +150,7 @@ class Player : public Entity
         }
 
         // Arma equipada (def do slot RightHand) ou nullptr = soco.
-        // Fonte única p/ render, BodySystem e meleeHitbox.
+        // Fonte única p/ render, BodySystem e sweepArc.
         const core::ItemDef* weaponDef() const;
         bool hasWeapon() const { return weaponDef() != nullptr; }
         // Segunda arma (LeftHand): dano soma no melee. nullptr = sem.
@@ -427,10 +428,13 @@ class Player : public Entity
         // Avança timers; retorna a fase atual.
         MeleePhase updateMelee(float dt);
 
-        // Hitbox do swing atual (screen-space via swingAim). Só válida
-        // em Active; em outras fases retorna rect vazio.
+        // Arco de varredura ao vivo (Fase E, cone+anel da mão): válido
+        // só no Active com pose (vazio senão). MeleeSystem consome.
         // Não-const: getters legados do Entity não são const.
-        sf::FloatRect meleeHitbox();
+        support::SweepArc sweepArc();
+        // Arco previsto p/ a mira (debug F2 laranja): mesma geometria
+        // do ao vivo, sem exigir swing (vazio sem boxes).
+        support::SweepArc predictedSweep(support::AimDir aim);
         int meleeDamage() const;
         float meleePosture() const;
 };

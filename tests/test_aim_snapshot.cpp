@@ -32,31 +32,32 @@ int main() {
         p.aimDir = AimDir::E; // meio do swing: input muda
         assert(p.swingAim == AimDir::N);
     }
-    { // HitboxUsesSwingAim (N = 20px acima do centro)
+    { // SweepUsesSwingAim (N = cone apontando p/ cima)
         Player p;
         p.equipment.equip(core::Item{"iron_sword", 1});
         assert(p.hasWeapon());
-        p.meleePhase = MeleePhase::Active;
-        p.meleeCombo = 0;
-        p.swingAim = AimDir::N;
+        p.body.rebuild({0.f, 0.f}, 1);
+        p.aimDir = AimDir::N;
+        assert(p.startSwing());
+        assert(p.updateMelee(0.10f) == MeleePhase::Active);
 
-        sf::FloatRect box = p.meleeHitbox();
-        // Rect do N x2 (corpo 100): cy=-40, h=40 → topo 60px acima.
-        assert(near(box.top, p.getCenterY() - 60.f));
-        assert(near(box.height, 40.f));
-        assert(near(box.top + box.height, p.getCenterY() - 20.f));
+        const support::SweepArc arc = p.sweepArc();
+        assert(!arc.empty);
+        // N em screen-space (Y p/ baixo) = -90°.
+        assert(near(arc.centerAngle, -3.14159265f * 0.5f));
+        assert(arc.rOuter > arc.rInner && arc.rInner >= 0.f);
     }
-    { // FallbackSocoWhenUnequipped (N ignorado sem arma)
+    { // SweepUnarmedAimBased (soco segue a mira, não o facing)
         Player p;
         p.equipment.unequip(core::EquipSlot::RightHand);
-        p.meleePhase = MeleePhase::Active;
-        p.meleeCombo = 0; // kLight[0].hx = 16
-        p.swingAim = AimDir::N;
+        p.body.rebuild({0.f, 0.f}, 1);
+        p.aimDir = AimDir::N;
+        assert(p.startSwing());
+        assert(p.updateMelee(0.10f) == MeleePhase::Active);
 
-        sf::FloatRect box = p.meleeHitbox();
-        assert(near(box.width, 16.f));
-        // Soco é reto à frente, centrado em Y (sem -20 do N).
-        assert(near(box.top + box.height * 0.5f, p.getCenterY()));
+        const support::SweepArc arc = p.sweepArc();
+        assert(!arc.empty);
+        assert(near(arc.centerAngle, -3.14159265f * 0.5f));
     }
     { // ResolveAimCoversEightWays
         using support::resolveAim;

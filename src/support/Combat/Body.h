@@ -74,6 +74,13 @@ struct Body {
     void attach(const BodySchema* s) {
         schema = s;
         parts.resize(s ? s->parts.size() : 0);
+        // Ids desde o attach (antes só no rebuild): find() antes do
+        // primeiro rebuild achava tudo como Torso (default) e ArmR/ArmL
+        // davam null — updateLimbs nunca ligava sem BodySystem.
+        if (s) {
+            for (std::size_t i = 0; i < s->parts.size(); ++i)
+                parts[i].id = s->parts[i].id;
+        }
     }
 
     void rebuild(core::Vec2f topLeftPos, int facing_);

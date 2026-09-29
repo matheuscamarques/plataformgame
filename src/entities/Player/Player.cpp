@@ -968,32 +968,13 @@ struct MeleeDef {
     float windup, active, recovery;
     int   damage;
     float posture;
-    float hx, hy; // tamanho da hitbox
 };
 
 // Combo light 3-hit: tempos em segundos (tick fixo 1/30).
 constexpr MeleeDef kLight[3] = {
-    {0.06f, 0.08f, 0.10f,  8,  5.f, 16.f, 20.f},
-    {0.05f, 0.08f, 0.12f, 10,  6.f, 18.f, 20.f},
-    {0.10f, 0.10f, 0.22f, 16, 12.f, 22.f, 24.f},
-};
-} // namespace
-
-namespace {
-// Rect local ao centro do player por direção (Y cresce p/ baixo).
-// Só vale com arma; soco usa kLight (reto, sem direcionalidade).
-struct AimHitboxLocal {
-    float cx, cy, w, h;
-};
-constexpr AimHitboxLocal kAimHitbox[8] = {
-    {20.f, 0.f, 20.f, 14.f},   // E
-    {14.f, -14.f, 18.f, 14.f}, // NE
-    {0.f, -20.f, 14.f, 20.f},  // N
-    {-14.f, -14.f, 18.f, 14.f},// NW
-    {-20.f, 0.f, 20.f, 14.f},  // W
-    {-14.f, 14.f, 18.f, 14.f}, // SW
-    {0.f, 20.f, 14.f, 20.f},   // S
-    {14.f, 14.f, 18.f, 14.f},  // SE
+    {0.06f, 0.08f, 0.10f,  8,  5.f},
+    {0.05f, 0.08f, 0.12f, 10,  6.f},
+    {0.10f, 0.10f, 0.22f, 16, 12.f},
 };
 } // namespace
 
@@ -1051,12 +1032,23 @@ void Player::updateLimbs() {
         body.find(support::BodyPartId::ArmL);
     if (!torso || !armR || !armL) return; // sem boxes: mantém últimos
     const float row = getH() / 40.f;      // mundo por row (kPlayerH)
-    const core::Vec2f tTop{torso->worldBox.left, torso->worldBox.top};
-    const core::Vec2f tSize{torso->worldBox.width, torso->worldBox.height};
-    const float cxR = armR->worldBox.left + armR->worldBox.width * 0.5f;
-    const float cxL = armL->worldBox.left + armL->worldBox.width * 0.5f;
-    const core::Vec2f shR = support::limbShoulder(tTop, tSize, cxR);
-    const core::Vec2f shL = support::limbShoulder(tTop, tSize, cxL);
+    // Sem BodySystem os boxes vêm zerados (só attach): ombro cai no
+    // AABB (robusto como o rect antigo, que nunca lia boxes).
+    const float fw0 = static_cast<float>(facing);
+    auto shoulderOf = [&](const support::PartState* arm, float side) {
+        if (torso->worldBox.width > 0.f && torso->worldBox.height > 0.f &&
+            arm->worldBox.width > 0.f && arm->worldBox.height > 0.f) {
+            const float cx =
+                arm->worldBox.left + arm->worldBox.width * 0.5f;
+            return support::limbShoulder(
+                {torso->worldBox.left, torso->worldBox.top},
+                {torso->worldBox.width, torso->worldBox.height}, cx);
+        }
+        return core::Vec2f{getCenterX() + fw0 * side * getW(),
+                           getY() + getH() * 0.5f};
+    };
+    const core::Vec2f shR = shoulderOf(armR, 0.15f);
+    const core::Vec2f shL = shoulderOf(armL, -0.15f);
     const float fw = static_cast<float>(facing);
     // Repouso: à frente e abaixo do ombro (braço caído natural).
     auto rest = [&](core::Vec2f sh, float fwdRows) {
@@ -1108,35 +1100,65 @@ void Player::updateLimbs() {
     handTargetsLive_ = true;
 }
 
-sf::FloatRect Player::meleeHitbox() {
-    if (meleePhase != MeleePhase::Active) return sf::FloatRect{};
-
-    // Com arma: 8 rects por swingAim (snapshot; input não move o golpe).
-    // swingAim já é screen-space (tecla esquerda = W = esquerda da tela),
-    // então NÃO espelha por facing — o * facing aqui duplicava o espelho
-    // e jogava o W para a direita (melee só acertava à direita).
-    if (const core::ItemDef* wdef = weaponDef()) {
-        const auto &hb = kAimHitbox[static_cast<int>(swingAim)];
-        float ws = 1.f, hs = 1.f;
-        if (const auto *wd =
+namespace {
+// Lâmina além da mão em mundo (Fase E): maior eixo do sprite menos a
+// origem (guarda), em sprite-px. Soco = punho + avanço (6 rows).
+float bladeLengthRows(const Player* p) {
+    if (const core::ItemDef* wdef = p->weaponDef()) {
+        if (const auto* wd =
                 support::WeaponRegistry::instance().find(wdef->id)) {
-            ws = wd->spriteW / 16.f;
-            hs = wd->spriteH / 8.f;
+            return std::max({wd->spriteW - wd->originX,
+                             wd->spriteH - wd->originY, 0.f});
         }
-        // Alcance escala com o corpo (bs=2 a 100px): soco de 1 bloco
-        // nunca sairia do corpo de 2 blocos. Soco (abaixo) já é dinâmico.
-        const float bs = getH() / 50.f;
-        const float w = hb.w * bs * ws, h = hb.h * bs * hs;
-        const float cx = getCenterX() + hb.cx * bs;
-        const float cy = getCenterY() + hb.cy * bs;
-        return sf::FloatRect{cx - w * 0.5f, cy - h * 0.5f, w, h};
     }
+    return 6.f;
+}
+} // namespace
 
-    // Fallback: soco. Mantém kLight[] — sem direcionalidade (soco é reto).
-    const MeleeDef &d = kLight[meleeCombo];
-    const float cx = getCenterX() + static_cast<float>(facing) * (getW() * 0.5f + d.hx * 0.5f);
-    const float cy = getCenterY();
-    return sf::FloatRect{cx - d.hx * 0.5f, cy - d.hy * 0.5f, d.hx, d.hy};
+support::SweepArc Player::sweepArc() {
+    support::SweepArc arc;
+    // Só o Active tem hitbox; sem pose (fase setada à mão), vazio.
+    if (meleePhase != MeleePhase::Active || !handTargetsLive_) return arc;
+    const float row = getH() / 40.f; // mundo por row (kPlayerH)
+    const core::Vec2f o = poseR_.shoulderWorld;
+    const core::Vec2f h = poseR_.handWorld;
+    const float dx = h.x - o.x;
+    const float dy = h.y - o.y;
+    const float dist = std::sqrt(dx * dx + dy * dy);
+    if (dist <= 1e-6f) return arc;
+    const float thick = 2.f * row; // tolerância da lâmina
+    arc.origin = o;
+    arc.centerAngle = std::atan2(dy, dx);
+    arc.halfWidth = support::kSweepHalfWidth;
+    arc.rInner = std::max(0.f, dist - thick);
+    arc.rOuter = dist + bladeLengthRows(this) * row;
+    arc.empty = false;
+    return arc;
+}
+
+support::SweepArc Player::predictedSweep(support::AimDir aim) {
+    support::SweepArc arc;
+    const support::PartState* torso =
+        body.find(support::BodyPartId::Torso);
+    const support::PartState* armR =
+        body.find(support::BodyPartId::ArmR);
+    if (!torso || !armR) return arc;
+    const float row = getH() / 40.f;
+    const float cx = armR->worldBox.left + armR->worldBox.width * 0.5f;
+    const core::Vec2f o = support::limbShoulder(
+        {torso->worldBox.left, torso->worldBox.top},
+        {torso->worldBox.width, torso->worldBox.height}, cx);
+    // Mesma geometria do ramo Active de updateLimbs (8 rows no eixo).
+    const core::Vec2f av = support::aimVector(aim);
+    const float dist = 8.f * row;
+    const float thick = 2.f * row;
+    arc.origin = o;
+    arc.centerAngle = std::atan2(av.y, av.x);
+    arc.halfWidth = support::kSweepHalfWidth;
+    arc.rInner = std::max(0.f, dist - thick);
+    arc.rOuter = dist + bladeLengthRows(this) * row;
+    arc.empty = false;
+    return arc;
 }
 
 Player::MeleeBreakdown Player::meleeDamageBreakdown() const {

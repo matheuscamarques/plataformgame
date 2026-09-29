@@ -74,6 +74,44 @@ sf::Color colorForChar(char c) {
         static_cast<sf::Uint8>(80 + ((h >> 14) & 0x7F))};
 }
 
+// Setor do arco (Fase E, debug F2): anéis interno/externo + 2 raios.
+void drawArcSector(sf::RenderTarget& target,
+                   const support::SweepArc& arc, sf::Color col) {
+    if (arc.empty || arc.rOuter <= 0.f) return;
+    constexpr int kSegs = 24;
+    sf::VertexArray outer(sf::LineStrip, kSegs + 1);
+    sf::VertexArray inner(sf::LineStrip, kSegs + 1);
+    for (int i = 0; i <= kSegs; ++i) {
+        const float a = arc.centerAngle - arc.halfWidth +
+                        2.f * arc.halfWidth * i / kSegs;
+        const float c = std::cos(a);
+        const float s = std::sin(a);
+        outer[i] = sf::Vertex(
+            {arc.origin.x + c * arc.rOuter, arc.origin.y + s * arc.rOuter},
+            col);
+        const float ri = std::max(arc.rInner, 0.f);
+        inner[i] = sf::Vertex(
+            {arc.origin.x + c * ri, arc.origin.y + s * ri}, col);
+    }
+    target.draw(outer);
+    target.draw(inner);
+    const float c0 = std::cos(arc.centerAngle - arc.halfWidth);
+    const float s0 = std::sin(arc.centerAngle - arc.halfWidth);
+    const float c1 = std::cos(arc.centerAngle + arc.halfWidth);
+    const float s1 = std::sin(arc.centerAngle + arc.halfWidth);
+    sf::Vertex spokes[] = {
+        sf::Vertex({arc.origin.x, arc.origin.y}, col),
+        sf::Vertex({arc.origin.x + c0 * arc.rOuter,
+                    arc.origin.y + s0 * arc.rOuter},
+                   col),
+        sf::Vertex({arc.origin.x, arc.origin.y}, col),
+        sf::Vertex({arc.origin.x + c1 * arc.rOuter,
+                    arc.origin.y + s1 * arc.rOuter},
+                   col),
+    };
+    target.draw(spokes, 4, sf::Lines);
+}
+
 // Posição final da peça: game::pieceDrawPos (fonte única, testável).
 
 // Renderiza o ASCII do frame com uma cor por char (F3).
@@ -423,16 +461,10 @@ void Game::render()
 
     particles_->render(*window);
 
-    // Flash do swing: outline da hitbox só na janela Active (canal F2).
+    // Flash do swing: setor do arco só na janela Active (canal F2).
     if (player.get()->meleePhase == MeleePhase::Active &&
         overlay_.visible() && overlay_.hitboxes()) {
-        const sf::FloatRect box = player.get()->meleeHitbox();
-        sf::RectangleShape r(sf::Vector2f(box.width, box.height));
-        r.setPosition(box.left, box.top);
-        r.setFillColor(sf::Color::Transparent);
-        r.setOutlineColor(sf::Color::Yellow);
-        r.setOutlineThickness(1.f);
-        window->draw(r);
+        drawArcSector(*window, player.get()->sweepArc(), sf::Color::Yellow);
     }
 
     drops_->render(*window);
@@ -497,48 +529,13 @@ void Game::render()
             }
         }
 
-        // ── 2. Preview da hitbox 8-dir (laranja, sólida: SFML não
-        // tem tracejado): onde a hitbox cairia se apertasse K agora.
-        // Mesma fórmula de Player::meleeHitbox(), mas com a mira
-        // atual (fora do swing) ou o snapshot (no swing), sem exigir
-        // Active. Tabela duplicada só p/ debug; quem manda em prod é
-        // Player::meleeHitbox(). Escala da arma replicada (machado).
+        // ── 2. Preview do sweep (laranja): arco previsto p/ a mira
+        // atual (mesma geometria de sweepArc(); quem manda em prod é
+        // o arco ao vivo).
         {
             const auto aim = p->inMeleeSwing() ? p->swingAim : p->aimDir;
-            struct HB {
-                float cx, cy, w, h;
-            };
-            static const HB kPrev[8] = {
-                {20.f, 0.f, 20.f, 14.f}, // E
-                {14.f, -14.f, 18.f, 14.f}, // NE
-                {0.f, -20.f, 14.f, 20.f}, // N
-                {-14.f, -14.f, 18.f, 14.f}, // NW
-                {-20.f, 0.f, 20.f, 14.f}, // W
-                {-14.f, 14.f, 18.f, 14.f}, // SW
-                {0.f, 20.f, 14.f, 20.f}, // S
-                {14.f, 14.f, 18.f, 14.f}, // SE
-            };
-            const auto &hb = kPrev[static_cast<int>(aim)];
-            float ws = 1.f, hs = 1.f;
-            if (p->hasWeapon()) {
-                if (const auto *wd =
-                        support::WeaponRegistry::instance().find(
-                            p->weaponDef()->id)) {
-                    ws = wd->spriteW / 16.f;
-                    hs = wd->spriteH / 8.f;
-                }
-            }
-            // Preview espelha meleeHitbox: alcance escala com o corpo.
-            const float bs = p->getH() / 50.f;
-            const float w = hb.w * bs * ws, h = hb.h * bs * hs;
-            const float cx = p->getCenterX() + hb.cx * bs;
-            const float cy = p->getCenterY() + hb.cy * bs;
-            sf::RectangleShape r({w, h});
-            r.setPosition(cx - w * 0.5f, cy - h * 0.5f);
-            r.setFillColor(sf::Color::Transparent);
-            r.setOutlineColor(sf::Color(255, 140, 0)); // laranja
-            r.setOutlineThickness(1.f);
-            window->draw(r);
+            drawArcSector(*window, p->predictedSweep(aim),
+                          sf::Color(255, 140, 0)); // laranja
         }
 
         // ── 3. Indicador de mira (linha amarela): centro do player
@@ -1067,8 +1064,7 @@ sf::Color playerSkinColor() {
 
 // Segmento placeholder B.2: retângulo sólido de a até b.
 void drawLimbSeg(sf::RenderTarget& target, core::Vec2f a, core::Vec2f b,
-                 float thick, sf::Color col) {
-    const float dx = b.x - a.x;
+                 float thick, sf::Color col) {    const float dx = b.x - a.x;
     const float dy = b.y - a.y;
     const float len = std::sqrt(dx * dx + dy * dy);
     if (len < 0.5f) return;

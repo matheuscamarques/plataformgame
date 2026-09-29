@@ -72,8 +72,13 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
         !(p->anim.liveEvents() & support::AnimEvent::Hitbox))
         return;
 
-    const sf::FloatRect box = p->meleeHitbox();
-    if (box.width <= 0.f) return;
+    // Fase E: varredura segue a mão (cone+anel), não rect fixo.
+    const support::SweepArc arc = p->sweepArc();
+    if (arc.empty) return;
+    // Broadphase barata: AABB do alcance (círculo da ponta) vs união.
+    const sf::FloatRect arcBox{arc.origin.x - arc.rOuter,
+                               arc.origin.y - arc.rOuter,
+                               arc.rOuter * 2.f, arc.rOuter * 2.f};
 
     // Eremita: "sozinho" = 1 inimigo vivo (conta 1x por swing).
     int aliveCount = 0;
@@ -111,7 +116,7 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
                 broad = {l, t, r - l, b - t};
             });
         }
-        if (!box.intersects(broad)) return;
+        if (!arcBox.intersects(broad)) return;
         // Narrowphase: maior damageMult entre as partes tocadas
         // (mesma regra da explosão). Sem parte tocada:
         // com schema = whiff; sem schema = AABB 1x (legado).
@@ -120,7 +125,17 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
         float bestDmgMult = 0.f;
         s.bodyParts.forEach([&](const PartState &st, const PartDef &def) {
             if (st.fromSchema) return; // parte oculta: não é alvo
-            if (!box.intersects(st.worldBox)) return;
+            // Círculo da parte (centro + meia-diagonal maior): teste
+            // do cone+anel (Fase E) em vez do rect.
+            const float pcx =
+                st.worldBox.left + st.worldBox.width * 0.5f;
+            const float pcy =
+                st.worldBox.top + st.worldBox.height * 0.5f;
+            const float pr =
+                std::max(st.worldBox.width, st.worldBox.height) * 0.5f;
+            if (!support::sweepHitsCircle(
+                    arc, {pcx, pcy}, pr))
+                return;
             if (def.damageMult > bestDmgMult) {
                 bestDmgMult = def.damageMult;
                 best = &def;

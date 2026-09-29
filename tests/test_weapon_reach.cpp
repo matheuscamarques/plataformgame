@@ -21,40 +21,40 @@ bool near(float a, float b) { return std::fabs(a - b) < 0.01f; }
 } // namespace
 
 int main() {
-    { // MeleeHitboxFromSwingAim (arma + Active = rect E por snapshot)
-        Player p; // (0,0,30,50), centro (15,25), facing 1, swingAim E
+    constexpr float kRow = 100.f / 40.f; // AABB 60x100 do ctor: 2.5
+    { // SweepEastOnActive (espada + Active = cone E a partir da mão)
+        Player p; // (0,0) 60x100, aim E
         p.equipment.equip(core::Item{"iron_sword", 1});
         assert(p.hasWeapon());
-        p.meleePhase = MeleePhase::Active;
-        BodySchema s = BodySchema::humanoid(50.f, 50.f);
-        p.body.attach(&s);
-        p.body.rebuild({100.f, 100.f}, 1);
-        // E x2 (corpo 100): {40,0,40,28}: cx=70, cy=50 → {50,36,40,28}.
-        sf::FloatRect box = p.meleeHitbox();
-        assert(near(box.left, 50.f) && near(box.width, 40.f));
-        assert(near(box.top, 36.f) && near(box.height, 28.f));
+        p.body.rebuild({0.f, 0.f}, 1);
+        assert(p.startSwing());
+        assert(p.updateMelee(0.10f) == MeleePhase::Active);
+        const support::SweepArc arc = p.sweepArc();
+        assert(!arc.empty);
+        assert(near(arc.centerAngle, 0.f));
+        // Mão a 8 rows + lâmina (16-5)=11px: R=20+27.5, dentro=20-5.
+        assert(near(arc.rOuter, 8.f * kRow + 11.f * kRow));
+        assert(near(arc.rInner, 8.f * kRow - 2.f * kRow));
     }
-    { // FallbackToLightWhenNoWeapon (sem equipamento = kLight, soco)
+    { // SweepUnarmedShorter (soco: punho+avanço 6 rows, sem lâmina)
         Player p;
         p.equipment.unequip(core::EquipSlot::RightHand);
-        p.meleePhase = MeleePhase::Active;
-        BodySchema s = BodySchema::humanoid(50.f, 50.f);
-        p.body.attach(&s);
-        p.body.rebuild({100.f, 100.f}, 1);
-        // Weapon do schema cai em 0.1px → fallback kLight[0].hx = 16.
-        sf::FloatRect box = p.meleeHitbox();
-        assert(near(box.width, 16.f));
+        p.body.rebuild({0.f, 0.f}, 1);
+        assert(p.startSwing());
+        assert(p.updateMelee(0.10f) == MeleePhase::Active);
+        const support::SweepArc arc = p.sweepArc();
+        assert(!arc.empty);
+        assert(near(arc.rOuter, 8.f * kRow + 6.f * kRow)); // 35 < 47.5
+        assert(arc.rOuter < 8.f * kRow + 11.f * kRow);
     }
-    { // NoHitboxOutsideActive (só Active acerta)
+    { // EmptyOutsideActive (só Active varre)
         Player p;
         p.equipment.equip(core::Item{"iron_sword", 1});
         assert(p.hasWeapon());
-        p.meleePhase = MeleePhase::Windup;
-        BodySchema s = BodySchema::humanoid(50.f, 50.f);
-        p.body.attach(&s);
-        p.body.rebuild({100.f, 100.f}, 1);
-        sf::FloatRect box = p.meleeHitbox();
-        assert(box.width <= 0.f && box.height <= 0.f);
+        p.body.rebuild({0.f, 0.f}, 1);
+        assert(p.sweepArc().empty);
+        assert(p.startSwing()); // Windup: ainda vazio
+        assert(p.sweepArc().empty);
     }
     { // AxeVsSwordReach (arma diferente = alcance diferente, sem lógica nova)
         // Espada: swing 16px de largura a 2.5x = 40px.

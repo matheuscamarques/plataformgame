@@ -6,6 +6,7 @@
  */
 
 #include <cassert>
+#include <cmath>
 #include <cstdio>
 
 #include "assets/PlayerSprite.h"
@@ -65,14 +66,17 @@ int main() {
         assert(resolveFor(p) == SpriteFrameId::PlayerPunchUp);
     }
     { // HitboxAndSpriteReadSameAim (money test: N divergente de E)
-        Player p; // espada: hitbox direcional por swingAim
+        Player p; // espada: arco direcional por swingAim
         p.equipment.equip(core::Item{"iron_sword", 1});
-        p.meleePhase = MeleePhase::Active;
-        p.swingAim = AimDir::N;
+        p.body.rebuild({0.f, 0.f}, 1);
+        p.aimDir = AimDir::N;
+        assert(p.startSwing());
         p.aimDir = AimDir::E; // divergente de propósito
+        assert(p.updateMelee(0.10f) == MeleePhase::Active);
         assert(p.inMeleeSwing());
-        const sf::FloatRect box = p.meleeHitbox();
-        assert(box.top < p.getY()); // N → acima
+        const support::SweepArc arc = p.sweepArc();
+        assert(!arc.empty); // N → acima (snapshot, não o E vivo)
+        assert(std::fabs(arc.centerAngle + 3.14159265f * 0.5f) < 0.01f);
         assert(resolveFor(p) == SpriteFrameId::PlayerPunchUp);
     }
 

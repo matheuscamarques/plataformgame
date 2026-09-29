@@ -111,8 +111,9 @@ int main() {
     }
     { // NarrowWhiffInPartGap (união ok, nenhuma parte: whiff strict)
         // Schema de teste com vão: head [47,57]x[11,15], perna
-        // [47,57]x[35,39]. Soco [50,66]x[15,35] cruza a união mas só
-        // encosta nas bordas (edge-touch estrito não intersecta).
+        // [47,57]x[35,39]. Slime alto (y=0): cabeça além do alcance
+        // (52 > R+5) e perna 45° acima do eixo (fora do cone de 22°).
+        // AABB do arco ainda cruza a união — o narrow precisa negar.
         static BodySchema gap;
         gap.overallHeight = 30.f;
         gap.halfWidth = 20.f;
@@ -124,7 +125,7 @@ int main() {
         p.equipment.unequip(core::EquipSlot::RightHand); // soco: geometria fixa facing-E
         p.setX(20.f);
         EnemySystem enemies;
-        enemies.spawn("slime", 62.f, 35.f);
+        enemies.spawn("slime", 62.f, 0.f);
         enemies.forEach([&](Enemy &s) {
             s.bodyParts.attach(&gap);
             s.bodyParts.rebuild({s.body.getX(), s.body.getY()}, 1);
