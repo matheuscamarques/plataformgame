@@ -443,6 +443,11 @@ void Game::tick() {
                                     p->swingAim,
                                     p->throwAnimT > 0.f,
                                     p->walkFrame);
+    // Locomoção via clip (fecha a Fase C): o resolve arbitra combate
+    // vs marcha; o clip decide o frame A/B (e emite os passos).
+    if (!run_.isDead())
+        p->currentFrameId =
+            game::applyLocoFrame(p->currentFrameId, p->loco.currentFrame());
     enemies_->forEach([&](support::Enemy &s) {
         // Frames por dado (Fase 3): o arquétipo diz quais; aqui só o
         // estado. Sem branch por archetypeId — inimigo novo com DwarfAI
@@ -576,6 +581,15 @@ void Game::tick() {
                 camera.addTrauma(0.3f);
             }
         }
+        // Passos da marcha (fecha a Fase C): poeira no contact frame,
+        // só com frame de marcha visível. Drena todo tick (sem eco).
+        const uint32_t locoEv = p->loco.consumeEvents();
+        if ((locoEv & support::AnimEvent::Step) &&
+            (p->currentFrameId == support::SpriteFrameId::PlayerWalkA ||
+             p->currentFrameId == support::SpriteFrameId::PlayerWalkB) &&
+            particles_)
+            particles_->emitDust(
+                {p->getCenterX(), p->getY() + p->getH()}, 2, 10.f);
     }
 
     // Edges observados: libera o latch p/ o próximo beginFrame expirar.

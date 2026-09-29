@@ -23,7 +23,8 @@ namespace AnimEvent {
 [[maybe_unused]] inline constexpr uint32_t Hitbox = 1u << 0; // janela de dano viva
 [[maybe_unused]] inline constexpr uint32_t Sfx = 1u << 1;    // quem consome: Fase F
 [[maybe_unused]] inline constexpr uint32_t Shake = 1u << 2;  // quem consome: Fase F
-inline constexpr uint32_t kLevelMask = Hitbox; // bits que valem por nível
+[[maybe_unused]] inline constexpr uint32_t Step = 1u << 3;   // contact frame: poeira no pé
+[[maybe_unused]] inline constexpr uint32_t kLevelMask = Hitbox; // bits que valem por nível
 } // namespace AnimEvent
 
 struct AnimKeyframe {

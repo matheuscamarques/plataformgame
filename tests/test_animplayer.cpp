@@ -6,6 +6,7 @@
 #include <cassert>
 #include <cstdio>
 #include "assets/PlayerClips.h"
+#include "assets/PlayerSprite.h"
 #include "entities/Player/Player.h"
 #include "support/Combat/AnimPlayer.h"
 
@@ -17,6 +18,7 @@ int main() {
     using support::AnimEvent::Hitbox;
     using support::AnimEvent::Shake;
     using support::AnimEvent::Sfx;
+    using support::AnimEvent::Step;
 
     { // TimeDrivenLoop (0.1s/frame: avança, dá a volta, emite borda)
         static constexpr AnimKeyframe k[] = {
@@ -139,6 +141,51 @@ int main() {
         p.aimDir = support::AimDir::N;
         assert(p.startSwing());
         assert(p.anim.currentFrame() == SpriteFrameId::PlayerPunchUp);
+    }
+    { // WalkClipData (A/B em 0.10s, loop, Step nos contacts)
+        AnimPlayer a;
+        a.play(game::walkClip());
+        assert(a.currentFrame() == SpriteFrameId::PlayerWalkA);
+        assert(a.consumeEvents() == Step); // contact A
+        a.tick(0.05f);
+        assert(a.currentFrame() == SpriteFrameId::PlayerWalkA);
+        a.tick(0.06f); // 0.11: contact B
+        assert(a.currentFrame() == SpriteFrameId::PlayerWalkB);
+        assert(a.consumeEvents() == Step);
+        a.tick(0.10f); // loop de volta ao A
+        assert(a.currentFrame() == SpriteFrameId::PlayerWalkA);
+        assert(!a.finished());
+    }
+    { // IdleClipData (1 frame parado, sem eventos, sem fim)
+        AnimPlayer a;
+        a.play(game::idleClip());
+        assert(a.currentFrame() == SpriteFrameId::PlayerIdle);
+        assert(a.consumeEvents() == 0);
+        a.tick(10.f);
+        assert(a.currentFrame() == SpriteFrameId::PlayerIdle);
+        assert(!a.finished());
+    }
+    { // ApplyLocoFrame (zona de marcha usa o clip; combate passa)
+        using support::SpriteFrameId;
+        using game::applyLocoFrame;
+        assert(applyLocoFrame(SpriteFrameId::PlayerWalkA,
+                              SpriteFrameId::PlayerWalkB) ==
+               SpriteFrameId::PlayerWalkB);
+        assert(applyLocoFrame(SpriteFrameId::PlayerWalkB,
+                              SpriteFrameId::PlayerWalkA) ==
+               SpriteFrameId::PlayerWalkA);
+        assert(applyLocoFrame(SpriteFrameId::PlayerIdle,
+                              SpriteFrameId::PlayerWalkA) ==
+               SpriteFrameId::PlayerWalkA);
+        assert(applyLocoFrame(SpriteFrameId::PlayerPunch,
+                              SpriteFrameId::PlayerWalkA) ==
+               SpriteFrameId::PlayerPunch);
+        assert(applyLocoFrame(SpriteFrameId::PlayerJump,
+                              SpriteFrameId::PlayerIdle) ==
+               SpriteFrameId::PlayerJump);
+        assert(applyLocoFrame(SpriteFrameId::PlayerHurt,
+                              SpriteFrameId::PlayerWalkB) ==
+               SpriteFrameId::PlayerHurt);
     }
 
     std::printf("animplayer test OK\n");

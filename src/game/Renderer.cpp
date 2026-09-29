@@ -1115,7 +1115,7 @@ void Game::drawPlayerSprite(Player *p) {
         kx = st.kx;
         ky = st.ky;
     } else if (std::fabs(p->getVx()) > 5.f) {
-        bobY = game::walkBobY(p->walkFrame) * s;
+        bobY = game::walkBobY(p->loco.frameIndex()) * s;
     } else {
         bobY = game::idleBobY(tickCount_, 1.f) * s;
     }

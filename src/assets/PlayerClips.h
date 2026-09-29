@@ -23,4 +23,9 @@ const support::AnimClip &attackClipDown();
 // Grupo do golpe pela mira congelada (mesma partição do resolve).
 const support::AnimClip &attackClipFor(support::AimDir aim);
 
+// Locomoção (fecha a Fase C): idle parado, marcha A/B em 0.10s
+// (mesma cadência do walkFrame físico). Step nos dois contacts.
+const support::AnimClip &idleClip();
+const support::AnimClip &walkClip();
+
 } // namespace game

@@ -249,7 +249,13 @@ void Player::tick() {
         setFacing8(support::facingFromVelocity(getVx(), getVy(), facing8));
     }
     // Mãos procedurais fora do swing (no swing, updateMelee dirige).
-    if (!inMeleeSwing()) updateLimbs();
+    // Locomoção primeiro: a senoide dos braços lê o índice do clip.
+    if (!inMeleeSwing()) {
+        const bool marching = (moveLeft || moveRight) && jumping;
+        loco.play(marching ? game::walkClip() : game::idleClip());
+        loco.tick(physics::kFixedDt);
+        updateLimbs();
+    }
 
     // Regen de estamina: 30/s × mult, só com delay pronto.
     staminaDelay.tick(1.f / 30.0f);
@@ -1079,11 +1085,13 @@ void Player::updateLimbs() {
     } else {
         targetHandR_ = rest(shR, 3.5f);
         targetHandL_ = rest(shL, 2.f);
-        // Senoide de marcha (walkFrame 0..3): círculo de 1 row, esquerda
-        // em oposição. Vale no ar rápido também (placeholder B.3).
+        // Senoide de marcha no relógio do clip (0/1 alterna ±row em X;
+        // o bounce em Y vem de walkBobY com a mesma paridade). Vale no
+        // ar rápido também (placeholder B.3).
         if (std::fabs(getVx()) > 1.f || std::fabs(getVy()) > 1.f) {
             constexpr float kPi = 3.14159265f;
-            const float ph = static_cast<float>(walkFrame) * kPi * 0.5f;
+            const float ph =
+                static_cast<float>(loco.frameIndex()) * kPi;
             targetHandR_.x += std::cos(ph) * row * fw;
             targetHandR_.y += std::sin(ph) * row;
             targetHandL_.x += std::cos(ph + kPi) * row * fw;

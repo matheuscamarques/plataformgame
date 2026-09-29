@@ -143,6 +143,18 @@ inline DirectedPose directedPose(sprites::PlayerPose pose,
     return {pose, artDirFor(f), support::isMirrored(f)};
 }
 
+// Marcha via clip (fecha a Fase C): o resolve arbitra combate vs
+// marcha; o clip decide o frame. Fora da zona, passa direto.
+inline support::SpriteFrameId applyLocoFrame(
+    support::SpriteFrameId resolved, support::SpriteFrameId loco) {
+    using support::SpriteFrameId;
+    return (resolved == SpriteFrameId::PlayerWalkA ||
+            resolved == SpriteFrameId::PlayerWalkB ||
+            resolved == SpriteFrameId::PlayerIdle)
+               ? loco
+               : resolved;
+}
+
 // Juice procedural (Fase 5, testável): respiração, bounce e squash.
 // Unidades em sprite-px (Renderer multiplica por s); Y+ = baixo.
 inline float idleBobY(int tickCount, float amplitude = 1.f) {
@@ -151,9 +163,9 @@ inline float idleBobY(int tickCount, float amplitude = 1.f) {
            amplitude; // 1Hz a 30 ticks/s
 }
 
-// Marcha: frame de contato (ímpar) afunda 1.5px.
-inline float walkBobY(int walkFrame) {
-    return (walkFrame % 2 == 1) ? 1.5f : 0.f;
+// Marcha: frame de contato (índice ímpar do clip) afunda 1.5px.
+inline float walkBobY(int clipFrame) {
+    return (clipFrame % 2 == 1) ? 1.5f : 0.f;
 }
 
 struct Squash {

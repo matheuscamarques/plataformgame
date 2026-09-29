@@ -207,6 +207,11 @@ class Player : public Entity
         // (relógio único = meleeTimer). MeleeSystem lê liveEvents().
         support::AnimPlayer anim;
 
+        // Locomoção data-driven (fecha a Fase C): marcha/idle no relógio
+        // fixo, congelado no swing (perna planta no golpe). App usa o
+        // frame p/ Walk/Idle; Step vira poeira no pé.
+        support::AnimPlayer loco;
+
         // Hitstop (Fase F): slots de 1/30 congelados restantes.
         // MeleeSystem arma no connect (max, sem acumular); Game::tick
         // consome sem simular. Zera no respawn.

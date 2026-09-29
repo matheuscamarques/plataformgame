@@ -64,4 +64,26 @@ const support::AnimClip &attackClipFor(support::AimDir aim) {
     }
 }
 
+namespace {
+
+constexpr AnimKeyframe kIdleFrames[1] = {
+    {SpriteFrameId::PlayerIdle, 0.25f, 0},
+};
+constexpr AnimKeyframe kWalkFrames[2] = {
+    {SpriteFrameId::PlayerWalkA, 0.10f, support::AnimEvent::Step},
+    {SpriteFrameId::PlayerWalkB, 0.10f, support::AnimEvent::Step},
+};
+
+} // namespace
+
+const support::AnimClip &idleClip() {
+    static constexpr support::AnimClip k{"idle", kIdleFrames, 1, true};
+    return k;
+}
+
+const support::AnimClip &walkClip() {
+    static constexpr support::AnimClip k{"walk", kWalkFrames, 2, true};
+    return k;
+}
+
 } // namespace game
