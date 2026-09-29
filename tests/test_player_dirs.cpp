@@ -296,6 +296,52 @@ int main() {
             }
         }
     }
+    { // DeathThrowDims (4 torsos + 4 cabeças + 4 torsos + 4 braços)
+        using namespace sprites;
+        checkRows(kPlayerDeath_S_Torso, 16);
+        checkRows(kPlayerDeath_N_Torso, 16);
+        checkRows(kPlayerDeath_SE_Torso, 16);
+        checkRows(kPlayerDeath_NE_Torso, 16);
+        checkRows(kPlayerThrow_S_Head, 12);
+        checkRows(kPlayerThrow_S_Arms, 16);
+        checkRows(kPlayerThrow_N_Head, 12);
+        checkRows(kPlayerThrow_N_Torso, 16);
+        checkRows(kPlayerThrow_N_Arms, 16);
+        checkRows(kPlayerThrow_SE_Head, 12);
+        checkRows(kPlayerThrow_SE_Torso, 16);
+        checkRows(kPlayerThrow_SE_Arms, 16);
+        checkRows(kPlayerThrow_NE_Head, 12);
+        checkRows(kPlayerThrow_NE_Torso, 16);
+        checkRows(kPlayerThrow_NE_Arms, 16);
+    }
+    { // DeathThrowDirs (vivas no composto + ≠E; Death S/N simétricas)
+        using game::artDirFor;
+        const Facing all4[] = {Facing::S, Facing::SE, Facing::NE,
+                               Facing::N};
+        for (Facing f : all4) {
+            assert(artDirFor(PlayerPose::Death, f) == f);
+            assert(artDirFor(PlayerPose::Throw, f) == f);
+        }
+        const assets::Part* de =
+            sprites::posePartsFor(PlayerPose::Death, Facing::E);
+        const assets::Part* te =
+            sprites::posePartsFor(PlayerPose::Throw, Facing::E);
+        for (Facing f : all4) {
+            const assets::Part* pd =
+                sprites::posePartsFor(PlayerPose::Death, f);
+            checkComposed(pd, "FE", "C", "LB", "GH");
+            assert(composedDiffers(de, pd));
+            const assets::Part* pt =
+                sprites::posePartsFor(PlayerPose::Throw, f);
+            checkComposed(pt, "FE", "C", "LB", "GH", "Tt");
+            assert(composedDiffers(te, pt));
+        }
+        for (Facing f : {Facing::S, Facing::N}) {
+            const assets::Part* pd =
+                sprites::posePartsFor(PlayerPose::Death, f);
+            for (int i = 0; i < 5; ++i) assert(partSym(pd[i]));
+        }
+    }
 
     std::printf("player dirs test OK\n");
     return 0;

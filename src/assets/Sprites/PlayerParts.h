@@ -2144,6 +2144,11 @@ inline constexpr assets::Part kPlayerJump_NE_Parts[] = {
     { kPlayerJumpFeet, 12, 6, 0, 34 },
     { kPlayerJumpArms, 12, 16, 0, 12 },
 };
+
+// ---- Fase D, onda 3b: Death/Throw em 5 direções ----
+// Morte deitada (rosto p/ cima/frente, nunca some); TNT por direção.
+
+
 inline const char* const kPlayerDeathHead[] = {
     "............",
     "............",
@@ -2225,6 +2230,338 @@ inline constexpr assets::Part kPlayerDeathParts[] = {
     { kPlayerDeathArms, 12, 16, 0, 12 },
 };
 
+inline const char* const kPlayerDeath_S_Torso[] = {
+    "....KKKK....",
+    "....KKKK....",
+    "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+};
+
+inline constexpr assets::Part kPlayerDeath_S_Parts[] = {
+    { kPlayerDeathHead, 12, 12, 0, 0 },
+    { kPlayerDeath_S_Torso, 12, 16, 0, 12 },
+    { kPlayerWalkB_S_Legs, 12, 6, 0, 28 },
+    { kPlayerWalkB_S_Feet, 12, 6, 0, 34 },
+    { kPlayerDeathArms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerDeath_N_Torso[] = {
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "...FFFFFF...",
+    "...FFFFFF...",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+};
+
+inline constexpr assets::Part kPlayerDeath_N_Parts[] = {
+    { kPlayerDeathHead, 12, 12, 0, 0 },
+    { kPlayerDeath_N_Torso, 12, 16, 0, 12 },
+    { kPlayerWalkB_S_Legs, 12, 6, 0, 28 },
+    { kPlayerWalkB_S_Feet, 12, 6, 0, 34 },
+    { kPlayerDeathArms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerDeath_SE_Torso[] = {
+    "....KKKK....",
+    "....KKKK....",
+    "..KKKKKKKK..",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFKE.",
+    "..KFFFFFFK..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+};
+
+inline constexpr assets::Part kPlayerDeath_SE_Parts[] = {
+    { kPlayerDeathHead, 12, 12, 0, 0 },
+    { kPlayerDeath_SE_Torso, 12, 16, 0, 12 },
+    { kPlayerWalkB_SE_Legs, 12, 6, 0, 28 },
+    { kPlayerWalkB_SE_Feet, 12, 6, 0, 34 },
+    { kPlayerDeathArms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerDeath_NE_Torso[] = {
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFKE.",
+    "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+};
+
+inline constexpr assets::Part kPlayerDeath_NE_Parts[] = {
+    { kPlayerDeathHead, 12, 12, 0, 0 },
+    { kPlayerDeath_NE_Torso, 12, 16, 0, 12 },
+    { kPlayerWalkB_NE_Legs, 12, 6, 0, 28 },
+    { kPlayerWalkB_NE_Feet, 12, 6, 0, 34 },
+    { kPlayerDeathArms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerThrow_S_Head[] = {
+    "....KKKK....",
+    "...TTTTTT...",
+    "...TTTTTT...",
+    "...TTttTT...",
+    "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "...FFFFFF...",
+    "...FFFFFF...",
+};
+
+inline const char* const kPlayerThrow_S_Arms[] = {
+    ".....HH.....",
+    ".....HH.....",
+    ".G...HH.....",
+    ".G...HH.....",
+    ".G...HH.....",
+    ".G...HH.....",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerThrow_S_Parts[] = {
+    { kPlayerThrow_S_Head, 12, 12, 0, 0 },
+    { kPlayerIdleSTorso, 12, 16, 0, 12 },
+    { kPlayerIdleSLegs, 12, 6, 0, 28 },
+    { kPlayerIdleSFeet, 12, 6, 0, 34 },
+    { kPlayerThrow_S_Arms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerThrow_N_Head[] = {
+    "....KKKK....",
+    ".....TT.....",
+    ".....TT.....",
+    ".....tt.....",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "...KKKKKK...",
+    "...FFFFFF...",
+    "...FFFFFF...",
+    "....FFFF....",
+};
+
+inline const char* const kPlayerThrow_N_Torso[] = {
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".GCCCCCCCC..",
+    ".GCCCCCCCC..",
+    ".GCCCCCCCC..",
+    ".GCCCCCCCC..",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".....KK.....",
+    ".....KK.....",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CCCCCC...",
+};
+
+inline const char* const kPlayerThrow_N_Arms[] = {
+    "............",
+    "............",
+    "............",
+    "G....HH.....",
+    "G....HH.....",
+    "G....HH.....",
+    "G....HH.....",
+    "G...........",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerThrow_N_Parts[] = {
+    { kPlayerThrow_N_Head, 12, 12, 0, 0 },
+    { kPlayerThrow_N_Torso, 12, 16, 0, 12 },
+    { kPlayerIdleNLegs, 12, 6, 0, 28 },
+    { kPlayerIdleNFeet, 12, 6, 0, 34 },
+    { kPlayerThrow_N_Arms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerThrow_SE_Head[] = {
+    "....KKKK..TT",
+    "....KKKK..TT",
+    "..KKKKKKKKtT",
+    "..KKKKKKKKtT",
+    "..KFFFFFFK..",
+    "..KFFFFFFKE.",
+    "..KFEFFEFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFKE.",
+    "..KFFFFFFK..",
+    "...FFFFFF...",
+    "...FFFFFF...",
+};
+
+inline const char* const kPlayerThrow_SE_Torso[] = {
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".GKCCCCCCC..",
+    ".GKCCCCCCC..",
+    ".GKCCCCCCC..",
+    ".GKCCCCCCC..",
+    ".GKCCCCCCCH.",
+    ".GKCCCCCCCH.",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CCCCCC...",
+    "...CC..CC...",
+    "...CC..CC...",
+};
+
+inline const char* const kPlayerThrow_SE_Arms[] = {
+    "..........HH",
+    "..........HH",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G..........",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerThrow_SE_Parts[] = {
+    { kPlayerThrow_SE_Head, 12, 12, 0, 0 },
+    { kPlayerThrow_SE_Torso, 12, 16, 0, 12 },
+    { kPlayerIdleSELegs, 12, 6, 0, 28 },
+    { kPlayerIdleSEFeet, 12, 6, 0, 34 },
+    { kPlayerThrow_SE_Arms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerThrow_NE_Head[] = {
+    "....KKKK..TT",
+    "....KKKK..TT",
+    "..KKKKKKKKtT",
+    "..KKKKKKKKtT",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFKE.",
+    "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "...FFFFFF...",
+    "....FFFF....",
+};
+
+inline const char* const kPlayerThrow_NE_Torso[] = {
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".GCCCCCCKC..",
+    ".GCCCCCCKC..",
+    ".GCCCCCCKC..",
+    ".GCCCCCCKC..",
+    ".GCCCCCCKCH.",
+    ".GCCCCCCKCH.",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CCCCCC...",
+    "...CC..CC...",
+    "...CC..CC...",
+};
+
+inline const char* const kPlayerThrow_NE_Arms[] = {
+    "..........H.",
+    "..........H.",
+    "..........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerThrow_NE_Parts[] = {
+    { kPlayerThrow_NE_Head, 12, 12, 0, 0 },
+    { kPlayerThrow_NE_Torso, 12, 16, 0, 12 },
+    { kPlayerIdleNELegs, 12, 6, 0, 28 },
+    { kPlayerIdleNEFeet, 12, 6, 0, 34 },
+    { kPlayerThrow_NE_Arms, 12, 16, 0, 12 },
+};
 // Poses na ordem dos frames (espelha textureForFrame do Renderer).
 enum class PlayerPose : uint8_t {
     Idle, WalkA, WalkB, Jump, Throw,
@@ -2359,6 +2696,24 @@ inline const assets::Part* posePartsFor(PlayerPose p, support::Facing d) {
             case support::Facing::NE: return kPlayerJump_NE_Parts;
             case support::Facing::N:  return kPlayerJump_N_Parts;
             default:                  return kPlayerJumpParts;
+        }
+    }
+    if (p == PlayerPose::Death) {
+        switch (d) {
+            case support::Facing::S:  return kPlayerDeath_S_Parts;
+            case support::Facing::SE: return kPlayerDeath_SE_Parts;
+            case support::Facing::NE: return kPlayerDeath_NE_Parts;
+            case support::Facing::N:  return kPlayerDeath_N_Parts;
+            default:                  return kPlayerDeathParts;
+        }
+    }
+    if (p == PlayerPose::Throw) {
+        switch (d) {
+            case support::Facing::S:  return kPlayerThrow_S_Parts;
+            case support::Facing::SE: return kPlayerThrow_SE_Parts;
+            case support::Facing::NE: return kPlayerThrow_NE_Parts;
+            case support::Facing::N:  return kPlayerThrow_N_Parts;
+            default:                  return kPlayerThrowParts;
         }
     }
     return poseParts(p);

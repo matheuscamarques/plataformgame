@@ -135,9 +135,8 @@ struct DirectedPose {
 
 inline support::Facing artDirFor(sprites::PlayerPose pose,
                                  support::Facing f) {
-    // Ondas 1 (Idle/Walk), 2 (Punch/PunchUp/PunchDown) e 3a
-    // (Hurt/Jump) têm 5 dirs; resto cai em E.
-    // baseDir dobra NW→NE, W→E, SW→SE (S/SE/E/NE/N com arte).
+    // Todas as 10 poses têm 5 dirs (Idle/Walk/Punch/Hurt/Jump/Death/
+    // Throw); nada mais cai em E. baseDir dobra NW→NE, W→E, SW→SE.
     switch (pose) {
         case sprites::PlayerPose::Idle:
         case sprites::PlayerPose::WalkA:
@@ -146,7 +145,9 @@ inline support::Facing artDirFor(sprites::PlayerPose pose,
         case sprites::PlayerPose::PunchUp:
         case sprites::PlayerPose::PunchDown:
         case sprites::PlayerPose::Hurt:
-        case sprites::PlayerPose::Jump:  return support::baseDir(f);
+        case sprites::PlayerPose::Jump:
+        case sprites::PlayerPose::Death:
+        case sprites::PlayerPose::Throw: return support::baseDir(f);
         default:                         return support::Facing::E;
     }
 }
