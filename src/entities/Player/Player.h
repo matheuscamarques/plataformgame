@@ -31,15 +31,25 @@
 #include "physics/PlayerPhysics.hpp"
 #include "core/Inventory.h"
 
-namespace sf { class Texture; }
-namespace support { class ThrowSystem; }
+namespace sf { class Texture; } // fwd: sem <SFML/Graphics.hpp> no header
+namespace support { class ThrowSystem; } // fwd: só em assinatura
 
-// Fase do swing atual. Idle = sem ataque em curso.
+// Fase do swing atual. Transições: Idle→Windup (startSwing) →
+// Active (janela de dano) →Recovery→Idle; Recovery→Windup encadeia
+// o combo. Idle = sem ataque em curso.
 enum class MeleePhase : uint8_t { Idle, Windup, Active, Recovery };
 
+/**
+ * @class Player
+ * @brief Fonte única do estado do jogador (movimento, combate, inventário).
+ * @details Membros públicos por design: Game::tick, MeleeSystem,
+ * BodySystem e UIs leem/escrevem direto (sem getters em hot path).
+ * Quem escreve um membro documenta nele QUEM escreve e QUANDO.
+ */
 class Player : public Entity
 {
     public:
+        // (público por design, ver @class acima — não "vazar" getters)
 
         bool moveDown = false, moveUp = false, moveLeft = false, moveRight = false,runFast = false;
         bool jumping = false;
