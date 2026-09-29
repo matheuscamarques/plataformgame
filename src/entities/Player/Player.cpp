@@ -244,6 +244,8 @@ void Player::tick() {
     } else if (std::fabs(getVx()) > 1.f || std::fabs(getVy()) > 1.f) {
         setFacing8(support::facingFromVelocity(getVx(), getVy(), facing8));
     }
+    // Mãos procedurais fora do swing (no swing, updateMelee dirige).
+    if (!inMeleeSwing()) updateHandTargets();
 
     // Regen de estamina: 30/s × mult, só com delay pronto.
     staminaDelay.tick(1.f / 30.0f);
@@ -953,6 +955,8 @@ void Player::respawn(float x, float y) {
     meleeCombo = 0;
     meleeTimer = 0.f;
     setFacing8(support::Facing::E);
+    targetHandR_ = targetHandL_ = {0.f, 0.f};
+    handTargetsLive_ = false; // próximo tick recalcula (repouso)
     jumping = false;
     inWater = false;
     jumpingRecharge = 0.f;
@@ -1010,6 +1014,7 @@ bool Player::startSwing() {
     meleeSwingId++;
     swingAim = aimDir; // congela direção do próximo golpe
     anim.play(game::attackClipFor(swingAim), true); // clip do zero
+    updateHandTargets(); // mão recua no eixo do golpe
     return true;
 }
 
@@ -1023,15 +1028,67 @@ MeleePhase Player::updateMelee(float dt) {
         meleePhase = MeleePhase::Active;
         meleeTimer = d.active;
         anim.gotoFrame(1); // frame do Active (Hitbox viva)
+        updateHandTargets(); // mão estende no eixo do golpe
     } else if (meleePhase == MeleePhase::Active) {
         meleePhase = MeleePhase::Recovery;
         meleeTimer = d.recovery;
         anim.gotoFrame(2); // Hitbox apaga junto com a fase
+        updateHandTargets(); // mão assenta
     } else { // Recovery esgotou: volta ao Idle
         meleePhase = MeleePhase::Idle;
         meleeCombo = 0;
+        updateHandTargets(); // repouso/marcha pela velocidade atual
     }
     return meleePhase;
+}
+
+void Player::updateHandTargets() {
+    const support::PartState* torso =
+        body.find(support::BodyPartId::Torso);
+    const support::PartState* armR =
+        body.find(support::BodyPartId::ArmR);
+    const support::PartState* armL =
+        body.find(support::BodyPartId::ArmL);
+    if (!torso || !armR || !armL) return; // sem boxes: mantém últimos
+    const float row = getH() / 40.f;      // mundo por row (kPlayerH)
+    const core::Vec2f tTop{torso->worldBox.left, torso->worldBox.top};
+    const core::Vec2f tSize{torso->worldBox.width, torso->worldBox.height};
+    const float cxR = armR->worldBox.left + armR->worldBox.width * 0.5f;
+    const float cxL = armL->worldBox.left + armL->worldBox.width * 0.5f;
+    const core::Vec2f shR = support::limbShoulder(tTop, tSize, cxR);
+    const core::Vec2f shL = support::limbShoulder(tTop, tSize, cxL);
+    const float fw = static_cast<float>(facing);
+    // Repouso: à frente e abaixo do ombro (braço caído natural).
+    auto rest = [&](core::Vec2f sh, float fwdRows) {
+        return core::Vec2f{sh.x + fw * fwdRows * row, sh.y + 2.f * row};
+    };
+    if (inMeleeSwing()) {
+        // Snapshot: direita segue a fase no eixo do golpe (recuo -5,
+        // impacto +8, assentando +2 rows); esquerda segura o repouso.
+        const core::Vec2f aim = support::aimVector(swingAim);
+        float reachRows = 2.f;
+        if (meleePhase == MeleePhase::Windup)
+            reachRows = -5.f;
+        else if (meleePhase == MeleePhase::Active)
+            reachRows = 8.f;
+        targetHandR_ = {shR.x + aim.x * reachRows * row,
+                        shR.y + aim.y * reachRows * row};
+        targetHandL_ = rest(shL, 2.f);
+    } else {
+        targetHandR_ = rest(shR, 3.5f);
+        targetHandL_ = rest(shL, 2.f);
+        // Senoide de marcha (walkFrame 0..3): círculo de 1 row, esquerda
+        // em oposição. Vale no ar rápido também (placeholder B.3).
+        if (std::fabs(getVx()) > 1.f || std::fabs(getVy()) > 1.f) {
+            constexpr float kPi = 3.14159265f;
+            const float ph = static_cast<float>(walkFrame) * kPi * 0.5f;
+            targetHandR_.x += std::cos(ph) * row * fw;
+            targetHandR_.y += std::sin(ph) * row;
+            targetHandL_.x += std::cos(ph + kPi) * row * fw;
+            targetHandL_.y += std::sin(ph + kPi) * row;
+        }
+    }
+    handTargetsLive_ = true;
 }
 
 sf::FloatRect Player::meleeHitbox() {

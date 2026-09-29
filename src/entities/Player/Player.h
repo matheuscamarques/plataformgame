@@ -26,6 +26,7 @@
 #include "core/TarotCard.h"
 #include "core/Cooldown.h"
 #include "core/Equipment.h"
+#include "core/Vec.h"
 #include "physics/PlayerPhysics.hpp"
 #include "core/Inventory.h"
 
@@ -206,6 +207,13 @@ class Player : public Entity
         // (3+3, medidos na arte atual); Renderer calibra o alcance por
         // frame contra o box legado (B.3 dirige os alvos).
         support::Limb limbR_, limbL_;
+        // Alvos procedurais da mão em mundo (B.3): por fase do swing
+        // (windup recuo / active estendida / recovery retorno) ou
+        // repouso+senoide fora dele. Renderer consome; B.4 a hitbox.
+        // live=false (preview/respawn) = Renderer usa o box legado.
+        core::Vec2f targetHandR_{0.f, 0.f}, targetHandL_{0.f, 0.f};
+        bool handTargetsLive_ = false;
+        void updateHandTargets();
 
         // Mira efetiva da arma: fora do swing segue o input (aimDir);
         // no swing congela no snapshot (swingAim). Sem isto, idle após

@@ -1,0 +1,124 @@
+/**
+ * @file tests/test_hand_target.cpp
+ * @brief Teste headless de B.3: alvos procedurais da mão por fase.
+ * @details Via Player (startSwing/updateMelee/tick): recuo no Windup,
+ * extensão no Active, assentamento no Recovery, repouso+senoide fora.
+ * Roda com make test em build/tests/test_hand_target.
+ */
+#include <cassert>
+#include <cmath>
+#include <cstdio>
+#include "entities/Player/Player.h"
+#include "support/Combat/Limb.h"
+
+static bool near(float a, float b, float eps) {
+    return std::fabs(a - b) <= eps;
+}
+
+// Ombro direito esperado a partir dos boxes atuais (mesma âncora).
+static core::Vec2f shoulderR(const Player& p) {
+    const auto* t = p.body.find(support::BodyPartId::Torso);
+    const auto* a = p.body.find(support::BodyPartId::ArmR);
+    assert(t && a);
+    const float cx = a->worldBox.left + a->worldBox.width * 0.5f;
+    return support::limbShoulder({t->worldBox.left, t->worldBox.top},
+                                 {t->worldBox.width, t->worldBox.height},
+                                 cx);
+}
+
+int main() {
+    constexpr float kRow = 100.f / 40.f; // getH()=100: 2.5 mundo/row
+
+    { // WindupRecua (mão 5 rows ATRÁS do eixo do golpe E)
+        Player p;
+        p.body.rebuild({0.f, 0.f}, 1);
+        assert(p.startSwing()); // aim E
+        assert(p.handTargetsLive_);
+        const core::Vec2f sh = shoulderR(p);
+        assert(near(p.targetHandR_.x, sh.x - 5.f * kRow, 1e-3f) &&
+               near(p.targetHandR_.y, sh.y, 1e-3f));
+    }
+    { // ActiveEstende (mão 8 rows À FRENTE no eixo E)
+        Player p;
+        p.body.rebuild({0.f, 0.f}, 1);
+        assert(p.startSwing());
+        assert(p.updateMelee(0.10f) == MeleePhase::Active);
+        const core::Vec2f sh = shoulderR(p);
+        assert(near(p.targetHandR_.x, sh.x + 8.f * kRow, 1e-3f) &&
+               near(p.targetHandR_.y, sh.y, 1e-3f));
+    }
+    { // RecoveryAssenta (mão 2 rows à frente: ainda no golpe)
+        Player p;
+        p.body.rebuild({0.f, 0.f}, 1);
+        assert(p.startSwing());
+        assert(p.updateMelee(0.10f) == MeleePhase::Active);
+        assert(p.updateMelee(0.10f) == MeleePhase::Recovery);
+        const core::Vec2f sh = shoulderR(p);
+        assert(near(p.targetHandR_.x, sh.x + 2.f * kRow, 1e-3f) &&
+               near(p.targetHandR_.y, sh.y, 1e-3f));
+    }
+    { // FasesDistintas (recuo/extensão/assento não coincidem)
+        Player p;
+        p.body.rebuild({0.f, 0.f}, 1);
+        assert(p.startSwing());
+        const core::Vec2f w = p.targetHandR_;
+        assert(p.updateMelee(0.10f) == MeleePhase::Active);
+        const core::Vec2f a = p.targetHandR_;
+        assert(p.updateMelee(0.10f) == MeleePhase::Recovery);
+        const core::Vec2f r = p.targetHandR_;
+        assert(w.x < r.x && r.x < a.x); // -5 < +2 < +8 rows
+    }
+    { // DiagonalNE (ativo sobe à direita: x+, y-)
+        Player p;
+        p.body.rebuild({0.f, 0.f}, 1);
+        p.aimDir = support::AimDir::NE;
+        assert(p.startSwing());
+        assert(p.updateMelee(0.10f) == MeleePhase::Active);
+        const core::Vec2f sh = shoulderR(p);
+        assert(p.targetHandR_.x > sh.x && p.targetHandR_.y < sh.y);
+    }
+    { // SwingGuardaDoTick (tick não sobrescreve alvo no swing)
+        Player p;
+        p.body.rebuild({0.f, 0.f}, 1);
+        assert(p.startSwing());
+        const core::Vec2f w = p.targetHandR_;
+        p.tick();
+        assert(p.inMeleeSwing());
+        assert(p.targetHandR_.x == w.x && p.targetHandR_.y == w.y);
+    }
+    { // RepousoParado (sem velocidade: à frente+abaixo do ombro)
+        Player p;
+        p.body.rebuild({0.f, 0.f}, 1);
+        p.setVx(0.f);
+        p.setVy(0.f);
+        p.updateHandTargets();
+        assert(p.handTargetsLive_);
+        const core::Vec2f sh = shoulderR(p);
+        assert(near(p.targetHandR_.x, sh.x + 3.5f * kRow, 1e-3f) &&
+               near(p.targetHandR_.y, sh.y + 2.f * kRow, 1e-3f));
+    }
+    { // MarchaOscila (walkFrame 0: direita +row em x, esquerda -row)
+        Player p;
+        p.body.rebuild({0.f, 0.f}, 1);
+        p.moveRight = true;
+        p.jumping = true; // chão: walkFrame anda
+        p.tick();
+        assert(!p.inMeleeSwing() && p.handTargetsLive_);
+        const core::Vec2f sh = shoulderR(p);
+        // frame 0: cos=1,sin=0 → R soma +row em x; L subtrai.
+        assert(near(p.targetHandR_.x, sh.x + 4.5f * kRow, 1e-3f) &&
+               near(p.targetHandR_.y, sh.y + 2.f * kRow, 1e-3f));
+    }
+    { // RespawnLimpa (volta a {0,0} + sem live até o próximo tick)
+        Player p;
+        p.body.rebuild({0.f, 0.f}, 1);
+        assert(p.startSwing());
+        assert(p.handTargetsLive_);
+        p.respawn(0.f, 0.f);
+        assert(!p.handTargetsLive_);
+        assert(p.targetHandR_.x == 0.f && p.targetHandR_.y == 0.f);
+    }
+
+    std::printf("hand target test OK\n");
+    return 0;
+}

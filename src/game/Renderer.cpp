@@ -1140,14 +1140,18 @@ void Game::drawPlayerSprite(Player *p) {
         const float thick = 2.f * s; // 2 sprite-px de pele
         const float row = s;         // 1 row do sprite em mundo
         auto drawArm = [&](const support::PartState* arm,
-                           support::Limb& limb) {
+                           support::Limb& limb, core::Vec2f target) {
             const float cx =
                 arm->worldBox.left + arm->worldBox.width * 0.5f;
             const core::Vec2f shoulder = support::limbShoulder(
                 {torso->worldBox.left, torso->worldBox.top},
                 {torso->worldBox.width, torso->worldBox.height}, cx);
-            const core::Vec2f hand = support::limbHand(
-                cx, arm->worldBox.top + arm->worldBox.height);
+            // B.3: alvo procedural; sem live (preview) = box legado.
+            const core::Vec2f hand =
+                p->handTargetsLive_
+                    ? target
+                    : support::limbHand(
+                          cx, arm->worldBox.top + arm->worldBox.height);
             const float dx = hand.x - shoulder.x;
             const float dy = hand.y - shoulder.y;
             const float dist = std::sqrt(dx * dx + dy * dy);
@@ -1163,8 +1167,8 @@ void Game::drawPlayerSprite(Player *p) {
             drawLimbSeg(*window, pose.elbowWorld, pose.handWorld, thick,
                         skin);
         };
-        drawArm(armR, p->limbR_);
-        drawArm(armL, p->limbL_);
+        drawArm(armR, p->limbR_, p->targetHandR_);
+        drawArm(armL, p->limbL_, p->targetHandL_);
     }
 }
 
