@@ -81,8 +81,9 @@ int main() {
         assert(artDirFor(PlayerPose::Idle, Facing::SW) == Facing::SE);
         assert(artDirFor(PlayerPose::WalkA, Facing::N) == Facing::N);
         assert(artDirFor(PlayerPose::WalkB, Facing::SW) == Facing::SE);
-        // Fora da onda: sempre E (PunchUp p/ cima continua side-view).
-        assert(artDirFor(PlayerPose::Punch, Facing::N) == Facing::E);
+        // Onda 2a: Punch entra no conjunto (PunchUp/Jump seguem em E).
+        assert(artDirFor(PlayerPose::Punch, Facing::N) == Facing::N);
+        assert(artDirFor(PlayerPose::Punch, Facing::SW) == Facing::SE);
         assert(artDirFor(PlayerPose::PunchUp, Facing::N) == Facing::E);
         assert(artDirFor(PlayerPose::Jump, Facing::S) == Facing::E);
         // directedPose carrega pose + artDir + espelho juntos.

@@ -8,6 +8,7 @@
 #include <cassert>
 #include <cstdio>
 #include <cstring>
+#include "assets/PlayerSprite.h"
 #include "assets/SpriteComposer.h"
 #include "assets/Sprites/PlayerParts.h"
 
@@ -178,6 +179,34 @@ int main() {
             const assets::Part* e = sprites::posePartsFor(pose, Facing::E);
             for (Facing f : all4)
                 assert(composedDiffers(e, sprites::posePartsFor(pose, f)));
+        }
+    }
+    { // PunchDims (8 novas: torso+braço por direção, 16 rows)
+        using namespace sprites;
+        checkRows(kPlayerPunch_S_Torso, 16);
+        checkRows(kPlayerPunch_S_Arms, 16);
+        checkRows(kPlayerPunch_N_Torso, 16);
+        checkRows(kPlayerPunch_N_Arms, 16);
+        checkRows(kPlayerPunch_SE_Torso, 16);
+        checkRows(kPlayerPunch_SE_Arms, 16);
+        checkRows(kPlayerPunch_NE_Torso, 16);
+        checkRows(kPlayerPunch_NE_Arms, 16);
+    }
+    { // PunchPresenceDiff (vivas + ≠E; soco é assimétrico por natureza)
+        using game::artDirFor;
+        assert(artDirFor(PlayerPose::Punch, Facing::S) == Facing::S);
+        assert(artDirFor(PlayerPose::Punch, Facing::SE) == Facing::SE);
+        assert(artDirFor(PlayerPose::Punch, Facing::NE) == Facing::NE);
+        assert(artDirFor(PlayerPose::Punch, Facing::N) == Facing::N);
+        assert(artDirFor(PlayerPose::Punch, Facing::W) == Facing::E);
+        const Facing all4[] = {Facing::S, Facing::SE, Facing::NE,
+                               Facing::N};
+        const assets::Part* e =
+            sprites::posePartsFor(PlayerPose::Punch, Facing::E);
+        for (Facing f : all4) {
+            checkPresence(sprites::posePartsFor(PlayerPose::Punch, f));
+            assert(composedDiffers(
+                e, sprites::posePartsFor(PlayerPose::Punch, f)));
         }
     }
 
