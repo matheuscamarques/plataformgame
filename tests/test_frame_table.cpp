@@ -50,6 +50,27 @@ int main() {
             assert(hits == 1);
         }
     }
+    { // PackPalsGeradas (cores/chars byte-idênticos às tabelas antigas)
+        const char* want = ".KFHERCTBWD";
+        auto check = [&](const core::PaletteEntry* pal, std::size_t c,
+                         sf::Color torso, sf::Color eye) {
+            assert(c == 11);
+            for (int i = 0; i < 11; ++i) assert(pal[i].ch == want[i]);
+            assert(pal[7].color == torso); // 'T'
+            assert(pal[4].color == eye);   // 'E'
+            assert(pal[3].color == pal[2].color); // 'H' = pele ('F')
+        };
+        check(sprites::kHollowPal, sprites::kHollowPalCount,
+              sf::Color(120, 70, 50), sf::Color(15, 15, 15));
+        check(sprites::kBurstPal, sprites::kBurstPalCount,
+              sf::Color(50, 120, 60), sf::Color(10, 10, 10));
+        check(sprites::kImpPal, sprites::kImpPalCount,
+              sf::Color(140, 50, 50), sf::Color(230, 200, 50));
+        check(sprites::kElementalPal, sprites::kElementalPalCount,
+              sf::Color(220, 100, 40), sf::Color(255, 255, 220));
+        check(sprites::kUndeadPal, sprites::kUndeadPalCount,
+              sf::Color(110, 110, 115), sf::Color(10, 10, 15));
+    }
 
     std::printf("frame table test OK\n");
     return 0;

@@ -7,6 +7,9 @@
 
 #pragma once
 
+#include <array>
+#include <cstddef>
+
 #include "core/sprite_from_ascii.h"
 
 namespace sprites {
@@ -354,19 +357,41 @@ inline constexpr int kPackW = 14;
 inline constexpr int kPackH = 18;
 inline constexpr int kPackSmallH = 12;
 
-inline const core::PaletteEntry kHollowPal[] = {
-    {'.', {0, 0, 0, 0}},
-    {'K', {20, 15, 10}, core::BodyPartId::None},
-    {'F', {170, 180, 165}, core::BodyPartId::Head},
-    {'H', {170, 180, 165}, core::BodyPartId::ArmR},
-    {'E', {15, 15, 15}, core::BodyPartId::Head},
-    {'R', {100, 100, 105}, core::BodyPartId::Head},
-    {'C', {90, 95, 105}, core::BodyPartId::Head},
-    {'T', {120, 70, 50}, core::BodyPartId::Torso},
-    {'B', {45, 35, 30}, core::BodyPartId::LegR},
-    {'W', {180, 180, 190}, core::BodyPartId::Weapon},
-    {'D', {220, 60, 50}, core::BodyPartId::Weapon},
+// Gerador das paletas 11-chars (. K F H E R C T B W D): mesma estrutura,
+// só cores. kXPal continua ponteiro + kXPalCount (registry inalterado).
+struct EnemySkin {
+    sf::Color outline, flesh, eye, hair, cloth, torso, leg, weapon,
+        weaponDetail;
 };
+
+inline std::array<core::PaletteEntry, 11> makeEnemyPal(const EnemySkin& s) {
+    return {{
+        {'.', {0, 0, 0, 0}},
+        {'K', s.outline, core::BodyPartId::None},
+        {'F', s.flesh, core::BodyPartId::Head},
+        {'H', s.flesh, core::BodyPartId::ArmR},
+        {'E', s.eye, core::BodyPartId::Head},
+        {'R', s.hair, core::BodyPartId::Head},
+        {'C', s.cloth, core::BodyPartId::Head},
+        {'T', s.torso, core::BodyPartId::Torso},
+        {'B', s.leg, core::BodyPartId::LegR},
+        {'W', s.weapon, core::BodyPartId::Weapon},
+        {'D', s.weaponDetail, core::BodyPartId::Weapon},
+    }};
+}
+
+inline const std::array<core::PaletteEntry, 11> kHollowPalStorage =
+    makeEnemyPal({{20, 15, 10},
+                  {170, 180, 165},
+                  {15, 15, 15},
+                  {100, 100, 105},
+                  {90, 95, 105},
+                  {120, 70, 50},
+                  {45, 35, 30},
+                  {180, 180, 190},
+                  {220, 60, 50}});
+inline const core::PaletteEntry* const kHollowPal =
+    kHollowPalStorage.data();
 inline constexpr std::size_t kHollowPalCount = 11;
 
 inline const char *const kHollowIdle[] = {
@@ -411,19 +436,17 @@ inline const char *const kHollowWalkB[] = {
     "..BBB.....BBB.",
 };
 
-inline const core::PaletteEntry kBurstPal[] = {
-    {'.', {0, 0, 0, 0}},
-    {'K', {20, 25, 15}, core::BodyPartId::None},
-    {'F', {140, 200, 120}, core::BodyPartId::Head},
-    {'H', {140, 200, 120}, core::BodyPartId::ArmR},
-    {'E', {10, 10, 10}, core::BodyPartId::Head},
-    {'R', {40, 90, 40}, core::BodyPartId::Head},
-    {'C', {90, 110, 90}, core::BodyPartId::Head},
-    {'T', {50, 120, 60}, core::BodyPartId::Torso},
-    {'B', {30, 60, 35}, core::BodyPartId::LegR},
-    {'W', {180, 180, 190}, core::BodyPartId::Weapon},
-    {'D', {220, 60, 50}, core::BodyPartId::Weapon},
-};
+inline const std::array<core::PaletteEntry, 11> kBurstPalStorage =
+    makeEnemyPal({{20, 25, 15},
+                  {140, 200, 120},
+                  {10, 10, 10},
+                  {40, 90, 40},
+                  {90, 110, 90},
+                  {50, 120, 60},
+                  {30, 60, 35},
+                  {180, 180, 190},
+                  {220, 60, 50}});
+inline const core::PaletteEntry* const kBurstPal = kBurstPalStorage.data();
 inline constexpr std::size_t kBurstPalCount = 11;
 
 inline const char *const kBurstIdle[] = {
@@ -468,19 +491,17 @@ inline const char *const kBurstWalkB[] = {
     "..BBB.....BBB.",
 };
 
-inline const core::PaletteEntry kImpPal[] = {
-    {'.', {0, 0, 0, 0}},
-    {'K', {25, 10, 10}, core::BodyPartId::None},
-    {'F', {200, 120, 100}, core::BodyPartId::Head},
-    {'H', {200, 120, 100}, core::BodyPartId::ArmR},
-    {'E', {230, 200, 50}, core::BodyPartId::Head},
-    {'R', {120, 40, 40}, core::BodyPartId::Head},
-    {'C', {80, 40, 40}, core::BodyPartId::Head},
-    {'T', {140, 50, 50}, core::BodyPartId::Torso},
-    {'B', {50, 25, 25}, core::BodyPartId::LegR},
-    {'W', {180, 180, 190}, core::BodyPartId::Weapon},
-    {'D', {220, 60, 50}, core::BodyPartId::Weapon},
-};
+inline const std::array<core::PaletteEntry, 11> kImpPalStorage =
+    makeEnemyPal({{25, 10, 10},
+                  {200, 120, 100},
+                  {230, 200, 50},
+                  {120, 40, 40},
+                  {80, 40, 40},
+                  {140, 50, 50},
+                  {50, 25, 25},
+                  {180, 180, 190},
+                  {220, 60, 50}});
+inline const core::PaletteEntry* const kImpPal = kImpPalStorage.data();
 inline constexpr std::size_t kImpPalCount = 11;
 
 inline const char *const kImpIdle[] = {
@@ -525,19 +546,18 @@ inline const char *const kImpWalkB[] = {
     "..BBB.....BBB.",
 };
 
-inline const core::PaletteEntry kElementalPal[] = {
-    {'.', {0, 0, 0, 0}},
-    {'K', {30, 15, 10}, core::BodyPartId::None},
-    {'F', {255, 180, 100}, core::BodyPartId::Head},
-    {'H', {255, 180, 100}, core::BodyPartId::ArmR},
-    {'E', {255, 255, 220}, core::BodyPartId::Head},
-    {'R', {230, 120, 40}, core::BodyPartId::Head},
-    {'C', {200, 80, 30}, core::BodyPartId::Head},
-    {'T', {220, 100, 40}, core::BodyPartId::Torso},
-    {'B', {90, 30, 20}, core::BodyPartId::LegR},
-    {'W', {255, 230, 150}, core::BodyPartId::Weapon},
-    {'D', {255, 120, 40}, core::BodyPartId::Weapon},
-};
+inline const std::array<core::PaletteEntry, 11> kElementalPalStorage =
+    makeEnemyPal({{30, 15, 10},
+                  {255, 180, 100},
+                  {255, 255, 220},
+                  {230, 120, 40},
+                  {200, 80, 30},
+                  {220, 100, 40},
+                  {90, 30, 20},
+                  {255, 230, 150},
+                  {255, 120, 40}});
+inline const core::PaletteEntry* const kElementalPal =
+    kElementalPalStorage.data();
 inline constexpr std::size_t kElementalPalCount = 11;
 
 inline const char *const kElementalIdle[] = {
@@ -582,19 +602,17 @@ inline const char *const kElementalWalkB[] = {
     "...DDDDDDDD...",
 };
 
-inline const core::PaletteEntry kUndeadPal[] = {
-    {'.', {0, 0, 0, 0}},
-    {'K', {20, 18, 15}, core::BodyPartId::None},
-    {'F', {210, 205, 190}, core::BodyPartId::Head},
-    {'H', {210, 205, 190}, core::BodyPartId::ArmR},
-    {'E', {10, 10, 15}, core::BodyPartId::Head},
-    {'R', {190, 185, 170}, core::BodyPartId::Head},
-    {'C', {130, 90, 60}, core::BodyPartId::Head},
-    {'T', {110, 110, 115}, core::BodyPartId::Torso},
-    {'B', {45, 40, 35}, core::BodyPartId::LegR},
-    {'W', {180, 180, 190}, core::BodyPartId::Weapon},
-    {'D', {220, 60, 50}, core::BodyPartId::Weapon},
-};
+inline const std::array<core::PaletteEntry, 11> kUndeadPalStorage =
+    makeEnemyPal({{20, 18, 15},
+                  {210, 205, 190},
+                  {10, 10, 15},
+                  {190, 185, 170},
+                  {130, 90, 60},
+                  {110, 110, 115},
+                  {45, 40, 35},
+                  {180, 180, 190},
+                  {220, 60, 50}});
+inline const core::PaletteEntry* const kUndeadPal = kUndeadPalStorage.data();
 inline constexpr std::size_t kUndeadPalCount = 11;
 
 inline const char *const kUndeadIdle[] = {
