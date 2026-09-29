@@ -16,6 +16,7 @@
 #include "core/TarotSprites.h"
 #include "core/sprite_from_ascii.h"
 
+#include "assets/SpriteFrameRegistry.h"
 #include "assets/Sprites/PlayerSprites.h"
 #include "assets/Sprites/PlayerParts.h"
 #include "assets/Sprites/EnemySprites.h"
@@ -93,6 +94,58 @@ struct SpriteSet {
         tarotTex;
 };
 
+// Frame de inimigo → membro de textura (item 3 da faxina): o loop do
+// build() lê rows/dims/pal da tabela do registry (fonte única).
+struct EnemyTexTarget {
+    support::SpriteFrameId id;
+    sf::Texture SpriteSet::* tex;
+};
+
+inline const EnemyTexTarget* enemyTexTargets(int* outCount) {
+    static const EnemyTexTarget kTargets[] = {
+        {support::SpriteFrameId::SlimeIdle, &SpriteSet::slimeIdle},
+        {support::SpriteFrameId::SlimeSquash, &SpriteSet::slimeSquash},
+        {support::SpriteFrameId::DwarfIdle, &SpriteSet::dwarfIdle},
+        {support::SpriteFrameId::DwarfWalkA, &SpriteSet::dwarfWalkA},
+        {support::SpriteFrameId::DwarfWalkB, &SpriteSet::dwarfWalkB},
+        {support::SpriteFrameId::DwarfWalkC, &SpriteSet::dwarfWalkC},
+        {support::SpriteFrameId::DwarfWalkD, &SpriteSet::dwarfWalkD},
+        {support::SpriteFrameId::DwarfThrow, &SpriteSet::dwarfThrow},
+        {support::SpriteFrameId::DwarfMelee, &SpriteSet::dwarfMelee},
+        {support::SpriteFrameId::SkeletonIdle, &SpriteSet::skeletonIdle},
+        {support::SpriteFrameId::SkeletonWalkA, &SpriteSet::skeletonWalkA},
+        {support::SpriteFrameId::SkeletonWalkB, &SpriteSet::skeletonWalkB},
+        {support::SpriteFrameId::SkeletonMelee, &SpriteSet::skeletonMelee},
+        {support::SpriteFrameId::HollowIdle, &SpriteSet::hollowIdle},
+        {support::SpriteFrameId::HollowWalkB, &SpriteSet::hollowWalkB},
+        {support::SpriteFrameId::RatIdle, &SpriteSet::ratIdle},
+        {support::SpriteFrameId::RatSquash, &SpriteSet::ratSquash},
+        {support::SpriteFrameId::BurstIdle, &SpriteSet::burstIdle},
+        {support::SpriteFrameId::BurstWalkB, &SpriteSet::burstWalkB},
+        {support::SpriteFrameId::ImpIdle, &SpriteSet::impIdle},
+        {support::SpriteFrameId::ImpWalkB, &SpriteSet::impWalkB},
+        {support::SpriteFrameId::ElementalIdle, &SpriteSet::elementalIdle},
+        {support::SpriteFrameId::ElementalWalkB, &SpriteSet::elementalWalkB},
+        {support::SpriteFrameId::UndeadIdle, &SpriteSet::undeadIdle},
+        {support::SpriteFrameId::UndeadWalkB, &SpriteSet::undeadWalkB},
+        {support::SpriteFrameId::HarpyIdle, &SpriteSet::harpyIdle},
+        {support::SpriteFrameId::HarpyWalkA, &SpriteSet::harpyWalkA},
+        {support::SpriteFrameId::HarpyWalkB, &SpriteSet::harpyWalkB},
+        {support::SpriteFrameId::EyeIdle, &SpriteSet::eyeIdle},
+        {support::SpriteFrameId::EyeWalkB, &SpriteSet::eyeWalkB},
+        {support::SpriteFrameId::InsectIdle, &SpriteSet::insectIdle},
+        {support::SpriteFrameId::SerpentIdle, &SpriteSet::serpentIdle},
+        {support::SpriteFrameId::SpecterIdle, &SpriteSet::specterIdle},
+        {support::SpriteFrameId::ConstructIdle, &SpriteSet::constructIdle},
+        {support::SpriteFrameId::PureElementalIdle,
+         &SpriteSet::pureElementalIdle},
+    };
+    if (outCount)
+        *outCount = static_cast<int>(sizeof(kTargets) /
+                                    sizeof(kTargets[0]));
+    return kTargets;
+}
+
 // Roda 1x no boot (precisa de contexto GL — nunca em teste headless).
 inline SpriteSet build() {
     SpriteSet s;
@@ -110,76 +163,25 @@ inline SpriteSet build() {
         s.playerParts[i].arms = core::makeSprite(
             pp[4].rows, pp[4].w, pp[4].h, kPlayerPal, kPlayerPalCount);
     }
-    s.slimeIdle = core::makeSprite(kSlimeIdle, kSlimeW, kSlimeH,
-                                   kSlimePal, kSlimePalCount);
-    s.slimeSquash = core::makeSprite(kSlimeSquash, kSlimeW, kSlimeH,
-                                     kSlimePal, kSlimePalCount);
-    s.dwarfIdle = core::makeSprite(kDwarfIdle, kDwarfW, kDwarfH,
-                                   kDwarfPal, kDwarfPalCount);
-    s.dwarfWalkA = core::makeSprite(kDwarfWalkA, kDwarfW, kDwarfH,
-                                    kDwarfPal, kDwarfPalCount);
-    s.dwarfWalkB = core::makeSprite(kDwarfWalkB, kDwarfW, kDwarfH,
-                                    kDwarfPal, kDwarfPalCount);
-    s.dwarfWalkC = core::makeSprite(kDwarfWalkC, kDwarfW, kDwarfH,
-                                    kDwarfPal, kDwarfPalCount);
-    s.dwarfWalkD = core::makeSprite(kDwarfWalkD, kDwarfW, kDwarfH,
-                                    kDwarfPal, kDwarfPalCount);
-    s.dwarfThrow = core::makeSprite(kDwarfThrow, kDwarfW, kDwarfH,
-                                    kDwarfPal, kDwarfPalCount);
-    s.dwarfMelee = core::makeSprite(kDwarfMelee, kDwarfW, kDwarfH,
-                                    kDwarfPal, kDwarfPalCount);
-    s.skeletonIdle = core::makeSprite(kSkeletonIdle, kSkeletonW, kSkeletonH,
-                                      kSkeletonPal, kSkeletonPalCount);
-    s.skeletonWalkA = core::makeSprite(kSkeletonWalkA, kSkeletonW, kSkeletonH,
-                                       kSkeletonPal, kSkeletonPalCount);
-    s.skeletonWalkB = core::makeSprite(kSkeletonWalkB, kSkeletonW, kSkeletonH,
-                                       kSkeletonPal, kSkeletonPalCount);
-    s.skeletonMelee = core::makeSprite(kSkeletonMelee, kSkeletonW, kSkeletonH,
-                                       kSkeletonPal, kSkeletonPalCount);
-    s.hollowIdle = core::makeSprite(kHollowIdle, 14, 18,
-                                       kHollowPal, kHollowPalCount);
-    s.hollowWalkB = core::makeSprite(kHollowWalkB, 14, 18,
-                                       kHollowPal, kHollowPalCount);
-    s.ratIdle = core::makeSprite(kRatIdle, 14, 12,
-                                       kRatPal, kRatPalCount);
-    s.ratSquash = core::makeSprite(kRatSquash, 14, 12,
-                                       kRatPal, kRatPalCount);
-    s.burstIdle = core::makeSprite(kBurstIdle, 14, 18,
-                                       kBurstPal, kBurstPalCount);
-    s.burstWalkB = core::makeSprite(kBurstWalkB, 14, 18,
-                                       kBurstPal, kBurstPalCount);
-    s.impIdle = core::makeSprite(kImpIdle, 14, 18,
-                                       kImpPal, kImpPalCount);
-    s.impWalkB = core::makeSprite(kImpWalkB, 14, 18,
-                                       kImpPal, kImpPalCount);
-    s.elementalIdle = core::makeSprite(kElementalIdle, 14, 18,
-                                       kElementalPal, kElementalPalCount);
-    s.elementalWalkB = core::makeSprite(kElementalWalkB, 14, 18,
-                                       kElementalPal, kElementalPalCount);
-    s.undeadIdle = core::makeSprite(kUndeadIdle, 14, 18,
-                                       kUndeadPal, kUndeadPalCount);
-    s.undeadWalkB = core::makeSprite(kUndeadWalkB, 14, 18,
-                                       kUndeadPal, kUndeadPalCount);
-    s.harpyIdle = core::makeSprite(kHarpyIdle, 14, 12,
-                                       kHarpyPal, kHarpyPalCount);
-    s.harpyWalkA = core::makeSprite(kHarpyWalkA, 14, 12,
-                                       kHarpyPal, kHarpyPalCount);
-    s.harpyWalkB = core::makeSprite(kHarpyWalkB, 14, 12,
-                                       kHarpyPal, kHarpyPalCount);
-    s.eyeIdle = core::makeSprite(kEyeIdle, 14, 12,
-                                       kEyePal, kEyePalCount);
-    s.eyeWalkB = core::makeSprite(kEyeWalkB, 14, 12,
-                                       kEyePal, kEyePalCount);
-    s.insectIdle = core::makeSprite(kInsectIdle, kInsectW, kInsectH,
-                                       kInsectPal, kInsectPalCount);
-    s.serpentIdle = core::makeSprite(kSerpentIdle, kSerpentW, kSerpentH,
-                                       kSerpentPal, kSerpentPalCount);
-    s.specterIdle = core::makeSprite(kSpecterIdle, kSpecterW, kSpecterH,
-                                       kSpecterPal, kSpecterPalCount);
-    s.constructIdle = core::makeSprite(kConstructIdle, kConstructW, kConstructH,
-                                       kConstructPal, kConstructPalCount);
-    s.pureElementalIdle = core::makeSprite(kPureElementalIdle, kPureElementalW, kPureElementalH,
-                                       kPureElementalPal, kPureElementalPalCount);
+    // Inimigos: rows/dims/pal vêm da tabela do registry (fonte única);
+    // aqui só o destino (membro). Id sem frame = textura vazia, sem crash.
+    {
+        int nn = 0, mm = 0;
+        const assets::StaticFrameEntry* ft = assets::staticFrameTable(&nn);
+        const EnemyTexTarget* tt = enemyTexTargets(&mm);
+        for (int i = 0; i < mm; ++i) {
+            const assets::StaticFrameEntry* e = nullptr;
+            for (int j = 0; j < nn; ++j) {
+                if (ft[j].id == tt[i].id) {
+                    e = &ft[j];
+                    break;
+                }
+            }
+            if (!e) continue;
+            s.*(tt[i].tex) =
+                core::makeSprite(e->rows, e->w, e->h, e->pal, e->palCount);
+        }
+    }
 
     // Paleta de equipamento por material: 5 entradas fixas (., W, w, G, E).
     for (int m = 0; m < SpriteSet::kMats; ++m) {

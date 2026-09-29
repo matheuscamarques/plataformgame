@@ -7,6 +7,7 @@
 #include <cassert>
 #include <cstdio>
 #include "assets/SpriteFrameRegistry.h"
+#include "assets/Sprites/SpriteSet.h"
 
 int main() {
     using support::SpriteFrameId;
@@ -36,6 +37,19 @@ int main() {
     assert(assets::frameData(SpriteFrameId::None).rows == nullptr);
     assert(assets::frameData(SpriteFrameId::COUNT).rows == nullptr);
     assert(assets::frameData(SpriteFrameId::PlayerIdle).rows != nullptr);
+
+    { // TargetsCobremTabela (build() monta 1:1 com a tabela, sem falta)
+        int m = 0;
+        const sprites::EnemyTexTarget* tt = sprites::enemyTexTargets(&m);
+        assert(m == n);
+        for (int i = 0; i < m; ++i) {
+            int hits = 0;
+            for (int j = 0; j < n; ++j) {
+                if (t[j].id == tt[i].id) ++hits;
+            }
+            assert(hits == 1);
+        }
+    }
 
     std::printf("frame table test OK\n");
     return 0;
