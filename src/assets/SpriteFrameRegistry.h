@@ -23,4 +23,18 @@ struct SpriteFrameData {
 
 SpriteFrameData frameData(support::SpriteFrameId id);
 
+// Frames estáticos (tudo menos player/None/COUNT): fonte única dos
+// dados acima e do SpriteSet::build (dimensões/paleta não divergem).
+// Player fica de fora (composto em runtime, por pose).
+struct StaticFrameEntry {
+    support::SpriteFrameId id = support::SpriteFrameId::None;
+    const char* const* rows = nullptr;
+    int w = 0, h = 0;
+    const core::PaletteEntry* pal = nullptr;
+    std::size_t palCount = 0;
+};
+
+// Tabela + tamanho (ponteiro p/ array estático; sem cópia).
+const StaticFrameEntry* staticFrameTable(int* outCount);
+
 } // namespace assets

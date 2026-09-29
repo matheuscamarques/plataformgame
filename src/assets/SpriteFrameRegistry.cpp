@@ -50,6 +50,72 @@ const char* const* composedRows(support::SpriteFrameId id) {
 
 } // namespace
 
+// Fonte única dos frames estáticos (item 2 da faxina): mesmos
+// rows/dimensões/paleta do switch antigo, sem repetir a tripla.
+// _LIT para dims literais (14x18/14x12, sem constante nomeada).
+#define STATIC_FRAME(Id, Rows, W, H, Pal)                                \
+    {support::SpriteFrameId::Id, sprites::Rows, sprites::W, sprites::H,   \
+     sprites::Pal, sprites::Pal##Count}
+#define STATIC_FRAME_LIT(Id, Rows, W, H, Pal)                            \
+    {support::SpriteFrameId::Id, sprites::Rows, (W), (H), sprites::Pal,   \
+     sprites::Pal##Count}
+
+const StaticFrameEntry kStaticFrames[] = {
+    STATIC_FRAME(SlimeIdle, kSlimeIdle, kSlimeW, kSlimeH, kSlimePal),
+    STATIC_FRAME(SlimeSquash, kSlimeSquash, kSlimeW, kSlimeH, kSlimePal),
+    STATIC_FRAME(DwarfIdle, kDwarfIdle, kDwarfW, kDwarfH, kDwarfPal),
+    STATIC_FRAME(DwarfWalkA, kDwarfWalkA, kDwarfW, kDwarfH, kDwarfPal),
+    STATIC_FRAME(DwarfWalkB, kDwarfWalkB, kDwarfW, kDwarfH, kDwarfPal),
+    STATIC_FRAME(DwarfWalkC, kDwarfWalkC, kDwarfW, kDwarfH, kDwarfPal),
+    STATIC_FRAME(DwarfWalkD, kDwarfWalkD, kDwarfW, kDwarfH, kDwarfPal),
+    STATIC_FRAME(DwarfThrow, kDwarfThrow, kDwarfW, kDwarfH, kDwarfPal),
+    STATIC_FRAME(DwarfMelee, kDwarfMelee, kDwarfW, kDwarfH, kDwarfPal),
+    STATIC_FRAME(SkeletonIdle, kSkeletonIdle, kSkeletonW, kSkeletonH,
+                 kSkeletonPal),
+    STATIC_FRAME(SkeletonWalkA, kSkeletonWalkA, kSkeletonW, kSkeletonH,
+                 kSkeletonPal),
+    STATIC_FRAME(SkeletonWalkB, kSkeletonWalkB, kSkeletonW, kSkeletonH,
+                 kSkeletonPal),
+    STATIC_FRAME(SkeletonMelee, kSkeletonMelee, kSkeletonW, kSkeletonH,
+                 kSkeletonPal),
+    STATIC_FRAME_LIT(HollowIdle, kHollowIdle, 14, 18, kHollowPal),
+    STATIC_FRAME_LIT(HollowWalkB, kHollowWalkB, 14, 18, kHollowPal),
+    STATIC_FRAME_LIT(RatIdle, kRatIdle, 14, 12, kRatPal),
+    STATIC_FRAME_LIT(RatSquash, kRatSquash, 14, 12, kRatPal),
+    STATIC_FRAME_LIT(BurstIdle, kBurstIdle, 14, 18, kBurstPal),
+    STATIC_FRAME_LIT(BurstWalkB, kBurstWalkB, 14, 18, kBurstPal),
+    STATIC_FRAME_LIT(ImpIdle, kImpIdle, 14, 18, kImpPal),
+    STATIC_FRAME_LIT(ImpWalkB, kImpWalkB, 14, 18, kImpPal),
+    STATIC_FRAME_LIT(ElementalIdle, kElementalIdle, 14, 18, kElementalPal),
+    STATIC_FRAME_LIT(ElementalWalkB, kElementalWalkB, 14, 18, kElementalPal),
+    STATIC_FRAME_LIT(UndeadIdle, kUndeadIdle, 14, 18, kUndeadPal),
+    STATIC_FRAME_LIT(UndeadWalkB, kUndeadWalkB, 14, 18, kUndeadPal),
+    STATIC_FRAME_LIT(HarpyIdle, kHarpyIdle, 14, 12, kHarpyPal),
+    STATIC_FRAME_LIT(HarpyWalkA, kHarpyWalkA, 14, 12, kHarpyPal),
+    STATIC_FRAME_LIT(HarpyWalkB, kHarpyWalkB, 14, 12, kHarpyPal),
+    STATIC_FRAME_LIT(EyeIdle, kEyeIdle, 14, 12, kEyePal),
+    STATIC_FRAME_LIT(EyeWalkB, kEyeWalkB, 14, 12, kEyePal),
+    STATIC_FRAME(InsectIdle, kInsectIdle, kInsectW, kInsectH, kInsectPal),
+    STATIC_FRAME(SerpentIdle, kSerpentIdle, kSerpentW, kSerpentH,
+                 kSerpentPal),
+    STATIC_FRAME(SpecterIdle, kSpecterIdle, kSpecterW, kSpecterH,
+                 kSpecterPal),
+    STATIC_FRAME(ConstructIdle, kConstructIdle, kConstructW, kConstructH,
+                 kConstructPal),
+    STATIC_FRAME(PureElementalIdle, kPureElementalIdle, kPureElementalW,
+                 kPureElementalH, kPureElementalPal),
+};
+
+#undef STATIC_FRAME
+#undef STATIC_FRAME_LIT
+
+const StaticFrameEntry* staticFrameTable(int* outCount) {
+    if (outCount)
+        *outCount = static_cast<int>(sizeof(kStaticFrames) /
+                                    sizeof(kStaticFrames[0]));
+    return kStaticFrames;
+}
+
 SpriteFrameData frameData(support::SpriteFrameId id) {
     using support::SpriteFrameId;
     switch (id) {
@@ -65,120 +131,18 @@ SpriteFrameData frameData(support::SpriteFrameId id) {
         case SpriteFrameId::PlayerDeath:
             return {composedRows(id), sprites::kPlayerW, sprites::kPlayerH,
                     sprites::kPlayerPal, sprites::kPlayerPalCount};
-        case SpriteFrameId::SlimeIdle:
-            return {sprites::kSlimeIdle, sprites::kSlimeW, sprites::kSlimeH,
-                    sprites::kSlimePal, sprites::kSlimePalCount};
-        case SpriteFrameId::SlimeSquash:
-            return {sprites::kSlimeSquash, sprites::kSlimeW, sprites::kSlimeH,
-                    sprites::kSlimePal, sprites::kSlimePalCount};
-        case SpriteFrameId::DwarfIdle:
-            return {sprites::kDwarfIdle, sprites::kDwarfW, sprites::kDwarfH,
-                    sprites::kDwarfPal, sprites::kDwarfPalCount};
-        case SpriteFrameId::DwarfWalkA:
-            return {sprites::kDwarfWalkA, sprites::kDwarfW, sprites::kDwarfH,
-                    sprites::kDwarfPal, sprites::kDwarfPalCount};
-        case SpriteFrameId::DwarfWalkB:
-            return {sprites::kDwarfWalkB, sprites::kDwarfW, sprites::kDwarfH,
-                    sprites::kDwarfPal, sprites::kDwarfPalCount};
-        case SpriteFrameId::DwarfWalkC:
-            return {sprites::kDwarfWalkC, sprites::kDwarfW, sprites::kDwarfH,
-                    sprites::kDwarfPal, sprites::kDwarfPalCount};
-        case SpriteFrameId::DwarfWalkD:
-            return {sprites::kDwarfWalkD, sprites::kDwarfW, sprites::kDwarfH,
-                    sprites::kDwarfPal, sprites::kDwarfPalCount};
-        case SpriteFrameId::DwarfThrow:
-            return {sprites::kDwarfThrow, sprites::kDwarfW, sprites::kDwarfH,
-                    sprites::kDwarfPal, sprites::kDwarfPalCount};
-        case SpriteFrameId::DwarfMelee:
-            return {sprites::kDwarfMelee, sprites::kDwarfW, sprites::kDwarfH,
-                    sprites::kDwarfPal, sprites::kDwarfPalCount};
-        case SpriteFrameId::SkeletonIdle:
-            return {sprites::kSkeletonIdle, sprites::kSkeletonW,
-                    sprites::kSkeletonH, sprites::kSkeletonPal,
-                    sprites::kSkeletonPalCount};
-        case SpriteFrameId::SkeletonWalkA:
-            return {sprites::kSkeletonWalkA, sprites::kSkeletonW,
-                    sprites::kSkeletonH, sprites::kSkeletonPal,
-                    sprites::kSkeletonPalCount};
-        case SpriteFrameId::SkeletonWalkB:
-            return {sprites::kSkeletonWalkB, sprites::kSkeletonW,
-                    sprites::kSkeletonH, sprites::kSkeletonPal,
-                    sprites::kSkeletonPalCount};
-        case SpriteFrameId::SkeletonMelee:
-            return {sprites::kSkeletonMelee, sprites::kSkeletonW,
-                    sprites::kSkeletonH, sprites::kSkeletonPal,
-                    sprites::kSkeletonPalCount};
-        case SpriteFrameId::HollowIdle:
-            return {sprites::kHollowIdle, 14, 18,
-                    sprites::kHollowPal, sprites::kHollowPalCount};
-        case SpriteFrameId::HollowWalkB:
-            return {sprites::kHollowWalkB, 14, 18,
-                    sprites::kHollowPal, sprites::kHollowPalCount};
-        case SpriteFrameId::RatIdle:
-            return {sprites::kRatIdle, 14, 12,
-                    sprites::kRatPal, sprites::kRatPalCount};
-        case SpriteFrameId::RatSquash:
-            return {sprites::kRatSquash, 14, 12,
-                    sprites::kRatPal, sprites::kRatPalCount};
-        case SpriteFrameId::BurstIdle:
-            return {sprites::kBurstIdle, 14, 18,
-                    sprites::kBurstPal, sprites::kBurstPalCount};
-        case SpriteFrameId::BurstWalkB:
-            return {sprites::kBurstWalkB, 14, 18,
-                    sprites::kBurstPal, sprites::kBurstPalCount};
-        case SpriteFrameId::ImpIdle:
-            return {sprites::kImpIdle, 14, 18,
-                    sprites::kImpPal, sprites::kImpPalCount};
-        case SpriteFrameId::ImpWalkB:
-            return {sprites::kImpWalkB, 14, 18,
-                    sprites::kImpPal, sprites::kImpPalCount};
-        case SpriteFrameId::ElementalIdle:
-            return {sprites::kElementalIdle, 14, 18,
-                    sprites::kElementalPal, sprites::kElementalPalCount};
-        case SpriteFrameId::ElementalWalkB:
-            return {sprites::kElementalWalkB, 14, 18,
-                    sprites::kElementalPal, sprites::kElementalPalCount};
-        case SpriteFrameId::UndeadIdle:
-            return {sprites::kUndeadIdle, 14, 18,
-                    sprites::kUndeadPal, sprites::kUndeadPalCount};
-        case SpriteFrameId::UndeadWalkB:
-            return {sprites::kUndeadWalkB, 14, 18,
-                    sprites::kUndeadPal, sprites::kUndeadPalCount};
-        case SpriteFrameId::HarpyIdle:
-            return {sprites::kHarpyIdle, 14, 12,
-                    sprites::kHarpyPal, sprites::kHarpyPalCount};
-        case SpriteFrameId::HarpyWalkA:
-            return {sprites::kHarpyWalkA, 14, 12,
-                    sprites::kHarpyPal, sprites::kHarpyPalCount};
-        case SpriteFrameId::HarpyWalkB:
-            return {sprites::kHarpyWalkB, 14, 12,
-                    sprites::kHarpyPal, sprites::kHarpyPalCount};
-        case SpriteFrameId::EyeIdle:
-            return {sprites::kEyeIdle, 14, 12,
-                    sprites::kEyePal, sprites::kEyePalCount};
-        case SpriteFrameId::EyeWalkB:
-            return {sprites::kEyeWalkB, 14, 12,
-                    sprites::kEyePal, sprites::kEyePalCount};
-        case SpriteFrameId::InsectIdle:
-            return {sprites::kInsectIdle, sprites::kInsectW, sprites::kInsectH,
-                    sprites::kInsectPal, sprites::kInsectPalCount};
-        case SpriteFrameId::SerpentIdle:
-            return {sprites::kSerpentIdle, sprites::kSerpentW, sprites::kSerpentH,
-                    sprites::kSerpentPal, sprites::kSerpentPalCount};
-        case SpriteFrameId::SpecterIdle:
-            return {sprites::kSpecterIdle, sprites::kSpecterW, sprites::kSpecterH,
-                    sprites::kSpecterPal, sprites::kSpecterPalCount};
-        case SpriteFrameId::ConstructIdle:
-            return {sprites::kConstructIdle, sprites::kConstructW, sprites::kConstructH,
-                    sprites::kConstructPal, sprites::kConstructPalCount};
-        case SpriteFrameId::PureElementalIdle:
-            return {sprites::kPureElementalIdle, sprites::kPureElementalW, sprites::kPureElementalH,
-                    sprites::kPureElementalPal, sprites::kPureElementalPalCount};
-        case SpriteFrameId::None:
-        case SpriteFrameId::COUNT:
         default:
-            return {};
+            break;
     }
+    int n = 0;
+    const StaticFrameEntry* table = staticFrameTable(&n);
+    for (int i = 0; i < n; ++i) {
+        if (table[i].id == id) {
+            return {table[i].rows, table[i].w, table[i].h, table[i].pal,
+                    table[i].palCount};
+        }
+    }
+    return {}; // None/COUNT/desconhecido
 }
 
 } // namespace assets
