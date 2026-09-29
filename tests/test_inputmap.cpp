@@ -134,6 +134,15 @@ int main() {
     assert(!in.pressedKey(sf::Keyboard::R));
     assert(!in.held(Action::ToggleInventory));
 
+    // clearEdges zera latches e preserva held (tecla segurada vale).
+    in.beginFrame();
+    in.handleEvent(keyEvent(sf::Event::KeyPressed, sf::Keyboard::D));
+    assert(in.pressed(Action::Right));
+    assert(in.held(Action::Right));
+    in.clearEdges();
+    assert(!in.pressed(Action::Right));
+    assert(in.held(Action::Right)); // segurada: continua valendo
+
     std::printf("inputmap test OK\n");
     return 0;
 }

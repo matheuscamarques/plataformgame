@@ -22,6 +22,7 @@ namespace creation {
 void CharacterCreationScreen::reset() {
     cursor_ = kNameRow;
     name_.clear();
+    nameWarn_ = false;
     selected_ = core::PlayerClass::Knight;
     pending_ = Action::None;
     rebuildPreview();
@@ -32,28 +33,39 @@ CharacterCreationScreen::CharacterCreationScreen() { reset(); }
 void CharacterCreationScreen::handleInput(support::InputMap &in) {
     // Teclas FÍSICAS (setas/Enter/Esc): letras digitadas (WASD, U...)
     // nunca movem o cursor nem confirmam — TextEntered cuida do nome.
+    // Consome a Action equivalente junto (S também marca Action::Down:
+    // sem isso o edge vaza p/ o próximo consumidor).
     using K = sf::Keyboard;
+    using A = support::Action;
     if (in.pressedKey(K::Up)) {
         in.consumeKey(K::Up);
+        in.consume(A::Up);
         cursor_ = (cursor_ + kRowCount - 1) % kRowCount;
     }
     if (in.pressedKey(K::Down)) {
         in.consumeKey(K::Down);
+        in.consume(A::Down);
         cursor_ = (cursor_ + 1) % kRowCount;
     }
     if (in.pressedKey(K::Return)) {
         in.consumeKey(K::Return);
+        in.consume(A::UseItem);
         confirm();
     }
     // Espaço confirma fora do Nome (no Nome, digita espaço via texto).
     if (cursor_ != kNameRow && in.pressedKey(K::Space)) {
         in.consumeKey(K::Space);
+        in.consume(A::Jump);
+        in.consume(A::RunFast);
         confirm();
     }
     if (in.pressedKey(K::Escape)) {
         in.consumeKey(K::Escape);
+        in.consume(A::Pause);
         pending_ = game::creation::Action::Back;
     }
+    // Nenhum edge sobrevive ao frame (letras digitadas não vazam).
+    in.clearEdges();
 }
 
 void CharacterCreationScreen::confirm() {
@@ -66,6 +78,10 @@ void CharacterCreationScreen::confirm() {
         }
         cursor_ = kStartRow; // confirma avança p/ COMEÇAR
     } else if (cursor_ == kStartRow) {
+        if (name_.empty()) {
+            nameWarn_ = true; // sem nome, sem jogo
+            return;
+        }
         pending_ = game::creation::Action::Done;
     }
 }
@@ -75,6 +91,7 @@ void CharacterCreationScreen::handleText(std::uint32_t unicode) {
     if (name_.size() >= kMaxName) return;
     if (unicode < 32 || unicode > 126) return; // ASCII visível
     name_.push_back(static_cast<char>(unicode));
+    nameWarn_ = false; // digitou: some o aviso
 }
 
 void CharacterCreationScreen::handleBackspace() {
@@ -136,6 +153,11 @@ void CharacterCreationScreen::render(sf::RenderTarget &target,
                sel ? sf::Color(255, 220, 100)
                    : sf::Color(170, 170, 180));
         y += 34.f;
+        if (nameWarn_) {
+            textAt("Dê um nome (obrigatório)", xL + 20.f, y - 8.f, 13,
+                   sf::Color(240, 120, 120));
+            y += 18.f;
+        }
     }
     for (int i = 0; i < kClassCount; ++i) {
         const bool sel = (cursor_ == kClassFirst + i);

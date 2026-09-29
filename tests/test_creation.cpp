@@ -147,6 +147,7 @@ int main() {
     { // SpaceConfirmsOffName (Espaço confirma fora do Nome)
         CharacterCreationScreen s;
         InputMap in;
+        s.handleText('X'); // nome primeiro (foco volta p/ COMEÇAR? não)
         press(in, sf::Keyboard::Down);
         s.handleInput(in);
         release(in, sf::Keyboard::Down);
@@ -171,6 +172,37 @@ int main() {
         assert(s.cursor() == 0); // ficou no Nome
         assert(s.name() == " ");
         assert(s.consumeAction() == MenuAct::None);
+    }
+    { // ActionsConsumed (tecla física consome a Action junto)
+        CharacterCreationScreen s;
+        InputMap in;
+        press(in, sf::Keyboard::S); // S = Action::Down + letra
+        s.handleInput(in);
+        assert(!in.pressed(Act::Down)); // edge consumido
+        assert(!in.pressedKey(sf::Keyboard::S));
+        release(in, sf::Keyboard::S);
+        press(in, sf::Keyboard::U); // U = Action::UseItem + letra
+        s.handleInput(in);
+        release(in, sf::Keyboard::U);
+        assert(!in.pressed(Act::UseItem));
+        // Cursor não saiu do Nome (letras não navegam).
+        assert(s.cursor() == 0);
+    }
+    { // EmptyNameBlocked (COMEÇAR sem nome avisa e trava)
+        CharacterCreationScreen s;
+        InputMap in;
+        assert(!s.nameWarn());
+        for (int i = 0; i < kStart; ++i) nav(in, s, sf::Keyboard::Down);
+        assert(s.cursor() == kStart);
+        nav(in, s, sf::Keyboard::Return);
+        assert(s.consumeAction() == MenuAct::None); // bloqueado
+        assert(s.nameWarn());
+        s.handleText('Z'); // digitou: aviso some (foco volta ao Nome)
+        assert(!s.nameWarn());
+        assert(s.cursor() == 0);
+        for (int i = 0; i < kStart; ++i) nav(in, s, sf::Keyboard::Down);
+        nav(in, s, sf::Keyboard::Return);
+        assert(s.consumeAction() == MenuAct::Done); // agora vai
     }
     { // BackToMenu (Esc volta sem concluir)
         CharacterCreationScreen s;

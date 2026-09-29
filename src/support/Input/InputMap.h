@@ -104,6 +104,11 @@ public:
     // não abre o inventário no spawn, etc).
     void clearAll();
 
+    // Zera só os edges (latches), preservando held: a criação chama no
+    // fim de todo frame — nenhuma tecla digitada vaza p/ o gameplay
+    // (nem p/ o próximo consumidor), e segurar tecla continua valendo.
+    void clearEdges();
+
     // Eixos para movimento e IA.
     // Retorna -1, 0 ou 1. Combina Left/Right e Up/Down.
     float axisX() const;

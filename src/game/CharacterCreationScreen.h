@@ -51,6 +51,7 @@ public:
 
     int cursor() const { return cursor_; }
     const std::string &name() const { return name_; }
+    bool nameWarn() const { return nameWarn_; }
     core::PlayerClass klass() const { return selected_; }
     // Boneco de preview (App desenha): equipamento da selecionada.
     const Player &preview() const { return preview_; }
@@ -64,6 +65,7 @@ private:
     void confirm(); // Enter/Espaço na linha atual
     int cursor_ = kNameRow; // começa no Nome (digita direto)
     std::string name_;
+    bool nameWarn_ = false; // COMEÇAR sem nome: avisa, não avança
     core::PlayerClass selected_ = core::PlayerClass::Knight;
     Player preview_; // boneco: rebuild no reset/seleção
     Action pending_ = Action::None;

@@ -164,6 +164,11 @@ void InputMap::clearAll() {
     rawLatch_.fill(false);
 }
 
+void InputMap::clearEdges() {
+    latch_.fill(false);
+    rawLatch_.fill(false);
+}
+
 bool InputMap::released(Action a) const {
     if (!enabled_ || !indexValid(a)) return false;
     auto i = static_cast<std::size_t>(a);
