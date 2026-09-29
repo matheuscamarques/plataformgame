@@ -23,6 +23,90 @@
 #include "core/Vec.h"
 #include "core/Coords.h"
 
+namespace {
+// Fábricas de skills (item 7 da faxina): params exatos preservados,
+// corpo único. Alcance do golpe = maxRange + lunge (40→48, 36→44,
+// 44→52, 48→56 em todas as atuais). onHit = efeito extra pós-dano.
+inline constexpr float kMeleeHitBonus = 8.f;
+
+using HitHook =
+    std::function<void(support::Enemy&, support::GameContext&)>;
+
+support::SkillDef makeMeleeSkill(const char* name, float cooldown,
+                                 float telegraph, float staminaCost,
+                                 float maxRange, float baseWeight,
+                                 float damage,
+                                 core::DamageType dt =
+                                     core::DamageType::Physical,
+                                 HitHook onHit = nullptr) {
+    support::SkillDef s;
+    s.name = name;
+    s.cooldown = cooldown;
+    s.telegraph = telegraph;
+    s.damageType = dt;
+    s.staminaCost = staminaCost;
+    s.isMelee = true;
+    s.minRange = 0.f;
+    s.maxRange = maxRange;
+    s.baseWeight = baseWeight;
+    s.execute = [damage, onHit](support::Enemy& self,
+                                support::GameContext& ctx,
+                                const support::SkillDef& def) {
+        if (!ctx.player) return;
+        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
+        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
+        const float hit = def.maxRange + kMeleeHitBonus;
+        if (dx * dx + dy * dy < hit * hit) {
+            ctx.player->hurt(static_cast<int>(damage * self.damageMult),
+                             def.damageType);
+            if (onHit) onHit(self, ctx);
+        }
+    };
+    return s;
+}
+
+// Cuspe em linha reta, sem gravidade/fuse (dano fixo, sem scaling).
+support::SkillDef makeSpitSkill(const char* name, float cooldown,
+                                float telegraph, float staminaCost,
+                                float minRange, float maxRange,
+                                float baseWeight, float speed, int damage,
+                                core::DamageType dt =
+                                    core::DamageType::Physical) {
+    support::SkillDef s;
+    s.name = name;
+    s.cooldown = cooldown;
+    s.telegraph = telegraph;
+    s.damageType = dt;
+    s.staminaCost = staminaCost;
+    s.isRanged = true;
+    s.minRange = minRange;
+    s.maxRange = maxRange;
+    s.baseWeight = baseWeight;
+    s.execute = [speed, damage](support::Enemy& self,
+                                support::GameContext& ctx,
+                                const support::SkillDef& def) {
+        if (!ctx.player || !ctx.throws) return;
+        core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
+        core::Vec2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
+        core::Vec2f dir = to - from;
+        const float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+        if (len < 1.f) return;
+        dir /= len;
+        auto* t = ctx.throws->throwItem(from, dir * speed,
+                                        support::ThrowKind::Spit);
+        if (t) {
+            t->gravity = 0.f;
+            t->fuse = -1.f;
+            t->damage = damage;
+            t->damageType = def.damageType;
+            t->radius = 0.f;
+            t->tilesRadius = 0;
+        }
+    };
+    return s;
+}
+} // namespace
+
 // Slime (trash) + anão básico (elite). Terceiro inimigo = append aqui
 // + 1 arquivo Behavior. Zero edição em Factory/SpawnSystem.
 REGISTER_ENEMY_ARCHETYPE("slime", [] {
@@ -129,125 +213,33 @@ REGISTER_ENEMY_ARCHETYPE("skeleton", [] {
 
 // Golpe do esqueleto: melee espelhado do dwarf_melee (mesmo alcance
 // 40px, dano 10 × damageMult). Nome próprio p/ feed e debug.
-REGISTER_SKILL("skeleton_slash", [] {
-    support::SkillDef s;
-    s.name = "Golpe Osseo";
-    s.cooldown = 0.9f;
-    s.telegraph = 0.25f;
-    s.staminaCost = 15.f;
-    s.isMelee = true;
-    s.minRange = 0.f;
-    s.maxRange = 40.f;
-    s.baseWeight = 15.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    [[maybe_unused]] const support::SkillDef &def) {
-        if (!ctx.player) return;
-        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
-        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
-        if (dx * dx + dy * dy < 48.f * 48.f)
-            ctx.player->hurt(static_cast<int>(10.f * self.damageMult),
-                             def.damageType);
-    };
-    return s;
-}());
+REGISTER_SKILL("skeleton_slash",
+               makeMeleeSkill("Golpe Osseo", 0.9f, 0.25f, 15.f, 40.f,
+                              15.f, 10.f));
 // Toque Gélido (Fase 2 elementais): aplica buildup de frost + dano.
 // Registrado mas SEM arquétipo (gancho da Fase 4: variante gelada).
 // Não atribuir a inimigo vivo sem rebalancear — teste cobre via tryUse.
-REGISTER_SKILL("frost_touch", [] {
-    support::SkillDef s;
-    s.name = "Toque Gelido";
-    s.cooldown = 2.0f;
-    s.telegraph = 0.3f;
-    s.damageType = core::DamageType::Frost;
-    s.staminaCost = 10.f;
-    s.isMelee = true;
-    s.minRange = 0.f;
-    s.maxRange = 40.f;
-    s.baseWeight = 12.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    [[maybe_unused]] const support::SkillDef &def) {
-        if (!ctx.player) return;
-        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
-        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
-        if (dx * dx + dy * dy < 48.f * 48.f) {
-            ctx.player->hurt(static_cast<int>(8.f * self.damageMult),
-                             def.damageType);
-            ctx.player->addFrost(20.f);
-        }
-    };
-    return s;
-}());
+REGISTER_SKILL("frost_touch",
+               makeMeleeSkill("Toque Gelido", 2.0f, 0.3f, 10.f, 40.f,
+                              12.f, 8.f, core::DamageType::Frost,
+                              [](support::Enemy&, support::GameContext& ctx) {
+                                  ctx.player->addFrost(20.f);
+                              }));
 
 // Golpe Flamejante (Fase 4): slash do esqueleto em Fire. Entra via
 // variante (extraSkills), nunca no arquétipo base.
-REGISTER_SKILL("skeleton_flame_slash", [] {
-    support::SkillDef s;
-    s.name = "Golpe Flamejante";
-    s.cooldown = 1.1f;
-    s.telegraph = 0.25f;
-    s.damageType = core::DamageType::Fire;
-    s.staminaCost = 15.f;
-    s.isMelee = true;
-    s.minRange = 0.f;
-    s.maxRange = 40.f;
-    s.baseWeight = 15.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    [[maybe_unused]] const support::SkillDef &def) {
-        if (!ctx.player) return;
-        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
-        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
-        if (dx * dx + dy * dy < 48.f * 48.f)
-            ctx.player->hurt(static_cast<int>(12.f * self.damageMult),
-                             def.damageType);
-    };
-    return s;
-}());
+REGISTER_SKILL("skeleton_flame_slash",
+               makeMeleeSkill("Golpe Flamejante", 1.1f, 0.25f, 15.f, 40.f,
+                              15.f, 12.f, core::DamageType::Fire));
 // Golpe do soldado oco: espada enferrujada (melee físico 10).
 // Reuso de forma: mesmo alcance do dwarf_melee, nome próprio.
-REGISTER_SKILL("soldier_slash", [] {
-    support::SkillDef s;
-    s.name = "Golpe Enferrujado";
-    s.cooldown = 1.0f;
-    s.telegraph = 0.25f;
-    s.staminaCost = 12.f;
-    s.isMelee = true;
-    s.minRange = 0.f;
-    s.maxRange = 40.f;
-    s.baseWeight = 12.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    [[maybe_unused]] const support::SkillDef &def) {
-        if (!ctx.player) return;
-        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
-        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
-        if (dx * dx + dy * dy < 48.f * 48.f)
-            ctx.player->hurt(static_cast<int>(10.f * self.damageMult),
-                             def.damageType);
-    };
-    return s;
-}());
+REGISTER_SKILL("soldier_slash",
+               makeMeleeSkill("Golpe Enferrujado", 1.0f, 0.25f, 12.f, 40.f,
+                              12.f, 10.f));
 
 // Mordida de rato: melee físico 6, rápido (cooldown curto).
-REGISTER_SKILL("rat_bite", [] {
-    support::SkillDef s;
-    s.name = "Mordida";
-    s.cooldown = 0.7f;
-    s.telegraph = 0.15f;
-    s.staminaCost = 8.f;
-    s.isMelee = true;
-    s.minRange = 0.f;
-    s.maxRange = 36.f;
-    s.baseWeight = 14.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    [[maybe_unused]] const support::SkillDef &def) {
-        if (!ctx.player) return;
-        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
-        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
-        if (dx * dx + dy * dy < 44.f * 44.f)
-            ctx.player->hurt(static_cast<int>(6.f * self.damageMult),
-                             def.damageType);
-    };
-    return s;
-}());
+REGISTER_SKILL("rat_bite", makeMeleeSkill("Mordida", 0.7f, 0.15f, 8.f,
+                                          36.f, 14.f, 6.f));
 
 // Detonação (creeper): explode no corpo-a-corpo — dano em área no
 // player, clarão visual e morte própria (drop/XP seguem normais).
@@ -279,74 +271,14 @@ REGISTER_SKILL("burst_detonate", [] {
 }());
 
 // Cuspe de fogo (diabrete): espelho do slime_spit em Fire.
-REGISTER_SKILL("imp_fire_spit", [] {
-    support::SkillDef s;
-    s.name = "Cuspe Ígneo";
-    s.cooldown = 2.0f;
-    s.telegraph = 0.25f;
-    s.damageType = core::DamageType::Fire;
-    s.staminaCost = 10.f;
-    s.isRanged = true;
-    s.minRange = 40.f;
-    s.maxRange = 220.f;
-    s.baseWeight = 10.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    [[maybe_unused]] const support::SkillDef &def) {
-        if (!ctx.player || !ctx.throws) return;
-        core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
-        core::Vec2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
-        core::Vec2f dir = to - from;
-        const float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
-        if (len < 1.f) return;
-        dir /= len;
-        auto *t = ctx.throws->throwItem(from, dir * 240.f,
-                                        support::ThrowKind::Spit);
-        if (t) {
-            t->gravity = 0.f;
-            t->fuse = -1.f;
-            t->damage = 8;
-            t->damageType = def.damageType;
-            t->radius = 0.f;
-            t->tilesRadius = 0;
-        }
-    };
-    return s;
-}());
+REGISTER_SKILL("imp_fire_spit",
+               makeSpitSkill("Cuspe Ígneo", 2.0f, 0.25f, 10.f, 40.f, 220.f,
+                             10.f, 240.f, 8, core::DamageType::Fire));
 
 // Pena da harpia: projétil físico de médio alcance (padrão spit).
-REGISTER_SKILL("harpy_feather", [] {
-    support::SkillDef s;
-    s.name = "Pena Cortante";
-    s.cooldown = 1.6f;
-    s.telegraph = 0.2f;
-    s.staminaCost = 8.f;
-    s.isMelee = false;
-    s.isRanged = true;
-    s.minRange = 60.f;
-    s.maxRange = 240.f;
-    s.baseWeight = 12.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    [[maybe_unused]] const support::SkillDef &def) {
-        if (!ctx.player || !ctx.throws) return;
-        core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
-        core::Vec2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
-        core::Vec2f dir = to - from;
-        const float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
-        if (len < 1.f) return;
-        dir /= len;
-        auto *t = ctx.throws->throwItem(from, dir * 280.f,
-                                        support::ThrowKind::Spit);
-        if (t) {
-            t->gravity = 0.f;
-            t->fuse = -1.f;
-            t->damage = 6;
-            t->damageType = def.damageType;
-            t->radius = 0.f;
-            t->tilesRadius = 0;
-        }
-    };
-    return s;
-}());
+REGISTER_SKILL("harpy_feather",
+               makeSpitSkill("Pena Cortante", 1.6f, 0.2f, 8.f, 60.f, 240.f,
+                             12.f, 280.f, 6));
 
 REGISTER_ENEMY_ARCHETYPE("hollow", [] {
     support::EnemyArchetype a;
@@ -593,39 +525,9 @@ REGISTER_ENEMY_ARCHETYPE("eye", [] {
 }());
 
 // Cuspe gelado (slime de gelo): espelho do fire spit em Frost.
-REGISTER_SKILL("slime_frost_spit", [] {
-    support::SkillDef s;
-    s.name = "Cuspe Gélido";
-    s.cooldown = 2.0f;
-    s.telegraph = 0.25f;
-    s.damageType = core::DamageType::Frost;
-    s.staminaCost = 10.f;
-    s.isRanged = true;
-    s.minRange = 40.f;
-    s.maxRange = 220.f;
-    s.baseWeight = 10.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    [[maybe_unused]] const support::SkillDef &def) {
-        if (!ctx.player || !ctx.throws) return;
-        core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
-        core::Vec2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
-        core::Vec2f dir = to - from;
-        const float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
-        if (len < 1.f) return;
-        dir /= len;
-        auto *t = ctx.throws->throwItem(from, dir * 240.f,
-                                        support::ThrowKind::Spit);
-        if (t) {
-            t->gravity = 0.f;
-            t->fuse = -1.f;
-            t->damage = 8;
-            t->damageType = def.damageType;
-            t->radius = 0.f;
-            t->tilesRadius = 0;
-        }
-    };
-    return s;
-}());
+REGISTER_SKILL("slime_frost_spit",
+               makeSpitSkill("Cuspe Gélido", 2.0f, 0.25f, 10.f, 40.f, 220.f,
+                             10.f, 240.f, 8, core::DamageType::Frost));
 
 REGISTER_ENEMY_ARCHETYPE("fire_slime", [] {
     support::EnemyArchetype a;
@@ -748,101 +650,30 @@ REGISTER_ENEMY_ARCHETYPE("elder_slime", [] {
 }());
 
 // Mordida aracnídea: físico 8 + veneno 15 (padrão frost_touch).
-REGISTER_SKILL("spider_bite", [] {
-    support::SkillDef s;
-    s.name = "Mordida Aracnídea";
-    s.cooldown = 1.2f;
-    s.telegraph = 0.2f;
-    s.staminaCost = 10.f;
-    s.isMelee = true;
-    s.minRange = 0.f;
-    s.maxRange = 40.f;
-    s.baseWeight = 14.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    [[maybe_unused]] const support::SkillDef &def) {
-        if (!ctx.player) return;
-        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
-        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
-        if (dx * dx + dy * dy < 48.f * 48.f) {
-            ctx.player->hurt(static_cast<int>(8.f * self.damageMult),
-                             def.damageType);
-            ctx.player->addPoison(15.f);
-        }
-    };
-    return s;
-}());
+REGISTER_SKILL("spider_bite",
+               makeMeleeSkill("Mordida Aracnídea", 1.2f, 0.2f, 10.f, 40.f,
+                              14.f, 8.f, core::DamageType::Physical,
+                              [](support::Enemy&, support::GameContext& ctx) {
+                                  ctx.player->addPoison(15.f);
+                              }));
 
 // Mordida de serpente: físico 12, cooldown médio.
-REGISTER_SKILL("serpent_bite", [] {
-    support::SkillDef s;
-    s.name = "Bote";
-    s.cooldown = 1.4f;
-    s.telegraph = 0.25f;
-    s.staminaCost = 12.f;
-    s.isMelee = true;
-    s.minRange = 0.f;
-    s.maxRange = 44.f;
-    s.baseWeight = 14.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    [[maybe_unused]] const support::SkillDef &def) {
-        if (!ctx.player) return;
-        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
-        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
-        if (dx * dx + dy * dy < 52.f * 52.f)
-            ctx.player->hurt(static_cast<int>(12.f * self.damageMult),
-                             def.damageType);
-    };
-    return s;
-}());
+REGISTER_SKILL("serpent_bite", makeMeleeSkill("Bote", 1.4f, 0.25f, 12.f,
+                                              44.f, 14.f, 12.f));
 
 // Dreno vital (espectro): 10 de dano + cura 5 em si.
-REGISTER_SKILL("life_drain", [] {
-    support::SkillDef s;
-    s.name = "Dreno Vital";
-    s.cooldown = 2.0f;
-    s.telegraph = 0.3f;
-    s.staminaCost = 12.f;
-    s.isMelee = true;
-    s.minRange = 0.f;
-    s.maxRange = 44.f;
-    s.baseWeight = 12.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    [[maybe_unused]] const support::SkillDef &def) {
-        if (!ctx.player) return;
-        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
-        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
-        if (dx * dx + dy * dy < 52.f * 52.f) {
-            ctx.player->hurt(static_cast<int>(10.f * self.damageMult),
-                             def.damageType);
-            self.resources.hp = std::min(
-                self.resources.hpMax, self.resources.hp + 5);
-        }
-    };
-    return s;
-}());
+REGISTER_SKILL("life_drain",
+               makeMeleeSkill("Dreno Vital", 2.0f, 0.3f, 12.f, 44.f, 12.f,
+                              10.f, core::DamageType::Physical,
+                              [](support::Enemy& self, support::GameContext&) {
+                                  self.resources.hp = std::min(
+                                      self.resources.hpMax,
+                                      self.resources.hp + 5);
+                              }));
 
 // Esmagamento (golem): físico 18, lento (cooldown longo).
-REGISTER_SKILL("golem_slam", [] {
-    support::SkillDef s;
-    s.name = "Esmagamento";
-    s.cooldown = 2.5f;
-    s.telegraph = 0.5f;
-    s.staminaCost = 20.f;
-    s.isMelee = true;
-    s.minRange = 0.f;
-    s.maxRange = 48.f;
-    s.baseWeight = 16.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    [[maybe_unused]] const support::SkillDef &def) {
-        if (!ctx.player) return;
-        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
-        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
-        if (dx * dx + dy * dy < 56.f * 56.f)
-            ctx.player->hurt(static_cast<int>(18.f * self.damageMult),
-                             def.damageType);
-    };
-    return s;
-}());
+REGISTER_SKILL("golem_slam", makeMeleeSkill("Esmagamento", 2.5f, 0.5f, 20.f,
+                                            48.f, 16.f, 18.f));
 
 REGISTER_ENEMY_ARCHETYPE("spider", [] {
     support::EnemyArchetype a;
@@ -1003,35 +834,8 @@ REGISTER_ENEMY_ARCHETYPE("blaze", [] {
 
 // Cuspe de slime: projétil linear (sem gravidade/fuse), dano no impacto.
 // Valida o mecanismo SkillRegistry; anão ganha as dele no Elite.
-REGISTER_SKILL("slime_spit", [] {
-    support::SkillDef s;
-    s.name = "Spit";
-    s.cooldown = 1.8f;
-    s.telegraph = 0.20f;
-    s.staminaCost = 5.f;
-    s.isRanged = true;
-    s.maxRange = 220.f;
-    s.baseWeight = 1.0f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    [[maybe_unused]] const support::SkillDef &def) {
-        if (!ctx.player || !ctx.throws) return;
-        core::Vec2f from{self.body.getCenterX(), self.body.getCenterY()};
-        core::Vec2f to{ctx.player->getCenterX(), ctx.player->getCenterY()};
-        core::Vec2f dir = to - from;
-        const float len = std::sqrt(dir.x * dir.x + dir.y * dir.y);
-        if (len < 1.f) return;
-        dir /= len;
-        auto *t = ctx.throws->throwItem(from, dir * 260.f, support::ThrowKind::Spit);
-        if (t) {
-            t->gravity = 0.f;
-            t->fuse = -1.f; // sem fuse: expira parado (ThrowSystem libera)
-            t->damage = 8;
-            t->radius = 0.f;
-            t->tilesRadius = 0;
-        }
-    };
-    return s;
-}());
+REGISTER_SKILL("slime_spit", makeSpitSkill("Spit", 1.8f, 0.20f, 5.f, 0.f,
+                                                 220.f, 1.0f, 260.f, 8));
 
 // Dinamite do anão: arco na direção do player, fuse 0.8s.
 REGISTER_SKILL("dwarf_dynamite", [] {
@@ -1063,27 +867,8 @@ REGISTER_SKILL("dwarf_dynamite", [] {
 }());
 
 // Picaretada: dano direto com re-cheque de alcance no impacto.
-REGISTER_SKILL("dwarf_melee", [] {
-    support::SkillDef s;
-    s.name = "Picaretada";
-    s.cooldown = 0.8f;
-    s.telegraph = 0.25f;
-    s.staminaCost = 15.f;
-    s.isMelee = true;
-    s.minRange = 0.f;
-    s.maxRange = 40.f;
-    s.baseWeight = 15.f;
-    s.execute = [](support::Enemy &self, support::GameContext &ctx,
-                    [[maybe_unused]] const support::SkillDef &def) {
-        if (!ctx.player) return;
-        const float dx = ctx.player->getCenterX() - self.body.getCenterX();
-        const float dy = ctx.player->getCenterY() - self.body.getCenterY();
-        if (dx * dx + dy * dy < 48.f * 48.f)
-            ctx.player->hurt(static_cast<int>(12.f * self.damageMult),
-                             def.damageType);
-    };
-    return s;
-}());
+REGISTER_SKILL("dwarf_melee", makeMeleeSkill("Picaretada", 0.8f, 0.25f, 15.f,
+                                             40.f, 15.f, 12.f));
 
 // Bomba de Fumaça: dash para trás (via knockbackLock: física integra,
 // IA pausa 0.25s). Nuvem visual pendente (sem SmokeSystem).
