@@ -13,7 +13,7 @@
 #include "entities/Player/Player.h"
 #include "support/Enemies/EnemyArchetype.h"
 #include "support/Enemies/EnemySystem.h"
-#include "support/Enemies/SkeletonAI.h"
+#include "support/Enemies/NamedAI.h"
 #include "support/Combat/BodySchemaRegistry.h"
 #include "support/Combat/SpriteFrame.h"
 #include "assets/SpriteFrameRegistry.h"

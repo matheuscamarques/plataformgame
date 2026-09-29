@@ -6,7 +6,7 @@
  * DwarfAI herdada. Chamado por Factory via behaviorKind, sem branch.
  */
 
-#include "SkeletonAI.h"
+#include "NamedAI.h"
 
 #include "BehaviorRegistry.h"
 

@@ -6,19 +6,7 @@
  */
 
 #include "BehaviorRegistry.h"
-#include "BlazeAI.h"
-#include "BurstAI.h"
-#include "DemonEyeAI.h"
-#include "ElementalAI.h"
-#include "GolemAI.h"
-#include "HarpyAI.h"
-#include "HollowAI.h"
-#include "ImpAI.h"
-#include "RatAI.h"
-#include "SerpentAI.h"
-#include "SpiderAI.h"
-#include "UndeadAI.h"
-#include "WraithAI.h"
+#include "NamedAI.h"
 
 namespace support {
 
