@@ -1379,30 +1379,43 @@ void InventoryUI::renderStatusTab(sf::RenderTarget& t, float sw, float sh,
         const auto bd = player_->meleeDamageBreakdown();
         line(xR, yR, "Base ................ " + std::to_string(bd.base),
              13, sf::Color(200, 200, 200));
-        if (bd.strBonus >= 0.01f)
-            line(xR, yR,
-                 "+ STR " +
-                     std::to_string((int)player_->attrs.get(
-                         core::Attr::Strength)) +
-                     "  " + core::scaleLetter(wdef->strScale) +
-                     " ..... +" + std::to_string((int)bd.strBonus),
-                 13, sf::Color(255, 180, 120));
-        if (bd.dexBonus >= 0.01f)
-            line(xR, yR,
-                 "+ DEX " +
-                     std::to_string((int)player_->attrs.get(
-                         core::Attr::Dexterity)) +
-                     "  " + core::scaleLetter(wdef->dexScale) +
-                     " ..... +" + std::to_string((int)bd.dexBonus),
-                 13, sf::Color(180, 255, 180));
-        if (bd.intBonus >= 0.01f)
-            line(xR, yR,
-                 "+ INT ..... +" + std::to_string((int)bd.intBonus),
-                 13, sf::Color(180, 180, 255));
-        if (bd.faiBonus >= 0.01f)
-            line(xR, yR,
-                 "+ FE  ..... +" + std::to_string((int)bd.faiBonus),
-                 13, sf::Color(255, 220, 180));
+        // Bônus por atributo em tabela (item 11 da faxina): mesma ordem
+        // e texto de antes; STR/DEX mostram valor+letra, INT/FÉ só bônus.
+        struct BonusRow {
+            const char* label;
+            float bonus;
+            core::Attr attr;
+            char scale;
+            sf::Color color;
+            bool showAttr;
+            // Preenchimento quando sem attr (FE tem 1 espaço a mais que
+            // INT no original: alinha os pontos com o label mais curto).
+            const char* pad;
+        };
+        const BonusRow bonusRows[] = {
+            {"STR", bd.strBonus, core::Attr::Strength,
+             core::scaleLetter(wdef->strScale), sf::Color(255, 180, 120),
+             true, ""},
+            {"DEX", bd.dexBonus, core::Attr::Dexterity,
+             core::scaleLetter(wdef->dexScale), sf::Color(180, 255, 180),
+             true, ""},
+            {"INT", bd.intBonus, core::Attr::Intelligence, '?',
+             sf::Color(180, 180, 255), false, ""},
+            {"FE", bd.faiBonus, core::Attr::Faith, '?',
+             sf::Color(255, 220, 180), false, " "},
+        };
+        for (const auto& r : bonusRows) {
+            if (r.bonus < 0.01f) continue;
+            std::string text = std::string("+ ") + r.label;
+            if (r.showAttr) {
+                text += " " + std::to_string((int)player_->attrs.get(r.attr)) +
+                        "  " + r.scale;
+            } else {
+                text += r.pad;
+            }
+            text += " ..... +" + std::to_string((int)r.bonus);
+            line(xR, yR, text, 13, r.color);
+        }
         if (bd.halvedByReq)
             line(xR, yR, "(req nao atendido: -50%)", 11,
                  sf::Color(240, 120, 120));
