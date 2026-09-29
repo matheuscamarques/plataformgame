@@ -95,6 +95,326 @@ inline constexpr assets::Part kPlayerIdleParts[] = {
     { kPlayerIdleArms, 12, 16, 0, 12 },
 };
 
+// ---- Fase D, onda 1: Idle em 5 direções (S/SE/E/NE/N) ----
+// Mesma grade 12x40 e mesmos chars→parte (F/E cabeça, G/H braços,
+// C torso, L/B pernas); só a silhueta muda. S/N simétricos.
+
+inline const char* const kPlayerIdleSHead[] = {
+    "....KKKK....",
+    "...KKKKKK...",
+    "..KKKKKKKK..",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFK..",
+    "..KFFEEFFK..",
+    "..KFFFFFFK..",
+    "...FFFFFF...",
+    "...FFFFFF...",
+    "....FFFF....",
+};
+
+inline const char* const kPlayerIdleSTorso[] = {
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCKKKKCC..",
+    "..CCKKKKCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CCCCCC...",
+};
+
+inline const char* const kPlayerIdleSLegs[] = {
+    "..CC....CC..",
+    "..CC....CC..",
+    "..CC....CC..",
+    "..CC....CC..",
+    "..LL....BB..",
+    "..LL....BB..",
+};
+
+inline const char* const kPlayerIdleSFeet[] = {
+    "..LL....BB..",
+    "..LL....BB..",
+    ".LL......BB.",
+    ".LL......BB.",
+    "LL........BB",
+    "LL........BB",
+};
+
+inline const char* const kPlayerIdleSArms[] = {
+    "............",
+    "............",
+    "............",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerIdleSParts[] = {
+    { kPlayerIdleSHead, 12, 12, 0, 0 },
+    { kPlayerIdleSTorso, 12, 16, 0, 12 },
+    { kPlayerIdleSLegs, 12, 6, 0, 28 },
+    { kPlayerIdleSFeet, 12, 6, 0, 34 },
+    { kPlayerIdleSArms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerIdleNHead[] = {
+    "....KKKK....",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "...KKKKKK...",
+    "...FFFFFF...",
+    "...FFFFFF...",
+    "....FFFF....",
+};
+
+inline const char* const kPlayerIdleNTorso[] = {
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".....KK.....",
+    ".....KK.....",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CCCCCC...",
+};
+
+inline const char* const kPlayerIdleNLegs[] = {
+    "...CC..CC...",
+    "...CC..CC...",
+    "...CC..CC...",
+    "...CC..CC...",
+    "....LLBB....",
+    "....LLBB....",
+};
+
+inline const char* const kPlayerIdleNFeet[] = {
+    "....LLBB....",
+    "....LLBB....",
+    "....LLBB....",
+    "....LLBB....",
+    "............",
+    "............",
+};
+
+inline const char* const kPlayerIdleNArms[] = {
+    "............",
+    "............",
+    "............",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerIdleNParts[] = {
+    { kPlayerIdleNHead, 12, 12, 0, 0 },
+    { kPlayerIdleNTorso, 12, 16, 0, 12 },
+    { kPlayerIdleNLegs, 12, 6, 0, 28 },
+    { kPlayerIdleNFeet, 12, 6, 0, 34 },
+    { kPlayerIdleNArms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerIdleSEHead[] = {
+    "....KKKK....",
+    "....KKKK....",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "..KFFFFFFK..",
+    "..KFFFFFFKE.",
+    "..KFEFFEFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFKE.",
+    "..KFFFFFFK..",
+    "...FFFFFF...",
+    "...FFFFFF...",
+};
+
+inline const char* const kPlayerIdleSETorso[] = {
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GKCCCCCCCH.",
+    ".GKCCCCCCCH.",
+    ".GKCCCCCCCH.",
+    ".GKCCCCCCCH.",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CCCCCC...",
+};
+
+inline const char* const kPlayerIdleSELegs[] = {
+    "...CC..CC...",
+    "...CC..CC...",
+    "...CC...CC..",
+    "...CC...CC..",
+    "...LL...BB..",
+    "...LL...BB..",
+};
+
+inline const char* const kPlayerIdleSEFeet[] = {
+    "...LL...BB..",
+    "...LL...BB..",
+    "...LL...BB..",
+    "...LL...BB..",
+    "............",
+    "............",
+};
+
+inline const char* const kPlayerIdleSEArms[] = {
+    "............",
+    "............",
+    ".G..........",
+    ".G..........",
+    ".G........H.",
+    ".G........H.",
+    ".........HH.",
+    "..........H.",
+    "..........H.",
+    "..........H.",
+    "..........H.",
+    "..........H.",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerIdleSEParts[] = {
+    { kPlayerIdleSEHead, 12, 12, 0, 0 },
+    { kPlayerIdleSETorso, 12, 16, 0, 12 },
+    { kPlayerIdleSELegs, 12, 6, 0, 28 },
+    { kPlayerIdleSEFeet, 12, 6, 0, 34 },
+    { kPlayerIdleSEArms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerIdleNEHead[] = {
+    "....KKKK....",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFKE.",
+    "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "...FFFFFF...",
+    "...FFFFFF...",
+    "....FFFF....",
+};
+
+inline const char* const kPlayerIdleNETorso[] = {
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCKCH.",
+    ".GCCCCCCKCH.",
+    ".GCCCCCCKCH.",
+    ".GCCCCCCKCH.",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CCCCCC...",
+};
+
+inline const char* const kPlayerIdleNELegs[] = {
+    "...CC..CC...",
+    "...CC..CC...",
+    "...CC..CC...",
+    "...CC..CC...",
+    ".......BB...",
+    ".......BB...",
+};
+
+inline const char* const kPlayerIdleNEFeet[] = {
+    "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    "...LL..BB...",
+    ".......BB...",
+    ".......BB...",
+};
+
+inline const char* const kPlayerIdleNEArms[] = {
+    "..........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G..........",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerIdleNEParts[] = {
+    { kPlayerIdleNEHead, 12, 12, 0, 0 },
+    { kPlayerIdleNETorso, 12, 16, 0, 12 },
+    { kPlayerIdleNELegs, 12, 6, 0, 28 },
+    { kPlayerIdleNEFeet, 12, 6, 0, 34 },
+    { kPlayerIdleNEArms, 12, 16, 0, 12 },
+};
+
 inline const char* const kPlayerWalkAHead[] = {
     "....KKKK....",
     "....KKKK....",
@@ -885,10 +1205,18 @@ inline support::Facing artDirForIndex(int i) {
     }
 }
 
-// Partes por (pose, direção de arte). Sem arte direcional ainda:
-// tudo resolve p/ side-view (byte-idêntico ao poseParts).
+// Partes por (pose, direção de arte). Onda 1 cobre Idle; resto cai
+// em side-view (E) até sua onda.
 inline const assets::Part* posePartsFor(PlayerPose p, support::Facing d) {
-    (void)d;
+    if (p == PlayerPose::Idle) {
+        switch (d) {
+            case support::Facing::S:  return kPlayerIdleSParts;
+            case support::Facing::SE: return kPlayerIdleSEParts;
+            case support::Facing::NE: return kPlayerIdleNEParts;
+            case support::Facing::N:  return kPlayerIdleNParts;
+            default:                  return kPlayerIdleParts;
+        }
+    }
     return poseParts(p);
 }
 
