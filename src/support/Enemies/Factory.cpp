@@ -27,6 +27,25 @@
 
 namespace support {
 
+// Blit 1:1 arquétipo → recursos/skills (item 9 da faxina): campo novo
+// entra aqui uma vez, sem caçar cópias manuais no spawnEnemy.
+void configure(Enemy& e, const EnemyArchetype& a, float hpMult) {
+    e.resources.isTrash = a.isTrash;
+    e.resources.hp = e.resources.hpMax =
+        static_cast<int>(a.hp * a.scale * hpMult);
+    e.resources.posture = e.resources.postureMax = a.postureMax;
+    e.resources.postureRegen = a.postureRegen;
+    e.resources.postureRegenDelay = core::Cooldown(a.postureRegenDelay);
+    e.resources.stamina = e.resources.staminaMax = a.staminaMax;
+    e.resources.staminaRegen = a.staminaRegen;
+    e.resources.staminaRegenDelay = core::Cooldown(a.staminaRegenDelay);
+    e.resources.mana = e.resources.manaMax = a.manaMax;
+    e.resources.manaRegen = a.manaRegen;
+    e.resources.manaRegenDelay = core::Cooldown(a.manaRegenDelay);
+    e.skillIds = a.skills;
+    e.resources.resistances = a.resistances;
+}
+
 // Factory consome ArchetypeRegistry: zero branch por tipo.
 // kind desconhecido OU behavior ausente -> nullptr (nunca crash).
 // ctx opcional: com ctx, dispara onSpawn (SpawnSystem passa; Game passa null).
@@ -47,7 +66,6 @@ std::unique_ptr<Enemy> Factory::spawnEnemy(const std::string &kind,
     if (const BodySchema *s = BodySchemaRegistry::instance().get(a->bodySchema))
         e->bodyParts.attach(s);
 
-    e->resources.isTrash = a->isTrash;
     // Tarô híbrido: Diabo engorda o HP dos nascidos; lua de sangue
     // (+25%) soma. Sem player no ctx = intacto (teste/fallback).
     float foeHpMult = 1.f;
@@ -60,23 +78,7 @@ std::unique_ptr<Enemy> Factory::spawnEnemy(const std::string &kind,
                      ctx->dayNight->sample().sunIntensity < 0.20f;
         if (bloodNight) foeHpMult *= 1.25f;
     }
-    e->resources.hp = static_cast<int>(a->hp * a->scale * foeHpMult);
-    e->resources.hpMax = static_cast<int>(a->hp * a->scale * foeHpMult);
-    e->resources.posture = a->postureMax;
-    e->resources.postureMax = a->postureMax;
-    e->resources.postureRegen = a->postureRegen;
-    e->resources.postureRegenDelay = core::Cooldown(a->postureRegenDelay);
-    e->resources.stamina = a->staminaMax;
-    e->resources.staminaMax = a->staminaMax;
-    e->resources.staminaRegen = a->staminaRegen;
-    e->resources.staminaRegenDelay = core::Cooldown(a->staminaRegenDelay);
-    e->resources.mana = a->manaMax;
-    e->resources.manaMax = a->manaMax;
-    e->resources.manaRegen = a->manaRegen;
-    e->resources.manaRegenDelay = core::Cooldown(a->manaRegenDelay);
-
-    e->skillIds = a->skills;
-    e->resources.resistances = a->resistances;
+    configure(*e, *a, foeHpMult);
 
     // Equipamento inicial da tabela do arquétipo (vazio = nasce nu).
     // RNG determinístico por posição: bit-cast do float (memcpy, seguro
