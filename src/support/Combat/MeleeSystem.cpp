@@ -199,7 +199,10 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
         if (ctx.debug && applied > 0) {
             const core::Vec2f at{bestBox.left + bestBox.width * 0.5f,
                                   bestBox.top + bestBox.height * 0.5f};
-            ctx.debug->pushNumber("-" + std::to_string(applied), at);
+            // Crítico do fado (mesma regra do dano): todo 10º swing.
+            const bool crit = p->tarotFx.critDamageMult != 1.f &&
+                              p->meleeSwingId % 10 == 0;
+            ctx.debug->pushDamage(applied, p->weaponBuffType, at, crit);
             ctx.debug->pushLog(std::string("melee ") + enemyKindName(s) +
                                " " + (best ? partName(best->id) : "body") +
                                " -" + std::to_string(applied) + " " +

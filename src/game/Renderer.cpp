@@ -552,22 +552,31 @@ void Game::render()
             window->draw(line, 2, sf::Lines);
         }
 
-        // ── 4. Números de dano flutuantes (feed): sobem e somem em
-        // 0.5s. Valida per-part no olho (-16 = head, -5 = arm).
+        // ── 4. Números de dano flutuantes (feed): pop 0.5→1.2 em
+        // 0.1s, sobem e somem em 0.5s. Cor por tipo, crit maior+dourado.
+        // Valida per-part no olho (-16 = head, -5 = arm).
         for (const auto &n : debugFeed_.numbers) {
-            const float risen =
-                (support::DebugFeed::kNumberTtl - n.ttl) * 80.f;
+            const float age = support::DebugFeed::kNumberTtl - n.ttl;
+            const float risen = age * 80.f;
+            const float pop =
+                age < 0.1f ? 0.5f + 7.f * age
+                           : std::max(1.f, 1.2f - 0.5f * (age - 0.1f));
             const sf::Uint8 a = static_cast<sf::Uint8>(
                 255.f * std::max(0.f, std::min(1.f, n.ttl /
                                                          support::DebugFeed::kNumberTtl)));
             sf::Text t;
             t.setFont(font);
             t.setString(support::utf8(n.text));
-            t.setCharacterSize(14);
-            t.setFillColor(sf::Color(255, 240, 200, a));
+            t.setCharacterSize(n.crit ? 18 : 14);
+            sf::Color c = n.color;
+            c.a = a;
+            t.setFillColor(c);
             t.setOutlineColor(sf::Color(0, 0, 0, a));
             t.setOutlineThickness(1);
-            t.setPosition(n.pos.x - 10.f, n.pos.y - risen);
+            const auto b = t.getLocalBounds();
+            t.setOrigin(b.left + b.width * 0.5f, b.top + b.height * 0.5f);
+            t.setScale(pop, pop);
+            t.setPosition(n.pos.x, n.pos.y - risen);
             window->draw(t);
         }
 

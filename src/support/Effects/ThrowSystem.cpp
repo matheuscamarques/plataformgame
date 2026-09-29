@@ -18,6 +18,7 @@
 #include "physics/Physics2D.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/Combat/ExplosionSystem.h"
+#include "support/Debug/DebugFeed.h"
 #include "support/GameContext.h"
 #include "ParticleSystem.h"
 #include "support/Progression/PatienceSystem.h"
@@ -168,7 +169,10 @@ void ThrowSystem::tick(float dt, GameContext &ctx) {
             Player *pl = ctx.player;
             if (t.pos.x >= pl->getX() && t.pos.x <= pl->getX() + pl->getW() &&
                 t.pos.y >= pl->getY() && t.pos.y <= pl->getY() + pl->getH()) {
-                pl->hurt(t.damage, t.damageType);
+                // Número só se o dano entrou (i-frames barram em silêncio).
+                if (pl->hurt(t.damage, t.damageType) && ctx.debug)
+                    ctx.debug->pushDamage(t.damage, t.damageType, t.pos,
+                                          false);
                 if (particles_) particles_->spawnHitSpark(t.pos);
                 pool_.release(&t);
                 return;
@@ -183,7 +187,11 @@ void ThrowSystem::tick(float dt, GameContext &ctx) {
                     t.pos.x <= s.body.getX() + s.body.getW() &&
                     t.pos.y >= s.body.getY() &&
                     t.pos.y <= s.body.getY() + s.body.getH()) {
-                    s.resources.takeDamage(t.damage, t.damageType);
+                    const int applied =
+                        s.resources.takeDamage(t.damage, t.damageType);
+                    if (applied > 0 && ctx.debug)
+                        ctx.debug->pushDamage(applied, t.damageType, t.pos,
+                                              false);
                     if (particles_) particles_->spawnHitSpark(t.pos);
                     // Clarão kamehameha no impacto (só visual, sem dano).
                     spawnBlast(t.pos, 25.f);

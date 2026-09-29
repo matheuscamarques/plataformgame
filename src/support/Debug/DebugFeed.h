@@ -8,12 +8,15 @@
 
 #pragma once
 #include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Color.hpp>
 
 #include <cstddef>
 #include <filesystem>
 #include <fstream>
 #include <string>
 #include <vector>
+
+#include "core/DamageType.h"
 
 namespace support {
 
@@ -28,18 +31,41 @@ struct DamageNumber {
     std::string text;
     core::Vec2f pos{0.f, 0.f};
     float ttl = 0.5f;
+    sf::Color color{255, 240, 200}; // creme (legado); dano usa damageColor
+    bool crit = false;              // maior + dourado no render
 };
 
 struct DebugFeed {
     static constexpr float kNumberTtl = 0.5f;
     static constexpr std::size_t kLogCap = 5;
+    static constexpr std::size_t kNumberCap = 64; // pool: excedente derruba o mais velho
     static constexpr const char *kLogPath = "logs/debug.log";
 
     std::vector<DamageNumber> numbers;
     std::vector<std::string> log;
 
+    // Cor por tipo (físico branco, fogo laranja, frost azul, raio amarelo).
+    static sf::Color damageColor(core::DamageType t) {
+        switch (t) {
+            case core::DamageType::Fire: return {255, 140, 40};
+            case core::DamageType::Frost: return {140, 200, 255};
+            case core::DamageType::Lightning: return {255, 240, 120};
+            default: return {255, 255, 255};
+        }
+    }
+
     void pushNumber(const std::string &text, core::Vec2f pos) {
+        if (numbers.size() >= kNumberCap) numbers.erase(numbers.begin());
         numbers.push_back({text, pos, kNumberTtl});
+    }
+
+    // Dano com cor do tipo; crit doura (render aumenta).
+    void pushDamage(int dmg, core::DamageType type, core::Vec2f pos,
+                    bool crit = false) {
+        pushNumber("-" + std::to_string(dmg), pos);
+        numbers.back().color =
+            crit ? sf::Color(255, 210, 90) : damageColor(type);
+        numbers.back().crit = crit;
     }
     void pushLog(const std::string &line) {
         log.push_back(line);

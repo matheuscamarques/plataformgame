@@ -68,7 +68,7 @@ private:
 
     void breakTilesInCircle(core::Vec2f center, int tilesRadius, GameContext &ctx);
     bool applyToTarget(const ExplosionTarget &t, core::Vec2f center,
-                       const ExplosionDef &def);
+                       const ExplosionDef &def, GameContext &ctx);
 };
 
 } // namespace support

@@ -52,7 +52,7 @@ int ExplosionSystem::explode(core::Vec2f center, const ExplosionDef &def, GameCo
     int hit = 0;
     if (ctx.explosionTargets) {
         for (const auto &t : *ctx.explosionTargets) {
-            if (applyToTarget(t, center, def)) ++hit;
+            if (applyToTarget(t, center, def, ctx)) ++hit;
         }
     }
     // Visual: anel até o raio real (ThrowSystem desenha; sem ctx = sem custo).
@@ -74,8 +74,9 @@ int ExplosionSystem::explode(core::Vec2f center, const ExplosionDef &def, GameCo
 }
 
 bool ExplosionSystem::applyToTarget(const ExplosionTarget &t,
-                                    core::Vec2f center,
-                                    const ExplosionDef &def) {
+                                     core::Vec2f center,
+                                     const ExplosionDef &def,
+                                     GameContext &ctx) {
     const float r2 = def.radius * def.radius;
     if (!t.body) return false;
 
@@ -105,8 +106,13 @@ bool ExplosionSystem::applyToTarget(const ExplosionTarget &t,
     const float postDmg = def.postureDmg * (bestDef ? bestDef->postureMult : 1.f);
 
     if (t.resources) {
-        t.resources->takeDamage(dmg, def.damageType);
+        const int applied =
+            t.resources->takeDamage(dmg, def.damageType);
         t.resources->damagePosture(postDmg);
+        // Número no centro do alvo (só com dano; sem ctx.debug = nada).
+        if (applied > 0 && ctx.debug)
+            ctx.debug->pushDamage(applied, def.damageType, t.center,
+                                  false);
     }
     // Player não tem EnemyResources: HP próprio entra quando existir.
     // Por enquanto, conta como atingido sem aplicar dano.

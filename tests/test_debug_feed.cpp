@@ -23,6 +23,8 @@ int main() {
         assert(f.numbers.size() == 1u);
         assert(f.numbers[0].text == "-16");
         assert(f.numbers[0].ttl == DebugFeed::kNumberTtl);
+        assert(!f.numbers[0].crit); // genérico: sem crit, cor creme
+        assert(f.numbers[0].color == sf::Color(255, 240, 200));
     }
     { // TickExpiresNumbers (0.5s depois, some)
         DebugFeed f;
@@ -30,6 +32,35 @@ int main() {
         f.tick(0.25f);
         assert(f.numbers.size() == 1u);
         f.tick(0.25f);
+        assert(f.numbers.empty());
+    }
+    { // DamageColorsPerType (físico branco, fogo/frost/raio próprios)
+        DebugFeed f;
+        f.pushDamage(8, core::DamageType::Physical, {0.f, 0.f});
+        f.pushDamage(8, core::DamageType::Fire, {0.f, 0.f});
+        f.pushDamage(8, core::DamageType::Frost, {0.f, 0.f});
+        f.pushDamage(8, core::DamageType::Lightning, {0.f, 0.f});
+        assert(f.numbers.size() == 4u);
+        assert(f.numbers[0].text == "-8");
+        assert(f.numbers[0].color == sf::Color(255, 255, 255));
+        assert(f.numbers[1].color == sf::Color(255, 140, 40));
+        assert(f.numbers[2].color == sf::Color(140, 200, 255));
+        assert(f.numbers[3].color == sf::Color(255, 240, 120));
+        assert(!f.numbers[0].crit);
+    }
+    { // CritGoesGold (crit doura por cima do tipo)
+        DebugFeed f;
+        f.pushDamage(24, core::DamageType::Fire, {0.f, 0.f}, true);
+        assert(f.numbers.size() == 1u);
+        assert(f.numbers[0].crit);
+        assert(f.numbers[0].color == sf::Color(255, 210, 90));
+    }
+    { // NumbersCapAt64 (65º push derruba o 1º)
+        DebugFeed f;
+        for (int i = 0; i < 70; ++i)
+            f.pushNumber("-1", {0.f, 0.f});
+        assert(f.numbers.size() == DebugFeed::kNumberCap);
+        f.tick(1.f);
         assert(f.numbers.empty());
     }
     { // LogCapsAt5 (6º push derruba o 1º)
