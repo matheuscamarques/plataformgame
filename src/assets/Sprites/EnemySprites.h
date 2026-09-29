@@ -394,47 +394,25 @@ inline const core::PaletteEntry* const kHollowPal =
     kHollowPalStorage.data();
 inline constexpr std::size_t kHollowPalCount = 11;
 
-inline const char *const kHollowIdle[] = {
-    "...CCCCCC.....",
-    "..CCCCCCCC....",
-    "..CFFFFFFC....",
-    "..FEFFFFEF....",
-    "...FFFFFF.....",
-    "..RRRRRRRR....",
-    ".RRRRRRRRRR...",
-    ".RRRRRRRRRR...",
-    ".HRRRRRRRRRRH.",
-    ".TTTRRRRRRTTT.",
-    ".TTTTTTTTTTTT.",
-    ".TTTTTTTTTTTT.",
-    ".TTTTTTTTTTTT.",
-    "..TTTTTTTTTT..",
-    "..TTT....TTT..",
-    "..BBB....BBB..",
-    "..BBB....BBB..",
-    "..BBB....BBB..",
-};
+#define Hollow_TOP  \
+    "...CCCCCC.....",      \
+    "..CCCCCCCC....",      \
+    "..CFFFFFFC....",      \
+    "..FEFFFFEF....",      \
+    "...FFFFFF.....",      \
+    "..RRRRRRRR....",      \
+    ".RRRRRRRRRR...",      \
+    ".RRRRRRRRRR...",      \
+    ".HRRRRRRRRRRH.",      \
+    ".TTTRRRRRRTTT.",      \
+    ".TTTTTTTTTTTT.",      \
+    ".TTTTTTTTTTTT.",      \
+    ".TTTTTTTTTTTT.",      \
+    "..TTTTTTTTTT.."      
 
-inline const char *const kHollowWalkB[] = {
-    "...CCCCCC.....",
-    "..CCCCCCCC....",
-    "..CFFFFFFC....",
-    "..FEFFFFEF....",
-    "...FFFFFF.....",
-    "..RRRRRRRR....",
-    ".RRRRRRRRRR...",
-    ".RRRRRRRRRR...",
-    ".HRRRRRRRRRRH.",
-    ".TTTRRRRRRTTT.",
-    ".TTTTTTTTTTTT.",
-    ".TTTTTTTTTTTT.",
-    ".TTTTTTTTTTTT.",
-    "..TTTTTTTTTT..",
-    "..TTT.....TTT.",
-    "..BBB.....BBB.",
-    "..BBB.....BBB.",
-    "..BBB.....BBB.",
-};
+inline const char *const kHollowIdle[] = {Hollow_TOP, DWARF_LEGS_IDLE};
+
+inline const char *const kHollowWalkB[] = {Hollow_TOP, DWARF_LEGS_WALK};
 
 inline const std::array<core::PaletteEntry, 11> kBurstPalStorage =
     makeEnemyPal({{20, 25, 15},
@@ -449,47 +427,25 @@ inline const std::array<core::PaletteEntry, 11> kBurstPalStorage =
 inline const core::PaletteEntry* const kBurstPal = kBurstPalStorage.data();
 inline constexpr std::size_t kBurstPalCount = 11;
 
-inline const char *const kBurstIdle[] = {
-    "....CCCCCC....",
-    "...CCCCCCCC...",
-    "...CFFFFFFC...",
-    "...FEFFFFEF...",
-    "....FFFFFF....",
-    "...RRRRRRRR...",
-    "..RRRRRRRRRR..",
-    "..RRRRRRRRRR..",
-    ".HRRRRRRRRRRH.",
-    "TTTTRRRRRRTTTT",
-    "TTTTTTTTTTTTTT",
-    "TTTTTTTTTTTTTT",
-    "TTTTTTTTTTTTTT",
-    "..TTTTTTTTTT..",
-    "..TTT....TTT..",
-    "..BBB....BBB..",
-    "..BBB....BBB..",
-    "..BBB....BBB..",
-};
+#define Burst_TOP   \
+    "....CCCCCC....",      \
+    "...CCCCCCCC...",      \
+    "...CFFFFFFC...",      \
+    "...FEFFFFEF...",      \
+    "....FFFFFF....",      \
+    "...RRRRRRRR...",      \
+    "..RRRRRRRRRR..",      \
+    "..RRRRRRRRRR..",      \
+    ".HRRRRRRRRRRH.",      \
+    "TTTTRRRRRRTTTT",      \
+    "TTTTTTTTTTTTTT",      \
+    "TTTTTTTTTTTTTT",      \
+    "TTTTTTTTTTTTTT",      \
+    "..TTTTTTTTTT.."      
 
-inline const char *const kBurstWalkB[] = {
-    "....CCCCCC....",
-    "...CCCCCCCC...",
-    "...CFFFFFFC...",
-    "...FEFFFFEF...",
-    "....FFFFFF....",
-    "...RRRRRRRR...",
-    "..RRRRRRRRRR..",
-    "..RRRRRRRRRR..",
-    ".HRRRRRRRRRRH.",
-    "TTTTRRRRRRTTTT",
-    "TTTTTTTTTTTTTT",
-    "TTTTTTTTTTTTTT",
-    "TTTTTTTTTTTTTT",
-    "..TTTTTTTTTT..",
-    "..TTT.....TTT.",
-    "..BBB.....BBB.",
-    "..BBB.....BBB.",
-    "..BBB.....BBB.",
-};
+inline const char *const kBurstIdle[] = {Burst_TOP, DWARF_LEGS_IDLE};
+
+inline const char *const kBurstWalkB[] = {Burst_TOP, DWARF_LEGS_WALK};
 
 inline const std::array<core::PaletteEntry, 11> kImpPalStorage =
     makeEnemyPal({{25, 10, 10},
@@ -504,47 +460,25 @@ inline const std::array<core::PaletteEntry, 11> kImpPalStorage =
 inline const core::PaletteEntry* const kImpPal = kImpPalStorage.data();
 inline constexpr std::size_t kImpPalCount = 11;
 
-inline const char *const kImpIdle[] = {
-    ".DD.CCCCCC.DD.",
-    "..DCCCCCCCCD..",
-    "...CFFFFFFC...",
-    "...FEFFFFEF...",
-    "....FFFFFF....",
-    "...RRRRRRRR...",
-    "..RRRRRRRRRR..",
-    "..RRRRRRRRRR..",
-    ".HRRRRRRRRRRH.",
-    ".TTTRRRRRRTTT.",
-    ".TTTTTTTTTTTT.",
-    ".TTTTTTTTTTTT.",
-    ".TTTTTTTTTTTT.",
-    "..TTTTTTTTTT..",
-    "..TTT....TTT..",
-    "..BBB....BBB..",
-    "..BBB....BBB..",
-    "..BBB....BBB..",
-};
+#define Imp_TOP     \
+    ".DD.CCCCCC.DD.",      \
+    "..DCCCCCCCCD..",      \
+    "...CFFFFFFC...",      \
+    "...FEFFFFEF...",      \
+    "....FFFFFF....",      \
+    "...RRRRRRRR...",      \
+    "..RRRRRRRRRR..",      \
+    "..RRRRRRRRRR..",      \
+    ".HRRRRRRRRRRH.",      \
+    ".TTTRRRRRRTTT.",      \
+    ".TTTTTTTTTTTT.",      \
+    ".TTTTTTTTTTTT.",      \
+    ".TTTTTTTTTTTT.",      \
+    "..TTTTTTTTTT.."      
 
-inline const char *const kImpWalkB[] = {
-    ".DD.CCCCCC.DD.",
-    "..DCCCCCCCCD..",
-    "...CFFFFFFC...",
-    "...FEFFFFEF...",
-    "....FFFFFF....",
-    "...RRRRRRRR...",
-    "..RRRRRRRRRR..",
-    "..RRRRRRRRRR..",
-    ".HRRRRRRRRRRH.",
-    ".TTTRRRRRRTTT.",
-    ".TTTTTTTTTTTT.",
-    ".TTTTTTTTTTTT.",
-    ".TTTTTTTTTTTT.",
-    "..TTTTTTTTTT..",
-    "..TTT.....TTT.",
-    "..BBB.....BBB.",
-    "..BBB.....BBB.",
-    "..BBB.....BBB.",
-};
+inline const char *const kImpIdle[] = {Imp_TOP, DWARF_LEGS_IDLE};
+
+inline const char *const kImpWalkB[] = {Imp_TOP, DWARF_LEGS_WALK};
 
 inline const std::array<core::PaletteEntry, 11> kElementalPalStorage =
     makeEnemyPal({{30, 15, 10},
@@ -560,47 +494,31 @@ inline const core::PaletteEntry* const kElementalPal =
     kElementalPalStorage.data();
 inline constexpr std::size_t kElementalPalCount = 11;
 
-inline const char *const kElementalIdle[] = {
-    "....CCCCCC....",
-    "...CCCCCCCC...",
-    "...CFFFFFFC...",
-    "...FEFFFFEF...",
-    "....FFFFFF....",
-    "...RRRRRRRR...",
-    "..RRRRRRRRRR..",
-    "..RRRRRRRRRR..",
-    ".HRRRRRRRRRRH.",
-    ".TTTRRRRRRTTT.",
-    ".TTTTTTTTTTTT.",
-    ".TTTTTTTTTTTT.",
-    ".TTTTTTTTTTTT.",
-    "..TTTTTTTTTT..",
-    ".TTTTTTTTTTTT.",
-    "DTTTTTTTTTTTTD",
-    ".DDTTTTTTTTDD.",
-    "...DDDDDDDD...",
-};
+#define Elemental_TOP \
+    "....CCCCCC....",      \
+    "...CCCCCCCC...",      \
+    "...CFFFFFFC...",      \
+    "...FEFFFFEF...",      \
+    "....FFFFFF....",      \
+    "...RRRRRRRR...",      \
+    "..RRRRRRRRRR..",      \
+    "..RRRRRRRRRR..",      \
+    ".HRRRRRRRRRRH.",      \
+    ".TTTRRRRRRTTT.",      \
+    ".TTTTTTTTTTTT.",      \
+    ".TTTTTTTTTTTT.",      \
+    ".TTTTTTTTTTTT.",      \
+    "..TTTTTTTTTT.."      
 
-inline const char *const kElementalWalkB[] = {
-    "....CCCCCC....",
-    "...CCCCCCCC...",
-    "...CFFFFFFC...",
-    "...FEFFFFEF...",
-    "....FFFFFF....",
-    "...RRRRRRRR...",
-    "..RRRRRRRRRR..",
-    "..RRRRRRRRRR..",
-    ".HRRRRRRRRRRH.",
-    ".TTTRRRRRRTTT.",
-    ".TTTTTTTTTTTT.",
-    ".TTTTTTTTTTTT.",
-    ".TTTTTTTTTTTT.",
-    "..TTTTTTTTTT..",
-    ".TTTTTTTTTTTT.",
-    "DTTTTTTTTTTTTD",
-    ".DDTTTTTTTTDD.",
-    "...DDDDDDDD...",
-};
+#define ELEMENTAL_LEGS \
+    ".TTTTTTTTTTTT.",      \
+    "DTTTTTTTTTTTTD",      \
+    ".DDTTTTTTTTDD.",      \
+    "...DDDDDDDD..."      
+
+inline const char *const kElementalIdle[] = {Elemental_TOP, ELEMENTAL_LEGS};
+
+inline const char *const kElementalWalkB[] = {Elemental_TOP, ELEMENTAL_LEGS};
 
 inline const std::array<core::PaletteEntry, 11> kUndeadPalStorage =
     makeEnemyPal({{20, 18, 15},
@@ -615,47 +533,25 @@ inline const std::array<core::PaletteEntry, 11> kUndeadPalStorage =
 inline const core::PaletteEntry* const kUndeadPal = kUndeadPalStorage.data();
 inline constexpr std::size_t kUndeadPalCount = 11;
 
-inline const char *const kUndeadIdle[] = {
-    "....CCCCCC....",
-    "...CCCCCCCC...",
-    "...CFFFFFFC...",
-    "...FEFFFFEF...",
-    "....FFFFFF....",
-    "...RRRRRRRR...",
-    "..RRRRRRRRRRC.",
-    "..RRRRRRRRRRC.",
-    ".HRRRRRRRRRRH.",
-    ".CTTRRRRRRTCC.",
-    ".TTTTCTTTTCTC.",
-    ".TTTCTTTTCTTC.",
-    ".TTCTTTTCTTTC.",
-    "..CTTTTCTTTTC.",
-    "..TTT....TTT..",
-    "..BBB....BBB..",
-    "..BBB....BBB..",
-    "..BBB....BBB..",
-};
+#define Undead_TOP  \
+    "....CCCCCC....",      \
+    "...CCCCCCCC...",      \
+    "...CFFFFFFC...",      \
+    "...FEFFFFEF...",      \
+    "....FFFFFF....",      \
+    "...RRRRRRRR...",      \
+    "..RRRRRRRRRRC.",      \
+    "..RRRRRRRRRRC.",      \
+    ".HRRRRRRRRRRH.",      \
+    ".CTTRRRRRRTCC.",      \
+    ".TTTTCTTTTCTC.",      \
+    ".TTTCTTTTCTTC.",      \
+    ".TTCTTTTCTTTC.",      \
+    "..CTTTTCTTTTC."      
 
-inline const char *const kUndeadWalkB[] = {
-    "....CCCCCC....",
-    "...CCCCCCCC...",
-    "...CFFFFFFC...",
-    "...FEFFFFEF...",
-    "....FFFFFF....",
-    "...RRRRRRRR...",
-    "..RRRRRRRRRRC.",
-    "..RRRRRRRRRRC.",
-    ".HRRRRRRRRRRH.",
-    ".CTTRRRRRRTCC.",
-    ".TTTTCTTTTCTC.",
-    ".TTTCTTTTCTTC.",
-    ".TTCTTTTCTTTC.",
-    "..CTTTTCTTTTC.",
-    "..TTT.....TTT.",
-    "..BBB.....BBB.",
-    "..BBB.....BBB.",
-    "..BBB.....BBB.",
-};
+inline const char *const kUndeadIdle[] = {Undead_TOP, DWARF_LEGS_IDLE};
+
+inline const char *const kUndeadWalkB[] = {Undead_TOP, DWARF_LEGS_WALK};
 
 inline const core::PaletteEntry kRatPal[] = {
     {'.', {0, 0, 0, 0}},

@@ -10,6 +10,7 @@
 #include <cstring>
 #include "assets/PlayerSprite.h"
 #include "assets/SpriteFrameRegistry.h"
+#include "assets/Sprites/EnemySprites.h"
 // ASCII art: widths exatas (linha errada = sprite deslocada), telegraphs
 // exclusivos e prioridade de pick. build() NÃO é chamado (textura exige
 // contexto GL, sem teste headless — compara endereços em SpriteSet vazio).
@@ -126,6 +127,19 @@ int main() {
     }
     { // WalkLegsDiffer (B abre as pernas)
         assert(std::strcmp(prow(SpriteFrameId::PlayerWalkA)[15], prow(SpriteFrameId::PlayerWalkB)[15]) != 0);
+    }
+    { // PackTopsShared (Idle/WalkB dividem as 14 de cima; só pernas mudam)
+        const char* const* idles[] = {kHollowIdle, kBurstIdle, kImpIdle,
+                                      kElementalIdle, kUndeadIdle};
+        const char* const* walks[] = {kHollowWalkB, kBurstWalkB, kImpWalkB,
+                                      kElementalWalkB, kUndeadWalkB};
+        for (int k = 0; k < 5; ++k) {
+            for (int y = 0; y < 14; ++y)
+                assert(std::strcmp(idles[k][y], walks[k][y]) == 0);
+            for (int y = 14; y < 18; ++y)
+                assert(std::strlen(idles[k][y]) == 14 &&
+                       std::strlen(walks[k][y]) == 14);
+        }
     }
     { // ResolvePriority (hurt > melee > throw > jump > walk > idle)
         using support::SpriteFrameId;
