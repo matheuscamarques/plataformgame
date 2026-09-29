@@ -14,6 +14,7 @@
 #include "core/Item.h"
 #include "core/ItemDef.h"
 #include "support/Combat/Body.h"
+#include "support/UI/ItemIcon.h"
 
 using namespace support;
 
@@ -73,6 +74,16 @@ int main() {
         const core::Item back = eq.unequip(core::EquipSlot::Gloves);
         assert(back.defId == "iron_gloves" && back.quantity == 1);
         assert(eq.isEmpty());
+    }
+
+    { // RarityNames (5 nomes, sem "?"; COUNT cai no default cinza)
+        for (int i = 0; i < core::kItemRarityCount; ++i) {
+            const auto r = static_cast<core::ItemRarity>(i);
+            assert(std::string(itemRarityName(r)) != "?");
+        }
+        assert(std::string(itemRarityName(core::ItemRarity::COUNT)) == "?");
+        const sf::Color bad = itemRarityColor(core::ItemRarity::COUNT);
+        assert(bad.r == 160 && bad.g == 160 && bad.b == 160);
     }
     { // GlovesAllMaterials (4 materiais, slot/defesas espelham botas)
         const char *ids[] = {"leather_gloves", "gold_gloves",

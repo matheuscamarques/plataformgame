@@ -38,16 +38,16 @@ const char *enemyKindName(const Enemy &s) {
     }
 }
 const char *partName(BodyPartId id) {
-    switch (id) {
-        case BodyPartId::Head: return "head";
-        case BodyPartId::Torso: return "torso";
-        case BodyPartId::ArmL:
-        case BodyPartId::ArmR: return "arm";
-        case BodyPartId::LegL:
-        case BodyPartId::LegR: return "leg";
-        case BodyPartId::Weapon: return "weapon";
-        default: return "?";
-    }
+    // None=0 cai no default "?"; braços/pernas espelham o mesmo nome.
+    static constexpr const char *kNames[] = {
+        "?", "head", "torso", "arm", "arm", "leg", "leg", "weapon",
+    };
+    static_assert(sizeof(kNames) / sizeof(kNames[0]) ==
+                      static_cast<std::size_t>(BodyPartId::COUNT),
+                  "partName: tabela fora de sincronia com o enum");
+    const int i = static_cast<int>(id);
+    if (i < 0 || i >= static_cast<int>(BodyPartId::COUNT)) return "?";
+    return kNames[i];
 }
 } // namespace
 

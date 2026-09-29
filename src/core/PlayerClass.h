@@ -30,15 +30,15 @@ enum class PlayerClass : uint8_t {
 };
 
 inline const char *className(PlayerClass c) {
-    switch (c) {
-        case PlayerClass::Knight:    return "Cavaleiro";
-        case PlayerClass::Barbarian: return "Bárbaro";
-        case PlayerClass::Mage:      return "Mago";
-        case PlayerClass::Cleric:    return "Clérigo";
-        case PlayerClass::Thief:     return "Ladrão";
-        case PlayerClass::Deprived:  return "Desprovido";
-        default:                     return "?";
-    }
+    static constexpr const char *kNames[] = {
+        "Cavaleiro", "Bárbaro", "Mago", "Clérigo", "Ladrão", "Desprovido",
+    };
+    static_assert(sizeof(kNames) / sizeof(kNames[0]) ==
+                      static_cast<std::size_t>(PlayerClass::COUNT),
+                  "className: tabela fora de sincronia com o enum");
+    const int i = static_cast<int>(c);
+    if (i < 0 || i >= static_cast<int>(PlayerClass::COUNT)) return "?";
+    return kNames[i];
 }
 
 struct ClassDef {

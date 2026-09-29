@@ -7,6 +7,7 @@
 
 #include <cassert>
 #include <cstdio>
+#include <string>
 #include "entities/Player/Player.h"
 #include "support/GameContext.h"
 #include "support/Progression/StratumManager.h"
@@ -33,6 +34,8 @@ int main() {
         assert(stratumAt(10999) == 9 && stratumAt(11000) == 10);
         assert(stratumAt(11999) == 10 && stratumAt(50000) == 10);
         for (int s = 0; s < STRATUM_COUNT; ++s) assert(stratumName(s)[0] != '?');
+        assert(std::string(stratumName(-1)) == "?");
+        assert(std::string(stratumName(STRATUM_COUNT)) == "?");
         assert(checkpointTy(0) == 0 && checkpointTy(1) == 200);
         assert(checkpointTy(5) == 5000 && checkpointTy(6) == 6200);
         assert(checkpointTy(10) == 11000);

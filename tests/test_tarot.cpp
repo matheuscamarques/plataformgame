@@ -36,6 +36,7 @@ int main() {
                "Ás de Paus");
         assert(std::string(core::tarotName(TarotArcana::PentaclesKing)) ==
                "Rei de Ouros");
+        assert(std::string(core::tarotName(TarotArcana::COUNT)) == "?");
         for (int i = 0;
              i < static_cast<int>(TarotArcana::COUNT); ++i) {
             const auto *d = core::TarotRegistry::instance().find(
@@ -64,6 +65,7 @@ int main() {
         assert(core::weightOf(core::TarotTier::Rare) == 5);
         assert(core::weightOf(core::TarotTier::Epic) == 10);
         assert(core::weightOf(core::TarotTier::Legendary) == 25);
+        assert(core::weightOf(core::TarotTier::COUNT) == 0);
         assert(core::rollTier(0.0f) == core::TarotTier::Common);
         assert(core::rollTier(0.8f) == core::TarotTier::Uncommon);
         assert(core::rollTier(0.95f) == core::TarotTier::Rare);

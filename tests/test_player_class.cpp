@@ -24,6 +24,7 @@ int main() {
                "Cavaleiro");
         assert(std::string(core::className(PlayerClass::Deprived)) ==
                "Desprovido");
+        assert(std::string(core::className(PlayerClass::COUNT)) == "?");
         for (int i = 0; i < static_cast<int>(PlayerClass::COUNT); ++i) {
             const auto def =
                 core::classDef(static_cast<PlayerClass>(i));

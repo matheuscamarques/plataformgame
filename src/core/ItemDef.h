@@ -46,7 +46,10 @@ enum class ItemRarity : uint8_t {
     Rare,
     Epic,
     Legendary,
+    COUNT
 };
+
+inline constexpr int kItemRarityCount = static_cast<int>(ItemRarity::COUNT);
 
 // Definição estática (dado compartilhado, nunca muda em runtime).
 // Efeitos são callbacks com Player (não herança): poção cura,

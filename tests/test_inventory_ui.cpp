@@ -7,6 +7,7 @@
 
 #include <cassert>
 #include <cstdio>
+#include <string>
 
 #include "core/Inventory.h"
 #include "core/Equipment.h"
@@ -87,6 +88,23 @@ int main() {
         release(in, sf::Keyboard::Escape);
         assert(ui.state() == InventoryUI::UIState::Browse);
         assert(ui.isOpen());
+    }
+    { // TabNames (4+6+7 nomes; COUNT cai no default)
+        using MT = InventoryUI::MainTab;
+        using ST = InventoryUI::SubTab;
+        using MA = InventoryUI::MenuAction;
+        assert(std::string(InventoryUI::mainTabName(MT::Inventory)) ==
+               "Inventory");
+        assert(std::string(InventoryUI::mainTabName(MT::System)) == "System");
+        assert(std::string(InventoryUI::mainTabName(MT::COUNT)) ==
+               "Inventory");
+        assert(std::string(InventoryUI::subTabName(ST::All)) == "All");
+        assert(std::string(InventoryUI::subTabName(ST::Keys)) == "Key");
+        assert(std::string(InventoryUI::subTabName(ST::COUNT)) == "All");
+        assert(std::string(InventoryUI::menuActionName(MA::Use)) == "Use");
+        assert(std::string(InventoryUI::menuActionName(MA::Unattune)) ==
+               "Unattune");
+        assert(std::string(InventoryUI::menuActionName(MA::COUNT)) == "?");
     }
     { // MainTabSwitch (Tab/Q ciclam 4 abas, cursor reseta)
         InventoryUI ui;

@@ -50,94 +50,50 @@ enum class TarotArcana : uint8_t {
 };
 
 inline const char *tarotName(TarotArcana a) {
-    switch (a) {
-        case TarotArcana::Fool:           return "O Louco";
-        case TarotArcana::Magician:       return "O Mago";
-        case TarotArcana::HighPriestess:  return "A Sacerdotisa";
-        case TarotArcana::Empress:        return "A Imperatriz";
-        case TarotArcana::Emperor:        return "O Imperador";
-        case TarotArcana::Hierophant:     return "O Hierofante";
-        case TarotArcana::Lovers:         return "Os Amantes";
-        case TarotArcana::Chariot:        return "O Carro";
-        case TarotArcana::Strength:       return "A Força";
-        case TarotArcana::Hermit:         return "O Eremita";
-        case TarotArcana::WheelOfFortune: return "A Roda da Fortuna";
-        case TarotArcana::Justice:        return "A Justiça";
-        case TarotArcana::HangedMan:      return "O Enforcado";
-        case TarotArcana::Death:          return "A Morte";
-        case TarotArcana::Temperance:     return "A Temperança";
-        case TarotArcana::Devil:          return "O Diabo";
-        case TarotArcana::Tower:          return "A Torre";
-        case TarotArcana::Star:           return "A Estrela";
-        case TarotArcana::Moon:           return "A Lua";
-        case TarotArcana::Sun:            return "O Sol";
-        case TarotArcana::Judgment:       return "O Julgamento";
-        case TarotArcana::World:          return "O Mundo";
-        case TarotArcana::WandsAce:       return "Ás de Paus";
-        case TarotArcana::WandsTwo:       return "2 de Paus";
-        case TarotArcana::WandsThree:     return "3 de Paus";
-        case TarotArcana::WandsFour:      return "4 de Paus";
-        case TarotArcana::WandsFive:      return "5 de Paus";
-        case TarotArcana::WandsSix:       return "6 de Paus";
-        case TarotArcana::WandsSeven:     return "7 de Paus";
-        case TarotArcana::WandsEight:     return "8 de Paus";
-        case TarotArcana::WandsNine:      return "9 de Paus";
-        case TarotArcana::WandsTen:       return "10 de Paus";
-        case TarotArcana::WandsPage:      return "Pajem de Paus";
-        case TarotArcana::WandsKnight:    return "Cavaleiro de Paus";
-        case TarotArcana::WandsQueen:     return "Rainha de Paus";
-        case TarotArcana::WandsKing:      return "Rei de Paus";
-        case TarotArcana::CupsAce:        return "Ás de Copas";
-        case TarotArcana::CupsTwo:        return "2 de Copas";
-        case TarotArcana::CupsThree:      return "3 de Copas";
-        case TarotArcana::CupsFour:       return "4 de Copas";
-        case TarotArcana::CupsFive:       return "5 de Copas";
-        case TarotArcana::CupsSix:        return "6 de Copas";
-        case TarotArcana::CupsSeven:      return "7 de Copas";
-        case TarotArcana::CupsEight:      return "8 de Copas";
-        case TarotArcana::CupsNine:       return "9 de Copas";
-        case TarotArcana::CupsTen:        return "10 de Copas";
-        case TarotArcana::CupsPage:       return "Pajem de Copas";
-        case TarotArcana::CupsKnight:     return "Cavaleiro de Copas";
-        case TarotArcana::CupsQueen:      return "Rainha de Copas";
-        case TarotArcana::CupsKing:       return "Rei de Copas";
-        case TarotArcana::SwordsAce:      return "Ás de Espadas";
-        case TarotArcana::SwordsTwo:      return "2 de Espadas";
-        case TarotArcana::SwordsThree:    return "3 de Espadas";
-        case TarotArcana::SwordsFour:     return "4 de Espadas";
-        case TarotArcana::SwordsFive:     return "5 de Espadas";
-        case TarotArcana::SwordsSix:      return "6 de Espadas";
-        case TarotArcana::SwordsSeven:    return "7 de Espadas";
-        case TarotArcana::SwordsEight:    return "8 de Espadas";
-        case TarotArcana::SwordsNine:     return "9 de Espadas";
-        case TarotArcana::SwordsTen:      return "10 de Espadas";
-        case TarotArcana::SwordsPage:     return "Pajem de Espadas";
-        case TarotArcana::SwordsKnight:   return "Cavaleiro de Espadas";
-        case TarotArcana::SwordsQueen:    return "Rainha de Espadas";
-        case TarotArcana::SwordsKing:     return "Rei de Espadas";
-        case TarotArcana::PentaclesAce:   return "Ás de Ouros";
-        case TarotArcana::PentaclesTwo:   return "2 de Ouros";
-        case TarotArcana::PentaclesThree: return "3 de Ouros";
-        case TarotArcana::PentaclesFour:  return "4 de Ouros";
-        case TarotArcana::PentaclesFive:  return "5 de Ouros";
-        case TarotArcana::PentaclesSix:   return "6 de Ouros";
-        case TarotArcana::PentaclesSeven: return "7 de Ouros";
-        case TarotArcana::PentaclesEight: return "8 de Ouros";
-        case TarotArcana::PentaclesNine:  return "9 de Ouros";
-        case TarotArcana::PentaclesTen:   return "10 de Ouros";
-        case TarotArcana::PentaclesPage:  return "Pajem de Ouros";
-        case TarotArcana::PentaclesKnight:return "Cavaleiro de Ouros";
-        case TarotArcana::PentaclesQueen: return "Rainha de Ouros";
-        case TarotArcana::PentaclesKing:  return "Rei de Ouros";
-        default:                          return "?";
-    }
+    static constexpr const char *kNames[] = {
+        "O Louco", "O Mago", "A Sacerdotisa", "A Imperatriz", "O Imperador",
+        "O Hierofante", "Os Amantes", "O Carro", "A Força", "O Eremita",
+        "A Roda da Fortuna", "A Justiça", "O Enforcado", "A Morte",
+        "A Temperança", "O Diabo", "A Torre", "A Estrela", "A Lua", "O Sol",
+        "O Julgamento", "O Mundo",
+        "Ás de Paus", "2 de Paus", "3 de Paus", "4 de Paus", "5 de Paus",
+        "6 de Paus", "7 de Paus", "8 de Paus", "9 de Paus", "10 de Paus",
+        "Pajem de Paus", "Cavaleiro de Paus", "Rainha de Paus", "Rei de Paus",
+        "Ás de Copas", "2 de Copas", "3 de Copas", "4 de Copas", "5 de Copas",
+        "6 de Copas", "7 de Copas", "8 de Copas", "9 de Copas", "10 de Copas",
+        "Pajem de Copas", "Cavaleiro de Copas", "Rainha de Copas",
+        "Rei de Copas",
+        "Ás de Espadas", "2 de Espadas", "3 de Espadas", "4 de Espadas",
+        "5 de Espadas", "6 de Espadas", "7 de Espadas", "8 de Espadas",
+        "9 de Espadas", "10 de Espadas", "Pajem de Espadas",
+        "Cavaleiro de Espadas", "Rainha de Espadas", "Rei de Espadas",
+        "Ás de Ouros", "2 de Ouros", "3 de Ouros", "4 de Ouros", "5 de Ouros",
+        "6 de Ouros", "7 de Ouros", "8 de Ouros", "9 de Ouros", "10 de Ouros",
+        "Pajem de Ouros", "Cavaleiro de Ouros", "Rainha de Ouros",
+        "Rei de Ouros",
+    };
+    static_assert(sizeof(kNames) / sizeof(kNames[0]) ==
+                      static_cast<std::size_t>(TarotArcana::COUNT),
+                  "tarotName: tabela fora de sincronia com o enum");
+    const int i = static_cast<int>(a);
+    if (i < 0 || i >= static_cast<int>(TarotArcana::COUNT)) return "?";
+    return kNames[i];
 }
 
 // Raridade do fado: dirige peso do destino e chance de sorteio.
 // Lendário 4 (Devil, Tower, World, Judgment), Épico 8, Raro 10
 // (restam os Maiores), Incomum 16 (Ás + corte dos naipes),
 // Comum 40 (resto dos Menores). 4+8+10+16+40 = 78.
-enum class TarotTier : uint8_t { Common, Uncommon, Rare, Epic, Legendary };
+enum class TarotTier : uint8_t {
+    Common,
+    Uncommon,
+    Rare,
+    Epic,
+    Legendary,
+    COUNT
+};
+
+inline constexpr int kTarotTierCount = static_cast<int>(TarotTier::COUNT);
 
 inline TarotTier tierOf(TarotArcana a) {
     switch (a) {
@@ -180,14 +136,13 @@ inline TarotTier tierOf(TarotArcana a) {
 // Peso do destino por tier: 1/2/5/10/25. Sem escolha, sem descarte:
 // o peso só zera apagando o personagem (deleteCharacter).
 inline int weightOf(TarotTier t) {
-    switch (t) {
-        case TarotTier::Common:    return 1;
-        case TarotTier::Uncommon:  return 2;
-        case TarotTier::Rare:      return 5;
-        case TarotTier::Epic:      return 10;
-        case TarotTier::Legendary: return 25;
-    }
-    return 0;
+    static constexpr int kWeights[] = {1, 2, 5, 10, 25}; // Common..Legendary
+    static_assert(sizeof(kWeights) / sizeof(kWeights[0]) ==
+                      static_cast<std::size_t>(kTarotTierCount),
+                  "weightOf: tabela fora de sincronia com o enum");
+    const int i = static_cast<int>(t);
+    if (i < 0 || i >= kTarotTierCount) return 0;
+    return kWeights[i];
 }
 
 // Chance base de fado por morte (1%). Elite (variante nv4+) ×5;

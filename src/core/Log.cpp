@@ -14,24 +14,33 @@ namespace core {
 LogLevel Log::minLevel_ = LogLevel::Debug;
 
 namespace {
+// Debug=0..Error=3 (ordem do enum LogLevel, sem COUNT: tabela local).
+constexpr int kLevelCount = 4;
+
 const char *levelName(LogLevel l) {
-    switch (l) {
-        case LogLevel::Debug: return "DEBUG";
-        case LogLevel::Info:  return "INFO";
-        case LogLevel::Warn:  return "WARN";
-        case LogLevel::Error: return "ERROR";
-    }
-    return "?";
+    static constexpr const char *kNames[] = {"DEBUG", "INFO", "WARN",
+                                             "ERROR"};
+    static_assert(sizeof(kNames) / sizeof(kNames[0]) ==
+                      static_cast<std::size_t>(kLevelCount),
+                  "levelName: tabela fora de sincronia com o enum");
+    const int i = static_cast<int>(l);
+    if (i < 0 || i >= kLevelCount) return "?";
+    return kNames[i];
 }
 
 const char *levelColor(LogLevel l) {
-    switch (l) {
-        case LogLevel::Debug: return "\033[36m"; // cyan
-        case LogLevel::Info:  return "\033[32m"; // green
-        case LogLevel::Warn:  return "\033[33m"; // yellow
-        case LogLevel::Error: return "\033[31m"; // red
-    }
-    return "";
+    static constexpr const char *kColors[] = {
+        "\033[36m", // Debug: cyan
+        "\033[32m", // Info: green
+        "\033[33m", // Warn: yellow
+        "\033[31m", // Error: red
+    };
+    static_assert(sizeof(kColors) / sizeof(kColors[0]) ==
+                      static_cast<std::size_t>(kLevelCount),
+                  "levelColor: tabela fora de sincronia com o enum");
+    const int i = static_cast<int>(l);
+    if (i < 0 || i >= kLevelCount) return "";
+    return kColors[i];
 }
 } // namespace
 

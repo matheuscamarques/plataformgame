@@ -34,36 +34,41 @@ namespace support {
 // ─── Nomes / filtro ──────────────────────────────────────────
 
 const char* InventoryUI::mainTabName(MainTab t) {
-    switch (t) {
-        case MainTab::Equipment: return "Equipment";
-        case MainTab::Status:    return "Status";
-        case MainTab::System:    return "System";
-        default:                 return "Inventory";
-    }
+    // Inventory=0 é o default ("Inventory"): tabela[0] espelha.
+    static constexpr const char* kNames[] = {
+        "Inventory", "Equipment", "Status", "System",
+    };
+    static_assert(sizeof(kNames) / sizeof(kNames[0]) ==
+                      static_cast<std::size_t>(MainTab::COUNT),
+                  "mainTabName: tabela fora de sincronia com o enum");
+    const int i = static_cast<int>(t);
+    if (i < 0 || i >= static_cast<int>(MainTab::COUNT)) return "Inventory";
+    return kNames[i];
 }
 
 const char* InventoryUI::subTabName(SubTab s) {
-    switch (s) {
-        case SubTab::Materials:   return "Mat";
-        case SubTab::Consumables: return "Cons";
-        case SubTab::Weapons:     return "Wpn";
-        case SubTab::Armor:       return "Arm";
-        case SubTab::Keys:        return "Key";
-        default:                  return "All";
-    }
+    // All=0 é o default ("All"): tabela[0] espelha.
+    static constexpr const char* kNames[] = {
+        "All", "Mat", "Cons", "Wpn", "Arm", "Key",
+    };
+    static_assert(sizeof(kNames) / sizeof(kNames[0]) ==
+                      static_cast<std::size_t>(SubTab::COUNT),
+                  "subTabName: tabela fora de sincronia com o enum");
+    const int i = static_cast<int>(s);
+    if (i < 0 || i >= static_cast<int>(SubTab::COUNT)) return "All";
+    return kNames[i];
 }
 
 const char* InventoryUI::menuActionName(MenuAction a) {
-    switch (a) {
-        case MenuAction::Use:     return "Use";
-        case MenuAction::Equip:   return "Equip";
-        case MenuAction::Unequip: return "Unequip";
-        case MenuAction::Drop:    return "Drop";
-        case MenuAction::Arrange: return "Arrange";
-        case MenuAction::Attune:  return "Attune";
-        case MenuAction::Unattune: return "Unattune";
-        default:                  return "?";
-    }
+    static constexpr const char* kNames[] = {
+        "Use", "Equip", "Unequip", "Drop", "Arrange", "Attune", "Unattune",
+    };
+    static_assert(sizeof(kNames) / sizeof(kNames[0]) ==
+                      static_cast<std::size_t>(MenuAction::COUNT),
+                  "menuActionName: tabela fora de sincronia com o enum");
+    const int i = static_cast<int>(a);
+    if (i < 0 || i >= static_cast<int>(MenuAction::COUNT)) return "?";
+    return kNames[i];
 }
 
 bool InventoryUI::matchesSubTab(const core::ItemDef* def, SubTab sub) {

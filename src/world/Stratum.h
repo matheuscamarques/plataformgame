@@ -19,20 +19,17 @@ inline constexpr int STRATUM_TOP[STRATUM_COUNT] = {
 };
 
 inline const char *stratumName(int s) {
-    switch (s) {
-        case 0:  return "Superficie";
-        case 1:  return "Cavernas Rasas";
-        case 2:  return "Bosque Fungico";
-        case 3:  return "Veios de Prata";
-        case 4:  return "Minas Antigas";
-        case 5:  return "Cristais";
-        case 6:  return "Saloes Derretidos";
-        case 7:  return "Vazio Primordial";
-        case 8:  return "Coracao Partido";
-        case 9:  return "Nucleo";
-        case 10: return "O Fundo";
-        default: return "?";
-    }
+    static constexpr const char *kNames[STRATUM_COUNT] = {
+        "Superficie",      "Cavernas Rasas", "Bosque Fungico",
+        "Veios de Prata",  "Minas Antigas",  "Cristais",
+        "Saloes Derretidos", "Vazio Primordial", "Coracao Partido",
+        "Nucleo",          "O Fundo",
+    };
+    static_assert(sizeof(kNames) / sizeof(kNames[0]) ==
+                      static_cast<std::size_t>(STRATUM_COUNT),
+                  "stratumName: tabela fora de sincronia com STRATUM_COUNT");
+    if (s < 0 || s >= STRATUM_COUNT) return "?";
+    return kNames[s];
 }
 
 // ty negativo (céu) = 0; ty além do fundo = 10 (clamp).

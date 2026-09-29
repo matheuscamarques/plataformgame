@@ -31,8 +31,8 @@ sf::Color rarityColor(core::ItemRarity r) {
         case ItemRarity::Rare:      return {100, 160, 255};
         case ItemRarity::Epic:      return {190, 110, 255};
         case ItemRarity::Legendary: return {255, 170, 60};
+        default:                    return {200, 200, 200}; // COUNT/inválido
     }
-    return {200, 200, 200};
 }
 } // namespace
 
