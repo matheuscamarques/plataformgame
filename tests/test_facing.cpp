@@ -81,6 +81,8 @@ int main() {
         assert(artDirFor(PlayerPose::Idle, Facing::SW) == Facing::SE);
         assert(artDirFor(PlayerPose::WalkA, Facing::N) == Facing::N);
         assert(artDirFor(PlayerPose::WalkB, Facing::SW) == Facing::SE);
+        assert(artDirFor(PlayerPose::WalkC, Facing::NE) == Facing::NE);
+        assert(artDirFor(PlayerPose::WalkD, Facing::S) == Facing::S);
         // Onda 2a: Punch entra no conjunto (PunchUp/Jump seguem em E).
         assert(artDirFor(PlayerPose::Punch, Facing::N) == Facing::N);
         assert(artDirFor(PlayerPose::Punch, Facing::SW) == Facing::SE);

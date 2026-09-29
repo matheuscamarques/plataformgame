@@ -133,6 +133,8 @@ SpriteFrameData frameData(support::SpriteFrameId id) {
         case SpriteFrameId::PlayerIdle:
         case SpriteFrameId::PlayerWalkA:
         case SpriteFrameId::PlayerWalkB:
+        case SpriteFrameId::PlayerWalkC:
+        case SpriteFrameId::PlayerWalkD:
         case SpriteFrameId::PlayerJump:
         case SpriteFrameId::PlayerThrow:
         case SpriteFrameId::PlayerPunch:

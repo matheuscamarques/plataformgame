@@ -69,9 +69,11 @@ namespace {
 constexpr AnimKeyframe kIdleFrames[1] = {
     {SpriteFrameId::PlayerIdle, 0.25f, 0},
 };
-constexpr AnimKeyframe kWalkFrames[2] = {
-    {SpriteFrameId::PlayerWalkA, 0.10f, support::AnimEvent::Step},
+constexpr AnimKeyframe kWalkFrames[4] = {
+    {SpriteFrameId::PlayerWalkA, 0.10f, 0},
     {SpriteFrameId::PlayerWalkB, 0.10f, support::AnimEvent::Step},
+    {SpriteFrameId::PlayerWalkC, 0.10f, 0},
+    {SpriteFrameId::PlayerWalkD, 0.10f, support::AnimEvent::Step},
 };
 
 } // namespace
@@ -82,7 +84,7 @@ const support::AnimClip &idleClip() {
 }
 
 const support::AnimClip &walkClip() {
-    static constexpr support::AnimClip k{"walk", kWalkFrames, 2, true};
+    static constexpr support::AnimClip k{"walk", kWalkFrames, 4, true};
     return k;
 }
 

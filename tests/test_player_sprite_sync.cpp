@@ -89,6 +89,10 @@ int main() {
                PlayerPose::WalkA);
         assert(game::poseForFrameId(SpriteFrameId::PlayerWalkB) ==
                PlayerPose::WalkB);
+        assert(game::poseForFrameId(SpriteFrameId::PlayerWalkC) ==
+               PlayerPose::WalkC);
+        assert(game::poseForFrameId(SpriteFrameId::PlayerWalkD) ==
+               PlayerPose::WalkD);
         assert(game::poseForFrameId(SpriteFrameId::PlayerJump) ==
                PlayerPose::Jump);
         assert(game::poseForFrameId(SpriteFrameId::PlayerThrow) ==

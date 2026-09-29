@@ -177,7 +177,8 @@ int main() {
         checkRows(kPlayerWalkB_NE_Arms, 16);
     }
     { // WalkPresenceSymDiff (vivas + S/N simétricas + 3/4 + ≠E)
-        const PlayerPose poses[] = {PlayerPose::WalkA, PlayerPose::WalkB};
+        const PlayerPose poses[] = {PlayerPose::WalkA, PlayerPose::WalkB,
+                                    PlayerPose::WalkC, PlayerPose::WalkD};
         const Facing syms[] = {Facing::S, Facing::N};
         const Facing asyms[] = {Facing::SE, Facing::NE};
         const Facing all4[] = {Facing::S, Facing::SE, Facing::NE,

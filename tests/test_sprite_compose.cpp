@@ -108,8 +108,8 @@ int main() {
         for (int row = 0; row < 36; ++row) assert(got[row] == "............");
         assert(got[36] == kPlayerIdleHead[0]);
     }
-    { // PosesCoverAllFrames (10 poses × 4 partes com dims certas)
-        assert(kPlayerPoseCount == 10);
+    { // PosesCoverAllFrames (12 poses × 4 partes com dims certas)
+        assert(kPlayerPoseCount == 12);
         for (int i = 0; i < kPlayerPoseCount; ++i) {
             const assets::Part* pp =
                 poseParts(static_cast<PlayerPose>(i));
@@ -145,6 +145,21 @@ int main() {
             const auto f = assets::frameData(id);
             assert(f.rows != nullptr && f.w == 12 && f.h == 40);
             const assets::Part* pp = poseParts(static_cast<PlayerPose>(i));
+            const std::vector<std::string> composed =
+                assets::compose(pp, 4, 12, 40);
+            for (int row = 0; row < 40; ++row)
+                assert(std::string(f.rows[row]) == composed[row]);
+        }
+        // WalkC/D moram no fim do enum (sem deslocar ids): checagem direta.
+        const support::SpriteFrameId extraIds[] = {
+            support::SpriteFrameId::PlayerWalkC,
+            support::SpriteFrameId::PlayerWalkD};
+        const PlayerPose extraPoses[] = {PlayerPose::WalkC,
+                                         PlayerPose::WalkD};
+        for (int k = 0; k < 2; ++k) {
+            const auto f = assets::frameData(extraIds[k]);
+            assert(f.rows != nullptr && f.w == 12 && f.h == 40);
+            const assets::Part* pp = poseParts(extraPoses[k]);
             const std::vector<std::string> composed =
                 assets::compose(pp, 4, 12, 40);
             for (int row = 0; row < 40; ++row)

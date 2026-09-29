@@ -67,6 +67,10 @@ enum class SpriteFrameId : uint8_t {
     ConstructIdle,
     PureElementalIdle,
 
+    // Marcha 4-frame (onda D): no fim p/ não deslocar ids existentes.
+    PlayerWalkC,
+    PlayerWalkD,
+
     COUNT
 };
 

@@ -32,8 +32,7 @@ inline support::SpriteFrameId resolvePlayerSprite(bool onGround, float vx,
                                                    int walkFrame) {
     using support::SpriteFrameId;
     using support::AimDir;
-    if (hurt) return SpriteFrameId::PlayerHurt;
-    // Corpo reflete a direção congelada do golpe (attackAim), não o
+    if (hurt) return SpriteFrameId::PlayerHurt;    // Corpo reflete a direção congelada do golpe (attackAim), não o
     // input vivo: sprite e hitbox leem o mesmo snapshot.
     if (attackingMelee) {
         switch (attackAim) {
@@ -49,8 +48,12 @@ inline support::SpriteFrameId resolvePlayerSprite(bool onGround, float vx,
     if (attackingThrow) return SpriteFrameId::PlayerThrow;
     if (!onGround) return SpriteFrameId::PlayerJump;
     if (std::fabs(vx) > 5.f) {
-        return (walkFrame % 2 == 0) ? SpriteFrameId::PlayerWalkA
-                                    : SpriteFrameId::PlayerWalkB;
+        switch (walkFrame % 4) {
+            case 0: return SpriteFrameId::PlayerWalkA;
+            case 1: return SpriteFrameId::PlayerWalkB;
+            case 2: return SpriteFrameId::PlayerWalkC;
+            default: return SpriteFrameId::PlayerWalkD;
+        }
     }
     return SpriteFrameId::PlayerIdle;
 }
@@ -112,6 +115,8 @@ inline sprites::PlayerPose poseForFrameId(support::SpriteFrameId id) {
         case SpriteFrameId::PlayerIdle:      return PlayerPose::Idle;
         case SpriteFrameId::PlayerWalkA:     return PlayerPose::WalkA;
         case SpriteFrameId::PlayerWalkB:     return PlayerPose::WalkB;
+        case SpriteFrameId::PlayerWalkC:     return PlayerPose::WalkC;
+        case SpriteFrameId::PlayerWalkD:     return PlayerPose::WalkD;
         case SpriteFrameId::PlayerJump:      return PlayerPose::Jump;
         case SpriteFrameId::PlayerThrow:     return PlayerPose::Throw;
         case SpriteFrameId::PlayerPunch:     return PlayerPose::Punch;
@@ -141,6 +146,8 @@ inline support::Facing artDirFor(sprites::PlayerPose pose,
         case sprites::PlayerPose::Idle:
         case sprites::PlayerPose::WalkA:
         case sprites::PlayerPose::WalkB:
+        case sprites::PlayerPose::WalkC:
+        case sprites::PlayerPose::WalkD:
         case sprites::PlayerPose::Punch:
         case sprites::PlayerPose::PunchUp:
         case sprites::PlayerPose::PunchDown:

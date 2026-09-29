@@ -142,15 +142,19 @@ int main() {
         assert(p.startSwing());
         assert(p.anim.currentFrame() == SpriteFrameId::PlayerPunchUp);
     }
-    { // WalkClipData (A/B em 0.10s, loop, Step nos contacts)
+    { // WalkClipData (A/B/C/D em 0.10s, loop, Step só nos contacts)
         AnimPlayer a;
         a.play(game::walkClip());
         assert(a.currentFrame() == SpriteFrameId::PlayerWalkA);
-        assert(a.consumeEvents() == Step); // contact A
-        a.tick(0.05f);
-        assert(a.currentFrame() == SpriteFrameId::PlayerWalkA);
-        a.tick(0.06f); // 0.11: contact B
+        assert(a.consumeEvents() == 0); // passing: sem poeira
+        a.tick(0.11f);                  // contact B
         assert(a.currentFrame() == SpriteFrameId::PlayerWalkB);
+        assert(a.consumeEvents() == Step);
+        a.tick(0.10f); // passing C: sem Step
+        assert(a.currentFrame() == SpriteFrameId::PlayerWalkC);
+        assert(a.consumeEvents() == 0);
+        a.tick(0.10f); // contact D
+        assert(a.currentFrame() == SpriteFrameId::PlayerWalkD);
         assert(a.consumeEvents() == Step);
         a.tick(0.10f); // loop de volta ao A
         assert(a.currentFrame() == SpriteFrameId::PlayerWalkA);

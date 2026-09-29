@@ -32,6 +32,9 @@ int main() {
         p.tick(); // 0.133s: contact B
         assert(p.loco.currentFrame() == SpriteFrameId::PlayerWalkB);
         assert(p.loco.consumeEvents() == kStep);
+        for (int i = 0; i < 6; ++i) p.tick(); // 0.333s: contact D
+        assert(p.loco.currentFrame() == SpriteFrameId::PlayerWalkD);
+        assert(p.loco.consumeEvents() == kStep);
     }
     { // SwingCongela (marcha em B + 5 ticks de swing: fica no B)
         Player p;

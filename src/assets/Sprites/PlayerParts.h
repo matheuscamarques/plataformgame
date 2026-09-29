@@ -1304,6 +1304,90 @@ inline constexpr assets::Part kPlayerWalkBParts[] = {
     { kPlayerWalkBArms, 12, 16, 0, 12 },
 };
 
+// Marcha 4-frame (onda D): C = passing espelhado (pernas de A +
+// braço/torso de B), D = contact espelhado (pernas de B + braço/
+// torso de A). Recombinação pura, zero arrays novos de arte.
+inline constexpr assets::Part kPlayerWalkCParts[] = {
+    { kPlayerWalkAHead, 12, 12, 0, 0 },
+    { kPlayerWalkBTorso, 12, 16, 0, 12 },
+    { kPlayerWalkALegs, 12, 6, 0, 28 },
+    { kPlayerWalkAFeet, 12, 6, 0, 34 },
+    { kPlayerWalkBArms, 12, 16, 0, 12 },
+};
+
+inline constexpr assets::Part kPlayerWalkDParts[] = {
+    { kPlayerWalkAHead, 12, 12, 0, 0 },
+    { kPlayerWalkATorso, 12, 16, 0, 12 },
+    { kPlayerWalkBLegs, 12, 6, 0, 28 },
+    { kPlayerWalkBFeet, 12, 6, 0, 34 },
+    { kPlayerWalkAArms, 12, 16, 0, 12 },
+};
+
+// Mesma recombinação por direção (S/N/SE/NE reaproveitam suas peças).
+inline constexpr assets::Part kPlayerWalkC_S_Parts[] = {
+    { kPlayerIdleSHead, 12, 12, 0, 0 },
+    { kPlayerIdleSTorso, 12, 16, 0, 12 },
+    { kPlayerIdleSLegs, 12, 6, 0, 28 },
+    { kPlayerIdleSFeet, 12, 6, 0, 34 },
+    { kPlayerWalkB_S_Arms, 12, 16, 0, 12 },
+};
+
+inline constexpr assets::Part kPlayerWalkD_S_Parts[] = {
+    { kPlayerIdleSHead, 12, 12, 0, 0 },
+    { kPlayerIdleSTorso, 12, 16, 0, 12 },
+    { kPlayerWalkB_S_Legs, 12, 6, 0, 28 },
+    { kPlayerWalkB_S_Feet, 12, 6, 0, 34 },
+    { kPlayerWalkA_S_Arms, 12, 16, 0, 12 },
+};
+
+inline constexpr assets::Part kPlayerWalkC_N_Parts[] = {
+    { kPlayerIdleNHead, 12, 12, 0, 0 },
+    { kPlayerIdleNTorso, 12, 16, 0, 12 },
+    { kPlayerIdleNLegs, 12, 6, 0, 28 },
+    { kPlayerIdleNFeet, 12, 6, 0, 34 },
+    { kPlayerWalkB_N_Arms, 12, 16, 0, 12 },
+};
+
+inline constexpr assets::Part kPlayerWalkD_N_Parts[] = {
+    { kPlayerIdleNHead, 12, 12, 0, 0 },
+    { kPlayerIdleNTorso, 12, 16, 0, 12 },
+    { kPlayerWalkB_S_Legs, 12, 6, 0, 28 },
+    { kPlayerWalkB_S_Feet, 12, 6, 0, 34 },
+    { kPlayerWalkA_N_Arms, 12, 16, 0, 12 },
+};
+
+inline constexpr assets::Part kPlayerWalkC_SE_Parts[] = {
+    { kPlayerIdleSEHead, 12, 12, 0, 0 },
+    { kPlayerWalkB_SE_Torso, 12, 16, 0, 12 },
+    { kPlayerIdleSELegs, 12, 6, 0, 28 },
+    { kPlayerIdleSEFeet, 12, 6, 0, 34 },
+    { kPlayerWalkB_SE_Arms, 12, 16, 0, 12 },
+};
+
+inline constexpr assets::Part kPlayerWalkD_SE_Parts[] = {
+    { kPlayerIdleSEHead, 12, 12, 0, 0 },
+    { kPlayerWalkA_SE_Torso, 12, 16, 0, 12 },
+    { kPlayerWalkB_SE_Legs, 12, 6, 0, 28 },
+    { kPlayerWalkB_SE_Feet, 12, 6, 0, 34 },
+    { kPlayerWalkA_SE_Arms, 12, 16, 0, 12 },
+};
+
+inline constexpr assets::Part kPlayerWalkC_NE_Parts[] = {
+    { kPlayerIdleNEHead, 12, 12, 0, 0 },
+    { kPlayerWalkB_NE_Torso, 12, 16, 0, 12 },
+    { kPlayerIdleNELegs, 12, 6, 0, 28 },
+    { kPlayerIdleNEFeet, 12, 6, 0, 34 },
+    { kPlayerWalkB_NE_Arms, 12, 16, 0, 12 },
+};
+
+inline constexpr assets::Part kPlayerWalkD_NE_Parts[] = {
+    { kPlayerIdleNEHead, 12, 12, 0, 0 },
+    { kPlayerWalkA_NE_Torso, 12, 16, 0, 12 },
+    { kPlayerWalkB_NE_Legs, 12, 6, 0, 28 },
+    { kPlayerWalkB_NE_Feet, 12, 6, 0, 34 },
+    { kPlayerWalkA_NE_Arms, 12, 16, 0, 12 },
+};
+
 inline const char* const kPlayerJumpHead[] = {
     ".G........H.",
     ".G........H.",
@@ -2566,6 +2650,7 @@ inline constexpr assets::Part kPlayerThrow_NE_Parts[] = {
 enum class PlayerPose : uint8_t {
     Idle, WalkA, WalkB, Jump, Throw,
     Punch, PunchUp, PunchDown, Hurt, Death,
+    WalkC, WalkD, // marcha 4-frame (onda D): no fim, sem reordenar
     COUNT
 };
 
@@ -2578,13 +2663,15 @@ inline int partIndexForTex(int texIdx) {
     return (texIdx >= 0 && texIdx < 5) ? kMap[texIdx] : 0;
 }
 
-inline constexpr int kPlayerPoseCount = 10;
+inline constexpr int kPlayerPoseCount = 12;
 
 inline const assets::Part* poseParts(PlayerPose p) {
     switch (p) {
         case PlayerPose::Idle:      return kPlayerIdleParts;
         case PlayerPose::WalkA:     return kPlayerWalkAParts;
         case PlayerPose::WalkB:     return kPlayerWalkBParts;
+        case PlayerPose::WalkC:     return kPlayerWalkCParts;
+        case PlayerPose::WalkD:     return kPlayerWalkDParts;
         case PlayerPose::Jump:      return kPlayerJumpParts;
         case PlayerPose::Throw:     return kPlayerThrowParts;
         case PlayerPose::Punch:     return kPlayerPunchParts;
@@ -2651,6 +2738,24 @@ inline const assets::Part* posePartsFor(PlayerPose p, support::Facing d) {
             case support::Facing::NE: return kPlayerWalkB_NE_Parts;
             case support::Facing::N:  return kPlayerWalkB_N_Parts;
             default:                  return kPlayerWalkBParts;
+        }
+    }
+    if (p == PlayerPose::WalkC) {
+        switch (d) {
+            case support::Facing::S:  return kPlayerWalkC_S_Parts;
+            case support::Facing::SE: return kPlayerWalkC_SE_Parts;
+            case support::Facing::NE: return kPlayerWalkC_NE_Parts;
+            case support::Facing::N:  return kPlayerWalkC_N_Parts;
+            default:                  return kPlayerWalkCParts;
+        }
+    }
+    if (p == PlayerPose::WalkD) {
+        switch (d) {
+            case support::Facing::S:  return kPlayerWalkD_S_Parts;
+            case support::Facing::SE: return kPlayerWalkD_SE_Parts;
+            case support::Facing::NE: return kPlayerWalkD_NE_Parts;
+            case support::Facing::N:  return kPlayerWalkD_N_Parts;
+            default:                  return kPlayerWalkDParts;
         }
     }
     if (p == PlayerPose::Punch) {

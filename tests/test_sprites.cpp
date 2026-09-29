@@ -28,11 +28,12 @@ int main() {
         return false;
     };
 
-    { // PlayerWidths (12x40, 10 frames)
+    { // PlayerWidths (12x40, 12 frames)
         using support::SpriteFrameId;
         const support::SpriteFrameId ids[] = {
             SpriteFrameId::PlayerIdle, SpriteFrameId::PlayerWalkA,
-            SpriteFrameId::PlayerWalkB, SpriteFrameId::PlayerJump,
+            SpriteFrameId::PlayerWalkB, SpriteFrameId::PlayerWalkC,
+            SpriteFrameId::PlayerWalkD, SpriteFrameId::PlayerJump,
             SpriteFrameId::PlayerThrow, SpriteFrameId::PlayerPunch,
             SpriteFrameId::PlayerPunchUp, SpriteFrameId::PlayerPunchDown,
             SpriteFrameId::PlayerHurt, SpriteFrameId::PlayerDeath};
@@ -170,6 +171,10 @@ int main() {
                                          false, 0) == SpriteFrameId::PlayerWalkA);
         assert(game::resolvePlayerSprite(true, 100.f, false, false, AimDir::E,
                                          false, 1) == SpriteFrameId::PlayerWalkB);
+        assert(game::resolvePlayerSprite(true, 100.f, false, false, AimDir::E,
+                                         false, 2) == SpriteFrameId::PlayerWalkC);
+        assert(game::resolvePlayerSprite(true, 100.f, false, false, AimDir::E,
+                                         false, 3) == SpriteFrameId::PlayerWalkD);
         assert(game::resolvePlayerSprite(true, 0.f, false, false, AimDir::E,
                                          false, 0) == SpriteFrameId::PlayerIdle);
     }
