@@ -23,25 +23,7 @@ void EnemySystem::spawn(const std::string &kind, float x, float y,
     if (s) slimes_.push_back(std::move(s));
 }
 
-void EnemySystem::forEach(const std::function<void(Enemy &)> &fn) {
-    for (auto &s : slimes_) fn(*s);
-}
-
-void EnemySystem::removeDead(const std::function<void(Enemy&)> &onDeath,
-                             GameContext *ctx) {
-    for (auto it = slimes_.begin(); it != slimes_.end(); ) {
-        if (!(*it)->resources.isDead() && !(*it)->destroyPending) {
-            ++it;
-            continue;
-        }
-        if (ctx && (*it)->ai) (*it)->ai->onDeath(**it, *ctx);
-        // SFX morte por kind (sem ctx.audio em teste = mudo).
-        if (ctx && ctx->audio && (*it)->ai)
-            ctx->audio->play(game::keyOf(deathSfxFor((*it)->ai->kind())));
-        onDeath(**it); // antes do erase (ref pendurada depois)
-        it = slimes_.erase(it);
-    }
-}
+// forEach/removeDead moram no header (templates, sem std::function).
 
 std::size_t EnemySystem::despawnFar(float x, float y, float radius) {
     std::size_t n = 0;
@@ -136,10 +118,11 @@ void EnemySystem::physics(Enemy &s, GameContext &ctx) {
     s.grounded = false;
 
     if (!ctx.world) return;
-    std::vector<Entity *> around;
+    // Reusa o buffer do sistema (sem vector por inimigo por tick).
+    around_.clear();
     ctx.world->query(e.getX() - 2.0f, e.getY() - 2.0f,
-                     e.getW() + 4.0f, e.getH() + 4.0f, around);
-    for (Entity *c : around) {
+                     e.getW() + 4.0f, e.getH() + 4.0f, around_);
+    for (Entity *c : around_) {
         if (c->getName() != core::kIdColide) continue;
         if (e.getBoundsBottom().intersects(*c)) {
             e.setY(c->getY() - e.getH());

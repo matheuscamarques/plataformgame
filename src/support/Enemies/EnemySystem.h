@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <functional>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -115,7 +114,12 @@ public:
     void spawn(const std::string &kind, float x, float y,
                GameContext *ctx = nullptr);
 
-    void forEach(const std::function<void(Enemy &)> &fn);
+    // Sem std::function (C++17: template explícito, não auto): callers
+    // passam lambdas, zero indireção/alocação por inimigo por tick.
+    template <typename F>
+    void forEach(F&& fn) {
+        for (auto &s : slimes_) fn(*s);
+    }
     std::size_t count() const { return slimes_.size(); }
 
     // Limpa todos (restart da run). Slimes iniciais respawnam pelo caller.
@@ -126,8 +130,23 @@ public:
     // Com ctx, dispara ai->onDeath antes do erase (hook opcional).
     // Também varre destroyPending (markForDestroy): morte marcada
     // durante iteração cai aqui no fim do frame, nunca no meio do loop.
-    void removeDead(const std::function<void(Enemy&)> &onDeath,
-                    GameContext *ctx = nullptr);
+    // Template (sem std::function): callers passam lambdas, zero indireção.
+    template <typename F>
+    void removeDead(F&& onDeath, GameContext *ctx = nullptr) {
+        for (auto it = slimes_.begin(); it != slimes_.end(); ) {
+            if (!(*it)->resources.isDead() && !(*it)->destroyPending) {
+                ++it;
+                continue;
+            }
+            if (ctx && (*it)->ai) (*it)->ai->onDeath(**it, *ctx);
+            // SFX morte por kind (sem ctx.audio em teste = mudo).
+            if (ctx && ctx->audio && (*it)->ai)
+                ctx->audio->play(
+                    game::keyOf(deathSfxFor((*it)->ai->kind())));
+            onDeath(**it); // antes do erase (ref pendurada depois)
+            it = slimes_.erase(it);
+        }
+    }
 
     // Marca p/ destruição adiada (seguro dentro de forEach/tick).
     // O erase acontece no próximo removeDead.
@@ -141,6 +160,8 @@ private:
     void physics(Enemy &s, GameContext &ctx);
 
     std::vector<std::unique_ptr<Enemy>> slimes_;
+    // Rascunho por tick (sem allocar por inimigo): limpo a cada uso.
+    std::vector<Entity *> around_;
 };
 
 } // namespace support

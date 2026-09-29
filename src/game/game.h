@@ -24,6 +24,7 @@
 #include "../support/Debug/ScreenshotSystem.h"
 #include "../support/Input/InputMap.h"
 #include "support/Progression/RunManager.h"
+#include "support/Combat/ExplosionSystem.h"
 #include "assets/Sprites/SpriteSet.h"
 #include "core/AudioSystem.h"
 #include "core/Bloom.h"
@@ -118,6 +119,8 @@ private:
     std::unique_ptr<support::ChunkLoader> chunkLoader_;
     bool charView_ = false; // F3: ASCII por char, sem textura
     int tickCount_ = 0; // p/ animação walk do anão
+    // Alvos de explosão por tick (sem vector por tick; ctx aponta aqui).
+    std::vector<support::ExplosionTarget> targets_;
     // Debug A/B de playtest (F8/[): 0 = produção (ambos, por arma).
     int swooshMode_ = 0;      // 0 ambos, 1 só windup, 2 só impacto
     int hitstopOverride_ = 0; // 0 = WeaponDef, senão slots globais

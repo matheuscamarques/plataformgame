@@ -416,18 +416,19 @@ void Game::tick() {
     // Sistemas (inimigos etc.): scheduler com prioridade declarada.
     // BodySystem reconstrói hitboxes pós-movimento (priority 250).
     // Alvos de explosão: montados aqui (Player + Slimes), lidos pelo
-    // ExplosionSystem durante o tick do ThrowSystem.
-    std::vector<support::ExplosionTarget> targets;
-    targets.push_back({core::Vec2f(p->getCenterX(), p->getCenterY()),
+    // ExplosionSystem durante o tick do ThrowSystem. Buffer membro
+    // (sem vector por tick).
+    targets_.clear();
+    targets_.push_back({core::Vec2f(p->getCenterX(), p->getCenterY()),
                        &p->body, nullptr, true, p, nullptr});
     enemies_->forEach([&](support::Enemy &s) {
         if (s.resources.isDead()) return;
-        targets.push_back({core::Vec2f(s.body.getCenterX(), s.body.getCenterY()),
+        targets_.push_back({core::Vec2f(s.body.getCenterX(), s.body.getCenterY()),
                            &s.bodyParts, &s.resources, false,
                            &s.body, &s.knockbackLock});
     });
     support::GameContext ctx{getWorld(), p, &input_, enemies_,
-                              throws_, explodes_, drops_, &targets,
+                              throws_, explodes_, drops_, &targets_,
                               &screenshots_, &debugFeed_, &audio_, &camera,
                               &dayNight_};
     // Flags de debug A/B (F8/[, defaults = produção).
