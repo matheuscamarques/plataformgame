@@ -66,23 +66,50 @@ int main() {
             assert(p.facing == facingSign(f));
         }
     }
-    { // DirectedPose (Fase D infra: só side-view, mirror em NW/W/SW)
+    { // DirectedPose (Fase D: Idle/Walk têm 5 dirs; resto cai em E)
+        using game::artDirFor;
         using game::directedPose;
         using sprites::PlayerPose;
-        const Facing all[] = {Facing::E,  Facing::NE, Facing::N,
-                              Facing::NW, Facing::W,  Facing::SW,
-                              Facing::S,  Facing::SE};
-        for (Facing f : all) {
-            const auto d = directedPose(PlayerPose::Idle, f);
-            assert(d.pose == PlayerPose::Idle); // passa a pose adiante
-            assert(d.artDir == Facing::E);      // só side-view existe
-            assert(d.mirror == isMirrored(f));
-        }
-        // Outras poses passam intactas (WalkA/N sem espelho).
-        const auto w = directedPose(PlayerPose::WalkA, Facing::N);
-        assert(w.pose == PlayerPose::WalkA && !w.mirror);
+        // Onda 1: base dobra NW→NE, W→E, SW→SE.
+        assert(artDirFor(PlayerPose::Idle, Facing::S) == Facing::S);
+        assert(artDirFor(PlayerPose::Idle, Facing::SE) == Facing::SE);
+        assert(artDirFor(PlayerPose::Idle, Facing::E) == Facing::E);
+        assert(artDirFor(PlayerPose::Idle, Facing::NE) == Facing::NE);
+        assert(artDirFor(PlayerPose::Idle, Facing::N) == Facing::N);
+        assert(artDirFor(PlayerPose::Idle, Facing::NW) == Facing::NE);
+        assert(artDirFor(PlayerPose::Idle, Facing::W) == Facing::E);
+        assert(artDirFor(PlayerPose::Idle, Facing::SW) == Facing::SE);
+        assert(artDirFor(PlayerPose::WalkA, Facing::N) == Facing::N);
+        assert(artDirFor(PlayerPose::WalkB, Facing::SW) == Facing::SE);
+        // Fora da onda: sempre E (PunchUp p/ cima continua side-view).
+        assert(artDirFor(PlayerPose::Punch, Facing::N) == Facing::E);
+        assert(artDirFor(PlayerPose::PunchUp, Facing::N) == Facing::E);
+        assert(artDirFor(PlayerPose::Jump, Facing::S) == Facing::E);
+        // directedPose carrega pose + artDir + espelho juntos.
+        const auto d = directedPose(PlayerPose::Idle, Facing::NW);
+        assert(d.pose == PlayerPose::Idle);
+        assert(d.artDir == Facing::NE && d.mirror);
+        const auto e = directedPose(PlayerPose::Idle, Facing::E);
+        assert(e.artDir == Facing::E && !e.mirror);
         const auto h = directedPose(PlayerPose::Hurt, Facing::SW);
-        assert(h.pose == PlayerPose::Hurt && h.mirror);
+        assert(h.pose == PlayerPose::Hurt);
+        assert(h.artDir == Facing::E && h.mirror);
+    }
+    { // PosePartsForCaiEmE (sem arte direcional: mesmo ponteiro)
+        for (int pi = 0; pi < sprites::kPlayerPoseCount; ++pi) {
+            const auto pose = static_cast<sprites::PlayerPose>(pi);
+            assert(sprites::posePartsFor(pose, Facing::E) ==
+                   sprites::poseParts(pose));
+        }
+        // Índices 0..4 cobrem S/SE/E/NE/N; fora cai em E.
+        assert(sprites::artDirIndex(Facing::S) == 0);
+        assert(sprites::artDirIndex(Facing::SE) == 1);
+        assert(sprites::artDirIndex(Facing::E) == 2);
+        assert(sprites::artDirIndex(Facing::NE) == 3);
+        assert(sprites::artDirIndex(Facing::N) == 4);
+        assert(sprites::artDirForIndex(0) == Facing::S);
+        assert(sprites::artDirForIndex(4) == Facing::N);
+        assert(sprites::artDirForIndex(99) == Facing::E);
     }
     { // DeadzoneMantem (ruído ~0 não flipa; eixo dominante manda)
         using support::facingFromVelocity;

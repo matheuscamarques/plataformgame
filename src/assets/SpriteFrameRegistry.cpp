@@ -27,28 +27,39 @@ struct ComposedFrame {
     std::vector<const char*> rows;
 };
 
-const ComposedFrame& composedFor(sprites::PlayerPose pose) {
-    static ComposedFrame cache[sprites::kPlayerPoseCount];
-    static bool built = false;
-    if (!built) {
-        for (int i = 0; i < sprites::kPlayerPoseCount; ++i) {
-            const Part* pp = sprites::poseParts(
-                static_cast<sprites::PlayerPose>(i));
-            ComposedFrame& c = cache[i];
-            c.text = compose(pp, 4, sprites::kPlayerW, sprites::kPlayerH);
-            c.rows.reserve(c.text.size());
-            for (const auto& s : c.text) c.rows.push_back(s.c_str());
-        }
-        built = true;
+const ComposedFrame& composedFor(sprites::PlayerPose pose,
+                                 support::Facing artDir) {
+    static ComposedFrame cache[sprites::kPlayerPoseCount]
+                              [sprites::kArtDirCount];
+    static bool built[sprites::kPlayerPoseCount][sprites::kArtDirCount] = {};
+    const int pi = static_cast<int>(pose);
+    const int di = sprites::artDirIndex(artDir);
+    if (!built[pi][di]) {
+        const Part* pp = sprites::posePartsFor(
+            static_cast<sprites::PlayerPose>(pi),
+            sprites::artDirForIndex(di));
+        ComposedFrame& c = cache[pi][di];
+        c.text = compose(pp, 4, sprites::kPlayerW, sprites::kPlayerH);
+        c.rows.reserve(c.text.size());
+        for (const auto& s : c.text) c.rows.push_back(s.c_str());
+        built[pi][di] = true;
     }
-    return cache[static_cast<int>(pose)];
+    return cache[pi][di];
 }
 
 const char* const* composedRows(support::SpriteFrameId id) {
-    return composedFor(game::poseForFrameId(id)).rows.data();
+    return composedFor(game::poseForFrameId(id), support::Facing::E)
+        .rows.data();
 }
 
 } // namespace
+
+SpriteFrameData playerFrameData(sprites::PlayerPose pose,
+                                support::Facing artDir) {
+    const ComposedFrame& c = composedFor(pose, artDir);
+    return {c.rows.data(), sprites::kPlayerW, sprites::kPlayerH,
+            sprites::kPlayerPal, sprites::kPlayerPalCount};
+}
 
 // Fonte única dos frames estáticos (item 2 da faxina): mesmos
 // rows/dimensões/paleta do switch antigo, sem repetir a tripla.

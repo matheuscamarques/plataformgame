@@ -10,6 +10,7 @@
 #pragma once
 
 #include "assets/SpriteComposer.h"
+#include "support/Combat/Facing.h"
 
 namespace sprites {
 
@@ -855,6 +856,40 @@ inline const assets::Part* poseParts(PlayerPose p) {
         case PlayerPose::Death:     return kPlayerDeathParts;
         default:                    return kPlayerIdleParts;
     }
+}
+
+// Direções com arte (Fase D, onda 1: Idle/Walk; resto cai em E).
+// Ordem canônica p/ caches e texturas [pose][dir].
+inline constexpr int kArtDirCount = 5;
+
+inline int artDirIndex(support::Facing d) {
+    switch (d) {
+        case support::Facing::S:  return 0;
+        case support::Facing::SE: return 1;
+        case support::Facing::E:  return 2;
+        case support::Facing::NE: return 3;
+        case support::Facing::N:  return 4;
+        default:                  return 2; // NW/W/SW: resolve p/ base antes
+    }
+}
+
+// Inversa (loops de build/cache): 0..4 → S/SE/E/NE/N.
+inline support::Facing artDirForIndex(int i) {
+    switch (i) {
+        case 0: return support::Facing::S;
+        case 1: return support::Facing::SE;
+        case 2: return support::Facing::E;
+        case 3: return support::Facing::NE;
+        case 4: return support::Facing::N;
+        default: return support::Facing::E;
+    }
+}
+
+// Partes por (pose, direção de arte). Sem arte direcional ainda:
+// tudo resolve p/ side-view (byte-idêntico ao poseParts).
+inline const assets::Part* posePartsFor(PlayerPose p, support::Facing d) {
+    (void)d;
+    return poseParts(p);
 }
 
 } // namespace sprites

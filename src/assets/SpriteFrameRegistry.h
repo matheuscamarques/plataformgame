@@ -8,7 +8,9 @@
 #pragma once
 #include <cstddef>
 
+#include "assets/Sprites/PlayerParts.h"
 #include "core/sprite_from_ascii.h"
+#include "support/Combat/Facing.h"
 #include "support/Combat/SpriteFrame.h"
 
 namespace assets {
@@ -22,6 +24,12 @@ struct SpriteFrameData {
 };
 
 SpriteFrameData frameData(support::SpriteFrameId id);
+
+// Frame do player por (pose, direção de arte): mesma fonte do build
+// (posePartsFor) com cache composto. frameData() acima serve E
+// (legado/testes); BodySystem usa este p/ hitboxes direcionais.
+SpriteFrameData playerFrameData(sprites::PlayerPose pose,
+                                support::Facing artDir);
 
 // Frames estáticos (tudo menos player/None/COUNT): fonte única dos
 // dados acima e do SpriteSet::build (dimensões/paleta não divergem).

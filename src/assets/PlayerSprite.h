@@ -133,14 +133,21 @@ struct DirectedPose {
     bool mirror = false;      // flip horizontal
 };
 
-inline support::Facing artDirFor(support::Facing f) {
-    (void)f;
-    return support::Facing::E; // só side-view existe; N/NE/S plugam aqui
+inline support::Facing artDirFor(sprites::PlayerPose pose,
+                                 support::Facing f) {
+    // Onda 1 (Idle/Walk) tem 5 dirs; resto cai em side-view.
+    // baseDir dobra NW→NE, W→E, SW→SE (S/SE/E/NE/N com arte).
+    switch (pose) {
+        case sprites::PlayerPose::Idle:
+        case sprites::PlayerPose::WalkA:
+        case sprites::PlayerPose::WalkB: return support::baseDir(f);
+        default:                         return support::Facing::E;
+    }
 }
 
 inline DirectedPose directedPose(sprites::PlayerPose pose,
                                  support::Facing f) {
-    return {pose, artDirFor(f), support::isMirrored(f)};
+    return {pose, artDirFor(pose, f), support::isMirrored(f)};
 }
 
 // Marcha via clip (fecha a Fase C): o resolve arbitra combate vs

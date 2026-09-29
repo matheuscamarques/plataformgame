@@ -1097,8 +1097,10 @@ void Game::drawPlayerSprite(Player *p) {
     const auto directed = game::directedPose(pose, p->facing8);
     const float flip = directed.mirror ? -1.f : 1.f;
     const auto& pp =
-        sprites_.playerParts[static_cast<int>(directed.pose)];
-    const assets::Part* parts = sprites::poseParts(pose);
+        sprites_.playerParts[static_cast<int>(directed.pose)]
+                             [sprites::artDirIndex(directed.artDir)];
+    const assets::Part* parts =
+        sprites::posePartsFor(pose, directed.artDir);
     const core::Item& boots = p->equipment.get(core::EquipSlot::Boots);
     const core::ItemDef* bootsDef =
         boots.isEmpty() ? nullptr : boots.def();

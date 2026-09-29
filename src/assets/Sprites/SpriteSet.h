@@ -34,7 +34,7 @@ struct SpriteSet {
         sf::Texture feet;
         sf::Texture arms;
     };
-    PlayerPartsTex playerParts[kPlayerPoseCount];
+    PlayerPartsTex playerParts[kPlayerPoseCount][kArtDirCount];
     sf::Texture slimeIdle;
     sf::Texture slimeSquash;
     sf::Texture dwarfIdle;
@@ -150,18 +150,23 @@ inline const EnemyTexTarget* enemyTexTargets(int* outCount) {
 inline SpriteSet build() {
     SpriteSet s;
     // Partes: mesma arte dos frames, fatiada (compose() prova igualdade).
+    // Uma cópia por direção de arte (Fase D); sem arte direcional,
+    // todas as dirs apontam p/ side-view (posePartsFor decide).
     for (int i = 0; i < kPlayerPoseCount; ++i) {
-        const assets::Part* pp = poseParts(static_cast<PlayerPose>(i));
-        s.playerParts[i].head = core::makeSprite(
-            pp[0].rows, pp[0].w, pp[0].h, kPlayerPal, kPlayerPalCount);
-        s.playerParts[i].torso = core::makeSprite(
-            pp[1].rows, pp[1].w, pp[1].h, kPlayerPal, kPlayerPalCount);
-        s.playerParts[i].legs = core::makeSprite(
-            pp[2].rows, pp[2].w, pp[2].h, kPlayerPal, kPlayerPalCount);
-        s.playerParts[i].feet = core::makeSprite(
-            pp[3].rows, pp[3].w, pp[3].h, kPlayerPal, kPlayerPalCount);
-        s.playerParts[i].arms = core::makeSprite(
-            pp[4].rows, pp[4].w, pp[4].h, kPlayerPal, kPlayerPalCount);
+        for (int d = 0; d < kArtDirCount; ++d) {
+            const assets::Part* pp = posePartsFor(
+                static_cast<PlayerPose>(i), artDirForIndex(d));
+            s.playerParts[i][d].head = core::makeSprite(
+                pp[0].rows, pp[0].w, pp[0].h, kPlayerPal, kPlayerPalCount);
+            s.playerParts[i][d].torso = core::makeSprite(
+                pp[1].rows, pp[1].w, pp[1].h, kPlayerPal, kPlayerPalCount);
+            s.playerParts[i][d].legs = core::makeSprite(
+                pp[2].rows, pp[2].w, pp[2].h, kPlayerPal, kPlayerPalCount);
+            s.playerParts[i][d].feet = core::makeSprite(
+                pp[3].rows, pp[3].w, pp[3].h, kPlayerPal, kPlayerPalCount);
+            s.playerParts[i][d].arms = core::makeSprite(
+                pp[4].rows, pp[4].w, pp[4].h, kPlayerPal, kPlayerPalCount);
+        }
     }
     // Inimigos: rows/dims/pal vêm da tabela do registry (fonte única);
     // aqui só o destino (membro). Id sem frame = textura vazia, sem crash.

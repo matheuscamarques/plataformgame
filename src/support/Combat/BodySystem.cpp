@@ -7,6 +7,7 @@
 
 #include "BodySystem.h"
 
+#include "assets/PlayerSprite.h"
 #include "assets/SpriteFrameRegistry.h"
 #include "support/Combat/WeaponRegistry.h"
 #include "support/Enemies/EnemySystem.h"
@@ -69,7 +70,10 @@ sf::FloatRect computeWeaponBbox(Player &p) {
 void BodySystem::tick(float /*dt*/, GameContext &ctx) {
     if (ctx.player) {
         Player &p = *ctx.player;
-        const auto f = assets::frameData(p.currentFrameId);
+        // Fase D: hitbox segue a direção de arte (S/SE/E/NE/N).
+        const auto pose = game::poseForFrameId(p.currentFrameId);
+        const auto art = game::artDirFor(pose, p.facing8);
+        const auto f = assets::playerFrameData(pose, art);
         if (f.rows) {
             p.body.rebuildFromSprite(
                 {p.getX(), p.getY()}, {p.getW(), p.getH()},
