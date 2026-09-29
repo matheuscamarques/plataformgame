@@ -45,6 +45,33 @@ void soulGreatUse(Player& p) {
 
 } // namespace
 
+// Fábrica de armaduras (item 8 da faxina): sprite sempre 8x8, tipo
+// Armor, stack 1. Nome/descrição/pal/peso/defesa/raridade variam por
+// peça+material e passam como params (flavor preservado byte a byte).
+core::ItemDef makeArmor(const char* id, const char* name, const char* desc,
+                        const char* const* rows,
+                        const core::PaletteEntry* pal, std::size_t palCount,
+                        float weight, int defense, core::ItemRarity rarity,
+                        core::EquipSlot slot, core::MaterialId material) {
+    core::ItemDef def;
+    def.id = id;
+    def.name = name;
+    def.description = desc;
+    def.spriteRows = rows;
+    def.spriteW = 8;
+    def.spriteH = 8;
+    def.spritePal = pal;
+    def.spritePalCount = palCount;
+    def.weight = weight;
+    def.type = core::ItemType::Armor;
+    def.rarity = rarity;
+    def.stackMax = 1;
+    def.defense = defense;
+    def.equipSlot = slot;
+    def.material = material;
+    return def;
+}
+
 
 // ---- Sprites ASCII 8x8 dos itens (fase 4a; mesmo idioma de makeSprite)
 inline const core::PaletteEntry kItemDynamitePal[] = {
@@ -988,125 +1015,47 @@ REGISTER_ITEM("iron_axe", [] {
     return def;
 }())
 
-REGISTER_ITEM("iron_helm", [] {
-    core::ItemDef def;
-    def.id = "iron_helm";
-    def.description = "Elmo de ferro. Protege a cuca.";
-    def.spriteRows = kItemHelmSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemHelmPal;
-    def.spritePalCount = kItemHelmPalCount;
-    def.name = "Elmo de Ferro";
-    def.weight = 4.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Common;
-    def.stackMax = 1;
-    def.defense = 4;
-    def.equipSlot = core::EquipSlot::Head;
-    def.material = core::MaterialId::Iron;
-    return def;
-}())
+REGISTER_ITEM("iron_helm",
+              makeArmor("iron_helm", "Elmo de Ferro",
+                        "Elmo de ferro. Protege a cuca.", kItemHelmSprite,
+                        kItemHelmPal, kItemHelmPalCount, 4.f, 4,
+                        ItemRarity::Common, core::EquipSlot::Head,
+                        core::MaterialId::Iron));
 
-REGISTER_ITEM("iron_chest", [] {
-    core::ItemDef def;
-    def.id = "iron_chest";
-    def.description = "Peitoral de ferro. Aguenta porrada.";
-    def.spriteRows = kItemChestSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemChestPal;
-    def.spritePalCount = kItemChestPalCount;
-    def.name = "Peitoral de Ferro";
-    def.weight = 9.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Common;
-    def.stackMax = 1;
-    def.defense = 6;
-    def.equipSlot = core::EquipSlot::Chest;
-    def.material = core::MaterialId::Iron;
-    return def;
-}())
+REGISTER_ITEM("iron_chest",
+              makeArmor("iron_chest", "Peitoral de Ferro",
+                        "Peitoral de ferro. Aguenta porrada.", kItemChestSprite,
+                        kItemChestPal, kItemChestPalCount, 9.f, 6,
+                        ItemRarity::Common, core::EquipSlot::Chest,
+                        core::MaterialId::Iron));
 
-REGISTER_ITEM("iron_legs", [] {
-    core::ItemDef def;
-    def.id = "iron_legs";
-    def.description = "Perneiras de ferro. Correr cansa.";
-    def.spriteRows = kItemLegsSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemLegsPal;
-    def.spritePalCount = kItemLegsPalCount;
-    def.name = "Perneiras de Ferro";
-    def.weight = 6.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Common;
-    def.stackMax = 1;
-    def.defense = 4;
-    def.equipSlot = core::EquipSlot::Legs;
-    def.material = core::MaterialId::Iron;
-    return def;
-}())
+REGISTER_ITEM("iron_legs",
+              makeArmor("iron_legs", "Perneiras de Ferro",
+                        "Perneiras de ferro. Correr cansa.", kItemLegsSprite,
+                        kItemLegsPal, kItemLegsPalCount, 6.f, 4,
+                        ItemRarity::Common, core::EquipSlot::Legs,
+                        core::MaterialId::Iron));
 
-REGISTER_ITEM("leather_helm", [] {
-    core::ItemDef def;
-    def.id = "leather_helm";
-    def.description = "Elmo de couro. Leve e barato.";
-    def.spriteRows = kItemHelmSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemLeatherHelmPal;
-    def.spritePalCount = kItemLeatherHelmPalCount;
-    def.name = "Elmo de Couro";
-    def.weight = 2.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Common;
-    def.stackMax = 1;
-    def.defense = 2;
-    def.equipSlot = core::EquipSlot::Head;
-    def.material = core::MaterialId::Leather;
-    return def;
-}())
+REGISTER_ITEM("leather_helm",
+              makeArmor("leather_helm", "Elmo de Couro",
+                        "Elmo de couro. Leve e barato.", kItemHelmSprite,
+                        kItemLeatherHelmPal, kItemLeatherHelmPalCount, 2.f, 2,
+                        ItemRarity::Common, core::EquipSlot::Head,
+                        core::MaterialId::Leather));
 
-REGISTER_ITEM("leather_chest", [] {
-    core::ItemDef def;
-    def.id = "leather_chest";
-    def.description = "Peitoral de couro. Flexivel.";
-    def.spriteRows = kItemChestSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemLeatherChestPal;
-    def.spritePalCount = kItemLeatherChestPalCount;
-    def.name = "Peitoral de Couro";
-    def.weight = 5.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Common;
-    def.stackMax = 1;
-    def.defense = 4;
-    def.equipSlot = core::EquipSlot::Chest;
-    def.material = core::MaterialId::Leather;
-    return def;
-}())
+REGISTER_ITEM("leather_chest",
+              makeArmor("leather_chest", "Peitoral de Couro",
+                        "Peitoral de couro. Flexivel.", kItemChestSprite,
+                        kItemLeatherChestPal, kItemLeatherChestPalCount, 5.f, 4,
+                        ItemRarity::Common, core::EquipSlot::Chest,
+                        core::MaterialId::Leather));
 
-REGISTER_ITEM("leather_legs", [] {
-    core::ItemDef def;
-    def.id = "leather_legs";
-    def.description = "Perneiras de couro. Silenciosas.";
-    def.spriteRows = kItemLegsSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemLeatherLegsPal;
-    def.spritePalCount = kItemLeatherLegsPalCount;
-    def.name = "Perneiras de Couro";
-    def.weight = 3.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Common;
-    def.stackMax = 1;
-    def.defense = 2;
-    def.equipSlot = core::EquipSlot::Legs;
-    def.material = core::MaterialId::Leather;
-    return def;
-}())
+REGISTER_ITEM("leather_legs",
+              makeArmor("leather_legs", "Perneiras de Couro",
+                        "Perneiras de couro. Silenciosas.", kItemLegsSprite,
+                        kItemLeatherLegsPal, kItemLeatherLegsPalCount, 3.f, 2,
+                        ItemRarity::Common, core::EquipSlot::Legs,
+                        core::MaterialId::Leather));
 
 // ---- Matriz ouro/diamante + armas de couro (mesmo padrão) ----
 REGISTER_ITEM("gold_sword", [] {
@@ -1156,65 +1105,26 @@ REGISTER_ITEM("gold_axe", [] {
     return def;
 }())
 
-REGISTER_ITEM("gold_helm", [] {
-    core::ItemDef def;
-    def.id = "gold_helm";
-    def.description = "Elmo de ouro. Chama atenção (inclusive de slime).";
-    def.spriteRows = kItemHelmSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemGoldArmorPal;
-    def.spritePalCount = kItemGoldArmorPalCount;
-    def.name = "Elmo de Ouro";
-    def.weight = 5.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Rare;
-    def.stackMax = 1;
-    def.defense = 5;
-    def.equipSlot = core::EquipSlot::Head;
-    def.material = core::MaterialId::Gold;
-    return def;
-}())
+REGISTER_ITEM("gold_helm",
+              makeArmor("gold_helm", "Elmo de Ouro",
+                        "Elmo de ouro. Chama atenção (inclusive de slime).", kItemHelmSprite,
+                        kItemGoldArmorPal, kItemGoldArmorPalCount, 5.f, 5,
+                        ItemRarity::Rare, core::EquipSlot::Head,
+                        core::MaterialId::Gold));
 
-REGISTER_ITEM("gold_chest", [] {
-    core::ItemDef def;
-    def.id = "gold_chest";
-    def.description = "Peitoral de ouro. Reluzente.";
-    def.spriteRows = kItemChestSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemGoldArmorPal;
-    def.spritePalCount = kItemGoldArmorPalCount;
-    def.name = "Peitoral de Ouro";
-    def.weight = 12.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Rare;
-    def.stackMax = 1;
-    def.defense = 8;
-    def.equipSlot = core::EquipSlot::Chest;
-    def.material = core::MaterialId::Gold;
-    return def;
-}())
+REGISTER_ITEM("gold_chest",
+              makeArmor("gold_chest", "Peitoral de Ouro",
+                        "Peitoral de ouro. Reluzente.", kItemChestSprite,
+                        kItemGoldArmorPal, kItemGoldArmorPalCount, 12.f, 8,
+                        ItemRarity::Rare, core::EquipSlot::Chest,
+                        core::MaterialId::Gold));
 
-REGISTER_ITEM("gold_legs", [] {
-    core::ItemDef def;
-    def.id = "gold_legs";
-    def.description = "Perneiras de ouro. Barulhentas.";
-    def.spriteRows = kItemLegsSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemGoldArmorPal;
-    def.spritePalCount = kItemGoldArmorPalCount;
-    def.name = "Perneiras de Ouro";
-    def.weight = 8.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Rare;
-    def.stackMax = 1;
-    def.defense = 5;
-    def.equipSlot = core::EquipSlot::Legs;
-    def.material = core::MaterialId::Gold;
-    return def;
-}())
+REGISTER_ITEM("gold_legs",
+              makeArmor("gold_legs", "Perneiras de Ouro",
+                        "Perneiras de ouro. Barulhentas.", kItemLegsSprite,
+                        kItemGoldArmorPal, kItemGoldArmorPalCount, 8.f, 5,
+                        ItemRarity::Rare, core::EquipSlot::Legs,
+                        core::MaterialId::Gold));
 
 REGISTER_ITEM("diamond_sword", [] {
     core::ItemDef def;
@@ -1263,65 +1173,26 @@ REGISTER_ITEM("diamond_axe", [] {
     return def;
 }())
 
-REGISTER_ITEM("diamond_helm", [] {
-    core::ItemDef def;
-    def.id = "diamond_helm";
-    def.description = "Elmo de diamante. Praticamente eterno.";
-    def.spriteRows = kItemHelmSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemDiamondArmorPal;
-    def.spritePalCount = kItemDiamondArmorPalCount;
-    def.name = "Elmo de Diamante";
-    def.weight = 3.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Epic;
-    def.stackMax = 1;
-    def.defense = 8;
-    def.equipSlot = core::EquipSlot::Head;
-    def.material = core::MaterialId::Diamond;
-    return def;
-}())
+REGISTER_ITEM("diamond_helm",
+              makeArmor("diamond_helm", "Elmo de Diamante",
+                        "Elmo de diamante. Praticamente eterno.", kItemHelmSprite,
+                        kItemDiamondArmorPal, kItemDiamondArmorPalCount, 3.f, 8,
+                        ItemRarity::Epic, core::EquipSlot::Head,
+                        core::MaterialId::Diamond));
 
-REGISTER_ITEM("diamond_chest", [] {
-    core::ItemDef def;
-    def.id = "diamond_chest";
-    def.description = "Peitoral de diamante. Muralha vestível.";
-    def.spriteRows = kItemChestSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemDiamondArmorPal;
-    def.spritePalCount = kItemDiamondArmorPalCount;
-    def.name = "Peitoral de Diamante";
-    def.weight = 7.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Epic;
-    def.stackMax = 1;
-    def.defense = 12;
-    def.equipSlot = core::EquipSlot::Chest;
-    def.material = core::MaterialId::Diamond;
-    return def;
-}())
+REGISTER_ITEM("diamond_chest",
+              makeArmor("diamond_chest", "Peitoral de Diamante",
+                        "Peitoral de diamante. Muralha vestível.", kItemChestSprite,
+                        kItemDiamondArmorPal, kItemDiamondArmorPalCount, 7.f, 12,
+                        ItemRarity::Epic, core::EquipSlot::Chest,
+                        core::MaterialId::Diamond));
 
-REGISTER_ITEM("diamond_legs", [] {
-    core::ItemDef def;
-    def.id = "diamond_legs";
-    def.description = "Perneiras de diamante. Inquebráveis.";
-    def.spriteRows = kItemLegsSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemDiamondArmorPal;
-    def.spritePalCount = kItemDiamondArmorPalCount;
-    def.name = "Perneiras de Diamante";
-    def.weight = 5.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Epic;
-    def.stackMax = 1;
-    def.defense = 8;
-    def.equipSlot = core::EquipSlot::Legs;
-    def.material = core::MaterialId::Diamond;
-    return def;
-}())
+REGISTER_ITEM("diamond_legs",
+              makeArmor("diamond_legs", "Perneiras de Diamante",
+                        "Perneiras de diamante. Inquebráveis.", kItemLegsSprite,
+                        kItemDiamondArmorPal, kItemDiamondArmorPalCount, 5.f, 8,
+                        ItemRarity::Epic, core::EquipSlot::Legs,
+                        core::MaterialId::Diamond));
 
 REGISTER_ITEM("leather_sword", [] {
     core::ItemDef def;
@@ -1569,25 +1440,12 @@ inline const core::PaletteEntry kItemDiamondBootsPal[] = {
 };
 inline constexpr std::size_t kItemDiamondBootsPalCount = 3;
 
-REGISTER_ITEM("iron_boots", [] {
-    core::ItemDef def;
-    def.id = "iron_boots";
-    def.description = "Botas de ferro. Firmes no chão.";
-    def.spriteRows = kItemBootsSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemIronBootsPal;
-    def.spritePalCount = kItemIronBootsPalCount;
-    def.name = "Botas de Ferro";
-    def.weight = 3.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Common;
-    def.stackMax = 1;
-    def.defense = 3;
-    def.equipSlot = core::EquipSlot::Boots;
-    def.material = core::MaterialId::Iron;
-    return def;
-}())
+REGISTER_ITEM("iron_boots",
+              makeArmor("iron_boots", "Botas de Ferro",
+                        "Botas de ferro. Firmes no chão.", kItemBootsSprite,
+                        kItemIronBootsPal, kItemIronBootsPalCount, 3.f, 3,
+                        ItemRarity::Common, core::EquipSlot::Boots,
+                        core::MaterialId::Iron));
 
 // ---- Luvas (slot Gloves): par de manoplas, ícone 8x8 próprio ----
 inline const char* const kItemGlovesSprite[] = {
@@ -1608,25 +1466,12 @@ inline const core::PaletteEntry kItemIronGlovesPal[] = {
 };
 inline constexpr std::size_t kItemIronGlovesPalCount = 3;
 
-REGISTER_ITEM("iron_gloves", [] {
-    core::ItemDef def;
-    def.id = "iron_gloves";
-    def.description = "Manoplas de ferro. Protegem punhos e dedos.";
-    def.spriteRows = kItemGlovesSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemIronGlovesPal;
-    def.spritePalCount = kItemIronGlovesPalCount;
-    def.name = "Manoplas de Ferro";
-    def.weight = 2.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Common;
-    def.stackMax = 1;
-    def.defense = 2;
-    def.equipSlot = core::EquipSlot::Gloves;
-    def.material = core::MaterialId::Iron;
-    return def;
-}())
+REGISTER_ITEM("iron_gloves",
+              makeArmor("iron_gloves", "Manoplas de Ferro",
+                        "Manoplas de ferro. Protegem punhos e dedos.", kItemGlovesSprite,
+                        kItemIronGlovesPal, kItemIronGlovesPalCount, 2.f, 2,
+                        ItemRarity::Common, core::EquipSlot::Gloves,
+                        core::MaterialId::Iron));
 
 inline const core::PaletteEntry kItemLeatherGlovesPal[] = {
     {'.', {0, 0, 0, 0}},
@@ -1647,122 +1492,44 @@ inline const core::PaletteEntry kItemDiamondGlovesPal[] = {
 };
 inline constexpr std::size_t kItemDiamondGlovesPalCount = 3;
 
-REGISTER_ITEM("leather_gloves", [] {
-    core::ItemDef def;
-    def.id = "leather_gloves";
-    def.description = "Luvas de couro. Flexíveis e silenciosas.";
-    def.spriteRows = kItemGlovesSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemLeatherGlovesPal;
-    def.spritePalCount = kItemLeatherGlovesPalCount;
-    def.name = "Luvas de Couro";
-    def.weight = 1.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Common;
-    def.stackMax = 1;
-    def.defense = 1;
-    def.equipSlot = core::EquipSlot::Gloves;
-    def.material = core::MaterialId::Leather;
-    return def;
-}())
+REGISTER_ITEM("leather_gloves",
+              makeArmor("leather_gloves", "Luvas de Couro",
+                        "Luvas de couro. Flexíveis e silenciosas.", kItemGlovesSprite,
+                        kItemLeatherGlovesPal, kItemLeatherGlovesPalCount, 1.f, 1,
+                        ItemRarity::Common, core::EquipSlot::Gloves,
+                        core::MaterialId::Leather));
 
-REGISTER_ITEM("gold_gloves", [] {
-    core::ItemDef def;
-    def.id = "gold_gloves";
-    def.description = "Manoplas de ouro. Pesadas e vistosas.";
-    def.spriteRows = kItemGlovesSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemGoldGlovesPal;
-    def.spritePalCount = kItemGoldGlovesPalCount;
-    def.name = "Manoplas de Ouro";
-    def.weight = 3.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Rare;
-    def.stackMax = 1;
-    def.defense = 3;
-    def.equipSlot = core::EquipSlot::Gloves;
-    def.material = core::MaterialId::Gold;
-    return def;
-}())
+REGISTER_ITEM("gold_gloves",
+              makeArmor("gold_gloves", "Manoplas de Ouro",
+                        "Manoplas de ouro. Pesadas e vistosas.", kItemGlovesSprite,
+                        kItemGoldGlovesPal, kItemGoldGlovesPalCount, 3.f, 3,
+                        ItemRarity::Rare, core::EquipSlot::Gloves,
+                        core::MaterialId::Gold));
 
-REGISTER_ITEM("diamond_gloves", [] {
-    core::ItemDef def;
-    def.id = "diamond_gloves";
-    def.description = "Manoplas de diamante. Inquebráveis.";
-    def.spriteRows = kItemGlovesSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemDiamondGlovesPal;
-    def.spritePalCount = kItemDiamondGlovesPalCount;
-    def.name = "Manoplas de Diamante";
-    def.weight = 2.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Epic;
-    def.stackMax = 1;
-    def.defense = 5;
-    def.equipSlot = core::EquipSlot::Gloves;
-    def.material = core::MaterialId::Diamond;
-    return def;
-}())
+REGISTER_ITEM("diamond_gloves",
+              makeArmor("diamond_gloves", "Manoplas de Diamante",
+                        "Manoplas de diamante. Inquebráveis.", kItemGlovesSprite,
+                        kItemDiamondGlovesPal, kItemDiamondGlovesPalCount, 2.f, 5,
+                        ItemRarity::Epic, core::EquipSlot::Gloves,
+                        core::MaterialId::Diamond));
 
-REGISTER_ITEM("leather_boots", [] {
-    core::ItemDef def;
-    def.id = "leather_boots";
-    def.description = "Botas de couro. Silenciosas.";
-    def.spriteRows = kItemBootsSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemLeatherBootsPal;
-    def.spritePalCount = kItemLeatherBootsPalCount;
-    def.name = "Botas de Couro";
-    def.weight = 2.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Common;
-    def.stackMax = 1;
-    def.defense = 1;
-    def.equipSlot = core::EquipSlot::Boots;
-    def.material = core::MaterialId::Leather;
-    return def;
-}())
+REGISTER_ITEM("leather_boots",
+              makeArmor("leather_boots", "Botas de Couro",
+                        "Botas de couro. Silenciosas.", kItemBootsSprite,
+                        kItemLeatherBootsPal, kItemLeatherBootsPalCount, 2.f, 1,
+                        ItemRarity::Common, core::EquipSlot::Boots,
+                        core::MaterialId::Leather));
 
-REGISTER_ITEM("gold_boots", [] {
-    core::ItemDef def;
-    def.id = "gold_boots";
-    def.description = "Botas de ouro. Pesadas e vistosas.";
-    def.spriteRows = kItemBootsSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemGoldBootsPal;
-    def.spritePalCount = kItemGoldBootsPalCount;
-    def.name = "Botas de Ouro";
-    def.weight = 4.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Rare;
-    def.stackMax = 1;
-    def.defense = 4;
-    def.equipSlot = core::EquipSlot::Boots;
-    def.material = core::MaterialId::Gold;
-    return def;
-}())
+REGISTER_ITEM("gold_boots",
+              makeArmor("gold_boots", "Botas de Ouro",
+                        "Botas de ouro. Pesadas e vistosas.", kItemBootsSprite,
+                        kItemGoldBootsPal, kItemGoldBootsPalCount, 4.f, 4,
+                        ItemRarity::Rare, core::EquipSlot::Boots,
+                        core::MaterialId::Gold));
 
-REGISTER_ITEM("diamond_boots", [] {
-    core::ItemDef def;
-    def.id = "diamond_boots";
-    def.description = "Botas de diamante. Inquebráveis.";
-    def.spriteRows = kItemBootsSprite;
-    def.spriteW = 8;
-    def.spriteH = 8;
-    def.spritePal = kItemDiamondBootsPal;
-    def.spritePalCount = kItemDiamondBootsPalCount;
-    def.name = "Botas de Diamante";
-    def.weight = 3.f;
-    def.type = ItemType::Armor;
-    def.rarity = ItemRarity::Epic;
-    def.stackMax = 1;
-    def.defense = 6;
-    def.equipSlot = core::EquipSlot::Boots;
-    def.material = core::MaterialId::Diamond;
-    return def;
-}())
+REGISTER_ITEM("diamond_boots",
+              makeArmor("diamond_boots", "Botas de Diamante",
+                        "Botas de diamante. Inquebráveis.", kItemBootsSprite,
+                        kItemDiamondBootsPal, kItemDiamondBootsPalCount, 3.f, 6,
+                        ItemRarity::Epic, core::EquipSlot::Boots,
+                        core::MaterialId::Diamond));
