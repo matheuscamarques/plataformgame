@@ -830,6 +830,15 @@ enum class PlayerPose : uint8_t {
     COUNT
 };
 
+// Texturas no Renderer andam em ordem head/torso/ARMS/legs/feet, mas
+// Parts[] em head/torso/LEGS/feet/arms (7a125e1 inseriu arms no meio
+// das texturas sem remapear): índice da PARTE p/ índice da TEXTURA.
+// Origem e skip de botas DEVEM usar isto, nunca o índice cru.
+inline int partIndexForTex(int texIdx) {
+    constexpr int kMap[5] = {0, 1, 4, 2, 3};
+    return (texIdx >= 0 && texIdx < 5) ? kMap[texIdx] : 0;
+}
+
 inline constexpr int kPlayerPoseCount = 10;
 
 inline const assets::Part* poseParts(PlayerPose p) {

@@ -1108,14 +1108,16 @@ void Game::drawPlayerSprite(Player *p) {
     for (int k = 0; k < 5; ++k) {
         const int i = order[k];
         // Feet com botas: pula o pé base (a bota entra abaixo).
-        if (i == 3 && bootsDef) continue;
+        // i é índice de TEXTURA (feet = 4); parts[] tem outro layout.
+        if (i == 4 && bootsDef) continue;
         // Overlay de braços sai quando o procedural assume.
         if (i == 2 && procArms) continue;
         sf::Sprite spr;
         spr.setTexture(*texs[i]);
         spr.setOrigin(sprites::kPlayerW * 0.5f,
-                      static_cast<float>(sprites::kPlayerH -
-                                         parts[i].offY));
+                      static_cast<float>(
+                          sprites::kPlayerH -
+                          parts[sprites::partIndexForTex(i)].offY));
         spr.setPosition(p->getCenterX(), p->getY() + p->getH());
         spr.setScale(static_cast<float>(p->facing) * s, s);
         window->draw(spr);

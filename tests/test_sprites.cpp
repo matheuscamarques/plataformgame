@@ -141,6 +141,20 @@ int main() {
                        std::strlen(walks[k][y]) == 14);
         }
     }
+    { // OriginsMatchTextures (tex head/torso/arms/legs/feet → offY certo)
+        // offY esperado por TEXTURA (fatiamento 12/16/12/28/34).
+        const int want[5] = {0, 12, 12, 28, 34};
+        for (int pi = 0; pi < kPlayerPoseCount; ++pi) {
+            const assets::Part* pp =
+                poseParts(static_cast<PlayerPose>(pi));
+            for (int t = 0; t < 5; ++t)
+                assert(pp[partIndexForTex(t)].offY == want[t]);
+        }
+        // Botas substituem feet: skip i==4 mira parts[3] (feet, offY 34).
+        assert(partIndexForTex(4) == 3);
+        assert(partIndexForTex(2) == 4); // arms: overlay do torso
+        assert(partIndexForTex(9) == 0 && partIndexForTex(-1) == 0);
+    }
     { // ResolvePriority (hurt > melee > throw > jump > walk > idle)
         using support::SpriteFrameId;
         using support::AimDir;
