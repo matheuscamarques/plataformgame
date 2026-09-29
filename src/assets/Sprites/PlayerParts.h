@@ -415,6 +415,356 @@ inline constexpr assets::Part kPlayerIdleNEParts[] = {
     { kPlayerIdleNEArms, 12, 16, 0, 12 },
 };
 
+// ---- Fase D, onda 1b: WalkA/WalkB em 5 direções ----
+// Cabeças reutilizam o Idle direcional; vistas S/N mantêm simetria
+// (fases diferem por altura dos braços/pernas, não por lado).
+
+inline const char* const kPlayerWalkA_S_Arms[] = {
+    "............",
+    "............",
+    "............",
+    "............",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerWalkA_S_Parts[] = {
+    { kPlayerIdleSHead, 12, 12, 0, 0 },
+    { kPlayerIdleSTorso, 12, 16, 0, 12 },
+    { kPlayerIdleSLegs, 12, 6, 0, 28 },
+    { kPlayerIdleSFeet, 12, 6, 0, 34 },
+    { kPlayerWalkA_S_Arms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerWalkA_N_Arms[] = {
+    "............",
+    "............",
+    "............",
+    "............",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerWalkA_N_Parts[] = {
+    { kPlayerIdleNHead, 12, 12, 0, 0 },
+    { kPlayerIdleNTorso, 12, 16, 0, 12 },
+    { kPlayerIdleNLegs, 12, 6, 0, 28 },
+    { kPlayerIdleNFeet, 12, 6, 0, 34 },
+    { kPlayerWalkA_N_Arms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerWalkA_SE_Torso[] = {
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".GKCCCCCCC..",
+    ".GKCCCCCCC..",
+    ".GKCCCCCCC..",
+    ".GKCCCCCCC..",
+    ".GKCCCCCCC..",
+    ".GKCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CCCCCC...",
+};
+
+inline const char* const kPlayerWalkA_SE_Arms[] = {
+    "............",
+    "............",
+    ".G..........",
+    ".G..........",
+    ".G..........",
+    ".G........H.",
+    ".G........H.",
+    ".G..........",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerWalkA_SE_Parts[] = {
+    { kPlayerIdleSEHead, 12, 12, 0, 0 },
+    { kPlayerWalkA_SE_Torso, 12, 16, 0, 12 },
+    { kPlayerIdleSELegs, 12, 6, 0, 28 },
+    { kPlayerIdleSEFeet, 12, 6, 0, 34 },
+    { kPlayerWalkA_SE_Arms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerWalkA_NE_Torso[] = {
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".GCCCCCCKC..",
+    ".GCCCCCCKC..",
+    ".GCCCCCCKC..",
+    ".GCCCCCCKC..",
+    ".GCCCCCCKC..",
+    ".GCCCCCCKC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CCCCCC...",
+};
+
+inline const char* const kPlayerWalkA_NE_Arms[] = {
+    "..........H.",
+    "..........H.",
+    "............",
+    ".G..........",
+    ".G..........",
+    ".G..........",
+    ".G..........",
+    ".G..........",
+    ".G..........",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerWalkA_NE_Parts[] = {
+    { kPlayerIdleNEHead, 12, 12, 0, 0 },
+    { kPlayerWalkA_NE_Torso, 12, 16, 0, 12 },
+    { kPlayerIdleNELegs, 12, 6, 0, 28 },
+    { kPlayerIdleNEFeet, 12, 6, 0, 34 },
+    { kPlayerWalkA_NE_Arms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerWalkB_S_Legs[] = {
+    ".CC......CC.",
+    ".CC......CC.",
+    ".CC......CC.",
+    ".CC......CC.",
+    ".LL......BB.",
+    ".LL......BB.",
+};
+
+inline const char* const kPlayerWalkB_S_Feet[] = {
+    ".LL......BB.",
+    ".LL......BB.",
+    "LL........BB",
+    "LL........BB",
+    "............",
+    "............",
+};
+
+inline const char* const kPlayerWalkB_S_Arms[] = {
+    "............",
+    "............",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerWalkB_S_Parts[] = {
+    { kPlayerIdleSHead, 12, 12, 0, 0 },
+    { kPlayerIdleSTorso, 12, 16, 0, 12 },
+    { kPlayerWalkB_S_Legs, 12, 6, 0, 28 },
+    { kPlayerWalkB_S_Feet, 12, 6, 0, 34 },
+    { kPlayerWalkB_S_Arms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerWalkB_N_Arms[] = {
+    "............",
+    "............",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerWalkB_N_Parts[] = {
+    { kPlayerIdleNHead, 12, 12, 0, 0 },
+    { kPlayerIdleNTorso, 12, 16, 0, 12 },
+    { kPlayerWalkB_S_Legs, 12, 6, 0, 28 },
+    { kPlayerWalkB_S_Feet, 12, 6, 0, 34 },
+    { kPlayerWalkB_N_Arms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerWalkB_SE_Torso[] = {
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..KCCCCCCCH.",
+    "..KCCCCCCCH.",
+    "..KCCCCCCCH.",
+    "..KCCCCCCCH.",
+    "..KCCCCCCCH.",
+    "..KCCCCCCCH.",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CCCCCC...",
+};
+
+inline const char* const kPlayerWalkB_SE_Legs[] = {
+    "..CC.....CC.",
+    "..CC.....CC.",
+    "..CC.....CC.",
+    "..CC.....CC.",
+    "..LL.....BB.",
+    "..LL.....BB.",
+};
+
+inline const char* const kPlayerWalkB_SE_Feet[] = {
+    "..LL.....BB.",
+    "..LL.....BB.",
+    "..LL.....BB.",
+    "..LL.....BB.",
+    "............",
+    "............",
+};
+
+inline const char* const kPlayerWalkB_SE_Arms[] = {
+    "............",
+    "............",
+    "..........H.",
+    "..........H.",
+    "..........H.",
+    "..........H.",
+    ".G........H.",
+    ".G........H.",
+    "..........H.",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerWalkB_SE_Parts[] = {
+    { kPlayerIdleSEHead, 12, 12, 0, 0 },
+    { kPlayerWalkB_SE_Torso, 12, 16, 0, 12 },
+    { kPlayerWalkB_SE_Legs, 12, 6, 0, 28 },
+    { kPlayerWalkB_SE_Feet, 12, 6, 0, 34 },
+    { kPlayerWalkB_SE_Arms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerWalkB_NE_Torso[] = {
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".CCCCCCCKCH.",
+    ".CCCCCCCKCH.",
+    ".CCCCCCCKCH.",
+    ".CCCCCCCKCH.",
+    ".CCCCCCCKCH.",
+    ".CCCCCCCKCH.",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CCCCCC...",
+};
+
+inline const char* const kPlayerWalkB_NE_Legs[] = {
+    "..CC....CC..",
+    "..CC....CC..",
+    "..CC....CC..",
+    "..CC....CC..",
+    "..LL....BB..",
+    "..LL....BB..",
+};
+
+inline const char* const kPlayerWalkB_NE_Feet[] = {
+    "..LL....BB..",
+    "..LL....BB..",
+    "..LL....BB..",
+    "..LL....BB..",
+    "............",
+    "............",
+};
+
+inline const char* const kPlayerWalkB_NE_Arms[] = {
+    ".G..........",
+    ".G..........",
+    "............",
+    "..........H.",
+    "..........H.",
+    "..........H.",
+    "..........H.",
+    "..........H.",
+    "..........H.",
+    "..........H.",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerWalkB_NE_Parts[] = {
+    { kPlayerIdleNEHead, 12, 12, 0, 0 },
+    { kPlayerWalkB_NE_Torso, 12, 16, 0, 12 },
+    { kPlayerWalkB_NE_Legs, 12, 6, 0, 28 },
+    { kPlayerWalkB_NE_Feet, 12, 6, 0, 34 },
+    { kPlayerWalkB_NE_Arms, 12, 16, 0, 12 },
+};
+
 inline const char* const kPlayerWalkAHead[] = {
     "....KKKK....",
     "....KKKK....",
@@ -1205,8 +1555,8 @@ inline support::Facing artDirForIndex(int i) {
     }
 }
 
-// Partes por (pose, direção de arte). Onda 1 cobre Idle; resto cai
-// em side-view (E) até sua onda.
+// Partes por (pose, direção de arte). Onda 1 cobre Idle e Walk;
+// resto cai em side-view (E) até sua onda.
 inline const assets::Part* posePartsFor(PlayerPose p, support::Facing d) {
     if (p == PlayerPose::Idle) {
         switch (d) {
@@ -1215,6 +1565,24 @@ inline const assets::Part* posePartsFor(PlayerPose p, support::Facing d) {
             case support::Facing::NE: return kPlayerIdleNEParts;
             case support::Facing::N:  return kPlayerIdleNParts;
             default:                  return kPlayerIdleParts;
+        }
+    }
+    if (p == PlayerPose::WalkA) {
+        switch (d) {
+            case support::Facing::S:  return kPlayerWalkA_S_Parts;
+            case support::Facing::SE: return kPlayerWalkA_SE_Parts;
+            case support::Facing::NE: return kPlayerWalkA_NE_Parts;
+            case support::Facing::N:  return kPlayerWalkA_N_Parts;
+            default:                  return kPlayerWalkAParts;
+        }
+    }
+    if (p == PlayerPose::WalkB) {
+        switch (d) {
+            case support::Facing::S:  return kPlayerWalkB_S_Parts;
+            case support::Facing::SE: return kPlayerWalkB_SE_Parts;
+            case support::Facing::NE: return kPlayerWalkB_NE_Parts;
+            case support::Facing::N:  return kPlayerWalkB_N_Parts;
+            default:                  return kPlayerWalkBParts;
         }
     }
     return poseParts(p);

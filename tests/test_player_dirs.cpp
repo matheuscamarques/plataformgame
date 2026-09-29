@@ -134,6 +134,52 @@ int main() {
         assert(composedDiffers(
             e, sprites::posePartsFor(PlayerPose::Idle, Facing::N)));
     }
+    { // WalkDims (alturas exatas das 18 novas, 12 chars por row)
+        using namespace sprites;
+        checkRows(kPlayerWalkA_S_Arms, 16);
+        checkRows(kPlayerWalkA_N_Arms, 16);
+        checkRows(kPlayerWalkA_SE_Torso, 16);
+        checkRows(kPlayerWalkA_SE_Arms, 16);
+        checkRows(kPlayerWalkA_NE_Torso, 16);
+        checkRows(kPlayerWalkA_NE_Arms, 16);
+        checkRows(kPlayerWalkB_S_Legs, 6);
+        checkRows(kPlayerWalkB_S_Feet, 6);
+        checkRows(kPlayerWalkB_S_Arms, 16);
+        checkRows(kPlayerWalkB_N_Arms, 16);
+        checkRows(kPlayerWalkB_SE_Torso, 16);
+        checkRows(kPlayerWalkB_SE_Legs, 6);
+        checkRows(kPlayerWalkB_SE_Feet, 6);
+        checkRows(kPlayerWalkB_SE_Arms, 16);
+        checkRows(kPlayerWalkB_NE_Torso, 16);
+        checkRows(kPlayerWalkB_NE_Legs, 6);
+        checkRows(kPlayerWalkB_NE_Feet, 6);
+        checkRows(kPlayerWalkB_NE_Arms, 16);
+    }
+    { // WalkPresenceSymDiff (vivas + S/N simétricas + 3/4 + ≠E)
+        const PlayerPose poses[] = {PlayerPose::WalkA, PlayerPose::WalkB};
+        const Facing syms[] = {Facing::S, Facing::N};
+        const Facing asyms[] = {Facing::SE, Facing::NE};
+        const Facing all4[] = {Facing::S, Facing::SE, Facing::NE,
+                               Facing::N};
+        for (PlayerPose pose : poses) {
+            for (Facing f : all4)
+                checkPresence(sprites::posePartsFor(pose, f));
+            for (Facing f : syms) {
+                const assets::Part* pp = sprites::posePartsFor(pose, f);
+                for (int i = 0; i < 5; ++i) assert(partSym(pp[i]));
+            }
+            bool asymFound = false;
+            for (Facing f : asyms) {
+                const assets::Part* pp = sprites::posePartsFor(pose, f);
+                for (int i = 0; i < 5; ++i)
+                    if (!partSym(pp[i])) asymFound = true;
+            }
+            assert(asymFound);
+            const assets::Part* e = sprites::posePartsFor(pose, Facing::E);
+            for (Facing f : all4)
+                assert(composedDiffers(e, sprites::posePartsFor(pose, f)));
+        }
+    }
 
     std::printf("player dirs test OK\n");
     return 0;
