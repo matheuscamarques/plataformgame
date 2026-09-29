@@ -28,6 +28,9 @@ Entity(core::kIdPlayer,0,0,60,100) // AABB 2 blocos (sprite 12x40 a 2.5x)
     // câmera concordam entre si. Visual fino (30px) centrado na caixa.
     static auto schema = support::BodySchema::humanoid(100.f, 60.f);
     body.attach(&schema);
+    // Braços canônicos: 3 rows ombro→cotovelo + 3 cotovelo→mão (arte).
+    limbR_.upper.length = limbR_.lower.length = 3.f;
+    limbL_.upper.length = limbL_.lower.length = 3.f;
     // Sem seed: nasce Desprovido (base 10, 1 poção, sem souls);
     // menu de criação aplica a classe via applyClass (#3).
     // Kit generoso e set de ferro morreram com o seed.

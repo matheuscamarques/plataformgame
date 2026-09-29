@@ -55,4 +55,23 @@ inline void applyPose(Limb &limb, const LimbPose &pose) {
     limb.angleLower = pose.angleLower;
 }
 
+// B.2 — âncoras de calibragem (mundo): ombro = linha média do box do
+// torso no X do braço; mão = base do box do braço (== drawPlayerWeapon
+// e computeWeaponBbox). Renderer usa; teste trava as fórmulas.
+inline core::Vec2f limbShoulder(core::Vec2f torsoTopLeft,
+                                core::Vec2f torsoSize, float armCenterX) {
+    return {armCenterX, torsoTopLeft.y + torsoSize.y * 0.5f};
+}
+
+inline core::Vec2f limbHand(float armCenterX, float armBottomY) {
+    return {armCenterX, armBottomY};
+}
+
+// Alcance calibrado: 25% de folga sobre a distância ombro→mão +
+// 1 row (cotovelo visível, sem dobrar nem esticar). worldPerRow =
+// altura-mundo de 1 row do sprite (getH()/kPlayerH).
+inline float limbReach(float shoulderHandDist, float worldPerRow) {
+    return shoulderHandDist * 1.25f + worldPerRow;
+}
+
 } // namespace support

@@ -6,6 +6,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdio>
+#include "entities/Player/Player.h"
 #include "support/Combat/Limb.h"
 
 static bool near(float a, float b, float eps) {
@@ -87,6 +88,26 @@ int main() {
         const LimbPose fkm = forwardKinematics(arm, {0.f, 0.f}, -1);
         assert(near(fkm.elbowWorld.x, -fk.elbowWorld.x, 1e-4f) &&
                near(fkm.elbowWorld.y, fk.elbowWorld.y, 1e-4f));
+    }
+
+    { // B2Ancoras (ombro = meia-altura do torso no X do braço)
+        const core::Vec2f sh =
+            support::limbShoulder({10.f, 100.f}, {60.f, 40.f}, 25.f);
+        assert(near(sh.x, 25.f, 1e-6f) && near(sh.y, 120.f, 1e-6f));
+        const core::Vec2f h = support::limbHand(25.f, 160.f);
+        assert(near(h.x, 25.f, 1e-6f) && near(h.y, 160.f, 1e-6f));
+    }
+    { // B2ReachNuncaClampa (folga positiva p/ qualquer distância)
+        assert(near(support::limbReach(40.f, 2.5f), 52.5f, 1e-4f));
+        assert(support::limbReach(0.f, 2.5f) > 0.f);
+        assert(support::limbReach(100.f, 2.5f) > 100.f);
+    }
+    { // B2PlayerNasceComBracos (canônicos 3+3 rows, ângulos em repouso)
+        Player p;
+        assert(near(p.limbR_.upper.length, 3.f, 1e-6f) &&
+               near(p.limbR_.lower.length, 3.f, 1e-6f));
+        assert(near(p.limbL_.upper.length, 3.f, 1e-6f) &&
+               near(p.limbL_.lower.length, 3.f, 1e-6f));
     }
 
     std::printf("limb test OK\n");

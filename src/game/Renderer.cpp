@@ -1055,11 +1055,36 @@ void Game::render()
     window->display();
 }
 
+namespace {
+// Cor da pele 'F' da paleta do player (placeholder do braço B.2).
+sf::Color playerSkinColor() {
+    for (std::size_t i = 0; i < sprites::kPlayerPalCount; ++i) {
+        if (sprites::kPlayerPal[i].ch == 'F')
+            return sprites::kPlayerPal[i].color;
+    }
+    return sf::Color::Magenta; // paleta quebrada: grita, não some
+}
+
+// Segmento placeholder B.2: retângulo sólido de a até b.
+void drawLimbSeg(sf::RenderTarget& target, core::Vec2f a, core::Vec2f b,
+                 float thick, sf::Color col) {
+    const float dx = b.x - a.x;
+    const float dy = b.y - a.y;
+    const float len = std::sqrt(dx * dx + dy * dy);
+    if (len < 0.5f) return;
+    sf::RectangleShape seg({len, thick});
+    seg.setOrigin(0.f, thick * 0.5f);
+    seg.setPosition(a.x, a.y);
+    seg.setRotation(std::atan2(dy, dx) * 180.f / 3.14159265f);
+    seg.setFillColor(col);
+    target.draw(seg);
+}
+} // namespace
+
 void Game::drawPlayerSprite(Player *p) {
     if (!p) return;
     // Escala p/ altura da entidade (100px), aspecto preservado.
-    const float s = p->getH() / static_cast<float>(sprites::kPlayerH);
-    // 4 partes; se Boots equipada, ela SUBSTITUI o feet (não sobrepõe).
+    const float s = p->getH() / static_cast<float>(sprites::kPlayerH);    // 4 partes; se Boots equipada, ela SUBSTITUI o feet (não sobrepõe).
     const auto pose = game::poseForFrameId(p->currentFrameId);
     const auto& pp =
         sprites_.playerParts[static_cast<int>(pose)];
@@ -1071,10 +1096,21 @@ void Game::drawPlayerSprite(Player *p) {
                                   &pp.feet};
     // Ordem: torso antes dos braços (overlay transparente de pele G/H).
     const int order[5] = {0, 1, 4, 2, 3};
+    // B.2: braços procedurais calibrados nos boxes (placeholder). Sem
+    // boxes = overlay legado (segurança, nunca crasha).
+    const support::PartState* armR =
+        p->body.find(support::BodyPartId::ArmR);
+    const support::PartState* armL =
+        p->body.find(support::BodyPartId::ArmL);
+    const support::PartState* torso =
+        p->body.find(support::BodyPartId::Torso);
+    const bool procArms = armR && armL && torso;
     for (int k = 0; k < 5; ++k) {
         const int i = order[k];
         // Feet com botas: pula o pé base (a bota entra abaixo).
         if (i == 3 && bootsDef) continue;
+        // Overlay de braços sai quando o procedural assume.
+        if (i == 2 && procArms) continue;
         sf::Sprite spr;
         spr.setTexture(*texs[i]);
         spr.setOrigin(sprites::kPlayerW * 0.5f,
@@ -1094,6 +1130,39 @@ void Game::drawPlayerSprite(Player *p) {
         spr.setPosition(p->getCenterX(), p->getY() + p->getH());
         spr.setScale(static_cast<float>(p->facing) * s, s);
         window->draw(spr);
+    }
+    // B.2: dois segmentos por braço, ombro→cotovelo (IK)→mão. Alvo =
+    // posição antiga do box (calibragem: dano/draw da arma intocados).
+    if (procArms) {
+        const sf::Color skin = playerSkinColor();
+        const float thick = 2.f * s; // 2 sprite-px de pele
+        const float row = s;         // 1 row do sprite em mundo
+        auto drawArm = [&](const support::PartState* arm,
+                           support::Limb& limb) {
+            const float cx =
+                arm->worldBox.left + arm->worldBox.width * 0.5f;
+            const core::Vec2f shoulder = support::limbShoulder(
+                {torso->worldBox.left, torso->worldBox.top},
+                {torso->worldBox.width, torso->worldBox.height}, cx);
+            const core::Vec2f hand = support::limbHand(
+                cx, arm->worldBox.top + arm->worldBox.height);
+            const float dx = hand.x - shoulder.x;
+            const float dy = hand.y - shoulder.y;
+            const float dist = std::sqrt(dx * dx + dy * dy);
+            const float half = support::limbReach(dist, row) * 0.5f;
+            support::Limb l = limb; // calibra sem sujar o canônico
+            l.upper.length = half;
+            l.lower.length = half;
+            const support::LimbPose pose =
+                support::solveIK(l, shoulder, hand, true, p->facing);
+            support::applyPose(limb, pose); // ângulos persistem p/ B.3
+            drawLimbSeg(*window, pose.shoulderWorld, pose.elbowWorld,
+                        thick, skin);
+            drawLimbSeg(*window, pose.elbowWorld, pose.handWorld, thick,
+                        skin);
+        };
+        drawArm(armR, p->limbR_);
+        drawArm(armL, p->limbL_);
     }
 }
 

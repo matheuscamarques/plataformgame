@@ -16,6 +16,7 @@
 #include "support/Combat/AimDir.h"
 #include "support/Combat/AnimPlayer.h"
 #include "support/Combat/Facing.h"
+#include "support/Combat/Limb.h"
 #include "support/Combat/Body.h"
 #include "support/Combat/SpriteFrame.h"
 #include "core/Attributes.h"
@@ -200,6 +201,11 @@ class Player : public Entity
         // grupo da mira; updateMelee avança o frame nas transições
         // (relógio único = meleeTimer). MeleeSystem lê liveEvents().
         support::AnimPlayer anim;
+
+        // Braços articulados (B.2): comprimentos canônicos em sprite-rows
+        // (3+3, medidos na arte atual); Renderer calibra o alcance por
+        // frame contra o box legado (B.3 dirige os alvos).
+        support::Limb limbR_, limbL_;
 
         // Mira efetiva da arma: fora do swing segue o input (aimDir);
         // no swing congela no snapshot (swingAim). Sem isto, idle após
