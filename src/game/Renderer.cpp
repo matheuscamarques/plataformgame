@@ -1082,8 +1082,13 @@ void Game::drawPlayerSprite(Player *p) {
     // Escala p/ altura da entidade (100px), aspecto preservado.
     const float s = p->getH() / static_cast<float>(sprites::kPlayerH);    // 4 partes; se Boots equipada, ela SUBSTITUI o feet (não sobrepõe).
     const auto pose = game::poseForFrameId(p->currentFrameId);
+    // Fase D: direção do corpo (facing8) com fallback de espelho.
+    // Em produção facing == facingSign(facing8) (setFacing8 mantém),
+    // então o flip é idêntico ao antigo facing ±1.
+    const auto directed = game::directedPose(pose, p->facing8);
+    const float flip = directed.mirror ? -1.f : 1.f;
     const auto& pp =
-        sprites_.playerParts[static_cast<int>(pose)];
+        sprites_.playerParts[static_cast<int>(directed.pose)];
     const assets::Part* parts = sprites::poseParts(pose);
     const core::Item& boots = p->equipment.get(core::EquipSlot::Boots);
     const core::ItemDef* bootsDef =
@@ -1109,7 +1114,7 @@ void Game::drawPlayerSprite(Player *p) {
                           sprites::kPlayerH -
                           parts[sprites::partIndexForTex(i)].offY));
         spr.setPosition(p->getCenterX(), p->getY() + p->getH());
-        spr.setScale(static_cast<float>(p->facing) * s, s);
+        spr.setScale(flip * s, s);
         window->draw(spr);
     }
     // Bota no slot do feet (12x6, mesma origem do pé que substitui).
@@ -1120,7 +1125,7 @@ void Game::drawPlayerSprite(Player *p) {
                       static_cast<float>(sprites::kPlayerH -
                                          parts[3].offY));
         spr.setPosition(p->getCenterX(), p->getY() + p->getH());
-        spr.setScale(static_cast<float>(p->facing) * s, s);
+        spr.setScale(flip * s, s);
         window->draw(spr);
     }
     // B.4: desenha a pose resolvida no Player, verbatim (ombro,

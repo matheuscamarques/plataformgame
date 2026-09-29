@@ -5,6 +5,7 @@
  */
 #include <cassert>
 #include <cstdio>
+#include "assets/PlayerSprite.h"
 #include "entities/Player/Player.h"
 #include "support/Combat/Facing.h"
 
@@ -53,6 +54,35 @@ int main() {
         assert(facingSign(Facing::E) == 1);
         assert(facingSign(Facing::N) == 1);
         assert(facingSign(Facing::S) == 1);
+    }
+    { // FlipInvariant (produção: facing espelha facing8 via setFacing8)
+        Player p;
+        const Facing all[] = {Facing::E,  Facing::NE, Facing::N,
+                              Facing::NW, Facing::W,  Facing::SW,
+                              Facing::S,  Facing::SE};
+        for (Facing f : all) {
+            p.setFacing8(f);
+            assert(p.facing8 == f);
+            assert(p.facing == facingSign(f));
+        }
+    }
+    { // DirectedPose (Fase D infra: só side-view, mirror em NW/W/SW)
+        using game::directedPose;
+        using sprites::PlayerPose;
+        const Facing all[] = {Facing::E,  Facing::NE, Facing::N,
+                              Facing::NW, Facing::W,  Facing::SW,
+                              Facing::S,  Facing::SE};
+        for (Facing f : all) {
+            const auto d = directedPose(PlayerPose::Idle, f);
+            assert(d.pose == PlayerPose::Idle); // passa a pose adiante
+            assert(d.artDir == Facing::E);      // só side-view existe
+            assert(d.mirror == isMirrored(f));
+        }
+        // Outras poses passam intactas (WalkA/N sem espelho).
+        const auto w = directedPose(PlayerPose::WalkA, Facing::N);
+        assert(w.pose == PlayerPose::WalkA && !w.mirror);
+        const auto h = directedPose(PlayerPose::Hurt, Facing::SW);
+        assert(h.pose == PlayerPose::Hurt && h.mirror);
     }
     { // DeadzoneMantem (ruído ~0 não flipa; eixo dominante manda)
         using support::facingFromVelocity;

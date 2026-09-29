@@ -13,6 +13,7 @@
 #include "assets/Sprites/SpriteSet.h"
 #include "assets/Sprites/PlayerParts.h"
 #include "support/Combat/AimDir.h"
+#include "support/Combat/Facing.h"
 #include "support/Combat/SpriteFrame.h"
 
 class Player;
@@ -120,6 +121,26 @@ inline sprites::PlayerPose poseForFrameId(support::SpriteFrameId id) {
         case SpriteFrameId::PlayerDeath:     return PlayerPose::Death;
         default:                             return PlayerPose::Idle;
     }
+}
+
+// Fase D (infra, sem arte nova): pose dirigida por facing. artDir é a
+// direção COM arte desenhada (hoje sempre E: só existe side-view);
+// mirror espelha NW/W/SW. Quando poses N/NE/S chegarem, artDirFor
+// cresce e o Renderer escolhe a textura por (pose, artDir).
+struct DirectedPose {
+    sprites::PlayerPose pose; // a mesma (futuro: variante direcional)
+    support::Facing artDir;   // direção com arte (= E hoje)
+    bool mirror = false;      // flip horizontal
+};
+
+inline support::Facing artDirFor(support::Facing f) {
+    (void)f;
+    return support::Facing::E; // só side-view existe; N/NE/S plugam aqui
+}
+
+inline DirectedPose directedPose(sprites::PlayerPose pose,
+                                 support::Facing f) {
+    return {pose, artDirFor(f), support::isMirrored(f)};
 }
 
 } // namespace game
