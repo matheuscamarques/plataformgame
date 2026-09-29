@@ -209,6 +209,43 @@ int main() {
                 e, sprites::posePartsFor(PlayerPose::Punch, f)));
         }
     }
+    { // PunchUpDownDims (16 novas: torso+braço por direção)
+        using namespace sprites;
+        checkRows(kPlayerPunchUp_S_Torso, 16);
+        checkRows(kPlayerPunchUp_S_Arms, 16);
+        checkRows(kPlayerPunchUp_N_Torso, 16);
+        checkRows(kPlayerPunchUp_N_Arms, 16);
+        checkRows(kPlayerPunchUp_SE_Torso, 16);
+        checkRows(kPlayerPunchUp_SE_Arms, 16);
+        checkRows(kPlayerPunchUp_NE_Torso, 16);
+        checkRows(kPlayerPunchUp_NE_Arms, 16);
+        checkRows(kPlayerPunchDown_S_Torso, 16);
+        checkRows(kPlayerPunchDown_S_Arms, 16);
+        checkRows(kPlayerPunchDown_N_Torso, 16);
+        checkRows(kPlayerPunchDown_N_Arms, 16);
+        checkRows(kPlayerPunchDown_SE_Torso, 16);
+        checkRows(kPlayerPunchDown_SE_Arms, 16);
+        checkRows(kPlayerPunchDown_NE_Torso, 16);
+        checkRows(kPlayerPunchDown_NE_Arms, 16);
+    }
+    { // PunchUpDownPresenceDiff (vivas + ≠E nas 8 combinações)
+        using game::artDirFor;
+        const PlayerPose poses[] = {PlayerPose::PunchUp,
+                                    PlayerPose::PunchDown};
+        const Facing all4[] = {Facing::S, Facing::SE, Facing::NE,
+                               Facing::N};
+        for (PlayerPose pose : poses) {
+            for (Facing f : all4)
+                assert(artDirFor(pose, f) == f);
+            assert(artDirFor(pose, Facing::W) == Facing::E);
+            const assets::Part* e = sprites::posePartsFor(pose, Facing::E);
+            for (Facing f : all4) {
+                checkPresence(sprites::posePartsFor(pose, f));
+                assert(composedDiffers(
+                    e, sprites::posePartsFor(pose, f)));
+            }
+        }
+    }
 
     std::printf("player dirs test OK\n");
     return 0;

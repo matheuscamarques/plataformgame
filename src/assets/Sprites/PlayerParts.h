@@ -953,6 +953,193 @@ inline constexpr assets::Part kPlayerPunch_NE_Parts[] = {
     { kPlayerPunch_NE_Arms, 12, 16, 0, 12 },
 };
 
+// ---- Fase D, onda 2b: PunchDown em 5 direções ----
+// Cabeça/pernas/pés reutilizam o Idle direcional.
+
+inline const char* const kPlayerPunchDown_S_Torso[] = {
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    "..GCCCCCH...",
+    "..GCCCCCH...",
+    "..GCCCCCH...",
+    "..GCCCCCH...",
+    "...CCCCCC...",
+    "...CCCCCC...",
+};
+
+inline const char* const kPlayerPunchDown_S_Arms[] = {
+    "............",
+    "............",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    ".G........H.",
+    "..G......H..",
+    "..G......H..",
+    "....HHHH....",
+    "....HHHH....",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerPunchDown_S_Parts[] = {
+    { kPlayerIdleSHead, 12, 12, 0, 0 },
+    { kPlayerPunchDown_S_Torso, 12, 16, 0, 12 },
+    { kPlayerIdleSLegs, 12, 6, 0, 28 },
+    { kPlayerIdleSFeet, 12, 6, 0, 34 },
+    { kPlayerPunchDown_S_Arms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerPunchDown_N_Torso[] = {
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    "G.CCCCCCCC.H",
+    "G.CCCCCCCC.H",
+    "G.CCCCCCCC.H",
+    "G.CCCCCCCC.H",
+    "...CCCCCC...",
+    "...CCCCCC...",
+};
+
+inline const char* const kPlayerPunchDown_N_Arms[] = {
+    "............",
+    "............",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "GH........HG",
+    "GH........HG",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerPunchDown_N_Parts[] = {
+    { kPlayerIdleNHead, 12, 12, 0, 0 },
+    { kPlayerPunchDown_N_Torso, 12, 16, 0, 12 },
+    { kPlayerIdleNLegs, 12, 6, 0, 28 },
+    { kPlayerIdleNFeet, 12, 6, 0, 34 },
+    { kPlayerPunchDown_N_Arms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerPunchDown_SE_Torso[] = {
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GKCCCCCCCH.",
+    ".GKCCCCCCCH.",
+    ".GKCCCCCCCH.",
+    ".GKCCCCCCCH.",
+    "..CCCCCCCCH.",
+    "..CCCCCCCCH.",
+    "..CCCCCCCH..",
+    "..CCCCCCCH..",
+    "..CCCCCCCH..",
+    "..CCCCCCCH..",
+    "...CCCCCC...",
+    "...CCCCCC...",
+};
+
+inline const char* const kPlayerPunchDown_SE_Arms[] = {
+    "............",
+    "............",
+    ".G..........",
+    ".G..........",
+    ".G..........",
+    ".G........H.",
+    ".........HH.",
+    ".........HH.",
+    ".........HH.",
+    ".........HH.",
+    ".........HH.",
+    ".........HH.",
+    ".........HH.",
+    ".........HH.",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerPunchDown_SE_Parts[] = {
+    { kPlayerIdleSEHead, 12, 12, 0, 0 },
+    { kPlayerPunchDown_SE_Torso, 12, 16, 0, 12 },
+    { kPlayerIdleSELegs, 12, 6, 0, 28 },
+    { kPlayerIdleSEFeet, 12, 6, 0, 34 },
+    { kPlayerPunchDown_SE_Arms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerPunchDown_NE_Torso[] = {
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCCCH.",
+    ".GCCCCCCKCH.",
+    ".GCCCCCCKCH.",
+    ".GCCCCCCKCH.",
+    ".GCCCCCCKCH.",
+    "..CCCCCCCCH.",
+    "..CCCCCCCCH.",
+    "..CCCCCCCH..",
+    "..CCCCCCCH..",
+    "..CCCCCCCH..",
+    "..CCCCCCCH..",
+    "...CCCCCC...",
+    "...CCCCCC...",
+};
+
+inline const char* const kPlayerPunchDown_NE_Arms[] = {
+    ".G..........",
+    ".G..........",
+    ".G..........",
+    ".G..........",
+    "..........H.",
+    "..........H.",
+    ".........HH.",
+    ".........HH.",
+    ".........HH.",
+    ".........HH.",
+    ".........HH.",
+    ".........HH.",
+    ".........HH.",
+    ".........HH.",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerPunchDown_NE_Parts[] = {
+    { kPlayerIdleNEHead, 12, 12, 0, 0 },
+    { kPlayerPunchDown_NE_Torso, 12, 16, 0, 12 },
+    { kPlayerIdleNELegs, 12, 6, 0, 28 },
+    { kPlayerIdleNEFeet, 12, 6, 0, 34 },
+    { kPlayerPunchDown_NE_Arms, 12, 16, 0, 12 },
+};
+
 inline const char* const kPlayerWalkAHead[] = {
     "....KKKK....",
     "....KKKK....",
@@ -1439,6 +1626,195 @@ inline constexpr assets::Part kPlayerPunchUpParts[] = {
     { kPlayerPunchUpArms, 12, 16, 0, 12 },
 };
 
+// ---- Fase D, onda 2b: PunchUp em 5 direções ----
+// Cabeça do Up é simétrica (reutilizada, declarada abaixo no E); 
+// torso + braço por direção.
+
+inline const char* const kPlayerPunchUp_S_Torso[] = {
+    "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "...FFFFFF...",
+    "...FFFFFF...",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CCCCCC...",
+};
+
+inline const char* const kPlayerPunchUp_S_Arms[] = {
+    "GG........HH",
+    "GG........HH",
+    "GG........HH",
+    "GG........HH",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerPunchUp_S_Parts[] = {
+    { kPlayerPunchUpHead, 12, 12, 0, 0 },
+    { kPlayerPunchUp_S_Torso, 12, 16, 0, 12 },
+    { kPlayerIdleSLegs, 12, 6, 0, 28 },
+    { kPlayerIdleSFeet, 12, 6, 0, 34 },
+    { kPlayerPunchUp_S_Arms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerPunchUp_N_Torso[] = {
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "...FFFFFF...",
+    "...FFFFFF...",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CCCCCC...",
+};
+
+inline const char* const kPlayerPunchUp_N_Arms[] = {
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "G..........H",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerPunchUp_N_Parts[] = {
+    { kPlayerPunchUpHead, 12, 12, 0, 0 },
+    { kPlayerPunchUp_N_Torso, 12, 16, 0, 12 },
+    { kPlayerIdleNLegs, 12, 6, 0, 28 },
+    { kPlayerIdleNFeet, 12, 6, 0, 34 },
+    { kPlayerPunchUp_N_Arms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerPunchUp_SE_Torso[] = {
+    ".GKFFFFFFKH.",
+    ".GKFFFFFFKH.",
+    "...FFFFFF...",
+    "...FFFFFF...",
+    "..CCCCCCCC..",
+    "..KCCCCCCC..",
+    "..KCCCCCCC..",
+    "..KCCCCCCC..",
+    "..KCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CCCCCC...",
+};
+
+inline const char* const kPlayerPunchUp_SE_Arms[] = {
+    "..........H.",
+    ".G........H.",
+    ".G..........",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerPunchUp_SE_Parts[] = {
+    { kPlayerPunchUpHead, 12, 12, 0, 0 },
+    { kPlayerPunchUp_SE_Torso, 12, 16, 0, 12 },
+    { kPlayerIdleSELegs, 12, 6, 0, 28 },
+    { kPlayerIdleSEFeet, 12, 6, 0, 34 },
+    { kPlayerPunchUp_SE_Arms, 12, 16, 0, 12 },
+};
+
+inline const char* const kPlayerPunchUp_NE_Torso[] = {
+    ".GKFFFFFFKH.",
+    ".GKFFFFFFKH.",
+    "...FFFFFF...",
+    "...FFFFFF...",
+    "..CCCCCCCC..",
+    "..CCCCCCKC..",
+    "..CCCCCCKC..",
+    "..CCCCCCKC..",
+    "..CCCCCCKC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "..CCCCCCCC..",
+    "...CCCCCC...",
+    "...CCCCCC...",
+};
+
+inline const char* const kPlayerPunchUp_NE_Arms[] = {
+    "..........H.",
+    ".G........H.",
+    "..........H.",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+    "............",
+};
+
+inline constexpr assets::Part kPlayerPunchUp_NE_Parts[] = {
+    { kPlayerPunchUpHead, 12, 12, 0, 0 },
+    { kPlayerPunchUp_NE_Torso, 12, 16, 0, 12 },
+    { kPlayerIdleNELegs, 12, 6, 0, 28 },
+    { kPlayerIdleNEFeet, 12, 6, 0, 34 },
+    { kPlayerPunchUp_NE_Arms, 12, 16, 0, 12 },
+};
+
+
 inline const char* const kPlayerPunchDownHead[] = {
     "....KKKK....",
     "....KKKK....",
@@ -1780,6 +2156,24 @@ inline const assets::Part* posePartsFor(PlayerPose p, support::Facing d) {
             case support::Facing::NE: return kPlayerPunch_NE_Parts;
             case support::Facing::N:  return kPlayerPunch_N_Parts;
             default:                  return kPlayerPunchParts;
+        }
+    }
+    if (p == PlayerPose::PunchUp) {
+        switch (d) {
+            case support::Facing::S:  return kPlayerPunchUp_S_Parts;
+            case support::Facing::SE: return kPlayerPunchUp_SE_Parts;
+            case support::Facing::NE: return kPlayerPunchUp_NE_Parts;
+            case support::Facing::N:  return kPlayerPunchUp_N_Parts;
+            default:                  return kPlayerPunchUpParts;
+        }
+    }
+    if (p == PlayerPose::PunchDown) {
+        switch (d) {
+            case support::Facing::S:  return kPlayerPunchDown_S_Parts;
+            case support::Facing::SE: return kPlayerPunchDown_SE_Parts;
+            case support::Facing::NE: return kPlayerPunchDown_NE_Parts;
+            case support::Facing::N:  return kPlayerPunchDown_N_Parts;
+            default:                  return kPlayerPunchDownParts;
         }
     }
     return poseParts(p);

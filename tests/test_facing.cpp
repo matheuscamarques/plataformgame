@@ -84,7 +84,10 @@ int main() {
         // Onda 2a: Punch entra no conjunto (PunchUp/Jump seguem em E).
         assert(artDirFor(PlayerPose::Punch, Facing::N) == Facing::N);
         assert(artDirFor(PlayerPose::Punch, Facing::SW) == Facing::SE);
-        assert(artDirFor(PlayerPose::PunchUp, Facing::N) == Facing::E);
+        assert(artDirFor(PlayerPose::PunchUp, Facing::N) == Facing::N);
+        assert(artDirFor(PlayerPose::PunchUp, Facing::SW) == Facing::SE);
+        assert(artDirFor(PlayerPose::PunchDown, Facing::S) == Facing::S);
+        assert(artDirFor(PlayerPose::PunchDown, Facing::NE) == Facing::NE);
         assert(artDirFor(PlayerPose::Jump, Facing::S) == Facing::E);
         // directedPose carrega pose + artDir + espelho juntos.
         const auto d = directedPose(PlayerPose::Idle, Facing::NW);
