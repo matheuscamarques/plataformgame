@@ -39,6 +39,17 @@ void nav(support::InputMap& in, game::creation::CharacterCreationScreen& s,
     release(in, k);
 }
 
+// Enter real (ordem do App): KeyPressed marca o latch, TextEntered(13)
+// do próprio Enter passa por handleText, SÓ então handleInput confirma.
+// Sem isso o cursor seria arrancado p/ o Nome antes do confirm().
+void pressEnter(support::InputMap& in,
+                game::creation::CharacterCreationScreen& s) {
+    press(in, sf::Keyboard::Return);
+    s.handleText(13); // \r do Enter: não digita, não move cursor
+    s.handleInput(in);
+    release(in, sf::Keyboard::Return);
+}
+
 } // namespace
 
 int main() {
@@ -222,6 +233,28 @@ int main() {
         assert(s.klass() == core::PlayerClass::Knight);
         assert(s.consumeAction() == MenuAct::None);
         (void)in;
+    }
+    { // EnterTextDoesNotStealCursor (TextEntered(13) não move o cursor)
+        CharacterCreationScreen s;
+        InputMap in;
+        nav(in, s, sf::Keyboard::Down);
+        nav(in, s, sf::Keyboard::Down); // linha 2
+        assert(s.cursor() == 2);
+        pressEnter(in, s); // Enter real: seleciona a classe 1
+        assert(s.klass() == static_cast<core::PlayerClass>(1));
+        assert(s.cursor() == kStart); // pulou p/ COMEÇAR, não p/ o Nome
+        assert(s.consumeAction() == MenuAct::None); // só marcou
+    }
+    { // EnterStartsGame (nome + Enter + Enter = Done, sem vaivém)
+        CharacterCreationScreen s;
+        InputMap in;
+        s.handleText('G');
+        pressEnter(in, s); // no Nome: pula p/ COMEÇAR
+        assert(s.cursor() == kStart);
+        assert(s.consumeAction() == MenuAct::None);
+        pressEnter(in, s); // em COMEÇAR com nome: conclui
+        assert(s.consumeAction() == MenuAct::Done);
+        assert(s.name() == "G");
     }
 
     std::printf("creation test OK\n");

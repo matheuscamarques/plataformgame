@@ -87,9 +87,13 @@ void CharacterCreationScreen::confirm() {
 }
 
 void CharacterCreationScreen::handleText(std::uint32_t unicode) {
+    // ASCII visível primeiro: Enter/Tab/controle (unicode < 32) que o
+    // SFML entrega via TextEntered junto do KeyPressed NÃO podem mexer
+    // no cursor nem no nome (senão o Enter arrasta p/ o Nome antes do
+    // confirm() e a classe/COMEÇAR nunca são alcançados).
+    if (unicode < 32 || unicode > 126) return;
     if (cursor_ != kNameRow) cursor_ = kNameRow; // digitar foca o Nome
     if (name_.size() >= kMaxName) return;
-    if (unicode < 32 || unicode > 126) return; // ASCII visível
     name_.push_back(static_cast<char>(unicode));
     nameWarn_ = false; // digitou: some o aviso
 }
