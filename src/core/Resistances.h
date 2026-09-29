@@ -32,7 +32,7 @@ struct Resistances {
 };
 
 // Aplica o tipo: damage * resistência do alvo (trunca p/ int).
-inline int applyResistance(int damage, DamageType t, const Resistances &r) {
+[[nodiscard]] inline int applyResistance(int damage, DamageType t, const Resistances &r) {
     return static_cast<int>(damage * r.get(t));
 }
 

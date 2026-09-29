@@ -283,11 +283,11 @@ class Player : public Entity
 
         // Joga o item do slot (hotbar ativa): só se for throwable.
         // Consome 1 do slot exato; stats vêm do def (fonte única).
-        bool tryThrowSlot(support::ThrowSystem &throws, int slot);
-
+        [[nodiscard]] bool tryThrowSlot(support::ThrowSystem &throws,
+                                        int slot);
         // Usa o item do slot (hotbar ativa): só se tem onUse (poção).
         // Consome 1. Sem cooldown (igual ao menu Use).
-        bool tryUseSlot(int slot);
+        [[nodiscard]] bool tryUseSlot(int slot);
 
         // Conjura a 1ª magia sintonizada (G): Arrow vira Bolt, Heal cura,
         // Fire vira bola de fogo, FrostWeapon buffa a arma. FP + cooldown.
@@ -300,7 +300,7 @@ class Player : public Entity
         static constexpr float kFireRadius = 60.f; // área generosa
         static constexpr float kFrostWeaponCost = 30.f;
         static constexpr float kFrostWeaponDur = 30.f;
-        bool castAttuned(support::ThrowSystem &throws);
+        [[nodiscard]] bool castAttuned(support::ThrowSystem &throws);
 
         // Completa a pilha "dynamite" até 999 (legado generoso).
         // Chamado no ctor e no respawn; coleta soma por cima e o

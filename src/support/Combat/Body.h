@@ -92,8 +92,8 @@ struct Body {
         const char* const* rows, int spriteW, int spriteH,
         const core::PaletteEntry* pal, std::size_t palCount,
         int facing_);
-    const PartState* find(BodyPartId id) const;
-
+    // Nulo se ausente (checar!): ignorar é segfault no draw/bbox.
+    [[nodiscard]] const PartState* find(BodyPartId id) const;
     // Itera (estado, definição) em lockstep.
     template <typename F>
     void forEach(F&& fn) const {

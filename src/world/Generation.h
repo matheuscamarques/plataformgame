@@ -35,7 +35,7 @@ struct ColumnData {
     float humidity = 0.0f;
     bool ocean = false;
 };
-ColumnData computeColumn(int tx, uint32_t seed);
+[[nodiscard]] ColumnData computeColumn(int tx, uint32_t seed);
 Tile tileType(int tx, int ty, uint32_t seed, const ColumnData &col);
 // Espessura da terra: constante (não noise). Compartilhada com o viz.
 inline constexpr int DIRT_DEPTH = 3;

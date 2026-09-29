@@ -128,7 +128,7 @@ int main() {
     { // DeathRemovesDwarf (caminho genérico do DeathSystem)
         EnemySystem enemies;
         enemies.spawn("dwarf", 0.f, 0.f);
-        enemies.forEach([](Enemy &s) { s.resources.takeDamage(9999); });
+        enemies.forEach([](Enemy &s) { (void)s.resources.takeDamage(9999); });
         DeathSystem ds;
         GameContext ctx{};
         ctx.enemies = &enemies;

@@ -144,7 +144,7 @@ int main() {
     {
         EnemyResources r;
         r.hp = r.hpMax = 10;
-        r.takeDamage(10);
+        (void)r.takeDamage(10);
         assert(r.takeDamage(5) == 0 && r.hp == 0);
     }
     {

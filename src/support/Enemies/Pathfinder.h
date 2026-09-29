@@ -15,7 +15,7 @@ struct PathStep {
 
 // BFS de from até to dentro de [from±radius]. Alvo vale como destino
 // mesmo se bloqueado. Mesmo tile = {0,0,true}. Sem rota = !found.
-PathStep findStep(std::function<bool(int tx, int ty)> isBlocked,
+[[nodiscard]] PathStep findStep(std::function<bool(int tx, int ty)> isBlocked,
                   int fromTx, int fromTy, int toTx, int toTy, int radius);
 
 } // namespace support

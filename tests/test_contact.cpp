@@ -43,7 +43,7 @@ int main() {
         enemies.spawn("slime", 10.f, 10.f);
         enemies.spawn("slime", 500.f, 500.f);
         enemies.forEach([](Enemy &s) {
-            if (s.body.getX() < 100.f) s.resources.takeDamage(9999);
+            if (s.body.getX() < 100.f) (void)s.resources.takeDamage(9999);
         });
 
         ContactDamageSystem cs;

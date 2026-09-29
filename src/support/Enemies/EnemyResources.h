@@ -67,7 +67,7 @@ struct EnemyResources {
     // Retorna dano efetivamente aplicado (0 se já morto ou amount <= 0).
     // Protege duplo hit no mesmo frame de re-trigger.
     // Tipo filtra pela resistência antes de aplicar.
-    int takeDamage(int amount,
+    [[nodiscard]] int takeDamage(int amount,
                    core::DamageType type = core::DamageType::Physical);
 
     // Reduz postura e atualiza stagger. Use isso, não mexa em .posture direto

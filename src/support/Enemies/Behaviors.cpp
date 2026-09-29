@@ -265,7 +265,7 @@ REGISTER_SKILL("burst_detonate", [] {
                 ctx.throws->spawnBlast(
                     {self.body.getCenterX(), self.body.getCenterY()}, 60.f);
         }
-        self.resources.takeDamage(99999); // kamikaze: sempre morre
+        (void)self.resources.takeDamage(99999); // kamikaze: sempre morre
     };
     return s;
 }());

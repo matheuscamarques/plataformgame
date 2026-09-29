@@ -31,7 +31,7 @@ struct DropTable {
 // Resolve a tabela p/ um nível: lista de (itemId, qty).
 // RNG local com salt (LCG): determinístico p/ (posição, seed do mundo).
 // NUNCA core::randRange aqui — Random.h proíbe global em gameplay.
-inline std::vector<std::pair<std::string, int>>
+[[nodiscard]] inline std::vector<std::pair<std::string, int>>
 rollDrops(const DropTable& table, int level, uint32_t salt) {
     std::vector<std::pair<std::string, int>> out;
     uint32_t rng = salt;

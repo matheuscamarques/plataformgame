@@ -38,7 +38,7 @@ inline const char *stratumName(int s) {
 // ty negativo (céu) = 0; ty além do fundo = 10 (clamp).
 // O(1) aritmético: passo uniforme de 1200 a partir de 200.
 // Idêntico ao loop sobre STRATUM_TOP (teste test_strata trava).
-inline int stratumAt(int ty) {
+[[nodiscard]] inline int stratumAt(int ty) {
     if (ty < 200) return 0;
     int s = 1 + (ty - 200) / 1200;
     return s > 10 ? 10 : s;
