@@ -233,6 +233,14 @@ void Player::tick() {
     this->top = getY();
     this->setPosition(getX(), getY());
 
+    // Corpo híbrido (Fase A): no swing vira para o snapshot do golpe;
+    // andando segue a velocidade (eixo dominante); parado mantém.
+    if (inMeleeSwing()) {
+        setFacing8(swingAim);
+    } else if (std::fabs(getVx()) > 1.f || std::fabs(getVy()) > 1.f) {
+        setFacing8(support::facingFromVelocity(getVx(), getVy(), facing8));
+    }
+
     // Regen de estamina: 30/s × mult, só com delay pronto.
     staminaDelay.tick(1.f / 30.0f);
     if (stamina < staminaMax && staminaDelay.ready())
@@ -504,7 +512,7 @@ bool Player::startRoll() {
     stamina -= physics::kRollCost * computeModifiers().staminaCostMult;
     staminaDelay.trigger();
     rollDir = moveLeft ? -1 : (moveRight ? 1 : facing);
-    facing = rollDir;
+    setFacing8(rollDir >= 0 ? support::Facing::E : support::Facing::W);
     rollTimer = physics::kRollDur;
     // Fat roll (carga pesada) não dá i-frames (DS).
     if (!heavilyLoaded()) rollIframes.trigger();
@@ -940,7 +948,7 @@ void Player::respawn(float x, float y) {
     meleePhase = MeleePhase::Idle;
     meleeCombo = 0;
     meleeTimer = 0.f;
-    facing = 1;
+    setFacing8(support::Facing::E);
     jumping = false;
     inWater = false;
     jumpingRecharge = 0.f;

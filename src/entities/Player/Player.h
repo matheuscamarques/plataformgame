@@ -14,6 +14,7 @@
 #include <SFML/Graphics/Rect.hpp>
 #include "entities/Entity.hpp"
 #include "support/Combat/AimDir.h"
+#include "support/Combat/Facing.h"
 #include "support/Combat/Body.h"
 #include "support/Combat/SpriteFrame.h"
 #include "core/Attributes.h"
@@ -177,6 +178,16 @@ class Player : public Entity
         // o input no meio do golpe).
         support::AimDir aimDir = support::AimDir::E;
         support::AimDir swingAim = support::AimDir::E;
+
+        // Corpo em 8 vias (híbrido Fase A): fora do swing segue o
+        // movimento (parado mantém); no swing congela no snapshot do
+        // golpe (telegraph, até Idle). Render ainda lê facing (±1,
+        // derivado) — sem mudança visual até a Fase D.
+        support::Facing facing8 = support::Facing::E;
+        void setFacing8(support::Facing f) {
+            facing8 = f;
+            facing = support::facingSign(f);
+        }
 
         // Fonte única do estado de swing. O resolve do sprite, a
         // hitbox e o debug yellow box leem TODOS isto — nunca timer.

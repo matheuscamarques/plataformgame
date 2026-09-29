@@ -246,8 +246,8 @@ void Game::tick() {
     // Pesado (>50% da carga): sem correr (equip load, DS).
     p->runFast   = !uiOpen && !p->heavilyLoaded() &&
                    input_.held(support::Action::RunFast);
-    if (p->moveLeft && !p->moveRight) p->facing = -1;
-    if (p->moveRight && !p->moveLeft) p->facing = 1;
+    if (p->moveLeft && !p->moveRight) p->setFacing8(support::Facing::W);
+    if (p->moveRight && !p->moveLeft) p->setFacing8(support::Facing::E);
 
     // Run gate: morto/pausado congela movimento, mundo e scheduler.
     // RunManager roda sempre (precisa ver o R).
