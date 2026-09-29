@@ -60,6 +60,12 @@ struct GameContext {
 
     // Ciclo dia/noite para sistemas que dependem de horário.
     core::DayNightCycle *dayNight = nullptr;
+
+    // Flags de debug p/ playtest A/B (F8/[): defaults = produção.
+    // Swoosh: 0 = windup+impacto, 1 = só windup, 2 = só impacto.
+    int swooshMode = 0;
+    // Hitstop: 0 = por arma (WeaponDef), senão slots globais.
+    int hitstopOverride = 0;
 };
 
 } // namespace support

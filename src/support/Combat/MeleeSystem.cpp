@@ -65,8 +65,10 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
     // tocando (fase setada à mão), vale o legado. Drena borda aqui
     // para Sfx/Shake não vazarem para o próximo swing (Fase F).
     // Fase F: swoosh no Impact (edge Sfx do clip, mesmo no whiff).
+    // Modo debug A/B (F8): 0 ambos, 1 só windup, 2 só impacto.
     const uint32_t animEdge = p->anim.consumeEvents();
-    if ((animEdge & support::AnimEvent::Sfx) && ctx.audio)
+    const bool impactSwoosh = ctx.swooshMode == 0 || ctx.swooshMode == 2;
+    if ((animEdge & support::AnimEvent::Sfx) && impactSwoosh && ctx.audio)
         ctx.audio->play(game::keyOf(game::Sfx::MeleeSwing), 0.5f);
     if (p->anim.playing() &&
         !(p->anim.liveEvents() & support::AnimEvent::Hitbox))
@@ -170,6 +172,7 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
         s.resources.damagePosture(postureBase * postureMult);
         if (applied > 0) {
             // Fase F: shake e hitstop pelo peso da arma (soco = default).
+            // Override de debug ([/]): 0 = WeaponDef, senão global.
             float trauma = 0.15f;
             int hitstop = 2;
             if (const core::ItemDef* wdef = p->weaponDef()) {
@@ -179,6 +182,7 @@ void MeleeSystem::tick(float dt, GameContext &ctx) {
                     hitstop = wd->hitstopTicks;
                 }
             }
+            if (ctx.hitstopOverride > 0) hitstop = ctx.hitstopOverride;
             p->triggerHitstop(hitstop); // max: sem acumular multi-hit
             if (ctx.camera) ctx.camera->addTrauma(trauma); // hit conecta
             if (s.ai) s.ai->onTakeHit(s, applied, ctx);

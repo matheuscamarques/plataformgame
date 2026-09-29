@@ -23,6 +23,8 @@ enum class Action : uint8_t {
     ToggleHitboxes, ToggleAi, ToggleEvents, ToggleWorld, // F2,F5,F4,F6
     ToggleFileLog, // F9: log de eventos em logs/debug.log
     ToggleLightMask, // F7: máscara do raycast de luz
+    SwooshCycle,     // F8: alterna swoosh windup/impacto (debug A/B)
+    HitstopCycle,    // [: alterna override de hitstop (debug A/B)
     Hotbar1, Hotbar2, Hotbar3, Hotbar4, Hotbar5, // fase 4a: 1-5
     ToggleInventory, // fase 4b: E abre/fecha grid
     Interact,        // F: abre/executa menu de ação (com grid aberto)

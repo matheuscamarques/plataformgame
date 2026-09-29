@@ -118,6 +118,9 @@ private:
     std::unique_ptr<support::ChunkLoader> chunkLoader_;
     bool charView_ = false; // F3: ASCII por char, sem textura
     int tickCount_ = 0; // p/ animação walk do anão
+    // Debug A/B de playtest (F8/[): 0 = produção (ambos, por arma).
+    int swooshMode_ = 0;      // 0 ambos, 1 só windup, 2 só impacto
+    int hitstopOverride_ = 0; // 0 = WeaponDef, senão slots globais
     bool running = false;
     // Vinheta de boot (logo WEB-ENGENHARIA); atrás dela o jogo já existe.
     std::unique_ptr<game::logo::LogoScreen> splash_;

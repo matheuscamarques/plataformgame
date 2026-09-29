@@ -87,6 +87,28 @@ int main() {
         p.triggerHitstop(2); // max: não rebaixa em dobro-hit
         assert(p.hitstopT == 5);
     }
+    { // HitstopOverrideWins (debug [/]: global passa por cima da arma)
+        Player p;
+        p.equipment.equip(core::Item{"iron_axe", 1});
+        EnemySystem enemies;
+        enemies.spawn("slime", 62.f, 35.f);
+        enemies.forEach([](Enemy &s) {
+            s.bodyParts.rebuild({s.body.getX(), s.body.getY()}, 1);
+        });
+
+        MeleeSystem ms;
+        GameContext ctx{};
+        ctx.player = &p;
+        ctx.enemies = &enemies;
+        ctx.hitstopOverride = 7;
+
+        assert(p.startSwing());
+        for (int i = 0; i < 6; ++i) ms.tick(1.f / 30.f, ctx);
+        int hp = -1;
+        enemies.forEach([&](Enemy &s) { hp = s.resources.hp; });
+        assert(hp < 40); // conectou
+        assert(p.hitstopT == 7); // override, não os 5 do machado
+    }
     { // WhiffsWhenFar
         Player p;
         EnemySystem enemies;

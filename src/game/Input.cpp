@@ -66,4 +66,27 @@ void Game::pollEvents() {
         debugFeed_.pushLog(debugFeed_.fileEnabled() ? "filelog on"
                                                     : "filelog off");
     }
+    // Debug A/B de playtest (sem re recompilar): F8 cicla o swoosh
+    // (ambos → só windup → só impacto), [ cicla override de hitstop
+    // (por arma → 3 → 5 → 7 slots). Log no feed (F4) p/ comparar.
+    if (input_.pressed(support::Action::SwooshCycle)) {
+        input_.consume(support::Action::SwooshCycle);
+        swooshMode_ = (swooshMode_ + 1) % 3;
+        debugFeed_.pushLog(std::string("swoosh ") +
+                           (swooshMode_ == 0
+                                ? "windup+impact"
+                                : (swooshMode_ == 1 ? "windup" : "impact")));
+    }
+    if (input_.pressed(support::Action::HitstopCycle)) {
+        input_.consume(support::Action::HitstopCycle);
+        hitstopOverride_ =
+            (hitstopOverride_ == 0)
+                ? 3
+                : (hitstopOverride_ >= 7 ? 0 : hitstopOverride_ + 2);
+        debugFeed_.pushLog(std::string("hitstop ") +
+                           (hitstopOverride_ == 0
+                                ? "por arma"
+                                : std::to_string(hitstopOverride_) +
+                                      " slots"));
+    }
 }

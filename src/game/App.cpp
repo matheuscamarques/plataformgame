@@ -429,6 +429,9 @@ void Game::tick() {
                               throws_, explodes_, drops_, &targets,
                               &screenshots_, &debugFeed_, &audio_, &camera,
                               &dayNight_};
+    // Flags de debug A/B (F8/[, defaults = produção).
+    ctx.swooshMode = swooshMode_;
+    ctx.hitstopOverride = hitstopOverride_;
 
     // Sprite atual primeiro: BodySystem (scheduler) deriva hitboxes dele.
     p->currentFrameId = run_.isDead()
@@ -554,7 +557,8 @@ void Game::tick() {
     if (!frozen) {
         if (!wasGrounded && p->jumping)
             audio_.play(game::keyOf(game::Sfx::PlayerLand));
-        if (phaseBefore == 0 && static_cast<int>(p->meleePhase) == 1)
+        if (phaseBefore == 0 && static_cast<int>(p->meleePhase) == 1 &&
+            (swooshMode_ == 0 || swooshMode_ == 1))
             audio_.play(game::keyOf(game::Sfx::MeleeSwing));
         if (p->hp < hpBefore) {
             if (p->hp <= 0) {

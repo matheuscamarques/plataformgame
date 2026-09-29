@@ -34,6 +34,8 @@ InputMap::InputMap() {
     bind(Action::ToggleWorld, sf::Keyboard::F6);
     bind(Action::ToggleFileLog, sf::Keyboard::F9);
     bind(Action::ToggleLightMask, sf::Keyboard::F7);
+    bind(Action::SwooshCycle, sf::Keyboard::F8);
+    bind(Action::HitstopCycle, sf::Keyboard::LBracket);
     bind(Action::Hotbar1, sf::Keyboard::Num1);
     bind(Action::Hotbar2, sf::Keyboard::Num2);
     bind(Action::Hotbar3, sf::Keyboard::Num3);
