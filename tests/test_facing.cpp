@@ -88,7 +88,11 @@ int main() {
         assert(artDirFor(PlayerPose::PunchUp, Facing::SW) == Facing::SE);
         assert(artDirFor(PlayerPose::PunchDown, Facing::S) == Facing::S);
         assert(artDirFor(PlayerPose::PunchDown, Facing::NE) == Facing::NE);
-        assert(artDirFor(PlayerPose::Jump, Facing::S) == Facing::E);
+        // Onda 3a: Hurt/Jump entram (Death/Throw seguem em E).
+        assert(artDirFor(PlayerPose::Hurt, Facing::S) == Facing::S);
+        assert(artDirFor(PlayerPose::Hurt, Facing::NW) == Facing::NE);
+        assert(artDirFor(PlayerPose::Jump, Facing::S) == Facing::S);
+        assert(artDirFor(PlayerPose::Jump, Facing::NW) == Facing::NE);
         // directedPose carrega pose + artDir + espelho juntos.
         const auto d = directedPose(PlayerPose::Idle, Facing::NW);
         assert(d.pose == PlayerPose::Idle);
@@ -97,7 +101,9 @@ int main() {
         assert(e.artDir == Facing::E && !e.mirror);
         const auto h = directedPose(PlayerPose::Hurt, Facing::SW);
         assert(h.pose == PlayerPose::Hurt);
-        assert(h.artDir == Facing::E && h.mirror);
+        assert(h.artDir == Facing::SE && h.mirror); // onda 3a: tem SE
+        const auto t = directedPose(PlayerPose::Throw, Facing::W);
+        assert(t.artDir == Facing::E && t.mirror); // Throw segue em E
     }
     { // PosePartsForCaiEmE (sem arte direcional: mesmo ponteiro)
         for (int pi = 0; pi < sprites::kPlayerPoseCount; ++pi) {

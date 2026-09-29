@@ -49,6 +49,26 @@ bool partSym(const assets::Part& p) {
     return true;
 }
 
+// Presença no frame composto (poses com partes vazias: Hurt/Jump
+// têm braços/pés vazios, o que vale são os pixels no todo).
+void checkComposed(const assets::Part* pp, const char* head,
+                   const char* torso, const char* legs, const char* arms,
+                   const char* weapon = nullptr) {
+    bool h = false, t = false, l = false, a = false, w = true;
+    for (int i = 0; i < 5; ++i) {
+        if (hasChar(pp[i], head)) h = true;
+        if (hasChar(pp[i], torso)) t = true;
+        if (hasChar(pp[i], legs)) l = true;
+        if (hasChar(pp[i], arms)) a = true;
+    }
+    if (weapon) {
+        w = false;
+        for (int i = 0; i < 5; ++i)
+            if (hasChar(pp[i], weapon)) w = true;
+    }
+    assert(h && t && l && a && w);
+}
+
 // Presença por parte (hitbox e anchors nunca somem por direção).
 void checkPresence(const assets::Part* pp) {
     assert(hasChar(pp[0], "FE"));  // cabeça (F ou E)
@@ -243,6 +263,36 @@ int main() {
                 checkPresence(sprites::posePartsFor(pose, f));
                 assert(composedDiffers(
                     e, sprites::posePartsFor(pose, f)));
+            }
+        }
+    }
+    { // HurtJumpDims (6 novas: 4 cabeças + 2 torsos, 12/16 rows)
+        using namespace sprites;
+        checkRows(kPlayerHurt_S_Head, 12);
+        checkRows(kPlayerHurt_N_Head, 12);
+        checkRows(kPlayerHurt_SE_Head, 12);
+        checkRows(kPlayerHurt_SE_Torso, 16);
+        checkRows(kPlayerHurt_NE_Head, 12);
+        checkRows(kPlayerHurt_NE_Torso, 16);
+    }
+    { // HurtJumpDirs (vivas no composto + ≠E; S/N simétricas)
+        using game::artDirFor;
+        const PlayerPose poses[] = {PlayerPose::Hurt, PlayerPose::Jump};
+        const Facing all4[] = {Facing::S, Facing::SE, Facing::NE,
+                               Facing::N};
+        const Facing syms[] = {Facing::S, Facing::N};
+        for (PlayerPose pose : poses) {
+            for (Facing f : all4)
+                assert(artDirFor(pose, f) == f);
+            const assets::Part* e = sprites::posePartsFor(pose, Facing::E);
+            for (Facing f : all4) {
+                const assets::Part* pp = sprites::posePartsFor(pose, f);
+                checkComposed(pp, "FE", "C", "LB", "GH");
+                assert(composedDiffers(e, pp));
+            }
+            for (Facing f : syms) {
+                const assets::Part* pp = sprites::posePartsFor(pose, f);
+                for (int i = 0; i < 5; ++i) assert(partSym(pp[i]));
             }
         }
     }
