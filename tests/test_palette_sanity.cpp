@@ -56,7 +56,7 @@ int main() {
     using namespace sprites;
 
     { // NoDuplicateChars (1 char = 1 parte, sem ambiguidade)
-        assert(noDuplicateChars(kPlayerPal, kPlayerPalCount));
+        assert(noDuplicateChars(kPlayerPalette, kPlayerPaletteCount));
         assert(noDuplicateChars(kDwarfPal, kDwarfPalCount));
         assert(noDuplicateChars(kSlimePal, kSlimePalCount));
     }
@@ -103,6 +103,7 @@ int main() {
         }
     }
     { // LeftAndRightHandsHaveDistinctChars
+        // Tier 1: braço esq lit (G), dir em sombra (h minúsculo).
         bool hasH = false, hasG = false;
         const char* const* idle =
             assets::frameData(support::SpriteFrameId::PlayerIdle).rows;

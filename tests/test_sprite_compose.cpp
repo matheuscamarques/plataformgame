@@ -2,12 +2,13 @@
  * @file tests/test_sprite_compose.cpp
  * @author Matheus de Camargo Marques <matheuscamarques@gmail.com>
  * @brief Teste headless que trava composição == monolítico (Fase B).
- * @details Cobre os 10 frames do player: compor as 4 partes tem que dar
- * byte a byte o frame monolítico. Trava os limites (12+16+6+6=40).
+ * @details Cobre os 10 frames do player: compor as partes tem que dar
+ * byte a byte o frame monolítico. Trava o canvas 40x40 (40x40@0,0).
  */
 
 #include <cassert>
 #include <cstdio>
+#include <cstring>
 #include <string>
 #include <vector>
 
@@ -36,18 +37,17 @@ int main() {
         {kPlayerDeathParts, 4},
     };
 
-    { // PartitionCoversFrame (12+16+6+6=40, largura 12, offsets empilham)
+    { // FullFrameParts (canvas 40x40: toda parte cobre o frame
+        // inteiro; conteúdo 12-wide centrado nas cols 14-25, resto é
+        // '.' — linha N de qualquer array == linha N do composto)
         for (const auto& c : cases) {
-            int total = 0;
-            int y = 0;
             for (std::size_t i = 0; i < c.count; ++i) {
-                assert(c.parts[i].w == 12);
-                assert(c.parts[i].offX == 0);
-                assert(c.parts[i].offY == y); // sem buraco nem sobreposição
-                y += c.parts[i].h;
-                total += c.parts[i].h;
+                assert(c.parts[i].w == 40 && c.parts[i].h == 40);
+                assert(c.parts[i].offX == 0 && c.parts[i].offY == 0);
+                assert(c.parts[i].rows != nullptr);
+                for (int y = 0; y < 40; ++y)
+                    assert(std::strlen(c.parts[i].rows[y]) == 40);
             }
-            assert(total == 40 && y == 40);
         }
     }
     { // GoldenIdle (compose do idle == snapshot; trava o algoritmo)
@@ -55,75 +55,71 @@ int main() {
         // + postura S): se compose mudar, quebra aqui (as outras poses
         // têm cobertura estrutural acima).
         static const char* const kGoldenIdle[40] = {
-            "....KKKK....",
-            "...KKKKKK...",
-            "..KKKKKKKK..",
-            "..KFFFFFFK..",
-            "..KFEFFEFK..",
-            "..KFEFFEFK..",
-            "..KFFFFFFK..",
-            "..KFFFFFEK..",
-            "..KFFFFFFK..",
-            "...FFFFFF...",
-            "...FFFFFF...",
-            "....FFFF....",
-            "..CCCCCCCC..",
-            "..CCCCCCCC..",
-            ".GCCCCCCCCH.",
-            ".GCCCCCCCCH.",
-            ".GCCCCCCCCH.",
-            ".GCCCCCCCCH.",
-            ".GCCCCCCCCH.",
-            ".GCCCCCCCCH.",
-            "..CCCCCCCC..",
-            "..CCCCCCCC..",
-            "..CCKKKKCC..",
-            "..CCKKKKCC..",
-            "..CCCCCCCC..",
-            "..CCCCCCCC..",
-            "...CCCCCC...",
-            "...CCCCCC...",
-            "..CC....CC..",
-            "..CC....CC..",
-            "..CC....CC..",
-            "..CC....CC..",
-            "..LL....BB..",
-            "..LL....BB..",
-            "..LL....BB..",
-            "..LL....BB..",
-            ".LL......BB.",
-            ".LL......BB.",
-            "LL........BB",
-            "LL........BB",
+            "..................KKKK..................",
+            ".................KKKKKK.................",
+            "................KKKKKKKK................",
+            "................KFFFFFFK................",
+            "................KFEFFEFK................",
+            "................KFEFFEFK................",
+            "................KFFFFFFK................",
+            "................KFFFFFEK................",
+            "................KFFFFFFK................",
+            ".................FFFFFF.................",
+            ".................FFFFFF.................",
+            "..................FFFF..................",
+            "................CCCCCCCC................",
+            "................CCCCCCCC................",
+            "...............GCCCCCCCCH...............",
+            "...............GCCCCCCCCH...............",
+            "...............GCCCCCCCCH...............",
+            "...............GCCCCCCCCH...............",
+            "...............GCCCCCCCCH...............",
+            "...............GCCCCCCCCH...............",
+            "................CCCCCCCC................",
+            "................CCCCCCCC................",
+            "................CCKKKKCC................",
+            "................CCKKKKCC................",
+            "................CCCCCCCC................",
+            "................CCCCCCCC................",
+            ".................CCCCCC.................",
+            ".................CCCCCC.................",
+            "................CC....CC................",
+            "................CC....CC................",
+            "................CC....CC................",
+            "................CC....CC................",
+            "................LL....BB................",
+            "................LL....BB................",
+            "................LL....BB................",
+            "................LL....BB................",
+            "...............LL......BB...............",
+            "...............LL......BB...............",
+            "..............LL........BB..............",
+            "..............LL........BB..............",
         };
         const std::vector<std::string> got =
-            assets::compose(kPlayerIdleParts, 5, 12, 40);
+            assets::compose(kPlayerIdleParts, 5, kPlayerW, kPlayerH);
         assert(got.size() == 40u);
         for (int row = 0; row < 40; ++row)
             assert(got[row] == kGoldenIdle[row]);
     }
     { // ClipOutOfBounds (parte fora do buffer: recorta sem crash)
-        const assets::Part hang[] = {{kPlayerIdleHead, 12, 12, 0, 36}};
-        const std::vector<std::string> got = assets::compose(hang, 1, 12, 40);
+        // Head full-40 pendurada em offY 36: rows 36-39 ← conteúdo 0-3.
+        const assets::Part hang[] = {{kPlayerIdleHead, kPlayerW, kPlayerH, 0, 36}};
+        const std::vector<std::string> got = assets::compose(hang, 1, kPlayerW, kPlayerH);
         assert(got.size() == 40u);
-        for (int row = 0; row < 36; ++row) assert(got[row] == "............");
+        for (int row = 0; row < 36; ++row) assert(got[row] == "........................................");
         assert(got[36] == kPlayerIdleHead[0]);
     }
-    { // PosesCoverAllFrames (12 poses × 4 partes com dims certas)
+    { // PosesCoverAllFrames (12 poses × 5 partes 12x40@0,0)
         assert(kPlayerPoseCount == 12);
         for (int i = 0; i < kPlayerPoseCount; ++i) {
             const assets::Part* pp =
                 poseParts(static_cast<PlayerPose>(i));
             assert(pp != nullptr);
-            assert(pp[0].w == 12 && pp[0].h == 12); // head
-            assert(pp[1].w == 12 && pp[1].h == 16); // torso
-            assert(pp[2].w == 12 && pp[2].h == 6); // legs
-            assert(pp[3].w == 12 && pp[3].h == 6); // feet
-            // Overlay contido no frame (geometria por pose: torso ou
-            // cabeça; Jump/Hurt cobrem só as rows dos braços erguidos).
-            assert(pp[4].offX >= 0 && pp[4].offY >= 0);
-            assert(pp[4].offX + pp[4].w <= 12);
-            assert(pp[4].offY + pp[4].h <= 40);
+            for (int k = 0; k < 5; ++k) {
+                assert(pp[k].w == 40 && pp[k].h == 40);
+                assert(pp[k].offX == 0 && pp[k].offY == 0);
+            }
             assert(pp[0].rows && pp[1].rows && pp[2].rows && pp[3].rows &&
                    pp[4].rows);
         }
@@ -135,13 +131,14 @@ int main() {
             const assets::Part* pp =
                 poseParts(static_cast<PlayerPose>(i));
             const std::vector<std::string> base =
-                assets::compose(pp, 4, 12, 40);
+                assets::compose(pp, 4, kPlayerW, kPlayerH);
             const assets::Part& ov = pp[4];
             for (int y = 0; y < ov.h; ++y)
                 for (int x = 0; x < ov.w; ++x) {
                     const char a = ov.rows[y][x];
                     if (a == '.') continue;
-                    assert(a == 'G' || a == 'H');
+                    // Overlay só carrega braço (Tier 1: sombra g/h conta).
+                    assert(a == 'G' || a == 'H' || a == 'g' || a == 'h');
                     assert(base[ov.offY + y][ov.offX + x] == '.');
                 }
         }
@@ -151,10 +148,10 @@ int main() {
             const auto id =
                 static_cast<support::SpriteFrameId>(static_cast<int>(support::SpriteFrameId::PlayerIdle) + i);
             const auto f = assets::frameData(id);
-            assert(f.rows != nullptr && f.w == 12 && f.h == 40);
+            assert(f.rows != nullptr && f.w == 40 && f.h == 40);
             const assets::Part* pp = poseParts(static_cast<PlayerPose>(i));
             const std::vector<std::string> composed =
-                assets::compose(pp, 5, 12, 40);
+                assets::compose(pp, 5, kPlayerW, kPlayerH);
             for (int row = 0; row < 40; ++row)
                 assert(std::string(f.rows[row]) == composed[row]);
         }
@@ -166,10 +163,10 @@ int main() {
                                          PlayerPose::WalkD};
         for (int k = 0; k < 2; ++k) {
             const auto f = assets::frameData(extraIds[k]);
-            assert(f.rows != nullptr && f.w == 12 && f.h == 40);
+            assert(f.rows != nullptr && f.w == 40 && f.h == 40);
             const assets::Part* pp = poseParts(extraPoses[k]);
             const std::vector<std::string> composed =
-                assets::compose(pp, 5, 12, 40);
+                assets::compose(pp, 5, kPlayerW, kPlayerH);
             for (int row = 0; row < 40; ++row)
                 assert(std::string(f.rows[row]) == composed[row]);
         }

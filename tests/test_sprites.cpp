@@ -28,7 +28,7 @@ int main() {
         return false;
     };
 
-    { // PlayerWidths (12x40, 12 frames)
+    { // PlayerWidths (40x40, 12 frames)
         using support::SpriteFrameId;
         const support::SpriteFrameId ids[] = {
             SpriteFrameId::PlayerIdle, SpriteFrameId::PlayerWalkA,
@@ -64,7 +64,7 @@ int main() {
     }
     { // PalettesNonEmpty (toda sprite tem pixel visível, não é vazio)
         using support::SpriteFrameId;
-        assert(kPlayerPalCount == 12u && kSlimePalCount == 5u && kDwarfPalCount == 11u);
+        assert(kPlayerPaletteCount == 12u && kSlimePalCount == 5u && kDwarfPalCount == 11u);
         assert(has(prow(SpriteFrameId::PlayerIdle), kPlayerH, 'F'));
         // Jump com H no composto via overlay (hitbox viva); a cabeça
         // em si não tem G/H (trava em test_player_dirs).
@@ -87,12 +87,13 @@ int main() {
         assert(!has(prow(SpriteFrameId::PlayerPunch), kPlayerH, 'W'));
     }
     { // WalkArmsBothSides (overlay carrega hitbox dos 2 braços;
-        // balanço do passo vem do IK, não do composto)
+        // balanço do passo vem do IK, não do composto; canvas 40 com
+        // arte centrada: cols 1/10 viram 15/24)
         using support::SpriteFrameId;
-        assert(prow(SpriteFrameId::PlayerWalkA)[16][1] == 'G');
-        assert(prow(SpriteFrameId::PlayerWalkA)[16][10] == 'H');
-        assert(prow(SpriteFrameId::PlayerWalkB)[16][1] == 'G');
-        assert(prow(SpriteFrameId::PlayerWalkB)[16][10] == 'H');
+        assert(prow(SpriteFrameId::PlayerWalkA)[16][15] == 'G');
+        assert(prow(SpriteFrameId::PlayerWalkA)[16][24] == 'H');
+        assert(prow(SpriteFrameId::PlayerWalkB)[16][15] == 'G');
+        assert(prow(SpriteFrameId::PlayerWalkB)[16][24] == 'H');
     }
     { // PunchBodyAlignsWithIdle (cabeça na mesma row: sem crouch)
         using support::SpriteFrameId;
@@ -105,12 +106,12 @@ int main() {
         auto firstK = [&](const char *const *f) { return firstRowWith(f, kPlayerH, 'K'); };
         assert(firstK(prow(SpriteFrameId::PlayerPunch)) == firstK(prow(SpriteFrameId::PlayerIdle)));
     }
-    { // PunchHasExtendedFist (≥2 'H' nas cols 10-11 em alguma row)
+    { // PunchHasExtendedFist (≥2 'H' nas cols 24-25 em alguma row)
         const char* const* punch = prow(SpriteFrameId::PlayerPunch);
         int maxS = 0;
         for (int y = 0; y < kPlayerH; ++y) {
             int cnt = 0;
-            for (int x = 10; x <= 11; ++x) {
+            for (int x = 24; x <= 25; ++x) {
                 if (punch[y][x] == 'H') ++cnt;
             }
             if (cnt > maxS) maxS = cnt;
@@ -146,19 +147,15 @@ int main() {
                        std::strlen(walks[k][y]) == 14);
         }
     }
-    { // OriginsMatchTextures (tex head/torso/arms/legs/feet → offY certo)
-        // offY esperado por TEXTURA (fatiamento 12/16/12/28/34).
-        const int want[5] = {0, 12, 12, 28, 34};
+    { // OriginsMatchTextures (grade full-40: toda parte 12x40@0,0;
+        // origem do Renderer == kPlayerH - 0 p/ as 5 texturas)
         for (int pi = 0; pi < kPlayerPoseCount; ++pi) {
             const auto pose = static_cast<PlayerPose>(pi);
             const assets::Part* pp = poseParts(pose);
             for (int t = 0; t < 5; ++t) {
-                int w = want[t];
-                // Jump/Hurt: overlay cobre a cabeça (braços erguidos).
-                if (t == 2 &&
-                    (pose == PlayerPose::Jump || pose == PlayerPose::Hurt))
-                    w = 0;
-                assert(pp[partIndexForTex(t)].offY == w);
+                assert(pp[partIndexForTex(t)].w == 40);
+                assert(pp[partIndexForTex(t)].h == 40);
+                assert(pp[partIndexForTex(t)].offY == 0);
             }
         }
         // Botas substituem feet: skip i==4 mira parts[3] (feet, offY 34).

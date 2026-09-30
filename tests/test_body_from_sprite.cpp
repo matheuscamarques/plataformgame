@@ -127,8 +127,8 @@ int main() {
         punch.rebuildFromSprite({0.f, 0.f}, {30.f, 50.f},
                                 pf.rows,
                                 sprites::kPlayerW,
-                                sprites::kPlayerH, sprites::kPlayerPal,
-                                sprites::kPlayerPalCount, 1);
+                                sprites::kPlayerH, sprites::kPlayerPalette,
+                                sprites::kPlayerPaletteCount, 1);
         assert(punch.find(BodyPartId::ArmR) != nullptr);
         assert(punch.find(BodyPartId::Torso) != nullptr);
     }
@@ -154,6 +154,57 @@ int main() {
             assert(l != nullptr && r != nullptr);
             assert(l->worldBox.width > 0.f && l->worldBox.left > -1e5f);
             assert(r->worldBox.width > 0.f && r->worldBox.left > -1e5f);
+        }
+    }
+    { // AirAttackFrames (hitbox do ataque aéreo = frame tucked do
+        // Renderer: rows válidas, braços vivos, pernas mais curtas que
+        // as plantadas de chão)
+        static auto schema = BodySchema::humanoid(100.f, 60.f);
+        const sprites::PlayerPose atks[] = {
+            sprites::PlayerPose::Punch, sprites::PlayerPose::PunchUp,
+            sprites::PlayerPose::PunchDown, sprites::PlayerPose::Throw,
+        };
+        for (auto pose : atks) {
+            const auto f = assets::playerAirAttackFrameData(pose);
+            assert(f.rows != nullptr && f.w == 40 && f.h == 40);
+            Body b;
+            b.attach(&schema);
+            b.rebuildFromSprite({0.f, 0.f}, {30.f, 50.f}, f.rows, f.w,
+                                f.h, f.pal, f.palCount, 1);
+            const PartState* l = b.find(BodyPartId::ArmL);
+            const PartState* r = b.find(BodyPartId::ArmR);
+            assert(l != nullptr && r != nullptr);
+            assert(l->worldBox.width > 0.f && l->worldBox.left > -1e5f);
+            assert(r->worldBox.width > 0.f && r->worldBox.left > -1e5f);
+            const PartState* legL = b.find(BodyPartId::LegL);
+            const PartState* legR = b.find(BodyPartId::LegR);
+            assert(legL != nullptr && legR != nullptr);
+            assert(legL->worldBox.width > 0.f);
+            assert(legR->worldBox.width > 0.f);
+        }
+        // Tucked soco: perna aérea termina acima da plantada de chão.
+        // (Throw de chão tem coto próprio até a row 33 — fora deste
+        // teste; só Punch/PunchUp/PunchDown comparam.)
+        const sprites::PlayerPose punches[] = {
+            sprites::PlayerPose::Punch, sprites::PlayerPose::PunchUp,
+            sprites::PlayerPose::PunchDown,
+        };
+        for (auto pose : punches) {
+            const auto fa = assets::playerAirAttackFrameData(pose);
+            const auto fg =
+                assets::playerFrameData(pose, support::Facing::E);
+            Body ba, bg;
+            ba.attach(&schema);
+            bg.attach(&schema);
+            ba.rebuildFromSprite({0.f, 0.f}, {30.f, 50.f}, fa.rows,
+                                 fa.w, fa.h, fa.pal, fa.palCount, 1);
+            bg.rebuildFromSprite({0.f, 0.f}, {30.f, 50.f}, fg.rows,
+                                 fg.w, fg.h, fg.pal, fg.palCount, 1);
+            const PartState* la = ba.find(BodyPartId::LegL);
+            const PartState* lg = bg.find(BodyPartId::LegL);
+            assert(la != nullptr && lg != nullptr);
+            assert(la->worldBox.top + la->worldBox.height <=
+                   lg->worldBox.top + lg->worldBox.height + 0.01f);
         }
     }
     { // RegistryResolvesAllIds (todo id tem rows; None formular vazio)

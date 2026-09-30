@@ -1,7 +1,7 @@
 /**
  * @file tests/test_player_dirs.cpp
  * @brief Trava a arte direcional do player (Fase D, onda 1).
- * @details Dims exatas por parte (12/16/6/6/16, rows de 12 chars),
+ * @details Grade full-40 por parte (spans auditados via checkSpan),
  * presença de pixel por parte (hitbox nunca some), S/N simétricos,
  * SE/NE com 3/4 real e frames diferentes do E. Roda com make test.
  */
@@ -11,13 +11,22 @@
 #include "assets/PlayerSprite.h"
 #include "assets/SpriteComposer.h"
 #include "assets/Sprites/PlayerParts.h"
+#include "assets/Sprites/PlayerSprites.h"
 
 namespace {
 
+// Canvas 40x40 (auditoria lado a lado): 40 rows de 40 chars, arte
+// 12-wide centrada nas cols 14-25; conteúdo mora em [y0,y1], resto
+// '.' (linha N == row N do composto).
 template <std::size_t N>
-void checkRows(const char* const (&rows)[N], int expectH) {
-    assert(N == static_cast<std::size_t>(expectH));
-    for (const char* r : rows) assert(std::strlen(r) == 12);
+void checkSpan(const char* const (&rows)[N], int y0, int y1) {
+    assert(N == 40);
+    assert(y0 >= 0 && y1 < 40 && y0 <= y1);
+    for (int y = 0; y < 40; ++y) {
+        assert(std::strlen(rows[y]) == 40);
+        if (y < y0 || y > y1)
+            for (int x = 0; x < 40; ++x) assert(rows[y][x] == '.');
+    }
 }
 
 bool hasChar(const assets::Part& p, const char* chars) {
@@ -76,13 +85,13 @@ void checkPresence(const assets::Part* pp) {
     assert(hasChar(pp[1], "C"));   // torso
     assert(hasChar(pp[2], "CLB")); // pernas
     assert(hasChar(pp[3], "LB"));  // pés
-    assert(hasChar(pp[4], "G"));   // braço esq
+    assert(hasChar(pp[4], "G"));   // braço esq (Tier 1: G lit)
     assert(hasChar(pp[4], "H"));   // braço dir
 }
 
 bool composedDiffers(const assets::Part* a, const assets::Part* b) {
-    const auto ca = assets::compose(a, 5, 12, 40);
-    const auto cb = assets::compose(b, 5, 12, 40);
+    const auto ca = assets::compose(a, 5, sprites::kPlayerW, sprites::kPlayerH);
+    const auto cb = assets::compose(b, 5, sprites::kPlayerW, sprites::kPlayerH);
     return ca != cb;
 }
 
@@ -92,28 +101,28 @@ int main() {
     using sprites::PlayerPose;
     using support::Facing;
 
-    { // IdleDims (alturas exatas por parte, 12 chars por row)
+    { // IdleDims (spans full-40, 40 chars por row)
         using namespace sprites;
-        checkRows(kPlayerIdleSHead, 12);
-        checkRows(kPlayerIdleSTorso, 16);
-        checkRows(kPlayerIdleSLegs, 6);
-        checkRows(kPlayerIdleSFeet, 6);
-        checkRows(kPlayerIdleSArms, 16);
-        checkRows(kPlayerIdleSEHead, 12);
-        checkRows(kPlayerIdleSETorso, 16);
-        checkRows(kPlayerIdleSELegs, 6);
-        checkRows(kPlayerIdleSEFeet, 6);
-        checkRows(kPlayerIdleSEArms, 16);
-        checkRows(kPlayerIdleNEHead, 12);
-        checkRows(kPlayerIdleNETorso, 16);
-        checkRows(kPlayerIdleNELegs, 6);
-        checkRows(kPlayerIdleNEFeet, 6);
-        checkRows(kPlayerIdleNEArms, 16);
-        checkRows(kPlayerIdleNHead, 12);
-        checkRows(kPlayerIdleNTorso, 16);
-        checkRows(kPlayerIdleNLegs, 6);
-        checkRows(kPlayerIdleNFeet, 6);
-        checkRows(kPlayerIdleNArms, 16);
+        checkSpan(kPlayerIdleSHead, 0, 11);
+        checkSpan(kPlayerIdleSTorso, 12, 27);
+        checkSpan(kPlayerIdleSLegs, 28, 33);
+        checkSpan(kPlayerIdleSFeet, 34, 39);
+        checkSpan(kPlayerIdleSArms, 12, 27);
+        checkSpan(kPlayerIdleSEHead, 0, 11);
+        checkSpan(kPlayerIdleSETorso, 12, 27);
+        checkSpan(kPlayerIdleSELegs, 28, 33);
+        checkSpan(kPlayerIdleSEFeet, 34, 39);
+        checkSpan(kPlayerIdleSEArms, 12, 27);
+        checkSpan(kPlayerIdleNEHead, 0, 11);
+        checkSpan(kPlayerIdleNETorso, 12, 27);
+        checkSpan(kPlayerIdleNELegs, 28, 33);
+        checkSpan(kPlayerIdleNEFeet, 34, 39);
+        checkSpan(kPlayerIdleNEArms, 12, 27);
+        checkSpan(kPlayerIdleNHead, 0, 11);
+        checkSpan(kPlayerIdleNTorso, 12, 27);
+        checkSpan(kPlayerIdleNLegs, 28, 33);
+        checkSpan(kPlayerIdleNFeet, 34, 39);
+        checkSpan(kPlayerIdleNArms, 12, 27);
     }
     { // IdlePresence (toda direção mantém as 6 partes vivas)
         checkPresence(sprites::posePartsFor(PlayerPose::Idle, Facing::S));
@@ -156,26 +165,104 @@ int main() {
         assert(composedDiffers(
             e, sprites::posePartsFor(PlayerPose::Idle, Facing::N)));
     }
+    { // WalkSideViewCycle (E: A passing esq-down, C espelho, B contact)
+        using namespace sprites;
+        checkSpan(kPlayerWalkAFeet, 34, 39);
+        checkSpan(kPlayerWalkCFeet, 34, 39);
+        checkSpan(kPlayerWalkBFeet, 34, 39);
+        // A: esq plantada (rows 38-39 com L), dir no ar (sem B).
+        assert(std::strchr(kPlayerWalkAFeet[38], 'L') != nullptr);
+        assert(std::strchr(kPlayerWalkAFeet[38], 'B') == nullptr);
+        assert(std::strchr(kPlayerWalkAFeet[39], 'L') != nullptr);
+        assert(std::strchr(kPlayerWalkAFeet[39], 'B') == nullptr);
+        // C: espelho (dir plantada, esq no ar).
+        assert(std::strchr(kPlayerWalkCFeet[38], 'B') != nullptr);
+        assert(std::strchr(kPlayerWalkCFeet[38], 'L') == nullptr);
+        assert(std::strchr(kPlayerWalkCFeet[39], 'B') != nullptr);
+        assert(std::strchr(kPlayerWalkCFeet[39], 'L') == nullptr);
+        // B: contact planta os dois (rows 38-39 com L e B).
+        assert(std::strchr(kPlayerWalkBFeet[38], 'L') != nullptr);
+        assert(std::strchr(kPlayerWalkBFeet[38], 'B') != nullptr);
+        assert(std::strchr(kPlayerWalkBFeet[39], 'L') != nullptr);
+        assert(std::strchr(kPlayerWalkBFeet[39], 'B') != nullptr);
+        // 4 frames distintos no composto (antes C==A e D==B: torsos e
+        // braços de A/B são idênticos, então só o feet alternado
+        // diferencia; sem isso a marcha lia como polichinelo parado).
+        const assets::Part* a = sprites::posePartsFor(PlayerPose::WalkA, Facing::E);
+        const assets::Part* b = sprites::posePartsFor(PlayerPose::WalkB, Facing::E);
+        const assets::Part* c = sprites::posePartsFor(PlayerPose::WalkC, Facing::E);
+        const assets::Part* d = sprites::posePartsFor(PlayerPose::WalkD, Facing::E);
+        assert(composedDiffers(a, b));
+        assert(composedDiffers(a, c)); // C espelha o pé de A
+        assert(composedDiffers(b, c));
+        // Locomoção nunca usa S/N: artDirFor força E/W (side-view).
+        assert(game::artDirFor(PlayerPose::Idle, Facing::S) == Facing::E);
+        assert(game::artDirFor(PlayerPose::WalkA, Facing::N) == Facing::E);
+        assert(game::artDirFor(PlayerPose::WalkB, Facing::SW) == Facing::W);
+        assert(game::artDirFor(PlayerPose::WalkC, Facing::NE) == Facing::E);
+        assert(game::artDirFor(PlayerPose::WalkD, Facing::S) == Facing::E);
+        (void)d;
+    }
+    { // AirAttackLegs (Punch/Throw no ar: tronco do golpe + tucked Jump)
+        using namespace sprites;
+        using game::artDirFor;
+        const PlayerPose atks[] = {PlayerPose::Punch, PlayerPose::PunchUp,
+                                   PlayerPose::PunchDown, PlayerPose::Throw};
+        for (PlayerPose a : atks) {
+            const assets::Part* ap = sprites::posePartsForAir(a);
+            assert(ap != nullptr);
+            for (int i = 0; i < 5; ++i) {
+                assert(ap[i].w == 40);
+                assert(ap[i].offX == 0);
+            }
+            assert(ap[2].h == 40 && ap[2].offY == 0); // legs full-40
+            assert(ap[3].h == 40 && ap[3].offY == 0); // feet full-40
+            // Pernas: os mesmos arrays do Jump (tucked, pés em ponta).
+            assert(ap[2].rows == kPlayerJumpLegs);
+            assert(ap[3].rows == kPlayerJumpFeet);
+            // Tronco/cabeça/braços: os mesmos arrays do E de chão.
+            const assets::Part* e =
+                sprites::posePartsFor(a, Facing::E);
+            assert(ap[0].rows == e[0].rows);
+            assert(ap[1].rows == e[1].rows);
+            assert(ap[4].rows == e[4].rows);
+            // E o chão continua plantado (ar ≠ chão em alguma row
+            // das pernas).
+            bool legsDiffer = false;
+            for (int y = 28; y < 40; ++y)
+                if (std::string(e[2].rows[y]) != ap[2].rows[y] ||
+                    std::string(e[3].rows[y]) != ap[3].rows[y])
+                    legsDiffer = true;
+            assert(legsDiffer);
+            // Direção no ar: side-view; no chão: 8-way.
+            assert(artDirFor(a, Facing::S, true) == Facing::E);
+            assert(artDirFor(a, Facing::NW, true) == Facing::W);
+            assert(artDirFor(a, Facing::S, false) == Facing::S);
+        }
+        assert(sprites::posePartsForAir(PlayerPose::Jump) == nullptr);
+        assert(sprites::posePartsForAir(PlayerPose::Idle) == nullptr);
+        assert(sprites::posePartsForAir(PlayerPose::Hurt) == nullptr);
+    }
     { // WalkDims (alturas exatas das 18 novas, 12 chars por row)
         using namespace sprites;
-        checkRows(kPlayerWalkA_S_Arms, 16);
-        checkRows(kPlayerWalkA_N_Arms, 16);
-        checkRows(kPlayerWalkA_SE_Torso, 16);
-        checkRows(kPlayerWalkA_SE_Arms, 16);
-        checkRows(kPlayerWalkA_NE_Torso, 16);
-        checkRows(kPlayerWalkA_NE_Arms, 16);
-        checkRows(kPlayerWalkB_S_Legs, 6);
-        checkRows(kPlayerWalkB_S_Feet, 6);
-        checkRows(kPlayerWalkB_S_Arms, 16);
-        checkRows(kPlayerWalkB_N_Arms, 16);
-        checkRows(kPlayerWalkB_SE_Torso, 16);
-        checkRows(kPlayerWalkB_SE_Legs, 6);
-        checkRows(kPlayerWalkB_SE_Feet, 6);
-        checkRows(kPlayerWalkB_SE_Arms, 16);
-        checkRows(kPlayerWalkB_NE_Torso, 16);
-        checkRows(kPlayerWalkB_NE_Legs, 6);
-        checkRows(kPlayerWalkB_NE_Feet, 6);
-        checkRows(kPlayerWalkB_NE_Arms, 16);
+        checkSpan(kPlayerWalkA_S_Arms, 12, 27);
+        checkSpan(kPlayerWalkA_N_Arms, 12, 27);
+        checkSpan(kPlayerWalkA_SE_Torso, 12, 27);
+        checkSpan(kPlayerWalkA_SE_Arms, 12, 27);
+        checkSpan(kPlayerWalkA_NE_Torso, 12, 27);
+        checkSpan(kPlayerWalkA_NE_Arms, 12, 27);
+        checkSpan(kPlayerWalkB_S_Legs, 28, 33);
+        checkSpan(kPlayerWalkB_S_Feet, 34, 39);
+        checkSpan(kPlayerWalkB_S_Arms, 12, 27);
+        checkSpan(kPlayerWalkB_N_Arms, 12, 27);
+        checkSpan(kPlayerWalkB_SE_Torso, 12, 27);
+        checkSpan(kPlayerWalkB_SE_Legs, 28, 33);
+        checkSpan(kPlayerWalkB_SE_Feet, 34, 39);
+        checkSpan(kPlayerWalkB_SE_Arms, 12, 27);
+        checkSpan(kPlayerWalkB_NE_Torso, 12, 27);
+        checkSpan(kPlayerWalkB_NE_Legs, 28, 33);
+        checkSpan(kPlayerWalkB_NE_Feet, 34, 39);
+        checkSpan(kPlayerWalkB_NE_Arms, 12, 27);
     }
     { // WalkPresenceSymDiff (vivas + S/N simétricas + 3/4 + ≠E)
         const PlayerPose poses[] = {PlayerPose::WalkA, PlayerPose::WalkB,
@@ -205,14 +292,14 @@ int main() {
     }
     { // PunchDims (8 novas: torso+braço por direção, 16 rows)
         using namespace sprites;
-        checkRows(kPlayerPunch_S_Torso, 16);
-        checkRows(kPlayerPunch_S_Arms, 16);
-        checkRows(kPlayerPunch_N_Torso, 16);
-        checkRows(kPlayerPunch_N_Arms, 16);
-        checkRows(kPlayerPunch_SE_Torso, 16);
-        checkRows(kPlayerPunch_SE_Arms, 16);
-        checkRows(kPlayerPunch_NE_Torso, 16);
-        checkRows(kPlayerPunch_NE_Arms, 16);
+        checkSpan(kPlayerPunch_S_Torso, 12, 27);
+        checkSpan(kPlayerPunch_S_Arms, 12, 27);
+        checkSpan(kPlayerPunch_N_Torso, 12, 27);
+        checkSpan(kPlayerPunch_N_Arms, 12, 27);
+        checkSpan(kPlayerPunch_SE_Torso, 12, 27);
+        checkSpan(kPlayerPunch_SE_Arms, 12, 27);
+        checkSpan(kPlayerPunch_NE_Torso, 12, 27);
+        checkSpan(kPlayerPunch_NE_Arms, 12, 27);
     }
     { // PunchPresenceDiff (vivas + ≠E; soco é assimétrico por natureza)
         using game::artDirFor;
@@ -233,22 +320,22 @@ int main() {
     }
     { // PunchUpDownDims (16 novas: torso+braço por direção)
         using namespace sprites;
-        checkRows(kPlayerPunchUp_S_Torso, 16);
-        checkRows(kPlayerPunchUp_S_Arms, 16);
-        checkRows(kPlayerPunchUp_N_Torso, 16);
-        checkRows(kPlayerPunchUp_N_Arms, 16);
-        checkRows(kPlayerPunchUp_SE_Torso, 16);
-        checkRows(kPlayerPunchUp_SE_Arms, 16);
-        checkRows(kPlayerPunchUp_NE_Torso, 16);
-        checkRows(kPlayerPunchUp_NE_Arms, 16);
-        checkRows(kPlayerPunchDown_S_Torso, 16);
-        checkRows(kPlayerPunchDown_S_Arms, 16);
-        checkRows(kPlayerPunchDown_N_Torso, 16);
-        checkRows(kPlayerPunchDown_N_Arms, 16);
-        checkRows(kPlayerPunchDown_SE_Torso, 16);
-        checkRows(kPlayerPunchDown_SE_Arms, 16);
-        checkRows(kPlayerPunchDown_NE_Torso, 16);
-        checkRows(kPlayerPunchDown_NE_Arms, 16);
+        checkSpan(kPlayerPunchUp_S_Torso, 12, 27);
+        checkSpan(kPlayerPunchUp_S_Arms, 12, 27);
+        checkSpan(kPlayerPunchUp_N_Torso, 12, 27);
+        checkSpan(kPlayerPunchUp_N_Arms, 12, 27);
+        checkSpan(kPlayerPunchUp_SE_Torso, 12, 27);
+        checkSpan(kPlayerPunchUp_SE_Arms, 12, 27);
+        checkSpan(kPlayerPunchUp_NE_Torso, 12, 27);
+        checkSpan(kPlayerPunchUp_NE_Arms, 12, 27);
+        checkSpan(kPlayerPunchDown_S_Torso, 12, 27);
+        checkSpan(kPlayerPunchDown_S_Arms, 12, 27);
+        checkSpan(kPlayerPunchDown_N_Torso, 12, 27);
+        checkSpan(kPlayerPunchDown_N_Arms, 12, 27);
+        checkSpan(kPlayerPunchDown_SE_Torso, 12, 27);
+        checkSpan(kPlayerPunchDown_SE_Arms, 12, 27);
+        checkSpan(kPlayerPunchDown_NE_Torso, 12, 27);
+        checkSpan(kPlayerPunchDown_NE_Arms, 12, 27);
     }
     { // PunchUpDownPresenceDiff (vivas + ≠E nas 8 combinações)
         using game::artDirFor;
@@ -268,26 +355,35 @@ int main() {
             }
         }
     }
-    { // HurtJumpDims (6 novas: 4 cabeças + 2 torsos, 12/16 rows)
+    { // HurtJumpDims (6 novas: 4 cabeças + 2 torsos, spans full-40)
         using namespace sprites;
-        checkRows(kPlayerHurt_S_Head, 12);
-        checkRows(kPlayerHurt_N_Head, 12);
-        checkRows(kPlayerHurt_SE_Head, 12);
-        checkRows(kPlayerHurt_SE_Torso, 16);
-        checkRows(kPlayerHurt_NE_Head, 12);
-        checkRows(kPlayerHurt_NE_Torso, 16);
+        checkSpan(kPlayerHurt_S_Head, 0, 11);
+        checkSpan(kPlayerHurt_N_Head, 0, 11);
+        checkSpan(kPlayerHurt_SE_Head, 0, 11);
+        checkSpan(kPlayerHurt_SE_Torso, 12, 27);
+        checkSpan(kPlayerHurt_NE_Head, 0, 11);
+        checkSpan(kPlayerHurt_NE_Torso, 12, 27);
     }
-    { // JumpHurtNoBakedArms (G/H fora das 6 cabeças: braço é IK)
+    { // JumpHurtNoBakedArms (G/H fora das 7 cabeças: braço é IK ou
+        // overlay; PunchUp tinha os braços erguidos assados aqui e o
+        // IK desenhava por cima — 4 braços. Agora moram no overlay.)
         using namespace sprites;
         const char* const* heads[] = {
             kPlayerJumpHead, kPlayerHurtHead, kPlayerHurt_S_Head,
             kPlayerHurt_N_Head, kPlayerHurt_SE_Head, kPlayerHurt_NE_Head,
+            kPlayerPunchUpHead,
         };
         for (const char* const* h : heads)
             for (int y = 0; y < 12; ++y) {
                 assert(std::strchr(h[y], 'G') == nullptr);
                 assert(std::strchr(h[y], 'H') == nullptr);
             }
+        // E o overlay do PunchUp cobre os erguidos (preview/hitbox
+        // intactos: mesmos pixels, outra parte).
+        for (int y = 0; y < 4; ++y) {
+            assert(std::strchr(kPlayerPunchUpArms[y], 'G') != nullptr);
+            assert(std::strchr(kPlayerPunchUpArms[y], 'H') != nullptr);
+        }
     }
     { // TorsosNoBakedArms (12 poses × 5 dirs: torso é só corpo/roupa)
         const Facing dirs[] = {Facing::E, Facing::S, Facing::SE,
@@ -305,15 +401,23 @@ int main() {
             }
         }
     }
-    { // HurtJumpDirs (vivas no composto + ≠E; S/N simétricas)
+    { // HurtJumpDirs (arte existe nas 5 dirs p/ ambas; Hurt segue
+        // 8-way, Jump é marcha aérea side-view como Idle/Walk)
         using game::artDirFor;
         const PlayerPose poses[] = {PlayerPose::Hurt, PlayerPose::Jump};
         const Facing all4[] = {Facing::S, Facing::SE, Facing::NE,
                                Facing::N};
         const Facing syms[] = {Facing::S, Facing::N};
         for (PlayerPose pose : poses) {
-            for (Facing f : all4)
-                assert(artDirFor(pose, f) == f);
+            if (pose == PlayerPose::Hurt) {
+                for (Facing f : all4)
+                    assert(artDirFor(pose, f) == f);
+            } else {
+                for (Facing f : all4)
+                    assert(artDirFor(pose, f) == Facing::E);
+                assert(artDirFor(pose, Facing::W) == Facing::W);
+                assert(artDirFor(pose, Facing::NW) == Facing::W);
+            }
             const assets::Part* e = sprites::posePartsFor(pose, Facing::E);
             for (Facing f : all4) {
                 const assets::Part* pp = sprites::posePartsFor(pose, f);
@@ -328,21 +432,21 @@ int main() {
     }
     { // DeathThrowDims (4 torsos + 4 cabeças + 4 torsos + 4 braços)
         using namespace sprites;
-        checkRows(kPlayerDeath_S_Torso, 16);
-        checkRows(kPlayerDeath_N_Torso, 16);
-        checkRows(kPlayerDeath_SE_Torso, 16);
-        checkRows(kPlayerDeath_NE_Torso, 16);
-        checkRows(kPlayerThrow_S_Head, 12);
-        checkRows(kPlayerThrow_S_Arms, 16);
-        checkRows(kPlayerThrow_N_Head, 12);
-        checkRows(kPlayerThrow_N_Torso, 16);
-        checkRows(kPlayerThrow_N_Arms, 16);
-        checkRows(kPlayerThrow_SE_Head, 12);
-        checkRows(kPlayerThrow_SE_Torso, 16);
-        checkRows(kPlayerThrow_SE_Arms, 16);
-        checkRows(kPlayerThrow_NE_Head, 12);
-        checkRows(kPlayerThrow_NE_Torso, 16);
-        checkRows(kPlayerThrow_NE_Arms, 16);
+        checkSpan(kPlayerDeath_S_Torso, 12, 27);
+        checkSpan(kPlayerDeath_N_Torso, 12, 27);
+        checkSpan(kPlayerDeath_SE_Torso, 12, 27);
+        checkSpan(kPlayerDeath_NE_Torso, 12, 27);
+        checkSpan(kPlayerThrow_S_Head, 0, 11);
+        checkSpan(kPlayerThrow_S_Arms, 12, 27);
+        checkSpan(kPlayerThrow_N_Head, 0, 11);
+        checkSpan(kPlayerThrow_N_Torso, 12, 27);
+        checkSpan(kPlayerThrow_N_Arms, 12, 27);
+        checkSpan(kPlayerThrow_SE_Head, 0, 11);
+        checkSpan(kPlayerThrow_SE_Torso, 12, 27);
+        checkSpan(kPlayerThrow_SE_Arms, 12, 27);
+        checkSpan(kPlayerThrow_NE_Head, 0, 11);
+        checkSpan(kPlayerThrow_NE_Torso, 12, 27);
+        checkSpan(kPlayerThrow_NE_Arms, 12, 27);
     }
     { // DeathThrowDirs (vivas no composto + ≠E; Death S/N simétricas)
         using game::artDirFor;

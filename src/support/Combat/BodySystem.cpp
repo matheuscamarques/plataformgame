@@ -71,9 +71,13 @@ void BodySystem::tick(float /*dt*/, GameContext &ctx) {
     if (ctx.player) {
         Player &p = *ctx.player;
         // Fase D: hitbox segue a direção de arte (S/SE/E/NE/N).
+        // jumping=true é chão; no ar, ataques usam o frame tucked
+        // (mesma fonte do Renderer: playerAirAttackFrameData).
         const auto pose = game::poseForFrameId(p.currentFrameId);
-        const auto art = game::artDirFor(pose, p.facing8);
-        const auto f = assets::playerFrameData(pose, art);
+        const bool airborne = !p.jumping;
+        const auto art = game::artDirFor(pose, p.facing8, airborne);
+        const auto f = airborne ? assets::playerAirAttackFrameData(pose)
+                                : assets::playerFrameData(pose, art);
         if (f.rows) {
             p.body.rebuildFromSprite(
                 {p.getX(), p.getY()}, {p.getW(), p.getH()},

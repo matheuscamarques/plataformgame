@@ -67,23 +67,33 @@ int main() {
             assert(p.facing == facingSign(f));
         }
     }
-    { // DirectedPose (Fase D: Idle/Walk têm 5 dirs; resto cai em E)
+    { // DirectedPose (plataforma 2D: Idle/Walk/Jump sempre side-view;
+        // combate/morte segue 8-way via baseDir)
         using game::artDirFor;
         using game::directedPose;
         using sprites::PlayerPose;
-        // Onda 1: base dobra NW→NE, W→E, SW→SE.
-        assert(artDirFor(PlayerPose::Idle, Facing::S) == Facing::S);
-        assert(artDirFor(PlayerPose::Idle, Facing::SE) == Facing::SE);
+        // Locomoção nunca olha p/ o jogador: S/SE/E/NE/N → E,
+        // NW/W/SW → W (flip cuida do espelho).
+        assert(artDirFor(PlayerPose::Idle, Facing::S) == Facing::E);
+        assert(artDirFor(PlayerPose::Idle, Facing::SE) == Facing::E);
         assert(artDirFor(PlayerPose::Idle, Facing::E) == Facing::E);
-        assert(artDirFor(PlayerPose::Idle, Facing::NE) == Facing::NE);
-        assert(artDirFor(PlayerPose::Idle, Facing::N) == Facing::N);
-        assert(artDirFor(PlayerPose::Idle, Facing::NW) == Facing::NE);
-        assert(artDirFor(PlayerPose::Idle, Facing::W) == Facing::E);
-        assert(artDirFor(PlayerPose::Idle, Facing::SW) == Facing::SE);
-        assert(artDirFor(PlayerPose::WalkA, Facing::N) == Facing::N);
-        assert(artDirFor(PlayerPose::WalkB, Facing::SW) == Facing::SE);
-        assert(artDirFor(PlayerPose::WalkC, Facing::NE) == Facing::NE);
-        assert(artDirFor(PlayerPose::WalkD, Facing::S) == Facing::S);
+        assert(artDirFor(PlayerPose::Idle, Facing::NE) == Facing::E);
+        assert(artDirFor(PlayerPose::Idle, Facing::N) == Facing::E);
+        assert(artDirFor(PlayerPose::Idle, Facing::NW) == Facing::W);
+        assert(artDirFor(PlayerPose::Idle, Facing::W) == Facing::W);
+        assert(artDirFor(PlayerPose::Idle, Facing::SW) == Facing::W);
+        const PlayerPose locom[] = {PlayerPose::WalkA, PlayerPose::WalkB,
+                                    PlayerPose::WalkC, PlayerPose::WalkD,
+                                    PlayerPose::Jump};
+        for (PlayerPose w : locom) {
+            assert(artDirFor(w, Facing::S) == Facing::E);
+            assert(artDirFor(w, Facing::N) == Facing::E);
+            assert(artDirFor(w, Facing::SE) == Facing::E);
+            assert(artDirFor(w, Facing::NE) == Facing::E);
+            assert(artDirFor(w, Facing::W) == Facing::W);
+            assert(artDirFor(w, Facing::SW) == Facing::W);
+            assert(artDirFor(w, Facing::NW) == Facing::W);
+        }
         // Onda 2a: Punch entra no conjunto (PunchUp/Jump seguem em E).
         assert(artDirFor(PlayerPose::Punch, Facing::N) == Facing::N);
         assert(artDirFor(PlayerPose::Punch, Facing::SW) == Facing::SE);
@@ -91,15 +101,33 @@ int main() {
         assert(artDirFor(PlayerPose::PunchUp, Facing::SW) == Facing::SE);
         assert(artDirFor(PlayerPose::PunchDown, Facing::S) == Facing::S);
         assert(artDirFor(PlayerPose::PunchDown, Facing::NE) == Facing::NE);
-        // Onda 3a: Hurt/Jump entram (Death/Throw seguem em E).
+        // Onda 3a: Hurt entra (Jump é marcha aérea: side-view acima).
         assert(artDirFor(PlayerPose::Hurt, Facing::S) == Facing::S);
         assert(artDirFor(PlayerPose::Hurt, Facing::NW) == Facing::NE);
-        assert(artDirFor(PlayerPose::Jump, Facing::S) == Facing::S);
-        assert(artDirFor(PlayerPose::Jump, Facing::NW) == Facing::NE);
+        // Ataque aéreo: Punch/Throw viram side-view (perna tucked);
+        // no chão seguem 8-way. Hurt/Death não mudam no ar.
+        const PlayerPose airAtk[] = {PlayerPose::Punch,
+                                     PlayerPose::PunchUp,
+                                     PlayerPose::PunchDown,
+                                     PlayerPose::Throw};
+        for (PlayerPose a : airAtk) {
+            for (Facing f : {Facing::S, Facing::SE, Facing::NE,
+                             Facing::N})
+                assert(artDirFor(a, f, true) == Facing::E);
+            for (Facing f : {Facing::W, Facing::SW, Facing::NW})
+                assert(artDirFor(a, f, true) == Facing::W);
+            assert(artDirFor(a, Facing::N, false) ==
+                   artDirFor(a, Facing::N)); // chão: 8-way intacto
+            const auto da = directedPose(a, Facing::SW, true);
+            assert(da.artDir == Facing::W && da.mirror);
+        }
+        assert(artDirFor(PlayerPose::Hurt, Facing::S, true) == Facing::S);
+        assert(artDirFor(PlayerPose::Death, Facing::NW, true) ==
+               Facing::NE);
         // directedPose carrega pose + artDir + espelho juntos.
         const auto d = directedPose(PlayerPose::Idle, Facing::NW);
         assert(d.pose == PlayerPose::Idle);
-        assert(d.artDir == Facing::NE && d.mirror);
+        assert(d.artDir == Facing::W && d.mirror); // locomoção: side-view
         const auto e = directedPose(PlayerPose::Idle, Facing::E);
         assert(e.artDir == Facing::E && !e.mirror);
         const auto h = directedPose(PlayerPose::Hurt, Facing::SW);

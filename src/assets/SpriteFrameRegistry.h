@@ -29,7 +29,12 @@ SpriteFrameData frameData(support::SpriteFrameId id);
 // (posePartsFor) com cache composto. frameData() acima serve E
 // (legado/testes); BodySystem usa este p/ hitboxes direcionais.
 SpriteFrameData playerFrameData(sprites::PlayerPose pose,
-                                support::Facing artDir);
+                                 support::Facing artDir);
+
+// Ataque aéreo: Punch/PunchUp/PunchDown/Throw com pernas tucked
+// (posePartsForAir); outras poses caem no playerFrameData(E).
+// BodySystem lê daqui quando airborne — mesma fonte do Renderer.
+SpriteFrameData playerAirAttackFrameData(sprites::PlayerPose pose);
 
 // Frames estáticos (tudo menos player/None/COUNT): fonte única dos
 // dados acima e do SpriteSet::build (dimensões/paleta não divergem).

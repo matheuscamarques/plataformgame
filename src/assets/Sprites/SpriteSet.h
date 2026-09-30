@@ -157,15 +157,15 @@ inline SpriteSet build() {
             const assets::Part* pp = posePartsFor(
                 static_cast<PlayerPose>(i), artDirForIndex(d));
             s.playerParts[i][d].head = core::makeSprite(
-                pp[0].rows, pp[0].w, pp[0].h, kPlayerPal, kPlayerPalCount);
+                pp[0].rows, pp[0].w, pp[0].h, kPlayerPalette, kPlayerPaletteCount);
             s.playerParts[i][d].torso = core::makeSprite(
-                pp[1].rows, pp[1].w, pp[1].h, kPlayerPal, kPlayerPalCount);
+                pp[1].rows, pp[1].w, pp[1].h, kPlayerPalette, kPlayerPaletteCount);
             s.playerParts[i][d].legs = core::makeSprite(
-                pp[2].rows, pp[2].w, pp[2].h, kPlayerPal, kPlayerPalCount);
+                pp[2].rows, pp[2].w, pp[2].h, kPlayerPalette, kPlayerPaletteCount);
             s.playerParts[i][d].feet = core::makeSprite(
-                pp[3].rows, pp[3].w, pp[3].h, kPlayerPal, kPlayerPalCount);
+                pp[3].rows, pp[3].w, pp[3].h, kPlayerPalette, kPlayerPaletteCount);
             s.playerParts[i][d].arms = core::makeSprite(
-                pp[4].rows, pp[4].w, pp[4].h, kPlayerPal, kPlayerPalCount);
+                pp[4].rows, pp[4].w, pp[4].h, kPlayerPalette, kPlayerPaletteCount);
         }
     }
     // Inimigos: rows/dims/pal vêm da tabela do registry (fonte única);

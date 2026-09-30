@@ -128,40 +128,58 @@ inline sprites::PlayerPose poseForFrameId(support::SpriteFrameId id) {
     }
 }
 
-// Fase D (infra, sem arte nova): pose dirigida por facing. artDir é a
-// direção COM arte desenhada (hoje sempre E: só existe side-view);
-// mirror espelha NW/W/SW. Quando poses N/NE/S chegarem, artDirFor
-// cresce e o Renderer escolhe a textura por (pose, artDir).
+// Fase D (infra + arte 5-dir): pose dirigida por facing. artDir é a
+// direção COM arte desenhada; mirror espelha NW/W/SW. Tudo que é
+// plataforma 2D (Idle/WalkA-D + Jump aéreo + ataques no ar) é sempre
+// side-view (E/W, com flip cuidando do W) — nunca de frente/costas,
+// mesmo que o facing8 interno esteja em S/N (subida mostrava a
+// nuca via Jump_N, queda mostrava o rosto via Jump_S, e o ataque
+// aéreo trocava perna tucked por perna plantada). O facing8 segue
+// 8-way (swingAim, IK e hitbox leem o snapshot); só o DESENHO ignora
+// S/N no ar. No chão, combate/morte (Punch/Hurt/Death/Throw) mantém
+// 8-way (golpe direcional intencional).
 struct DirectedPose {
     sprites::PlayerPose pose; // a mesma (futuro: variante direcional)
-    support::Facing artDir;   // direção com arte (= E hoje)
+    support::Facing artDir;   // direção com arte (E/W p/ locomoção)
     bool mirror = false;      // flip horizontal
 };
 
 inline support::Facing artDirFor(sprites::PlayerPose pose,
-                                 support::Facing f) {
-    // Todas as 10 poses têm 5 dirs (Idle/Walk/Punch/Hurt/Jump/Death/
-    // Throw); nada mais cai em E. baseDir dobra NW→NE, W→E, SW→SE.
+                                 support::Facing f,
+                                 bool airborne = false) {
+    // Locomoção (chão + ar): sempre side-view. baseDir dobraria
+    // S/SE/NE/N em si mesmos (frente/costas); aqui forçamos E e o
+    // mirror resolve o W. Jump entra aqui — é marcha aérea, não mira.
+    // Ataques no ar (Punch/Throw) também: perna tucked + rosto de
+    // lado; o swingAim 8-way segue vivo p/ IK e hitbox. No chão o
+    // golpe direcional usa a arte 8-way.
     switch (pose) {
         case sprites::PlayerPose::Idle:
         case sprites::PlayerPose::WalkA:
         case sprites::PlayerPose::WalkB:
         case sprites::PlayerPose::WalkC:
         case sprites::PlayerPose::WalkD:
+        case sprites::PlayerPose::Jump:
+            return support::isMirrored(f) ? support::Facing::W
+                                          : support::Facing::E;
         case sprites::PlayerPose::Punch:
         case sprites::PlayerPose::PunchUp:
         case sprites::PlayerPose::PunchDown:
+        case sprites::PlayerPose::Throw:
+            if (airborne)
+                return support::isMirrored(f) ? support::Facing::W
+                                              : support::Facing::E;
+            return support::baseDir(f);
         case sprites::PlayerPose::Hurt:
-        case sprites::PlayerPose::Jump:
-        case sprites::PlayerPose::Death:
-        case sprites::PlayerPose::Throw: return support::baseDir(f);
+        case sprites::PlayerPose::Death: return support::baseDir(f);
         default:                         return support::Facing::E;
     }
 }
 
 inline DirectedPose directedPose(sprites::PlayerPose pose,
-                                 support::Facing f) {
-    return {pose, artDirFor(pose, f), support::isMirrored(f)};
+                                 support::Facing f,
+                                 bool airborne = false) {
+    return {pose, artDirFor(pose, f, airborne), support::isMirrored(f)};
 }
 
 // Marcha via clip (fecha a Fase C): o resolve arbitra combate vs

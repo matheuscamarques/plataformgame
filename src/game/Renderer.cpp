@@ -1064,9 +1064,9 @@ void Game::render()
 namespace {
 // Cor da pele 'F' da paleta do player (placeholder do braço B.2).
 sf::Color playerSkinColor() {
-    for (std::size_t i = 0; i < sprites::kPlayerPalCount; ++i) {
-        if (sprites::kPlayerPal[i].ch == 'F')
-            return sprites::kPlayerPal[i].color;
+    for (std::size_t i = 0; i < sprites::kPlayerPaletteCount; ++i) {
+        if (sprites::kPlayerPalette[i].ch == 'F')
+            return sprites::kPlayerPalette[i].color;
     }
     return sf::Color::Magenta; // paleta quebrada: grita, não some
 }
@@ -1094,18 +1094,35 @@ void Game::drawPlayerSprite(Player *p) {
     // Fase D: direção do corpo (facing8) com fallback de espelho.
     // Em produção facing == facingSign(facing8) (setFacing8 mantém),
     // então o flip é idêntico ao antigo facing ±1.
-    const auto directed = game::directedPose(pose, p->facing8);
+    // jumping=true é chão; no ar, ataques usam perna tucked + E/W.
+    const bool airborne = !p->jumping;
+    const auto directed = game::directedPose(pose, p->facing8, airborne);
     const float flip = directed.mirror ? -1.f : 1.f;
     const auto& pp =
         sprites_.playerParts[static_cast<int>(directed.pose)]
                              [sprites::artDirIndex(directed.artDir)];
     const assets::Part* parts =
         sprites::posePartsFor(pose, directed.artDir);
+    // Ataque aéreo: pernas do Jump (tucked) no lugar das plantadas.
+    // Texturas do Jump E já existem no build; toda parte é 40x40@0,0,
+    // então só troca o pixels (origens idênticas).
+    const sf::Texture* legsTex = &pp.legs;
+    const sf::Texture* feetTex = &pp.feet;
+    if (airborne) {
+        if (const assets::Part* ap = sprites::posePartsForAir(pose)) {
+            parts = ap;
+            const auto& jp = sprites_.playerParts[static_cast<int>(
+                    sprites::PlayerPose::Jump)]
+                [sprites::artDirIndex(support::Facing::E)];
+            legsTex = &jp.legs;
+            feetTex = &jp.feet;
+        }
+    }
     const core::Item& boots = p->equipment.get(core::EquipSlot::Boots);
     const core::ItemDef* bootsDef =
         boots.isEmpty() ? nullptr : boots.def();
-    const sf::Texture* texs[5] = {&pp.head, &pp.torso, &pp.arms, &pp.legs,
-                                  &pp.feet};
+    const sf::Texture* texs[5] = {&pp.head, &pp.torso, &pp.arms, legsTex,
+                                  feetTex};
     // Ordem: torso antes dos braços (overlay transparente de pele G/H).
     const int order[5] = {0, 1, 4, 2, 3};
     // B.4: poses resolvidas no Player (verbatim): mesma fonte da bbox
@@ -1215,14 +1232,22 @@ void Game::drawPlayerEquipment(Player *p) {
 
     // Luva centrada na mão; some sem Gloves (mão mostra a pele).
     // Sem slot próprio antes: seguia o elmo; agora lê o slot Gloves.
+    // Com IK live, a mão é a pose procedural (mesma fonte da arma e
+    // da hitbox): o box do overlay fica p/ trás quando a mão estende
+    // (soco) ou ergue (pulo) e a luva flutuava duplicando o braço.
+    // Sem live (preview/respawn), centro do box como antes.
     auto drawGlove = [&](support::BodyPartId arm, int m) {
         const auto *part = p->body.find(arm);
         if (!part || part->fromSchema) return;
+        core::Vec2f anchor{part->worldBox.left + part->worldBox.width * 0.5f,
+                           part->worldBox.top + part->worldBox.height * 0.5f};
+        if (p->handTargetsLive_)
+            anchor = (arm == support::BodyPartId::ArmR) ? p->weaponHand()
+                                                        : p->offHand();
         sf::Sprite spr(sprites_.gloves[m]);
         spr.setOrigin(sprites::kGloveW * 0.5f,
                       static_cast<float>(sprites::kGloveH * 0.5f));
-        spr.setPosition(part->worldBox.left + part->worldBox.width * 0.5f,
-                        part->worldBox.top + part->worldBox.height * 0.5f);
+        spr.setPosition(anchor.x, anchor.y);
         spr.setScale(s * static_cast<float>(f), s);
         window->draw(spr);
     };

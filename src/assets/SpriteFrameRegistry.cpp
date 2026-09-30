@@ -58,10 +58,31 @@ const char* const* composedRows(support::SpriteFrameId id) {
 } // namespace
 
 SpriteFrameData playerFrameData(sprites::PlayerPose pose,
-                                support::Facing artDir) {
+                                 support::Facing artDir) {
     const ComposedFrame& c = composedFor(pose, artDir);
     return {c.rows.data(), sprites::kPlayerW, sprites::kPlayerH,
-            sprites::kPlayerPal, sprites::kPlayerPalCount};
+            sprites::kPlayerPalette, sprites::kPlayerPaletteCount};
+}
+
+SpriteFrameData playerAirAttackFrameData(sprites::PlayerPose pose) {
+    const assets::Part* ap = sprites::posePartsForAir(pose);
+    if (!ap)
+        return playerFrameData(pose, support::Facing::E);
+    static ComposedFrame cache[sprites::kPlayerPoseCount];
+    static bool built[sprites::kPlayerPoseCount] = {};
+    const int pi = static_cast<int>(pose);
+    if (pi < 0 || pi >= sprites::kPlayerPoseCount)
+        return playerFrameData(pose, support::Facing::E);
+    if (!built[pi]) {
+        ComposedFrame& c = cache[pi];
+        c.text = compose(ap, 5, sprites::kPlayerW, sprites::kPlayerH);
+        c.rows.reserve(c.text.size());
+        for (const auto& s : c.text) c.rows.push_back(s.c_str());
+        built[pi] = true;
+    }
+    const ComposedFrame& c = cache[pi];
+    return {c.rows.data(), sprites::kPlayerW, sprites::kPlayerH,
+            sprites::kPlayerPalette, sprites::kPlayerPaletteCount};
 }
 
 // Fonte única dos frames estáticos (item 2 da faxina): mesmos
@@ -146,7 +167,7 @@ SpriteFrameData frameData(support::SpriteFrameId id) {
         case SpriteFrameId::PlayerHurt:
         case SpriteFrameId::PlayerDeath:
             return {composedRows(id), sprites::kPlayerW, sprites::kPlayerH,
-                    sprites::kPlayerPal, sprites::kPlayerPalCount};
+                    sprites::kPlayerPalette, sprites::kPlayerPaletteCount};
         default:
             break;
     }

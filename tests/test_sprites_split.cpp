@@ -17,15 +17,15 @@
 // agregado continua íntegro (counts que os testes legados cobrem).
 // build() NÃO é chamado (textura exige GL, sem teste headless).
 int main() {
-    // Player 12x40 (8 frames), slime 14x12 (2), dwarf 14x18 (5).
-    assert(sprites::kPlayerW == 12 && sprites::kPlayerH == 40);
+    // Player 40x40 (8 frames), slime 14x12 (2), dwarf 14x18 (5).
+    assert(sprites::kPlayerW == 40 && sprites::kPlayerH == 40);
     assert(sprites::kSlimeW == 14 && sprites::kSlimeH == 12);
     assert(sprites::kDwarfW == 14 && sprites::kDwarfH == 18);
     // Equip: espada 8x20 (idle/windup), 16x8 (swing).
     assert(sprites::kSwordW == 8 && sprites::kSwordH == 20);
     assert(sprites::kSwordSwingW == 16 && sprites::kSwordSwingH == 8);
     // Paletas por família.
-    assert(sprites::kPlayerPalCount == 12);
+    assert(sprites::kPlayerPaletteCount == 12);
     assert(sprites::kSlimePalCount == 5);
     assert(sprites::kDwarfPalCount == 11);
     // Set agregado: 1 textura por (peça × material).
