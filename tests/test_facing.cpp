@@ -4,6 +4,7 @@
  * @details Puro, sem GL. Roda com make test em build/tests/test_facing.
  */
 #include <cassert>
+#include <cmath>
 #include <cstdio>
 #include "assets/PlayerSprite.h"
 #include "entities/Player/Player.h"
@@ -143,6 +144,27 @@ int main() {
         p.tick();
         assert(p.facing8 == Facing::N);
         assert(p.facing == 1); // N não espelha: derivado volta a +1
+    }
+    { // ChaoIgnoraVy (parado no chão: gravidade residual não vira S)
+        Player p;
+        p.respawn(0.f, 0.f);
+        assert(p.facing8 == Facing::E);
+        p.jumping = true; // chão (no jogo, collide poria)
+        p.tick(); // step aplica gravidade: vy≈2, vx=0
+        assert(p.jumping && std::fabs(p.getVy()) > 1.f); // cenário armado
+        assert(p.facing8 == Facing::E); // mantém E, nunca S
+        p.moveRight = true;
+        p.tick();
+        assert(p.facing8 == Facing::E); // andando: side-view
+    }
+    { // ArSegueEixoDominante (no ar vy real manda: caindo vira S)
+        Player p;
+        p.respawn(0.f, 0.f);
+        p.jumping = false; // ar
+        p.setVy(50.f);
+        p.tick();
+        assert(!p.jumping && std::fabs(p.getVy()) > 1.f);
+        assert(p.facing8 == Facing::S);
     }
 
     std::printf("facing test OK\n");

@@ -241,10 +241,16 @@ void Player::tick() {
     this->top = getY();
     this->setPosition(getX(), getY());
 
-    // Corpo híbrido (Fase A): no swing vira para o snapshot do golpe;
-    // andando segue a velocidade (eixo dominante); parado mantém.
+    // Corpo híbrido (Fase A): no swing vira para o snapshot do golpe.
+    // Plataforma 2D: no chão (jumping=true) só vx decide — o vy
+    // residual da gravidade (collide zera depois, no App::tick) não
+    // é direção; parado mantém e nunca cai p/ S. No ar vy é real
+    // e o eixo dominante manda.
     if (inMeleeSwing()) {
         setFacing8(swingAim);
+    } else if (jumping) {
+        if (std::fabs(getVx()) > 1.f)
+            setFacing8(support::facingFromVelocity(getVx(), 0.f, facing8));
     } else if (std::fabs(getVx()) > 1.f || std::fabs(getVy()) > 1.f) {
         setFacing8(support::facingFromVelocity(getVx(), getVy(), facing8));
     }
