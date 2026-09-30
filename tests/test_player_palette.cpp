@@ -463,6 +463,10 @@ int main() {
                 const char c = kArrays[i][y][x];
                 if (c == '.') continue;
                 assert(pal.count(c) && "I3: char sem entrada na paleta");
+                // 'W' é Weapon: rim light usa 'V' (None). 'W' na arte
+                // do corpo criava hitbox de arma fantasma (foi o bug
+                // da caixa estranha na cabeça do idle).
+                assert(c != 'W' && "rim usa V, nunca W");
                 if (y < lo) lo = y;
                 if (y > hi) hi = y;
             }
