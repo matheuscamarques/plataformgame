@@ -255,6 +255,17 @@ class Player : public Entity
             return {arm->worldBox.left + arm->worldBox.width * 0.5f,
                     arm->worldBox.top + arm->worldBox.height};
         }
+        // Mão esquerda em mundo (espelho de weaponHand): pose IK
+        // quando live; base do ArmL senão; {0,0} sem fonte alguma.
+        // Off-hand consome daqui, nunca do box direto.
+        core::Vec2f offHand() const {
+            if (handTargetsLive_) return poseL_.handWorld;
+            const support::PartState* arm =
+                body.find(support::BodyPartId::ArmL);
+            if (!arm) return {0.f, 0.f};
+            return {arm->worldBox.left + arm->worldBox.width * 0.5f,
+                    arm->worldBox.top + arm->worldBox.height};
+        }
 
         // Mira efetiva da arma: fora do swing segue o input (aimDir);
         // no swing congela no snapshot (swingAim). Sem isto, idle após

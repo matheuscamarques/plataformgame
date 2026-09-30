@@ -1358,15 +1358,14 @@ void Game::drawPlayerWeapon(Player *p) {
     // Mesma seleção da direita (cajado/sino têm arte própria).
     if (const core::ItemDef* off = p->offHandDef()) {
         const int mo = static_cast<int>(off->material);
-        if (const auto *armL = p->body.find(support::BodyPartId::ArmL)) {
-            const float hx =
-                armL->worldBox.left + armL->worldBox.width * 0.5f;
-            const float hy = armL->worldBox.top + armL->worldBox.height;
+        // Mesma fonte da direita (doutrina B.4): pose IK ou box legado.
+        const core::Vec2f h = p->offHand();
+        if (h.x != 0.f || h.y != 0.f) {
             const sf::Texture *otex = weaponIdleTex(sprites_, off->id, mo);
             sf::Sprite ospr;
             ospr.setTexture(*otex);
             ospr.setOrigin(4.f, 20.f);
-            ospr.setPosition(hx, hy);
+            ospr.setPosition(h.x, h.y);
             ospr.setScale(s, s);
             ospr.setRotation(angle);
             window->draw(ospr);

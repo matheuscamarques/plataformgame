@@ -139,6 +139,21 @@ int main() {
                near(wh.y, p.poseR_.handWorld.y, 1e-3f));
         assert(wh.y < shR.y);
     }
+    { // OffHandEspelha (live: poseL; Jump: esquerda sobe junto)
+        Player p;
+        p.body.rebuild({0.f, 0.f}, 1);
+        p.setVx(0.f);
+        p.setVy(0.f);
+        p.updateLimbs();
+        assert(p.handTargetsLive_);
+        const core::Vec2f oh = p.offHand();
+        assert(near(oh.x, p.poseL_.handWorld.x, 1e-3f) &&
+               near(oh.y, p.poseL_.handWorld.y, 1e-3f));
+        p.currentFrameId = support::SpriteFrameId::PlayerJump;
+        p.updateLimbs();
+        const core::Vec2f shL = shoulderL(p);
+        assert(near(p.offHand().y, shL.y - 10.f * kRow, 1e-3f));
+    }
     { // RespawnLimpa (volta a {0,0} + sem live até o próximo tick)
         Player p;
         p.body.rebuild({0.f, 0.f}, 1);
