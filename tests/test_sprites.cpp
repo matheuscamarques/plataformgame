@@ -66,7 +66,9 @@ int main() {
         using support::SpriteFrameId;
         assert(kPlayerPalCount == 12u && kSlimePalCount == 5u && kDwarfPalCount == 11u);
         assert(has(prow(SpriteFrameId::PlayerIdle), kPlayerH, 'F'));
-        assert(has(prow(SpriteFrameId::PlayerJump), kPlayerH, 'H'));
+        // Jump sem H assado: braços são IK procedural (fatia 3).
+        assert(!has(prow(SpriteFrameId::PlayerJump), kPlayerH, 'H'));
+        assert(has(prow(SpriteFrameId::PlayerJump), kPlayerH, 'F'));
         assert(has(prow(SpriteFrameId::PlayerThrow), kPlayerH, 'T'));
         assert(has(prow(SpriteFrameId::PlayerPunch), kPlayerH, 'H'));
         assert(has(kSlimeIdle, kSlimeH, 'G'));

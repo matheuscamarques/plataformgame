@@ -1389,12 +1389,12 @@ inline constexpr assets::Part kPlayerWalkD_NE_Parts[] = {
 };
 
 inline const char* const kPlayerJumpHead[] = {
-    ".G........H.",
-    ".G........H.",
-    ".G.KKKKKK.H.",
-    ".G.KKKKKK.H.",
-    ".GKKKKKKKKH.",
-    ".GKKKKKKKKH.",
+    "............",
+    "............",
+    "...KKKKKK...",
+    "...KKKKKK...",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
     "..KFFFFFFK..",
     "..KFFFFFFK..",
     "..KFEFFEFK..",
@@ -1983,12 +1983,12 @@ inline constexpr assets::Part kPlayerPunchDownParts[] = {
 };
 
 inline const char* const kPlayerHurtHead[] = {
-    ".G........H.",
-    ".G........H.",
-    ".G.KKKKKK.H.",
-    ".G.KKKKKK.H.",
-    ".GKKKKKKKKH.",
-    ".GKKKKKKKKH.",
+    "............",
+    "............",
+    "...KKKKKK...",
+    "...KKKKKK...",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
     "..KFFFFFFK..",
     "..KFFFFFFK..",
     "..KFEFFEFK..",
@@ -2068,12 +2068,12 @@ inline constexpr assets::Part kPlayerHurtParts[] = {
 // torsos de dor 3/4 com sombra; Jump reaproveita tudo.
 
 inline const char* const kPlayerHurt_S_Head[] = {
-    ".G..KKKK..H.",
-    ".G..KKKK..H.",
-    ".GKKKKKKKKH.",
-    ".GKKKKKKKKH.",
-    ".GKFFFFFFKH.",
-    ".GKFFFFFFKH.",
+    "....KKKK....",
+    "....KKKK....",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "..KFFFFFFK..",
+    "..KFFFFFFK..",
     "..KFEFFEFK..",
     "..KFEFFEFK..",
     "..KFFFFFFK..",
@@ -2091,12 +2091,12 @@ inline constexpr assets::Part kPlayerHurt_S_Parts[] = {
 };
 
 inline const char* const kPlayerHurt_N_Head[] = {
-    "G...KKKK...H",
-    "G...KKKK...H",
-    "G..KKKKKK..H",
-    "G..KKKKKK..H",
-    "G.KKKKKKKK.H",
-    "G.KKKKKKKK.H",
+    "....KKKK....",
+    "....KKKK....",
+    "...KKKKKK...",
+    "...KKKKKK...",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
     "..KKKKKKKK..",
     "..KKKKKKKK..",
     "...KKKKKK...",
@@ -2114,12 +2114,12 @@ inline constexpr assets::Part kPlayerHurt_N_Parts[] = {
 };
 
 inline const char* const kPlayerHurt_SE_Head[] = {
-    ".G........H.",
-    ".G........H.",
-    ".G.KKKKKK.H.",
-    ".G.KKKKKK.H.",
-    ".GKKKKKKKKH.",
-    ".GKKKKKKKKH.",
+    "............",
+    "............",
+    "...KKKKKK...",
+    "...KKKKKK...",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
     "..KFFFFFFK..",
     "..KFFFFFFKE.",
     "..KFEFFEFK..",
@@ -2156,17 +2156,17 @@ inline constexpr assets::Part kPlayerHurt_SE_Parts[] = {
 };
 
 inline const char* const kPlayerHurt_NE_Head[] = {
-    ".G........H.",
-    ".G........H.",
-    ".G..KKKK..H.",
-    ".G..KKKK..H.",
-    ".GKKKKKKKKH.",
-    ".GKKKKKKKKH.",
-    ".GKFFFFFFKH.",
-    ".GKFFFFFFKH.",
-    ".GKFEFFEFKH.",
-    ".GKFEFFEFKH.",
-    ".GKFFFFFFKH.",
+    "............",
+    "............",
+    "....KKKK....",
+    "....KKKK....",
+    "..KKKKKKKK..",
+    "..KKKKKKKK..",
+    "..KFFFFFFK..",
+    "..KFFFFFFK..",
+    "..KFEFFEFK..",
+    "..KFEFFEFK..",
+    "..KFFFFFFK..",
     "...FFFFFF...",
 };
 
