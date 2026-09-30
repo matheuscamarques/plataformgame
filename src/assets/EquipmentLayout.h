@@ -11,7 +11,7 @@
 
 namespace game {
 
-// Posição de overlay na grade do sprite do player (12x20).
+// Posição de overlay na grade do sprite do player (12x40).
 // spriteLeft/Top = canto superior esquerdo do sprite no mundo.
 // Espelha X quando facing<0. Pura, testável sem GL.
 // REGRA: posições em pixels do SPRITE (rows do ASCII), nunca world.

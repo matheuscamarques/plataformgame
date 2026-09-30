@@ -12,8 +12,8 @@
 namespace sprites {
 // ============================================================
 // EQUIPAMENTO — forma compartilhada, 1 textura por material.
-// Espada 8x20 (idle/windup), 16x8 (swing); elmo 12x5; peitoral 12x8;
-// perneiras 12x6. Paleta de 5 entradas (., W, w, G, E) por material.
+// Espada 8x20 (idle/windup), 16x8 (swing); elmo 12x8; peitoral 12x18;
+// perneiras 12x10. Paleta de 5 entradas (., W, w, G, E) por material.
 inline constexpr int kSwordW = 8;
 inline constexpr int kSwordH = 20;
 inline constexpr int kSwordSwingW = 16;
