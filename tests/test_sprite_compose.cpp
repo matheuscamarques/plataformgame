@@ -118,23 +118,30 @@ int main() {
             assert(pp[1].w == 12 && pp[1].h == 16); // torso
             assert(pp[2].w == 12 && pp[2].h == 6); // legs
             assert(pp[3].w == 12 && pp[3].h == 6); // feet
-            assert(pp[4].w == 12 && pp[4].h == 16); // arms overlay
-            assert(pp[4].offX == 0 && pp[4].offY == 12); // zona do torso
+            // Overlay contido no frame (geometria por pose: torso ou
+            // cabeça; Jump/Hurt cobrem só as rows dos braços erguidos).
+            assert(pp[4].offX >= 0 && pp[4].offY >= 0);
+            assert(pp[4].offX + pp[4].w <= 12);
+            assert(pp[4].offY + pp[4].h <= 40);
             assert(pp[0].rows && pp[1].rows && pp[2].rows && pp[3].rows &&
                    pp[4].rows);
         }
         // Fora da faixa: fallback idle (nunca nullptr).
         assert(poseParts(static_cast<PlayerPose>(99)) == kPlayerIdleParts);
     }
-    { // ArmsOverlayIsPixelSafe (overlay só repinta pele G/H idêntica)
+    { // ArmsOverlayAddsOnly (overlay: só G/H, só sobre '.' do composto-4)
         for (int i = 0; i < kPlayerPoseCount; ++i) {
             const assets::Part* pp =
                 poseParts(static_cast<PlayerPose>(i));
-            for (int y = 0; y < 16; ++y)
-                for (int x = 0; x < 12; ++x) {
-                    const char a = pp[4].rows[y][x];
+            const std::vector<std::string> base =
+                assets::compose(pp, 4, 12, 40);
+            const assets::Part& ov = pp[4];
+            for (int y = 0; y < ov.h; ++y)
+                for (int x = 0; x < ov.w; ++x) {
+                    const char a = ov.rows[y][x];
                     if (a == '.') continue;
-                    assert((a == 'G' || a == 'H') && a == pp[1].rows[y][x]);
+                    assert(a == 'G' || a == 'H');
+                    assert(base[ov.offY + y][ov.offX + x] == '.');
                 }
         }
     }

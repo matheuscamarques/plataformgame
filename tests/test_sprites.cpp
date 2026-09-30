@@ -66,8 +66,9 @@ int main() {
         using support::SpriteFrameId;
         assert(kPlayerPalCount == 12u && kSlimePalCount == 5u && kDwarfPalCount == 11u);
         assert(has(prow(SpriteFrameId::PlayerIdle), kPlayerH, 'F'));
-        // Jump sem H assado: braços são IK procedural (fatia 3).
-        assert(!has(prow(SpriteFrameId::PlayerJump), kPlayerH, 'H'));
+        // Jump com H no composto via overlay (hitbox viva); a cabeça
+        // em si não tem G/H (trava em test_player_dirs).
+        assert(has(prow(SpriteFrameId::PlayerJump), kPlayerH, 'H'));
         assert(has(prow(SpriteFrameId::PlayerJump), kPlayerH, 'F'));
         assert(has(prow(SpriteFrameId::PlayerThrow), kPlayerH, 'T'));
         assert(has(prow(SpriteFrameId::PlayerPunch), kPlayerH, 'H'));
@@ -148,10 +149,16 @@ int main() {
         // offY esperado por TEXTURA (fatiamento 12/16/12/28/34).
         const int want[5] = {0, 12, 12, 28, 34};
         for (int pi = 0; pi < kPlayerPoseCount; ++pi) {
-            const assets::Part* pp =
-                poseParts(static_cast<PlayerPose>(pi));
-            for (int t = 0; t < 5; ++t)
-                assert(pp[partIndexForTex(t)].offY == want[t]);
+            const auto pose = static_cast<PlayerPose>(pi);
+            const assets::Part* pp = poseParts(pose);
+            for (int t = 0; t < 5; ++t) {
+                int w = want[t];
+                // Jump/Hurt: overlay cobre a cabeça (braços erguidos).
+                if (t == 2 &&
+                    (pose == PlayerPose::Jump || pose == PlayerPose::Hurt))
+                    w = 0;
+                assert(pp[partIndexForTex(t)].offY == w);
+            }
         }
         // Botas substituem feet: skip i==4 mira parts[3] (feet, offY 34).
         assert(partIndexForTex(4) == 3);

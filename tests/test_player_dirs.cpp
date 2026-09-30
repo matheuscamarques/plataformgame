@@ -289,6 +289,22 @@ int main() {
                 assert(std::strchr(h[y], 'H') == nullptr);
             }
     }
+    { // TorsosNoBakedArms (12 poses × 5 dirs: torso é só corpo/roupa)
+        const Facing dirs[] = {Facing::E, Facing::S, Facing::SE,
+                               Facing::NE, Facing::N};
+        for (int i = 0; i < sprites::kPlayerPoseCount; ++i) {
+            const auto pose = static_cast<PlayerPose>(i);
+            for (Facing f : dirs) {
+                const assets::Part* pp =
+                    sprites::posePartsFor(pose, f);
+                const assets::Part& torso = pp[1];
+                for (int y = 0; y < torso.h; ++y) {
+                    assert(std::strchr(torso.rows[y], 'G') == nullptr);
+                    assert(std::strchr(torso.rows[y], 'H') == nullptr);
+                }
+            }
+        }
+    }
     { // HurtJumpDirs (vivas no composto + ≠E; S/N simétricas)
         using game::artDirFor;
         const PlayerPose poses[] = {PlayerPose::Hurt, PlayerPose::Jump};
