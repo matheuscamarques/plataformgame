@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <SFML/Graphics/Rect.hpp>
 #include "entities/Player/Player.h"
+#include "support/Combat/BodySystem.h"
 #include "support/Combat/ContactDamageSystem.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
@@ -73,6 +74,45 @@ int main() {
             if (pb.intersects(sb)) overlap = true;
         });
         assert(!overlap);
+    }
+    { // PixelHurtbox (arte 30px, não AABB 60px: fantasma não morde)
+        // Player (0,0) Idle: arte x[15,45]. Slime 40x30 à esquerda com
+        // AABB invadindo o player ([-25,15] cruza x=0) mas arte em
+        // x[-22,12]: 30 ticks sem dano. Encostando a arte, morde.
+        Player p; // Idle default, facing E
+        EnemySystem enemies;
+        enemies.spawn("slime", -25.f, 90.f);
+        enemies.forEach([](Enemy &s) {
+            s.currentFrameId = support::SpriteFrameId::SlimeIdle;
+        });
+
+        BodySystem bs;
+        ContactDamageSystem cs;
+        GameContext ctx{};
+        ctx.player = &p;
+        ctx.enemies = &enemies;
+
+        for (int i = 0; i < 30; ++i) {
+            bs.tick(1.f / 30.f, ctx); // ordem de produção: corpos antes
+            cs.tick(1.f / 30.f, ctx);
+        }
+        assert(p.hp == 100); // AABB encosta, pixel não: sem mordida
+        float sx = 0.f;
+        enemies.forEach([&](Enemy &s) { sx = s.body.getX(); });
+        assert(sx == -25.f); // sem contato: sem separação
+
+        auto touch = [](EnemySystem &e) {
+            e.forEach([](Enemy &s) {
+                s.body.setX(0.f);
+                s.body.setY(90.f);
+            });
+        };
+        for (int i = 0; i < 30; ++i) {
+            touch(enemies); // recolado: separação ejeta a cada tick
+            bs.tick(1.f / 30.f, ctx);
+            cs.tick(1.f / 30.f, ctx);
+        }
+        assert(p.hp < 100); // arte com arte: morde após o windup
     }
 
     std::printf("contact test OK\n");

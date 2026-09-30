@@ -24,17 +24,56 @@ constexpr int kContactDamage = 10;
 constexpr float kPushBack = 6.f; // px, direto na posição
 constexpr float kBiteWindup = 0.35f; // telegraph da mordida (Enemy::biteWindup)
 constexpr float kWindupRecover = 0.5f; // fração que recupera sem contato
+
+// União das partes vivas (pixels, não AABB): mesma fonte do MeleeSystem.
+// fromSchema = ausente neste frame (Body.h) → pula; Weapon nunca é
+// hurtbox (espada não morde de volta). Vazia (sem boxes: testes, frame
+// 1) → false e o chamador cai no AABB legado.
+bool aliveUnion(const Body& b, sf::FloatRect& out) {
+    bool any = false;
+    for (std::size_t i = 0; i < b.parts.size(); ++i) {
+        const PartState& st = b.parts[i];
+        if (st.fromSchema) continue;
+        if (st.id == BodyPartId::Weapon) continue;
+        if (st.worldBox.width <= 0.f || st.worldBox.height <= 0.f)
+            continue;
+        if (!any) {
+            out = st.worldBox;
+            any = true;
+            continue;
+        }
+        const float l = std::min(out.left, st.worldBox.left);
+        const float t = std::min(out.top, st.worldBox.top);
+        out = {l, t,
+               std::max(out.left + out.width,
+                        st.worldBox.left + st.worldBox.width) -
+                   l,
+               std::max(out.top + out.height,
+                        st.worldBox.top + st.worldBox.height) -
+                   t};
+    }
+    return any;
+}
 } // namespace
 
 void ContactDamageSystem::tick(float dt, GameContext &ctx) {
     Player *p = ctx.player;
     if (!p || !ctx.enemies) return;
 
-    const sf::FloatRect pb{p->getX(), p->getY(), p->getW(), p->getH()};
+    // Hurtbox = união das partes vivas (arte 30px, não AABB 60px:
+    // antes o slime mordia 15px antes de encostar). Sem boxes (testes,
+    // frame 1), cai no AABB legado. BodySystem (250) roda antes (310).
+    const sf::FloatRect pbAABB{p->getX(), p->getY(), p->getW(), p->getH()};
+    sf::FloatRect pbUnion{0.f, 0.f, 0.f, 0.f};
+    const sf::FloatRect pb =
+        aliveUnion(p->body, pbUnion) ? pbUnion : pbAABB;
     ctx.enemies->forEach([&](Enemy &s) {
         if (s.resources.isDead()) return;
-        sf::FloatRect sb{s.body.getX(), s.body.getY(),
-                         s.body.getW(), s.body.getH()};
+        const sf::FloatRect sbAABB{s.body.getX(), s.body.getY(),
+                                  s.body.getW(), s.body.getH()};
+        sf::FloatRect sbUnion{0.f, 0.f, 0.f, 0.f};
+        const sf::FloatRect sb =
+            aliveUnion(s.bodyParts, sbUnion) ? sbUnion : sbAABB;
         if (!pb.intersects(sb)) {
             // Sem contato: windup recupera, cor volta ao ocioso.
             if (s.biteWindup < kBiteWindup) {
