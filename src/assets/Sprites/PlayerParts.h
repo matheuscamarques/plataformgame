@@ -2017,13 +2017,15 @@ inline const char* const kPlayerHurtLegs[] = {
     "..LL....BB..",
 };
 
+// Pés plantados (slot 34-39 cheio): Hurt é grounded, sem flutuar.
+// Mesmo desenho do IdleS (um design só).
 inline const char* const kPlayerHurtFeet[] = {
-    "............",
-    "............",
-    "............",
-    "............",
-    "............",
-    "............",
+    "..LL....BB..",
+    "..LL....BB..",
+    ".LL......BB.",
+    ".LL......BB.",
+    "LL........BB",
+    "LL........BB",
 };
 
 
