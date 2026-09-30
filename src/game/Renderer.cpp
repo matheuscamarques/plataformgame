@@ -1274,7 +1274,12 @@ void Game::drawPlayerWeapon(Player *p) {
                                  p->meleePhase == MeleePhase::Windup);
     float angle = 0.f;
     using support::AimDir;
-    switch (p->effectiveAim()) {
+    // Empunhadura erguida: no Jump fora do swing a lâmina aponta p/
+    // cima (mãos já subiram no updateLimbs). Vale p/ as duas mãos.
+    const bool raisedGrip =
+        p->currentFrameId == support::SpriteFrameId::PlayerJump &&
+        p->meleePhase == MeleePhase::Idle;
+    switch (support::gripAim(p->effectiveAim(), raisedGrip)) {
         case AimDir::E: angle = 0.f; break;
         case AimDir::NE: angle = -45.f; break;
         case AimDir::N: angle = -90.f; break;

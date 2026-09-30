@@ -53,4 +53,13 @@ inline AimDir resolveAim(bool up, bool down, bool left, bool right, int facing) 
     return (facing >= 0) ? AimDir::E : AimDir::W;
 }
 
+// Empunhadura erguida (Jump fora do swing): mira horizontal (E/W)
+// segura a lâmina p/ cima; diagonais/verticais não mudam.
+// Só visual (hitbox só vive no Active/Recovery): não toca dano.
+inline AimDir gripAim(AimDir aim, bool raised) {
+    if (!raised) return aim;
+    if (aim == AimDir::E || aim == AimDir::W) return AimDir::N;
+    return aim;
+}
+
 } // namespace support

@@ -82,6 +82,18 @@ int main() {
         assert(near(n.x, 0.f) && near(n.y, -1.f)); // Y cresce p/ baixo
     }
 
+    { // GripAimRaised (Jump: E/W viram N; resto não muda; sem raise: igual)
+        using support::gripAim;
+        assert(gripAim(AimDir::E, true) == AimDir::N);
+        assert(gripAim(AimDir::W, true) == AimDir::N);
+        assert(gripAim(AimDir::NE, true) == AimDir::NE);
+        assert(gripAim(AimDir::N, true) == AimDir::N);
+        assert(gripAim(AimDir::S, true) == AimDir::S);
+        for (int i = 0; i < static_cast<int>(AimDir::COUNT); ++i)
+            assert(gripAim(static_cast<AimDir>(i), false) ==
+                   static_cast<AimDir>(i));
+    }
+
     std::printf("aim snapshot test OK\n");
     return 0;
 }
