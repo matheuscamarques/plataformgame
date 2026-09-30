@@ -86,7 +86,7 @@ void checkPresence(const assets::Part* pp) {
     assert(hasChar(pp[2], "CLB")); // pernas
     assert(hasChar(pp[3], "LB"));  // pés
     assert(hasChar(pp[4], "G"));   // braço esq (Tier 1: G lit)
-    assert(hasChar(pp[4], "H"));   // braço dir
+    assert(hasChar(pp[4], "Hh"));  // braço dir (Tier 1: h sombra)
 }
 
 bool composedDiffers(const assets::Part* a, const assets::Part* b) {

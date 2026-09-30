@@ -40,9 +40,19 @@ inline const core::PaletteEntry kPlayerPalette[] = {
     {'T', {220, 60, 50}, core::BodyPartId::Weapon},  // TNT / arma vermelha
     {'t', {90, 30, 25}, core::BodyPartId::Weapon},   // TNT sombra
     // Tier 1 — sombra lateral + contato + rim (spike Idle E).
-// Tier 1 (spike Idle E, commit separado).
+    {'k', {19, 12, 12}, core::BodyPartId::None},     // cabelo em sombra
+    {'f', {143, 112, 87}, core::BodyPartId::Head},   // pele em sombra
+    {'c', {37, 56, 99}, core::BodyPartId::Torso},    // roupa em sombra
+    {'l', {31, 22, 19}, core::BodyPartId::LegL},     // perna esq em sombra
+    {'b', {31, 22, 19}, core::BodyPartId::LegR},     // perna dir em sombra
+    {'g', {143, 112, 87}, core::BodyPartId::ArmL},   // braço esq em sombra
+    {'h', {143, 112, 87}, core::BodyPartId::ArmR},   // braço dir em sombra
+    {'o', {12, 10, 12}, core::BodyPartId::None},     // contato/oclusão
+    {'V', {235, 240, 245}, core::BodyPartId::None},  // rim light neutro
+    {'n', {60, 40, 30}, core::BodyPartId::Head},     // detalhe facial escuro
 };
-inline constexpr std::size_t kPlayerPaletteCount = 12;
+inline constexpr std::size_t kPlayerPaletteCount =
+    sizeof(kPlayerPalette) / sizeof(kPlayerPalette[0]);
 
 // Tier 1 (spike Idle E) — sombra lateral + contato + rim. Mesma matiz
 // das bases ×0.62; 'o'/'V' sem hitbox (None); minúsculas herdam a

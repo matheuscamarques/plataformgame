@@ -25,7 +25,7 @@ int main() {
     assert(sprites::kSwordW == 8 && sprites::kSwordH == 20);
     assert(sprites::kSwordSwingW == 16 && sprites::kSwordSwingH == 8);
     // Paletas por família.
-    assert(sprites::kPlayerPaletteCount == 12);
+    assert(sprites::kPlayerPaletteCount == 22);
     assert(sprites::kSlimePalCount == 5);
     assert(sprites::kDwarfPalCount == 11);
     // Set agregado: 1 textura por (peça × material).

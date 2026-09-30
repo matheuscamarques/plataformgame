@@ -104,29 +104,30 @@ int main() {
     }
     { // LeftAndRightHandsHaveDistinctChars
         // Tier 1: braço esq lit (G), dir em sombra (h minúsculo).
-        bool hasH = false, hasG = false;
+        bool hash = false, hasG = false;
         const char* const* idle =
             assets::frameData(support::SpriteFrameId::PlayerIdle).rows;
         for (int y = 0; y < kPlayerH; ++y) {
             for (int x = 0; x < kPlayerW; ++x) {
-                if (idle[y][x] == 'H') hasH = true;
+                if (idle[y][x] == 'h') hash = true;
                 if (idle[y][x] == 'G') hasG = true;
             }
         }
-        assert(hasH);
+        assert(hash);
         assert(hasG);
     }
     { // LegLeftRightHaveDistinctChars
-        bool hasB = false, hasL = false;
+        // Tier 1: perna esq lit (L), dir em sombra (b minúsculo).
+        bool hasb = false, hasL = false;
         const char* const* idle =
             assets::frameData(support::SpriteFrameId::PlayerIdle).rows;
         for (int y = 0; y < kPlayerH; ++y) {
             for (int x = 0; x < kPlayerW; ++x) {
-                if (idle[y][x] == 'B') hasB = true;
+                if (idle[y][x] == 'b') hasb = true;
                 if (idle[y][x] == 'L') hasL = true;
             }
         }
-        assert(hasB);
+        assert(hasb);
         assert(hasL);
     }
     { // DwarfHandFaceBarba (H mão, F rosto, R barba presentes)

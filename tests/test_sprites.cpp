@@ -64,7 +64,7 @@ int main() {
     }
     { // PalettesNonEmpty (toda sprite tem pixel visível, não é vazio)
         using support::SpriteFrameId;
-        assert(kPlayerPaletteCount == 12u && kSlimePalCount == 5u && kDwarfPalCount == 11u);
+        assert(kPlayerPaletteCount == 22u && kSlimePalCount == 5u && kDwarfPalCount == 11u);
         assert(has(prow(SpriteFrameId::PlayerIdle), kPlayerH, 'F'));
         // Jump com H no composto via overlay (hitbox viva); a cabeça
         // em si não tem G/H (trava em test_player_dirs).
@@ -209,8 +209,9 @@ int main() {
             }
             return -1;
         };
-        assert(firstRowWith(prow(SpriteFrameId::PlayerPunchUp), 'B')
-               == firstRowWith(prow(SpriteFrameId::PlayerIdle), 'B'));
+        // Pernas ancoradas: sonda 'L' (Tier 1 sombreia a dir p/ 'b').
+        assert(firstRowWith(prow(SpriteFrameId::PlayerPunchUp), 'L')
+               == firstRowWith(prow(SpriteFrameId::PlayerIdle), 'L'));
         assert(firstRowWith(prow(SpriteFrameId::PlayerPunchUp), 'K')
                == firstRowWith(prow(SpriteFrameId::PlayerIdle), 'K') + 4);
         assert(firstRowWith(prow(SpriteFrameId::PlayerPunchUp), 'C')
@@ -228,8 +229,8 @@ int main() {
                == firstRowWith(prow(SpriteFrameId::PlayerIdle), 'K'));
         assert(firstRowWith(prow(SpriteFrameId::PlayerPunchDown), 'C')
                == firstRowWith(prow(SpriteFrameId::PlayerIdle), 'C'));
-        assert(firstRowWith(prow(SpriteFrameId::PlayerPunchDown), 'B')
-               == firstRowWith(prow(SpriteFrameId::PlayerIdle), 'B'));
+        assert(firstRowWith(prow(SpriteFrameId::PlayerPunchDown), 'L')
+               == firstRowWith(prow(SpriteFrameId::PlayerIdle), 'L'));
     }
     { // TextureForFrameMapsEveryId (inimigos resolvem; default existe)
         SpriteSet sp{};
