@@ -132,6 +132,30 @@ int main() {
         assert(punch.find(BodyPartId::ArmR) != nullptr);
         assert(punch.find(BodyPartId::Torso) != nullptr);
     }
+    { // ArmsAliveEveryPose (overlay carrega os 2 braços: sem fallback
+        // -1e6 em WalkA/B/Punch/Throw/Jump/Hurt/Idle; luva e ombro IK
+        // nunca leem caixa morta)
+        static auto schema = BodySchema::humanoid(100.f, 60.f);
+        const sprites::PlayerPose poses[] = {
+            sprites::PlayerPose::Idle, sprites::PlayerPose::WalkA,
+            sprites::PlayerPose::WalkB, sprites::PlayerPose::Punch,
+            sprites::PlayerPose::Throw, sprites::PlayerPose::Jump,
+            sprites::PlayerPose::Hurt,
+        };
+        for (auto pose : poses) {
+            Body b;
+            b.attach(&schema);
+            const auto f = assets::playerFrameData(
+                pose, support::Facing::E);
+            b.rebuildFromSprite({0.f, 0.f}, {30.f, 50.f}, f.rows, f.w,
+                                f.h, f.pal, f.palCount, 1);
+            const PartState* l = b.find(BodyPartId::ArmL);
+            const PartState* r = b.find(BodyPartId::ArmR);
+            assert(l != nullptr && r != nullptr);
+            assert(l->worldBox.width > 0.f && l->worldBox.left > -1e5f);
+            assert(r->worldBox.width > 0.f && r->worldBox.left > -1e5f);
+        }
+    }
     { // RegistryResolvesAllIds (todo id tem rows; None formular vazio)
         for (int i = 1; i < static_cast<int>(SpriteFrameId::COUNT); ++i) {
             auto f = assets::frameData(static_cast<SpriteFrameId>(i));

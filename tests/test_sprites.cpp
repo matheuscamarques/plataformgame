@@ -86,11 +86,12 @@ int main() {
         assert(!has(prow(SpriteFrameId::PlayerThrow), kPlayerH, 'W'));
         assert(!has(prow(SpriteFrameId::PlayerPunch), kPlayerH, 'W'));
     }
-    { // WalkFramesDifferInArms (braços em lados opostos; row 8→16 no 40)
+    { // WalkArmsBothSides (overlay carrega hitbox dos 2 braços;
+        // balanço do passo vem do IK, não do composto)
         using support::SpriteFrameId;
         assert(prow(SpriteFrameId::PlayerWalkA)[16][1] == 'G');
-        assert(prow(SpriteFrameId::PlayerWalkA)[16][10] == '.');
-        assert(prow(SpriteFrameId::PlayerWalkB)[16][1] == '.');
+        assert(prow(SpriteFrameId::PlayerWalkA)[16][10] == 'H');
+        assert(prow(SpriteFrameId::PlayerWalkB)[16][1] == 'G');
         assert(prow(SpriteFrameId::PlayerWalkB)[16][10] == 'H');
     }
     { // PunchBodyAlignsWithIdle (cabeça na mesma row: sem crouch)
@@ -129,8 +130,8 @@ int main() {
         auto firstC = [&](const char *const *f) { return firstRowWith(f, kDwarfH, 'C'); };
         assert(firstC(kDwarfThrow) == firstC(kDwarfIdle));
     }
-    { // WalkLegsDiffer (B abre as pernas)
-        assert(std::strcmp(prow(SpriteFrameId::PlayerWalkA)[15], prow(SpriteFrameId::PlayerWalkB)[15]) != 0);
+    { // WalkLegsDiffer (B abre as pernas: row 30 das legs)
+        assert(std::strcmp(prow(SpriteFrameId::PlayerWalkA)[30], prow(SpriteFrameId::PlayerWalkB)[30]) != 0);
     }
     { // PackTopsShared (Idle/WalkB dividem as 14 de cima; só pernas mudam)
         const char* const* idles[] = {kHollowIdle, kBurstIdle, kImpIdle,
