@@ -24,6 +24,8 @@ struct Part {
 };
 
 // Mescla parts num buffer totalW×totalH ('.' onde nada cobre).
+// '.' é transparente: overlay de braços só repinta G/H sem apagar
+// o torso (compor 5 partes == compor 4 + braços, byte-idêntico).
 inline std::vector<std::string> compose(const Part* parts, std::size_t count,
                                         int totalW, int totalH) {
     std::vector<std::string> out(totalH, std::string(totalW, '.'));
@@ -35,6 +37,7 @@ inline std::vector<std::string> compose(const Part* parts, std::size_t count,
                 const int dy = p.offY + y;
                 if (dx < 0 || dx >= totalW || dy < 0 || dy >= totalH)
                     continue; // fora: recorta, nunca crasha
+                if (p.rows[y][x] == '.') continue; // transparente
                 out[dy][dx] = p.rows[y][x];
             }
         }

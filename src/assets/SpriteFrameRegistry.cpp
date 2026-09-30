@@ -39,7 +39,10 @@ const ComposedFrame& composedFor(sprites::PlayerPose pose,
             static_cast<sprites::PlayerPose>(pi),
             sprites::artDirForIndex(di));
         ComposedFrame& c = cache[pi][di];
-        c.text = compose(pp, 4, sprites::kPlayerW, sprites::kPlayerH);
+        // 5 partes (head/torso/legs/feet + overlay de braços): com
+        // '.' transparente, o overlay só adiciona G/H (hitbox dos
+        // braços vive nele, não mais no torso).
+        c.text = compose(pp, 5, sprites::kPlayerW, sprites::kPlayerH);
         c.rows.reserve(c.text.size());
         for (const auto& s : c.text) c.rows.push_back(s.c_str());
         built[pi][di] = true;

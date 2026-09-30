@@ -96,7 +96,7 @@ int main() {
             "............",
         };
         const std::vector<std::string> got =
-            assets::compose(kPlayerIdleParts, 4, 12, 40);
+            assets::compose(kPlayerIdleParts, 5, 12, 40);
         assert(got.size() == 40u);
         for (int row = 0; row < 40; ++row)
             assert(got[row] == kGoldenIdle[row]);
@@ -146,7 +146,7 @@ int main() {
             assert(f.rows != nullptr && f.w == 12 && f.h == 40);
             const assets::Part* pp = poseParts(static_cast<PlayerPose>(i));
             const std::vector<std::string> composed =
-                assets::compose(pp, 4, 12, 40);
+                assets::compose(pp, 5, 12, 40);
             for (int row = 0; row < 40; ++row)
                 assert(std::string(f.rows[row]) == composed[row]);
         }
@@ -161,7 +161,7 @@ int main() {
             assert(f.rows != nullptr && f.w == 12 && f.h == 40);
             const assets::Part* pp = poseParts(extraPoses[k]);
             const std::vector<std::string> composed =
-                assets::compose(pp, 4, 12, 40);
+                assets::compose(pp, 5, 12, 40);
             for (int row = 0; row < 40; ++row)
                 assert(std::string(f.rows[row]) == composed[row]);
         }
