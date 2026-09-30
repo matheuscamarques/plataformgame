@@ -1097,6 +1097,12 @@ void Player::updateLimbs() {
         targetHandR_ = {shR.x + aim.x * reachRows * row,
                         shR.y + aim.y * reachRows * row};
         targetHandL_ = rest(shL, 2.f);
+    } else if (currentFrameId == support::SpriteFrameId::PlayerJump) {
+        // Jump: arte com braços erguidos (G/H no topo da cabeça,
+        // rows 0-5 do head): mãos sobem ~10 rows junto, sem senoide
+        // (pose estática lê bem no ar). Arma segue via weaponHand().
+        targetHandR_ = {shR.x + fw * 3.5f * row, shR.y - 10.f * row};
+        targetHandL_ = {shL.x + fw * 2.f * row, shL.y - 10.f * row};
     } else {
         targetHandR_ = rest(shR, 3.5f);
         targetHandL_ = rest(shL, 2.f);

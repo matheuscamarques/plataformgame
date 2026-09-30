@@ -15,6 +15,16 @@ static bool near(float a, float b, float eps) {
     return std::fabs(a - b) <= eps;
 }
 
+// Ombro esquerdo esperado (mesma âncora, box ArmL).
+static core::Vec2f shoulderL(const Player& p) {
+    const auto* t = p.body.find(support::BodyPartId::Torso);
+    const auto* a = p.body.find(support::BodyPartId::ArmL);
+    assert(t && a);
+    const float cx = a->worldBox.left + a->worldBox.width * 0.5f;
+    return support::limbShoulder({t->worldBox.left, t->worldBox.top},
+                                 {t->worldBox.width, t->worldBox.height},
+                                 cx);
+}
 // Ombro direito esperado a partir dos boxes atuais (mesma âncora).
 static core::Vec2f shoulderR(const Player& p) {
     const auto* t = p.body.find(support::BodyPartId::Torso);
@@ -108,6 +118,26 @@ int main() {
         // frame 0: cos=1,sin=0 → R soma +row em x; L subtrai.
         assert(near(p.targetHandR_.x, sh.x + 4.5f * kRow, 1e-3f) &&
                near(p.targetHandR_.y, sh.y + 2.f * kRow, 1e-3f));
+    }
+    { // JumpErgue (pose Jump: mãos ~10 rows ACIMA do ombro, sem senoide)
+        Player p;
+        p.body.rebuild({0.f, 0.f}, 1);
+        p.setVx(0.f);
+        p.setVy(-300.f); // subindo: senoide tentaria puxar p/ baixo
+        p.currentFrameId = support::SpriteFrameId::PlayerJump;
+        p.updateLimbs();
+        assert(!p.inMeleeSwing() && p.handTargetsLive_);
+        const core::Vec2f shR = shoulderR(p);
+        const core::Vec2f shL = shoulderL(p);
+        assert(near(p.targetHandR_.x, shR.x + 3.5f * kRow, 1e-3f) &&
+               near(p.targetHandR_.y, shR.y - 10.f * kRow, 1e-3f));
+        assert(near(p.targetHandL_.x, shL.x + 2.f * kRow, 1e-3f) &&
+               near(p.targetHandL_.y, shL.y - 10.f * kRow, 1e-3f));
+        // Arma segue a mão erguida (fim da arma flutuante).
+        const core::Vec2f wh = p.weaponHand();
+        assert(near(wh.x, p.poseR_.handWorld.x, 1e-3f) &&
+               near(wh.y, p.poseR_.handWorld.y, 1e-3f));
+        assert(wh.y < shR.y);
     }
     { // RespawnLimpa (volta a {0,0} + sem live até o próximo tick)
         Player p;
