@@ -51,21 +51,22 @@ int main() {
         }
     }
     { // GoldenIdle (compose do idle == snapshot; trava o algoritmo)
-        // Snapshot do monolítico deletado na Fase E3: se compose mudar,
-        // quebra aqui (as outras poses têm cobertura estrutural acima).
+        // Snapshot REGERADO na unificação (rosto E detalhado + cintura
+        // + postura S): se compose mudar, quebra aqui (as outras poses
+        // têm cobertura estrutural acima).
         static const char* const kGoldenIdle[40] = {
             "....KKKK....",
-            "....KKKK....",
+            "...KKKKKK...",
             "..KKKKKKKK..",
-            "..KKKKKKKK..",
-            "..KFFFFFFK..",
             "..KFFFFFFK..",
             "..KFEFFEFK..",
             "..KFEFFEFK..",
             "..KFFFFFFK..",
+            "..KFFFFFEK..",
             "..KFFFFFFK..",
             "...FFFFFF...",
             "...FFFFFF...",
+            "....FFFF....",
             "..CCCCCCCC..",
             "..CCCCCCCC..",
             ".GCCCCCCCCH.",
@@ -76,24 +77,24 @@ int main() {
             ".GCCCCCCCCH.",
             "..CCCCCCCC..",
             "..CCCCCCCC..",
-            "..CCCCCCCC..",
-            "..CCCCCCCC..",
+            "..CCKKKKCC..",
+            "..CCKKKKCC..",
             "..CCCCCCCC..",
             "..CCCCCCCC..",
             "...CCCCCC...",
             "...CCCCCC...",
-            "...CC..CC...",
-            "...CC..CC...",
-            "...CC..CC...",
-            "...CC..CC...",
-            "...LL..BB...",
-            "...LL..BB...",
-            "...LL..BB...",
-            "...LL..BB...",
-            "...LL..BB...",
-            "...LL..BB...",
-            "............",
-            "............",
+            "..CC....CC..",
+            "..CC....CC..",
+            "..CC....CC..",
+            "..CC....CC..",
+            "..LL....BB..",
+            "..LL....BB..",
+            "..LL....BB..",
+            "..LL....BB..",
+            ".LL......BB.",
+            ".LL......BB.",
+            "LL........BB",
+            "LL........BB",
         };
         const std::vector<std::string> got =
             assets::compose(kPlayerIdleParts, 5, 12, 40);
