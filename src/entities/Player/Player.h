@@ -237,7 +237,9 @@ class Player : public Entity
         // Alvos procedurais da mão em mundo (B.3): por fase do swing
         // (windup recuo / active estendida / recovery retorno) ou
         // repouso+senoide fora dele. Renderer consome; B.4 a hitbox.
-        // live=false (preview/respawn) = Renderer usa o box legado.
+        // live=false (raro: pré-1º-tick) = desenho pula os braços e
+        // weaponHand/offHand caem no box legado; preview/gameplay são
+        // sempre live (preview chama updateLimbs()).
         core::Vec2f targetHandR_{0.f, 0.f}, targetHandL_{0.f, 0.f};
         bool handTargetsLive_ = false;
         // Poses resolvidas (B.4, mundo, como desenhadas): fonte única

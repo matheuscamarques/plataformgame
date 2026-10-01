@@ -164,8 +164,8 @@ inline SpriteSet build() {
                 pp[2].rows, pp[2].w, pp[2].h, kPlayerPalette, kPlayerPaletteCount);
             s.playerParts[i][d].feet = core::makeSprite(
                 pp[3].rows, pp[3].w, pp[3].h, kPlayerPalette, kPlayerPaletteCount);
-            s.playerParts[i][d].arms = core::makeSprite(
-                pp[4].rows, pp[4].w, pp[4].h, kPlayerPalette, kPlayerPaletteCount);
+            // Arms sem textura: o desenho é 100% procedural (Renderer);
+            // o ASCII do overlay segue vivo p/ a hitbox no compose.
         }
     }
     // Inimigos: rows/dims/pal vêm da tabela do registry (fonte única);

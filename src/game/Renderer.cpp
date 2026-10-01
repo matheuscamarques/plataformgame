@@ -1071,9 +1071,19 @@ sf::Color playerSkinColor() {
     return sf::Color::Magenta; // paleta quebrada: grita, não some
 }
 
-// Segmento placeholder B.2: retângulo sólido de a até b.
-void drawLimbSeg(sf::RenderTarget& target, core::Vec2f a, core::Vec2f b,
-                 float thick, sf::Color col) {    const float dx = b.x - a.x;
+// Paleta por char (fonte única): sombra e manga do braço procedural.
+sf::Color playerPalColor(char ch, sf::Color fallback) {
+    for (std::size_t i = 0; i < sprites::kPlayerPaletteCount; ++i) {
+        if (sprites::kPlayerPalette[i].ch == ch)
+            return sprites::kPlayerPalette[i].color;
+    }
+    return fallback;
+}
+
+// Segmento sólido a→b, espessura em px de tela.
+void drawArmSeg(sf::RenderTarget& target, core::Vec2f a, core::Vec2f b,
+                float thick, sf::Color col) {
+    const float dx = b.x - a.x;
     const float dy = b.y - a.y;
     const float len = std::sqrt(dx * dx + dy * dy);
     if (len < 0.5f) return;
@@ -1083,6 +1093,24 @@ void drawLimbSeg(sf::RenderTarget& target, core::Vec2f a, core::Vec2f b,
     seg.setRotation(std::atan2(dy, dx) * 180.f / 3.14159265f);
     seg.setFillColor(col);
     target.draw(seg);
+}
+
+// Braço em 2 segmentos + mão (B.4 visual, escala por s).
+//   manga = cor da roupa (ombro→cotovelo, mais grossa)
+//   antebraço = pele ou luva (mais fino) + punho em disco no alvo
+// (mesma origem da hitbox). Lado direito sombreado (Tier 1); no flip
+// a sombra viaja com o membro (convenção do espelho, como na arte).
+void drawPlayerArm(sf::RenderTarget& target, const support::LimbPose& pose,
+                   float s, sf::Color upperCol, sf::Color lowerCol) {
+    drawArmSeg(target, pose.shoulderWorld, pose.elbowWorld, 4.f * s,
+               upperCol);
+    drawArmSeg(target, pose.elbowWorld, pose.handWorld, 3.f * s, lowerCol);
+    const float r = 2.f * s;
+    sf::CircleShape hand(r);
+    hand.setOrigin(r, r);
+    hand.setPosition(pose.handWorld.x, pose.handWorld.y);
+    hand.setFillColor(lowerCol);
+    target.draw(hand);
 }
 } // namespace
 
@@ -1125,9 +1153,9 @@ void Game::drawPlayerSprite(Player *p) {
                                   feetTex};
     // Ordem: torso antes dos braços (overlay transparente de pele G/H).
     const int order[5] = {0, 1, 4, 2, 3};
-    // B.4: poses resolvidas no Player (verbatim): mesma fonte da bbox
-    // e da arma. Sem live (preview) = overlay legado.
-    const bool procArms = p->handTargetsLive_;
+    // B.4: overlay de braços nunca é desenhado (só hitbox no compose);
+    // o visual é 100% procedural abaixo, live ou não (poses zero caem
+    // no len<0.5f; preview chama updateLimbs()).
     // Juice (Fase 5): respiração idle, bounce de marcha, squash de
     // pouso e stretch de queda. A escala pivota na origem de cada
     // parte — como todas ancoram em (centerX, y+h), equivale a squash
@@ -1152,8 +1180,9 @@ void Game::drawPlayerSprite(Player *p) {
         // Feet com botas: pula o pé base (a bota entra abaixo).
         // i é índice de TEXTURA (feet = 4); parts[] tem outro layout.
         if (i == 4 && bootsDef) continue;
-        // Overlay de braços sai quando o procedural assume.
-        if (i == 2 && procArms) continue;
+        // Arms (i == 2): textura nunca desenhada — hitbox vive no
+        // ASCII do compose; aqui só o procedural abaixo pinta.
+        if (i == 2) continue;
         sf::Sprite spr;
         spr.setTexture(*texs[i]);
         spr.setOrigin(sprites::kPlayerW * 0.5f,
@@ -1175,19 +1204,34 @@ void Game::drawPlayerSprite(Player *p) {
         spr.setScale(flip * s * kx, s * ky);
         window->draw(spr);
     }
-    // B.4: desenha a pose resolvida no Player, verbatim (ombro,
-    // cotovelo e mão são a mesma fonte de computeWeaponBbox).
-    if (procArms) {
-        const sf::Color skin = playerSkinColor();
-        const float thick = 2.f * s; // 2 sprite-px de pele
-        auto drawArm = [&](const support::LimbPose& pose) {
-            drawLimbSeg(*window, pose.shoulderWorld, pose.elbowWorld,
-                        thick, skin);
-            drawLimbSeg(*window, pose.elbowWorld, pose.handWorld, thick,
-                        skin);
-        };
-        drawArm(p->poseR_);
-        drawArm(p->poseL_);
+    // B.4: braços sempre procedurais, verbatim da pose resolvida
+    // (ombro/cotovelo/mão: mesma fonte de computeWeaponBbox). Manga
+    // na cor da roupa, antebraço em pele (ou luva) + punho em disco.
+    // Lado direito sombreado (Tier 1); a sombra viaja com o membro
+    // no flip, como na arte baked.
+    {
+        const core::Item& glove = p->equipment.get(core::EquipSlot::Gloves);
+        int mGlove = -1;
+        if (!glove.isEmpty()) {
+            if (const core::ItemDef* gd = glove.def())
+                mGlove = static_cast<int>(gd->material);
+        }
+        const sf::Color gloveCol =
+            mGlove >= 0
+                ? core::materialColors(static_cast<core::MaterialId>(mGlove))
+                      .main
+                : sf::Color::Transparent;
+        const sf::Color skinL = playerSkinColor();
+        const sf::Color skinR =
+            playerPalColor('f', sf::Color(143, 112, 87));
+        const sf::Color sleeveL =
+            playerPalColor('C', sf::Color(60, 90, 160));
+        const sf::Color sleeveR =
+            playerPalColor('c', sf::Color(37, 56, 99));
+        drawPlayerArm(*window, p->poseL_, s, sleeveL,
+                      mGlove >= 0 ? gloveCol : skinL);
+        drawPlayerArm(*window, p->poseR_, s, sleeveR,
+                      mGlove >= 0 ? gloveCol : skinR);
     }
 }
 

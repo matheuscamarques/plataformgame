@@ -33,8 +33,9 @@
 // Luz: topo-esquerda, world-space. Minúscula = sombra da base (mesma
 // matiz ×0.62); V = rim 1-2px na borda esq/topo; o = contato.
 // EXCEÇÃO Arms-em-y=0: Jump, Hurt e PunchUp-E têm o overlay em rows
-// 0-13 (braços erguidos), não 12-27. Está aqui e nos banners — não é
-// bug; teste I4 trava a lista.
+// 0-13 (região de dano dos braços erguidos), não 12-27. O overlay
+// nunca é desenhado (visual 100% procedural com R sombreado); está
+// aqui e nos banners — não é bug; teste I4 trava a lista.
 // Invariantes (teste test_player_palette trava todas):
 //   I1: todo array tem 40 rows. I2: toda row tem 40 chars, nunca "".
 //   I3: todo char não-dot existe na paleta. I4: conteúdo dentro do

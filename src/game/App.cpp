@@ -171,6 +171,7 @@ void Game::run()
                 pv.facing = 1;
                 pv.currentFrameId = support::SpriteFrameId::PlayerIdle;
                 pv.body.rebuild({dollX, dollTop}, 1);
+                pv.updateLimbs(); // preview com o mesmo IK do gameplay
                 drawPlayerSprite(&pv);
                 drawPlayerEquipment(&pv);
                 drawPlayerWeapon(&pv);

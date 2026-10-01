@@ -39,9 +39,8 @@ const ComposedFrame& composedFor(sprites::PlayerPose pose,
             static_cast<sprites::PlayerPose>(pi),
             sprites::artDirForIndex(di));
         ComposedFrame& c = cache[pi][di];
-        // 5 partes (head/torso/legs/feet + overlay de braços): com
-        // '.' transparente, o overlay só adiciona G/H (hitbox dos
-        // braços vive nele, não mais no torso).
+        // 5 partes: head/torso/legs/feet + arms. Arms é APENAS hitbox
+        // (G/H no corpo) — o desenho é 100% procedural em Renderer.
         c.text = compose(pp, 5, sprites::kPlayerW, sprites::kPlayerH);
         c.rows.reserve(c.text.size());
         for (const auto& s : c.text) c.rows.push_back(s.c_str());
