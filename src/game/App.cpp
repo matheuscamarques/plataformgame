@@ -274,6 +274,24 @@ void Game::tick() {
             audio_.play(game::keyOf(game::Sfx::PlayerJump));
         p->tick();
 
+        // Aim-bot: sem mira manual vertical (Up/Down) e fora do swing,
+        // a mira segue o vivo mais próximo no cone do facing — voador
+        // em cima e rasteiro embaixo sem segurar Up. Manual sempre
+        // vence; startSwing congela o snapshot já assistido (Melee).
+        // Roda após p->tick (aim do input resolvida) e antes do
+        // scheduler (MeleeSystem lê no Heavy).
+        if (!uiOpen && !p->inMeleeSwing() && !p->moveUp && !p->moveDown) {
+            if (support::Enemy* tgt = enemies_->nearestAhead(
+                    {p->getCenterX(), p->getCenterY()}, p->facing)) {
+                const float dx =
+                    tgt->body.getCenterX() - p->getCenterX();
+                const float dy =
+                    tgt->body.getCenterY() - p->getCenterY();
+                p->aimDir = static_cast<support::AimDir>(
+                    support::facingFromInput(dx, dy, p->facing8));
+            }
+        }
+
         // S6: J (Action::Light) usa o slot ativo da hotbar: bomba voa,
         // consumível com onUse é usado (poção), resto cai na dinamite
         // da pilha (legado). Fora com menu aberto.

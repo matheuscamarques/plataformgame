@@ -25,6 +25,25 @@ void EnemySystem::spawn(const std::string &kind, float x, float y,
 
 // forEach/removeDead moram no header (templates, sem std::function).
 
+Enemy* EnemySystem::nearestAhead(core::Vec2f from, int facing,
+                                 float maxSlop, float maxRange) {
+    Enemy* best = nullptr;
+    float bestD2 = maxRange * maxRange;
+    const float fw = static_cast<float>(facing);
+    for (auto& s : slimes_) {
+        Enemy& e = *s;
+        if (e.resources.isDead() || e.destroyPending) continue;
+        const float dx = e.body.getCenterX() - from.x;
+        const float dy = e.body.getCenterY() - from.y;
+        if (dx * fw <= -maxSlop) continue; // atrás: fora do cone
+        const float d2 = dx * dx + dy * dy;
+        if (d2 > bestD2) continue;
+        bestD2 = d2;
+        best = &e;
+    }
+    return best;
+}
+
 std::size_t EnemySystem::despawnFar(float x, float y, float radius) {
     std::size_t n = 0;
     const float r2 = radius * radius;

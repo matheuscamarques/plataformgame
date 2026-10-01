@@ -114,6 +114,15 @@ public:
     void spawn(const std::string &kind, float x, float y,
                GameContext *ctx = nullptr);
 
+    // Aim-bot: vivo mais próximo no cone do facing, a partir de from
+    // (centro do player). Entra quem está à frente (dx*facing > -slop;
+    // o slop tolera sobre a cabeça) até maxRange. Mortos e
+    // destroyPending pulam. Null = sem alvo (mira manual). O setor
+    // 8-way quem faz é o caller via facingFromInput (AimDir==Facing).
+    // Não-const porque Entity::getCenterX não é const (só leitura).
+    Enemy* nearestAhead(core::Vec2f from, int facing,
+                        float maxSlop = 8.f, float maxRange = 300.f);
+
     // Sem std::function (C++17: template explícito, não auto): callers
     // passam lambdas, zero indireção/alocação por inimigo por tick.
     template <typename F>
