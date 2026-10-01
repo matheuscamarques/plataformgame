@@ -85,7 +85,7 @@ void checkPresence(const assets::Part* pp) {
     assert(hasChar(pp[1], "C"));   // torso
     assert(hasChar(pp[2], "CLB")); // pernas
     assert(hasChar(pp[3], "LB"));  // pés
-    assert(hasChar(pp[4], "G"));   // braço esq (Tier 1: G lit)
+    assert(hasChar(pp[4], "Gg"));  // braço esq (Tier 1: g sombra à esq no NE)
     assert(hasChar(pp[4], "Hh"));  // braço dir (Tier 1: h sombra)
 }
 
