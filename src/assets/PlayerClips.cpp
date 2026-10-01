@@ -69,11 +69,12 @@ namespace {
 constexpr AnimKeyframe kIdleFrames[1] = {
     {SpriteFrameId::PlayerIdle, 0.25f, 0},
 };
+// A/C = contact (pé bate: poeira), B/D = passing (pé no ar).
 constexpr AnimKeyframe kWalkFrames[4] = {
-    {SpriteFrameId::PlayerWalkA, 0.10f, 0},
-    {SpriteFrameId::PlayerWalkB, 0.10f, support::AnimEvent::Step},
-    {SpriteFrameId::PlayerWalkC, 0.10f, 0},
-    {SpriteFrameId::PlayerWalkD, 0.10f, support::AnimEvent::Step},
+    {SpriteFrameId::PlayerWalkA, 0.10f, support::AnimEvent::Step},
+    {SpriteFrameId::PlayerWalkB, 0.10f, 0},
+    {SpriteFrameId::PlayerWalkC, 0.10f, support::AnimEvent::Step},
+    {SpriteFrameId::PlayerWalkD, 0.10f, 0},
 };
 
 } // namespace

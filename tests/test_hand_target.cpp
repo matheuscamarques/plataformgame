@@ -107,7 +107,7 @@ int main() {
         assert(near(p.targetHandR_.x, sh.x + 3.5f * kRow, 1e-3f) &&
                near(p.targetHandR_.y, sh.y + 2.f * kRow, 1e-3f));
     }
-    { // MarchaOscila (walkFrame 0: direita +row em x, esquerda -row)
+    { // MarchaOscila (frame A, contact dir: contrapposto, esq lidera)
         Player p;
         p.body.rebuild({0.f, 0.f}, 1);
         p.moveRight = true;
@@ -115,9 +115,13 @@ int main() {
         p.tick();
         assert(!p.inMeleeSwing() && p.handTargetsLive_);
         const core::Vec2f sh = shoulderR(p);
-        // frame 0: cos=1,sin=0 → R soma +row em x; L subtrai.
-        assert(near(p.targetHandR_.x, sh.x + 4.5f * kRow, 1e-3f) &&
+        const core::Vec2f sl = shoulderL(p);
+        // fase +pi: R = 3.5+cos(pi) = +2.5, L = 2.0+cos(2pi) = +3.0:
+        // perna dir à frente, braço ESQ à frente (oposição).
+        assert(near(p.targetHandR_.x, sh.x + 2.5f * kRow, 1e-3f) &&
                near(p.targetHandR_.y, sh.y + 2.f * kRow, 1e-3f));
+        assert(near(p.targetHandL_.x, sl.x + 3.f * kRow, 1e-3f) &&
+               near(p.targetHandL_.y, sl.y + 2.f * kRow, 1e-3f));
     }
     { // JumpErgue (pose Jump: mãos ~10 rows ACIMA do ombro, sem senoide)
         Player p;

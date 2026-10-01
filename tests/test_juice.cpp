@@ -62,11 +62,11 @@ int main() {
         assert(near(game::idleBobY(15), 0.f, 1e-3f));
         assert(near(game::idleBobY(7, 2.f), 1.989f, 1e-3f));
     }
-    { // WalkBob (contato ímpar afunda 1.5px)
-        assert(near(game::walkBobY(0), 0.f));
-        assert(near(game::walkBobY(1), 1.5f));
-        assert(near(game::walkBobY(2), 0.f));
-        assert(near(game::walkBobY(3), 1.5f));
+    { // WalkBob (contact A/C, par, afunda 1.5px no impacto)
+        assert(near(game::walkBobY(0), 1.5f));
+        assert(near(game::walkBobY(1), 0.f));
+        assert(near(game::walkBobY(2), 1.5f));
+        assert(near(game::walkBobY(3), 0.f));
     }
     { // LandSquash (18% cheio, metade na metade, identidade fora)
         const auto full = game::landSquash(0.12f);

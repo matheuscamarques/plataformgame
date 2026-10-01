@@ -1114,11 +1114,13 @@ void Player::updateLimbs() {
         targetHandL_ = rest(shL, 2.f);
         // Senoide de marcha no relógio do clip (4 fases: círculo cheio;
         // o bounce em Y vem de walkBobY com a mesma paridade). Vale no
-        // ar rápido também (placeholder B.3).
+        // ar rápido também (placeholder B.3). Fase +pi (contrapposto:
+        // no contact A a perna dir vai à frente e o braço ESQ lidera;
+        // no C inverte; nos passing B/D os braços passam pelo centro).
         if (std::fabs(getVx()) > 1.f || std::fabs(getVy()) > 1.f) {
             constexpr float kPi = 3.14159265f;
             const float ph =
-                static_cast<float>(loco.frameIndex()) * kPi * 0.5f;
+                static_cast<float>(loco.frameIndex()) * kPi * 0.5f + kPi;
             targetHandR_.x += std::cos(ph) * row * fw;
             targetHandR_.y += std::sin(ph) * row;
             targetHandL_.x += std::cos(ph + kPi) * row * fw;

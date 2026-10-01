@@ -146,16 +146,16 @@ int main() {
         AnimPlayer a;
         a.play(game::walkClip());
         assert(a.currentFrame() == SpriteFrameId::PlayerWalkA);
-        assert(a.consumeEvents() == 0); // passing: sem poeira
-        a.tick(0.11f);                  // contact B
+        assert(a.consumeEvents() == Step); // contact A: poeira
+        a.tick(0.11f);                     // passing B
         assert(a.currentFrame() == SpriteFrameId::PlayerWalkB);
-        assert(a.consumeEvents() == Step);
-        a.tick(0.10f); // passing C: sem Step
-        assert(a.currentFrame() == SpriteFrameId::PlayerWalkC);
         assert(a.consumeEvents() == 0);
-        a.tick(0.10f); // contact D
-        assert(a.currentFrame() == SpriteFrameId::PlayerWalkD);
+        a.tick(0.10f); // contact C: Step
+        assert(a.currentFrame() == SpriteFrameId::PlayerWalkC);
         assert(a.consumeEvents() == Step);
+        a.tick(0.10f); // passing D
+        assert(a.currentFrame() == SpriteFrameId::PlayerWalkD);
+        assert(a.consumeEvents() == 0);
         a.tick(0.10f); // loop de volta ao A
         assert(a.currentFrame() == SpriteFrameId::PlayerWalkA);
         assert(!a.finished());

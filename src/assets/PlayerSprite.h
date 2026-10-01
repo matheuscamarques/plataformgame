@@ -202,9 +202,10 @@ inline float idleBobY(int tickCount, float amplitude = 1.f) {
            amplitude; // 1Hz a 30 ticks/s
 }
 
-// Marcha: frame de contato (índice ímpar do clip) afunda 1.5px.
+// Marcha: frame de contato (A/C, índices pares) afunda 1.5px no
+// impacto; passing (B/D, ímpares) volta ao nível (impulso).
 inline float walkBobY(int clipFrame) {
-    return (clipFrame % 2 == 1) ? 1.5f : 0.f;
+    return (clipFrame % 2 == 0) ? 1.5f : 0.f;
 }
 
 struct Squash {

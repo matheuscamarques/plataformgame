@@ -165,43 +165,50 @@ int main() {
         assert(composedDiffers(
             e, sprites::posePartsFor(PlayerPose::Idle, Facing::N)));
     }
-    { // WalkSideViewCycle (E: A passing esq-down, C espelho, B contact)
+    { // WalkSideViewCycle (sagital: A/C contact, B/D passing)
         using namespace sprites;
+        checkSpan(kPlayerWalkALegs, 28, 33);
         checkSpan(kPlayerWalkAFeet, 34, 39);
-        checkSpan(kPlayerWalkCFeet, 34, 39);
+        checkSpan(kPlayerWalkBLegs, 28, 33);
         checkSpan(kPlayerWalkBFeet, 34, 39);
-        // A: esq plantada (rows 38-39 com L), dir no ar (sem B).
-        assert(std::strchr(kPlayerWalkAFeet[38], 'L') != nullptr);
-        assert(std::strchr(kPlayerWalkAFeet[38], 'B') == nullptr);
+        checkSpan(kPlayerWalkCLegs, 28, 33);
+        checkSpan(kPlayerWalkCFeet, 34, 39);
+        checkSpan(kPlayerWalkDLegs, 28, 33);
+        checkSpan(kPlayerWalkDFeet, 34, 39);
+        // A/C = contact: pernas próprias (sem reuso), pés no chão.
+        // 'c' (coxa longe) conta como torso, como o 'C'.
+        assert(std::strchr(kPlayerWalkALegs[28], 'c') != nullptr);
+        assert(std::strchr(kPlayerWalkCLegs[28], 'c') != nullptr);
         assert(std::strchr(kPlayerWalkAFeet[39], 'L') != nullptr);
-        assert(std::strchr(kPlayerWalkAFeet[39], 'B') == nullptr);
-        // C: espelho (dir plantada, esq no ar).
-        assert(std::strchr(kPlayerWalkCFeet[38], 'B') != nullptr);
-        assert(std::strchr(kPlayerWalkCFeet[38], 'L') == nullptr);
-        assert(std::strchr(kPlayerWalkCFeet[39], 'B') != nullptr);
-        assert(std::strchr(kPlayerWalkCFeet[39], 'L') == nullptr);
-        // B: contact planta os dois (rows 38-39 com L e B).
-        assert(std::strchr(kPlayerWalkBFeet[38], 'L') != nullptr);
-        assert(std::strchr(kPlayerWalkBFeet[38], 'B') != nullptr);
-        assert(std::strchr(kPlayerWalkBFeet[39], 'L') != nullptr);
-        assert(std::strchr(kPlayerWalkBFeet[39], 'B') != nullptr);
-        // 4 frames distintos no composto (antes C==A e D==B: torsos e
-        // braços de A/B são idênticos, então só o feet alternado
-        // diferencia; sem isso a marcha lia como polichinelo parado).
+        assert(std::strchr(kPlayerWalkAFeet[39], 'b') != nullptr);
+        assert(std::strchr(kPlayerWalkCFeet[39], 'L') != nullptr);
+        assert(std::strchr(kPlayerWalkCFeet[39], 'b') != nullptr);
+        // B/D = passing: pé do balanço some 4 rows (só apoio no chão).
+        for (int y = 36; y < 40; ++y) {
+            assert(std::strchr(kPlayerWalkBFeet[y], 'L') == nullptr);
+            assert(std::strchr(kPlayerWalkBFeet[y], 'b') != nullptr);
+            assert(std::strchr(kPlayerWalkDFeet[y], 'L') == nullptr);
+            assert(std::strchr(kPlayerWalkDFeet[y], 'b') != nullptr);
+        }
+        assert(std::strchr(kPlayerWalkBFeet[34], 'L') != nullptr);
+        assert(std::strchr(kPlayerWalkDFeet[34], 'L') != nullptr);
+        // 4 frames distintos no composto (pernas próprias por frame).
         const assets::Part* a = sprites::posePartsFor(PlayerPose::WalkA, Facing::E);
         const assets::Part* b = sprites::posePartsFor(PlayerPose::WalkB, Facing::E);
         const assets::Part* c = sprites::posePartsFor(PlayerPose::WalkC, Facing::E);
         const assets::Part* d = sprites::posePartsFor(PlayerPose::WalkD, Facing::E);
         assert(composedDiffers(a, b));
-        assert(composedDiffers(a, c)); // C espelha o pé de A
+        assert(composedDiffers(a, c));
+        assert(composedDiffers(a, d));
         assert(composedDiffers(b, c));
+        assert(composedDiffers(b, d));
+        assert(composedDiffers(c, d));
         // Locomoção nunca usa S/N: artDirFor força E/W (side-view).
         assert(game::artDirFor(PlayerPose::Idle, Facing::S) == Facing::E);
         assert(game::artDirFor(PlayerPose::WalkA, Facing::N) == Facing::E);
         assert(game::artDirFor(PlayerPose::WalkB, Facing::SW) == Facing::W);
         assert(game::artDirFor(PlayerPose::WalkC, Facing::NE) == Facing::E);
         assert(game::artDirFor(PlayerPose::WalkD, Facing::S) == Facing::E);
-        (void)d;
     }
     { // AirAttackLegs (Punch/Throw no ar: tronco do golpe + tucked Jump)
         using namespace sprites;

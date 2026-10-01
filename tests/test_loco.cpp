@@ -21,19 +21,20 @@ int main() {
         p.tick();
         assert(p.loco.currentFrame() == SpriteFrameId::PlayerIdle);
     }
-    { // MarchaAvança (0.10s/frame: 4 ticks chegam no B com Step)
+    { // MarchaAvança (contact A entra com Step; B sem; C com Step)
         Player p;
         p.moveRight = true;
         p.jumping = true; // chão: marcha anda
         p.tick();
         assert(p.loco.currentFrame() == SpriteFrameId::PlayerWalkA);
+        assert(p.loco.consumeEvents() == kStep); // poeira do contact A
         p.tick();
         p.tick();
-        p.tick(); // 0.133s: contact B
+        p.tick(); // 0.133s: passing B, sem poeira
         assert(p.loco.currentFrame() == SpriteFrameId::PlayerWalkB);
-        assert(p.loco.consumeEvents() == kStep);
-        for (int i = 0; i < 6; ++i) p.tick(); // 0.333s: contact D
-        assert(p.loco.currentFrame() == SpriteFrameId::PlayerWalkD);
+        assert(p.loco.consumeEvents() == 0);
+        for (int i = 0; i < 3; ++i) p.tick(); // 0.233s: contact C
+        assert(p.loco.currentFrame() == SpriteFrameId::PlayerWalkC);
         assert(p.loco.consumeEvents() == kStep);
     }
     { // SwingCongela (marcha em B + 5 ticks de swing: fica no B)
@@ -41,11 +42,12 @@ int main() {
         p.moveRight = true;
         p.jumping = true;
         p.tick();
+        assert(p.loco.consumeEvents() == kStep); // drena o Step do A
         p.tick();
         p.tick();
         p.tick();
         assert(p.loco.currentFrame() == SpriteFrameId::PlayerWalkB);
-        assert(p.loco.consumeEvents() == kStep); // drena
+        assert(p.loco.consumeEvents() == 0); // passing B: nada a drenar
         assert(p.startSwing());
         for (int i = 0; i < 5; ++i) p.tick();
         assert(p.inMeleeSwing());
