@@ -1158,7 +1158,7 @@ void Player::updateLimbs() {
 
 namespace {
 // Lâmina além da mão em mundo (Fase E): maior eixo do sprite menos a
-// origem (guarda), em sprite-px. Soco = punho + avanço (8 rows).
+// origem (guarda), em sprite-px. Soco = punho + avanço (6 rows).
 float bladeLengthRows(const Player* p) {
     if (const core::ItemDef* wdef = p->weaponDef()) {
         if (const auto* wd =
@@ -1167,7 +1167,7 @@ float bladeLengthRows(const Player* p) {
                              wd->spriteH - wd->originY, 0.f});
         }
     }
-    return 8.f;
+    return 6.f;
 }
 } // namespace
 

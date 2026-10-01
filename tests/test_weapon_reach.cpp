@@ -36,7 +36,7 @@ int main() {
         assert(near(arc.rOuter, 8.f * kRow + 11.f * kRow));
         assert(near(arc.rInner, 8.f * kRow - 2.f * kRow));
     }
-    { // SweepUnarmedShorter (soco: punho+avanço 8 rows, sem lâmina)
+    { // SweepUnarmedShorter (soco: punho+avanço 6 rows, sem lâmina)
         Player p;
         p.equipment.unequip(core::EquipSlot::RightHand);
         p.body.rebuild({0.f, 0.f}, 1);
@@ -44,7 +44,7 @@ int main() {
         assert(p.updateMelee(0.10f) == MeleePhase::Active);
         const support::SweepArc arc = p.sweepArc();
         assert(!arc.empty);
-        assert(near(arc.rOuter, 8.f * kRow + 8.f * kRow)); // 40 < 47.5
+        assert(near(arc.rOuter, 8.f * kRow + 6.f * kRow)); // 35 < 47.5
         assert(arc.rOuter < 8.f * kRow + 11.f * kRow);
     }
     { // EmptyOutsideActive (só Active varre)
