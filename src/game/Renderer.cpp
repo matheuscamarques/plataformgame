@@ -1208,12 +1208,13 @@ void Game::drawPlayerSprite(Player *p) {
         window->draw(spr);
     }
     // Bota no slot do feet (12x6, mesma origem do pé que substitui).
+    // Origem pela TEXTURA (não pela parte: no canvas full-40 o offY
+    // é 0 e kPlayerW*0.5 jogava a bota 35px p/ esquerda e 85px p/ cima).
     if (bootsDef) {
         const int m = static_cast<int>(bootsDef->material);
         sf::Sprite spr(sprites_.boots[m]);
-        spr.setOrigin(sprites::kPlayerW * 0.5f,
-                      static_cast<float>(sprites::kPlayerH -
-                                         parts[3].offY));
+        spr.setOrigin(sprites::kBootsW * 0.5f,
+                      static_cast<float>(sprites::kBootsH));
         spr.setPosition(p->getCenterX(), p->getY() + p->getH() + bobY);
         spr.setScale(flip * s * kx, s * ky);
         window->draw(spr);
