@@ -6564,6 +6564,178 @@ inline int partIndexForTex(int texIdx) {
 
 inline constexpr int kPlayerPoseCount = 12;
 
+// Soco andando (E, side-view): tronco do golpe + pernas da marcha.
+// 16 recombinações estáticas (4 golpes × 4 frames de marcha).
+// Renderer e BodySystem leem via posePartsForMarch quando o soco
+// acontece marchando no chão (pernas não congelam no golpe).
+inline constexpr assets::Part kPlayerPunchWalkAParts[] = {
+    { kPlayerPunchHead,      40, 40, 0, 0 },
+    { kPlayerPunchTorso,     40, 40, 0, 0 },
+    { kPlayerWalkALegs,      40, 40, 0, 0 },
+    { kPlayerWalkAFeet,      40, 40, 0, 0 },
+    { kPlayerPunchArms,      40, 40, 0, 0 },
+};
+
+inline constexpr assets::Part kPlayerPunchWalkBParts[] = {
+    { kPlayerPunchHead,      40, 40, 0, 0 },
+    { kPlayerPunchTorso,     40, 40, 0, 0 },
+    { kPlayerWalkBLegs,      40, 40, 0, 0 },
+    { kPlayerWalkBFeet,      40, 40, 0, 0 },
+    { kPlayerPunchArms,      40, 40, 0, 0 },
+};
+
+inline constexpr assets::Part kPlayerPunchWalkCParts[] = {
+    { kPlayerPunchHead,      40, 40, 0, 0 },
+    { kPlayerPunchTorso,     40, 40, 0, 0 },
+    { kPlayerWalkCLegs,      40, 40, 0, 0 },
+    { kPlayerWalkCFeet,      40, 40, 0, 0 },
+    { kPlayerPunchArms,      40, 40, 0, 0 },
+};
+
+inline constexpr assets::Part kPlayerPunchWalkDParts[] = {
+    { kPlayerPunchHead,      40, 40, 0, 0 },
+    { kPlayerPunchTorso,     40, 40, 0, 0 },
+    { kPlayerWalkDLegs,      40, 40, 0, 0 },
+    { kPlayerWalkDFeet,      40, 40, 0, 0 },
+    { kPlayerPunchArms,      40, 40, 0, 0 },
+};
+
+inline constexpr assets::Part kPlayerPunchUpWalkAParts[] = {
+    { kPlayerPunchUpHead,    40, 40, 0, 0 },
+    { kPlayerPunchUpTorso,   40, 40, 0, 0 },
+    { kPlayerWalkALegs,      40, 40, 0, 0 },
+    { kPlayerWalkAFeet,      40, 40, 0, 0 },
+    { kPlayerPunchUpArms,    40, 40, 0, 0 },
+};
+
+inline constexpr assets::Part kPlayerPunchUpWalkBParts[] = {
+    { kPlayerPunchUpHead,    40, 40, 0, 0 },
+    { kPlayerPunchUpTorso,   40, 40, 0, 0 },
+    { kPlayerWalkBLegs,      40, 40, 0, 0 },
+    { kPlayerWalkBFeet,      40, 40, 0, 0 },
+    { kPlayerPunchUpArms,    40, 40, 0, 0 },
+};
+
+inline constexpr assets::Part kPlayerPunchUpWalkCParts[] = {
+    { kPlayerPunchUpHead,    40, 40, 0, 0 },
+    { kPlayerPunchUpTorso,   40, 40, 0, 0 },
+    { kPlayerWalkCLegs,      40, 40, 0, 0 },
+    { kPlayerWalkCFeet,      40, 40, 0, 0 },
+    { kPlayerPunchUpArms,    40, 40, 0, 0 },
+};
+
+inline constexpr assets::Part kPlayerPunchUpWalkDParts[] = {
+    { kPlayerPunchUpHead,    40, 40, 0, 0 },
+    { kPlayerPunchUpTorso,   40, 40, 0, 0 },
+    { kPlayerWalkDLegs,      40, 40, 0, 0 },
+    { kPlayerWalkDFeet,      40, 40, 0, 0 },
+    { kPlayerPunchUpArms,    40, 40, 0, 0 },
+};
+
+inline constexpr assets::Part kPlayerPunchDownWalkAParts[] = {
+    { kPlayerPunchDownHead,  40, 40, 0, 0 },
+    { kPlayerPunchDownTorso, 40, 40, 0, 0 },
+    { kPlayerWalkALegs,      40, 40, 0, 0 },
+    { kPlayerWalkAFeet,      40, 40, 0, 0 },
+    { kPlayerPunchDownArms,  40, 40, 0, 0 },
+};
+
+inline constexpr assets::Part kPlayerPunchDownWalkBParts[] = {
+    { kPlayerPunchDownHead,  40, 40, 0, 0 },
+    { kPlayerPunchDownTorso, 40, 40, 0, 0 },
+    { kPlayerWalkBLegs,      40, 40, 0, 0 },
+    { kPlayerWalkBFeet,      40, 40, 0, 0 },
+    { kPlayerPunchDownArms,  40, 40, 0, 0 },
+};
+
+inline constexpr assets::Part kPlayerPunchDownWalkCParts[] = {
+    { kPlayerPunchDownHead,  40, 40, 0, 0 },
+    { kPlayerPunchDownTorso, 40, 40, 0, 0 },
+    { kPlayerWalkCLegs,      40, 40, 0, 0 },
+    { kPlayerWalkCFeet,      40, 40, 0, 0 },
+    { kPlayerPunchDownArms,  40, 40, 0, 0 },
+};
+
+inline constexpr assets::Part kPlayerPunchDownWalkDParts[] = {
+    { kPlayerPunchDownHead,  40, 40, 0, 0 },
+    { kPlayerPunchDownTorso, 40, 40, 0, 0 },
+    { kPlayerWalkDLegs,      40, 40, 0, 0 },
+    { kPlayerWalkDFeet,      40, 40, 0, 0 },
+    { kPlayerPunchDownArms,  40, 40, 0, 0 },
+};
+
+inline constexpr assets::Part kPlayerThrowWalkAParts[] = {
+    { kPlayerThrowHead,      40, 40, 0, 0 },
+    { kPlayerThrowTorso,     40, 40, 0, 0 },
+    { kPlayerWalkALegs,      40, 40, 0, 0 },
+    { kPlayerWalkAFeet,      40, 40, 0, 0 },
+    { kPlayerThrowArms,      40, 40, 0, 0 },
+};
+
+inline constexpr assets::Part kPlayerThrowWalkBParts[] = {
+    { kPlayerThrowHead,      40, 40, 0, 0 },
+    { kPlayerThrowTorso,     40, 40, 0, 0 },
+    { kPlayerWalkBLegs,      40, 40, 0, 0 },
+    { kPlayerWalkBFeet,      40, 40, 0, 0 },
+    { kPlayerThrowArms,      40, 40, 0, 0 },
+};
+
+inline constexpr assets::Part kPlayerThrowWalkCParts[] = {
+    { kPlayerThrowHead,      40, 40, 0, 0 },
+    { kPlayerThrowTorso,     40, 40, 0, 0 },
+    { kPlayerWalkCLegs,      40, 40, 0, 0 },
+    { kPlayerWalkCFeet,      40, 40, 0, 0 },
+    { kPlayerThrowArms,      40, 40, 0, 0 },
+};
+
+inline constexpr assets::Part kPlayerThrowWalkDParts[] = {
+    { kPlayerThrowHead,      40, 40, 0, 0 },
+    { kPlayerThrowTorso,     40, 40, 0, 0 },
+    { kPlayerWalkDLegs,      40, 40, 0, 0 },
+    { kPlayerWalkDFeet,      40, 40, 0, 0 },
+    { kPlayerThrowArms,      40, 40, 0, 0 },
+};
+
+// Seletor marcha-atacando (E): nullptr fora de soco×marcha.
+inline const assets::Part* posePartsForMarch(PlayerPose atk,
+                                              PlayerPose walk) {
+    switch (atk) {
+        case PlayerPose::Punch:
+            switch (walk) {
+                case PlayerPose::WalkA: return kPlayerPunchWalkAParts;
+                case PlayerPose::WalkB: return kPlayerPunchWalkBParts;
+                case PlayerPose::WalkC: return kPlayerPunchWalkCParts;
+                case PlayerPose::WalkD: return kPlayerPunchWalkDParts;
+                default: return nullptr;
+            }
+        case PlayerPose::PunchUp:
+            switch (walk) {
+                case PlayerPose::WalkA: return kPlayerPunchUpWalkAParts;
+                case PlayerPose::WalkB: return kPlayerPunchUpWalkBParts;
+                case PlayerPose::WalkC: return kPlayerPunchUpWalkCParts;
+                case PlayerPose::WalkD: return kPlayerPunchUpWalkDParts;
+                default: return nullptr;
+            }
+        case PlayerPose::PunchDown:
+            switch (walk) {
+                case PlayerPose::WalkA: return kPlayerPunchDownWalkAParts;
+                case PlayerPose::WalkB: return kPlayerPunchDownWalkBParts;
+                case PlayerPose::WalkC: return kPlayerPunchDownWalkCParts;
+                case PlayerPose::WalkD: return kPlayerPunchDownWalkDParts;
+                default: return nullptr;
+            }
+        case PlayerPose::Throw:
+            switch (walk) {
+                case PlayerPose::WalkA: return kPlayerThrowWalkAParts;
+                case PlayerPose::WalkB: return kPlayerThrowWalkBParts;
+                case PlayerPose::WalkC: return kPlayerThrowWalkCParts;
+                case PlayerPose::WalkD: return kPlayerThrowWalkDParts;
+                default: return nullptr;
+            }
+        default: return nullptr;
+    }
+}
+
 // Seletor aéreo (E): nullptr p/ poses sem variante (chão/direcional
 // seguem posePartsFor). Renderer e BodySystem leem daqui quando
 // airborne — mesma fonte p/ desenho e hitbox (doutrina B.4).

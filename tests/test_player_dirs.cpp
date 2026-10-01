@@ -250,6 +250,53 @@ int main() {
         assert(sprites::posePartsForAir(PlayerPose::Idle) == nullptr);
         assert(sprites::posePartsForAir(PlayerPose::Hurt) == nullptr);
     }
+    { // MarchAttackLegs (soco andando: tronco do golpe + pernas)
+        using namespace sprites;
+        using game::isMarchAttackPose;
+        using game::isWalkPose;
+        assert(isMarchAttackPose(PlayerPose::Punch));
+        assert(isMarchAttackPose(PlayerPose::Throw));
+        assert(!isMarchAttackPose(PlayerPose::WalkA));
+        assert(!isMarchAttackPose(PlayerPose::Jump));
+        assert(isWalkPose(PlayerPose::WalkD));
+        assert(!isWalkPose(PlayerPose::Idle));
+        const PlayerPose atks[] = {PlayerPose::Punch, PlayerPose::PunchUp,
+                                   PlayerPose::PunchDown, PlayerPose::Throw};
+        const PlayerPose walks[] = {PlayerPose::WalkA, PlayerPose::WalkB,
+                                    PlayerPose::WalkC, PlayerPose::WalkD};
+        for (PlayerPose a : atks) {
+            for (PlayerPose w : walks) {
+                const assets::Part* mp = sprites::posePartsForMarch(a, w);
+                assert(mp != nullptr);
+                for (int i = 0; i < 5; ++i) {
+                    assert(mp[i].w == 40 && mp[i].h == 40);
+                    assert(mp[i].offX == 0 && mp[i].offY == 0);
+                }
+                // Tronco do golpe (E) + pernas da marcha (mesmos arrays).
+                const assets::Part* e = sprites::posePartsFor(a, Facing::E);
+                const assets::Part* l = sprites::posePartsFor(w, Facing::E);
+                assert(mp[0].rows == e[0].rows);
+                assert(mp[1].rows == e[1].rows);
+                assert(mp[4].rows == e[4].rows);
+                assert(mp[2].rows == l[2].rows);
+                assert(mp[3].rows == l[3].rows);
+            }
+            // Marcha lê no composto (troca de perna a cada frame).
+            const assets::Part* m0 =
+                sprites::posePartsForMarch(a, PlayerPose::WalkA);
+            const assets::Part* m1 =
+                sprites::posePartsForMarch(a, PlayerPose::WalkB);
+            const assets::Part* m2 =
+                sprites::posePartsForMarch(a, PlayerPose::WalkC);
+            assert(composedDiffers(m0, m1));
+            assert(composedDiffers(m0, m2));
+            assert(composedDiffers(m1, m2));
+        }
+        assert(sprites::posePartsForMarch(PlayerPose::Idle,
+                                          PlayerPose::WalkA) == nullptr);
+        assert(sprites::posePartsForMarch(PlayerPose::Punch,
+                                          PlayerPose::Idle) == nullptr);
+    }
     { // WalkDims (alturas exatas das 18 novas, 12 chars por row)
         using namespace sprites;
         checkSpan(kPlayerWalkA_S_Arms, 12, 27);

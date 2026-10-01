@@ -261,6 +261,12 @@ void Player::tick() {
         loco.play(marching ? game::walkClip() : game::idleClip());
         loco.tick(physics::kFixedDt);
         updateLimbs();
+    } else {
+        // Golpe andando: a marcha segue (Renderer/BodySystem combinam
+        // tronco do soco + pernas do walk); parado volta ao idle.
+        const bool marching = (moveLeft || moveRight) && jumping;
+        loco.play(marching ? game::walkClip() : game::idleClip());
+        if (marching) loco.tick(physics::kFixedDt);
     }
 
     // Regen de estamina: 30/s × mult, só com delay pronto.

@@ -36,6 +36,12 @@ SpriteFrameData playerFrameData(sprites::PlayerPose pose,
 // BodySystem lê daqui quando airborne — mesma fonte do Renderer.
 SpriteFrameData playerAirAttackFrameData(sprites::PlayerPose pose);
 
+// Soco andando: tronco do golpe + pernas da marcha (posePartsForMarch).
+// BodySystem lê daqui quando grounded+marchando — mesma fonte do
+// Renderer (doutrina B.4).
+SpriteFrameData playerMarchAttackFrameData(sprites::PlayerPose atk,
+                                           sprites::PlayerPose walk);
+
 // Frames estáticos (tudo menos player/None/COUNT): fonte única dos
 // dados acima e do SpriteSet::build (dimensões/paleta não divergem).
 // Player fica de fora (composto em runtime, por pose).

@@ -1145,6 +1145,20 @@ void Game::drawPlayerSprite(Player *p) {
             legsTex = &jp.legs;
             feetTex = &jp.feet;
         }
+    } else if (game::isMarchAttackPose(pose) &&
+               (directed.artDir == support::Facing::E ||
+                directed.artDir == support::Facing::W)) {
+        // Soco andando: tronco do golpe + pernas da marcha (ver nota
+        // na marcha sagital). Só side-view com frame de walk no loco.
+        const auto wpose =
+            game::poseForFrameId(p->loco.currentFrame());
+        if (game::isWalkPose(wpose)) {
+            parts = sprites::posePartsForMarch(pose, wpose);
+            const auto& wp = sprites_.playerParts[static_cast<int>(wpose)]
+                [sprites::artDirIndex(support::Facing::E)];
+            legsTex = &wp.legs;
+            feetTex = &wp.feet;
+        }
     }
     const core::Item& boots = p->equipment.get(core::EquipSlot::Boots);
     const core::ItemDef* bootsDef =

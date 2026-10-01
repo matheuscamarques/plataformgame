@@ -76,8 +76,16 @@ void BodySystem::tick(float /*dt*/, GameContext &ctx) {
         const auto pose = game::poseForFrameId(p.currentFrameId);
         const bool airborne = !p.jumping;
         const auto art = game::artDirFor(pose, p.facing8, airborne);
-        const auto f = airborne ? assets::playerAirAttackFrameData(pose)
-                                : assets::playerFrameData(pose, art);
+        auto f = airborne ? assets::playerAirAttackFrameData(pose)
+                          : assets::playerFrameData(pose, art);
+        // Soco andando: mesma fonte do Renderer (tronco + pernas).
+        if (!airborne && game::isMarchAttackPose(pose) &&
+            (art == support::Facing::E || art == support::Facing::W)) {
+            const auto wpose =
+                game::poseForFrameId(p.loco.currentFrame());
+            if (game::isWalkPose(wpose))
+                f = assets::playerMarchAttackFrameData(pose, wpose);
+        }
         if (f.rows) {
             p.body.rebuildFromSprite(
                 {p.getX(), p.getY()}, {p.getW(), p.getH()},

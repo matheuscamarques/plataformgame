@@ -37,7 +37,7 @@ int main() {
         assert(p.loco.currentFrame() == SpriteFrameId::PlayerWalkC);
         assert(p.loco.consumeEvents() == kStep);
     }
-    { // SwingCongela (marcha em B + 5 ticks de swing: fica no B)
+    { // MarchaSegueNoGolpe (marcha em B + swing: pernas não travam)
         Player p;
         p.moveRight = true;
         p.jumping = true;
@@ -51,8 +51,19 @@ int main() {
         assert(p.startSwing());
         for (int i = 0; i < 5; ++i) p.tick();
         assert(p.inMeleeSwing());
-        assert(p.loco.currentFrame() == SpriteFrameId::PlayerWalkB);
-        assert(p.loco.consumeEvents() == 0); // sem Step no golpe
+        // O clip avançou (B→C→D...) em vez de congelar: poeira do C sai.
+        assert(p.loco.currentFrame() == SpriteFrameId::PlayerWalkD);
+        assert(p.loco.consumeEvents() == kStep);
+    }
+    { // GolpeParadoPlanta (sem marcha no swing: volta ao idle)
+        Player p;
+        p.moveRight = true;
+        p.jumping = true;
+        p.tick();
+        assert(p.startSwing());
+        p.moveRight = false; // parou no meio do golpe
+        p.tick();
+        assert(p.loco.currentFrame() == SpriteFrameId::PlayerIdle);
     }
     { // VoltaAIdle (parou: troca de clip, recomeça do zero)
         Player p;

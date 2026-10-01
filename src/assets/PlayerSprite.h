@@ -182,6 +182,21 @@ inline DirectedPose directedPose(sprites::PlayerPose pose,
     return {pose, artDirFor(pose, f, airborne), support::isMirrored(f)};
 }
 
+// Soco andando: no chão, golpe melee/throw com marcha usa tronco do
+// golpe + pernas do walk (posePartsForMarch) em vez de congelar na
+// pose plantada. Só side-view (E/W); resto cai na pose cheia.
+inline bool isMarchAttackPose(sprites::PlayerPose p) {
+    using sprites::PlayerPose;
+    return p == PlayerPose::Punch || p == PlayerPose::PunchUp ||
+           p == PlayerPose::PunchDown || p == PlayerPose::Throw;
+}
+
+inline bool isWalkPose(sprites::PlayerPose p) {
+    using sprites::PlayerPose;
+    return p == PlayerPose::WalkA || p == PlayerPose::WalkB ||
+           p == PlayerPose::WalkC || p == PlayerPose::WalkD;
+}
+
 // Marcha via clip (fecha a Fase C): o resolve arbitra combate vs
 // marcha; o clip decide o frame. Fora da zona, passa direto.
 inline support::SpriteFrameId applyLocoFrame(

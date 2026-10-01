@@ -84,6 +84,51 @@ SpriteFrameData playerAirAttackFrameData(sprites::PlayerPose pose) {
             sprites::kPlayerPalette, sprites::kPlayerPaletteCount};
 }
 
+namespace {
+// atk: Punch/PunchUp/PunchDown/Throw → 0..3; walk: WalkA-D → 0..3.
+int marchAtkIndex(sprites::PlayerPose p) {
+    using sprites::PlayerPose;
+    switch (p) {
+        case PlayerPose::Punch:     return 0;
+        case PlayerPose::PunchUp:   return 1;
+        case PlayerPose::PunchDown: return 2;
+        case PlayerPose::Throw:     return 3;
+        default:                    return -1;
+    }
+}
+int marchWalkIndex(sprites::PlayerPose p) {
+    using sprites::PlayerPose;
+    switch (p) {
+        case PlayerPose::WalkA: return 0;
+        case PlayerPose::WalkB: return 1;
+        case PlayerPose::WalkC: return 2;
+        case PlayerPose::WalkD: return 3;
+        default:                return -1;
+    }
+}
+} // namespace
+
+SpriteFrameData playerMarchAttackFrameData(sprites::PlayerPose atk,
+                                           sprites::PlayerPose walk) {
+    const int ai = marchAtkIndex(atk);
+    const int wi = marchWalkIndex(walk);
+    if (ai < 0 || wi < 0)
+        return playerFrameData(atk, support::Facing::E);
+    static ComposedFrame cache[4][4];
+    static bool built[4][4] = {};
+    if (!built[ai][wi]) {
+        const assets::Part* pp = sprites::posePartsForMarch(atk, walk);
+        ComposedFrame& c = cache[ai][wi];
+        c.text = compose(pp, 5, sprites::kPlayerW, sprites::kPlayerH);
+        c.rows.reserve(c.text.size());
+        for (const auto& s : c.text) c.rows.push_back(s.c_str());
+        built[ai][wi] = true;
+    }
+    const ComposedFrame& c = cache[ai][wi];
+    return {c.rows.data(), sprites::kPlayerW, sprites::kPlayerH,
+            sprites::kPlayerPalette, sprites::kPlayerPaletteCount};
+}
+
 // Fonte única dos frames estáticos (item 2 da faxina): mesmos
 // rows/dimensões/paleta do switch antigo, sem repetir a tripla.
 // _LIT para dims literais (14x18/14x12, sem constante nomeada).

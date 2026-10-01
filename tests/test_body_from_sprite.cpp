@@ -8,6 +8,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdio>
+#include <string>
 
 #include "assets/SpriteFrameRegistry.h"
 #include "assets/Sprites/PlayerSprites.h"
@@ -206,6 +207,38 @@ int main() {
             assert(la->worldBox.top + la->worldBox.height <=
                    lg->worldBox.top + lg->worldBox.height + 0.01f);
         }
+    }
+    { // MarchAttackFrames (soco andando: rows do frame misto, braços
+        // vivos; perna do walk difere da plantada do soco parado)
+        static auto schema = BodySchema::humanoid(100.f, 60.f);
+        const sprites::PlayerPose atks[] = {
+            sprites::PlayerPose::Punch, sprites::PlayerPose::Throw,
+        };
+        for (auto pose : atks) {
+            const auto f = assets::playerMarchAttackFrameData(
+                pose, sprites::PlayerPose::WalkB);
+            assert(f.rows != nullptr && f.w == 40 && f.h == 40);
+            Body b;
+            b.attach(&schema);
+            b.rebuildFromSprite({0.f, 0.f}, {30.f, 50.f}, f.rows, f.w,
+                                f.h, f.pal, f.palCount, 1);
+            const PartState* l = b.find(BodyPartId::ArmL);
+            const PartState* r = b.find(BodyPartId::ArmR);
+            assert(l != nullptr && r != nullptr);
+            assert(l->worldBox.width > 0.f && l->worldBox.left > -1e5f);
+            assert(r->worldBox.width > 0.f && r->worldBox.left > -1e5f);
+            const auto g = assets::playerFrameData(pose, support::Facing::E);
+            bool differs = false;
+            for (int y = 28; y < 40; ++y)
+                if (std::string(f.rows[y]) != g.rows[y]) differs = true;
+            assert(differs);
+        }
+        // Fora de soco×marcha: cai no frame E de chão.
+        const auto fb = assets::playerMarchAttackFrameData(
+            sprites::PlayerPose::Idle, sprites::PlayerPose::WalkA);
+        const auto fe = assets::playerFrameData(sprites::PlayerPose::Idle,
+                                                support::Facing::E);
+        assert(fb.rows == fe.rows);
     }
     { // RegistryResolvesAllIds (todo id tem rows; None formular vazio)
         for (int i = 1; i < static_cast<int>(SpriteFrameId::COUNT); ++i) {

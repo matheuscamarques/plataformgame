@@ -609,12 +609,13 @@ void Game::tick() {
             }
         }
         // Passos da marcha (fecha a Fase C): poeira no contact frame
-        // (A/C sagitais), só com frame de marcha visível. Drena todo
-        // tick (sem eco).
+        // (A/C sagitais) do loco — vale marchando com ou sem soco (no
+        // soco, currentFrameId é Punch mas as pernas marcham). Drena
+        // todo tick (sem eco).
         const uint32_t locoEv = p->loco.consumeEvents();
         if ((locoEv & support::AnimEvent::Step) &&
-            (p->currentFrameId == support::SpriteFrameId::PlayerWalkA ||
-             p->currentFrameId == support::SpriteFrameId::PlayerWalkC) &&
+            (p->loco.currentFrame() == support::SpriteFrameId::PlayerWalkA ||
+             p->loco.currentFrame() == support::SpriteFrameId::PlayerWalkC) &&
             particles_)
             particles_->emitDust(
                 {p->getCenterX(), p->getY() + p->getH()}, 2, 10.f);
