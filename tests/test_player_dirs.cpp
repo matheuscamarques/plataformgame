@@ -432,14 +432,15 @@ int main() {
                 assert(std::strchr(h[y], 'G') == nullptr);
                 assert(std::strchr(h[y], 'H') == nullptr);
             }
-        // E o overlay do PunchUp cobre os erguidos (preview/hitbox
-        // intactos: mesmos pixels, outra parte).
+        // E o overlay do PunchUp cobre os erguidos (Tier-1: G lit
+        // à esq., h sombra à dir.; preview/hitbox intactos).
         for (int y = 0; y < 4; ++y) {
             assert(std::strchr(kPlayerPunchUpArms[y], 'G') != nullptr);
-            assert(std::strchr(kPlayerPunchUpArms[y], 'H') != nullptr);
+            assert(std::strchr(kPlayerPunchUpArms[y], 'h') != nullptr);
         }
     }
-    { // TorsosNoBakedArms (12 poses × 5 dirs: torso é só corpo/roupa)
+    { // TorsosNoBakedArms (12 poses × 5 dirs: torso é só corpo/roupa,
+        // nem lit (G/H) nem sombra (g/h) de braço)
         const Facing dirs[] = {Facing::E, Facing::S, Facing::SE,
                                Facing::NE, Facing::N};
         for (int i = 0; i < sprites::kPlayerPoseCount; ++i) {
@@ -451,6 +452,8 @@ int main() {
                 for (int y = 0; y < torso.h; ++y) {
                     assert(std::strchr(torso.rows[y], 'G') == nullptr);
                     assert(std::strchr(torso.rows[y], 'H') == nullptr);
+                    assert(std::strchr(torso.rows[y], 'g') == nullptr);
+                    assert(std::strchr(torso.rows[y], 'h') == nullptr);
                 }
             }
         }

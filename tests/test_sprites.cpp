@@ -71,7 +71,8 @@ int main() {
         assert(has(prow(SpriteFrameId::PlayerJump), kPlayerH, 'H'));
         assert(has(prow(SpriteFrameId::PlayerJump), kPlayerH, 'F'));
         assert(has(prow(SpriteFrameId::PlayerThrow), kPlayerH, 'T'));
-        assert(has(prow(SpriteFrameId::PlayerPunch), kPlayerH, 'H'));
+        // Soco Tier-1: punho direito sombreado ('h', não 'H').
+        assert(has(prow(SpriteFrameId::PlayerPunch), kPlayerH, 'h'));
         assert(has(kSlimeIdle, kSlimeH, 'G'));
         assert(has(kDwarfIdle, kDwarfH, 'R'));
         assert(has(kDwarfThrow, kDwarfH, 'D'));
@@ -106,13 +107,13 @@ int main() {
         auto firstK = [&](const char *const *f) { return firstRowWith(f, kPlayerH, 'K'); };
         assert(firstK(prow(SpriteFrameId::PlayerPunch)) == firstK(prow(SpriteFrameId::PlayerIdle)));
     }
-    { // PunchHasExtendedFist (≥2 'H' nas cols 24-25 em alguma row)
+    { // PunchHasExtendedFist (≥2 'h' Tier-1 nas cols 24-25, alguma row)
         const char* const* punch = prow(SpriteFrameId::PlayerPunch);
         int maxS = 0;
         for (int y = 0; y < kPlayerH; ++y) {
             int cnt = 0;
             for (int x = 24; x <= 25; ++x) {
-                if (punch[y][x] == 'H') ++cnt;
+                if (punch[y][x] == 'h') ++cnt;
             }
             if (cnt > maxS) maxS = cnt;
         }

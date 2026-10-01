@@ -60,9 +60,10 @@ int main() {
         assert(noDuplicateChars(kDwarfPal, kDwarfPalCount));
         assert(noDuplicateChars(kSlimePal, kSlimePalCount));
     }
-    { // PunchHandNotOverFace (o bug original: H e F separados)
+    { // PunchHandNotOverFace (o bug original: H e F separados;
+        // Tier-1: punho sombreado 'h', mesma separação)
         auto punch = assets::frameData(support::SpriteFrameId::PlayerPunch);
-        auto hand = bboxForChar(punch.rows, kPlayerH, 'H');
+        auto hand = bboxForChar(punch.rows, kPlayerH, 'h');
         auto face = bboxForChar(punch.rows, kPlayerH, 'F');
         assert(hand.valid && face.valid);
         assert(separated(hand, face));
@@ -96,7 +97,8 @@ int main() {
                 if (fMax < 0) continue; // sem F na row
                 for (int x = 0; x < kPlayerW; ++x) {
                     char c = f[y][x];
-                    bool isHand = (c == 'H' || c == 'G');
+                    bool isHand = (c == 'H' || c == 'G' || c == 'h' ||
+                                   c == 'g');
                     assert(!(isHand && x >= fMin && x <= fMax));
                 }
             }
