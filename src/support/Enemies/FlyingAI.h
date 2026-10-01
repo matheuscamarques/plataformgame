@@ -18,7 +18,9 @@ public:
     struct Config {
         float aggroRange = 260.f;
         float flySpeed = 5.f;
-        float orbitRadius = 70.f;
+        // 65px: espada antiaérea em pé conecta no limite (55px + margem
+        // do corpo); soco segue pedindo pulo. Melee deles (<60px) intacto.
+        float orbitRadius = 65.f;
     };
 
     FlyingAI() = default;

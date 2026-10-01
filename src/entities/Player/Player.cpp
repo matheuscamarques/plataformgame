@@ -1100,12 +1100,15 @@ void Player::updateLimbs() {
     if (inMeleeSwing()) {
         // Snapshot: direita segue a fase no eixo do golpe (recuo -5,
         // impacto +8, assentando +2 rows); esquerda segura o repouso.
+        // Antiaéreo: mirando p/ cima (N/NE/NW) o impacto estica 11
+        // rows — voador orbitando a 65px entra no arco de espada
+        // (55px + margem); side/down intactos (equilíbrio do chão).
         const core::Vec2f aim = support::aimVector(swingAim);
         float reachRows = 2.f;
         if (meleePhase == MeleePhase::Windup)
             reachRows = -5.f;
         else if (meleePhase == MeleePhase::Active)
-            reachRows = 8.f;
+            reachRows = (aim.y < 0.f) ? 11.f : 8.f;
         targetHandR_ = {shR.x + aim.x * reachRows * row,
                         shR.y + aim.y * reachRows * row};
         targetHandL_ = rest(shL, 2.f);
@@ -1155,7 +1158,7 @@ void Player::updateLimbs() {
 
 namespace {
 // Lâmina além da mão em mundo (Fase E): maior eixo do sprite menos a
-// origem (guarda), em sprite-px. Soco = punho + avanço (6 rows).
+// origem (guarda), em sprite-px. Soco = punho + avanço (8 rows).
 float bladeLengthRows(const Player* p) {
     if (const core::ItemDef* wdef = p->weaponDef()) {
         if (const auto* wd =
@@ -1164,7 +1167,7 @@ float bladeLengthRows(const Player* p) {
                              wd->spriteH - wd->originY, 0.f});
         }
     }
-    return 6.f;
+    return 8.f;
 }
 } // namespace
 

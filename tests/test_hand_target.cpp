@@ -87,6 +87,16 @@ int main() {
         const core::Vec2f sh = shoulderR(p);
         assert(p.targetHandR_.x > sh.x && p.targetHandR_.y < sh.y);
     }
+    { // ActiveUpEstende (antiaéreo: mira p/ cima estica 11 rows)
+        Player p;
+        p.body.rebuild({0.f, 0.f}, 1);
+        p.aimDir = support::AimDir::N;
+        assert(p.startSwing());
+        assert(p.updateMelee(0.10f) == MeleePhase::Active);
+        const core::Vec2f sh = shoulderR(p);
+        assert(near(p.targetHandR_.x, sh.x, 1e-3f) &&
+               near(p.targetHandR_.y, sh.y - 11.f * kRow, 1e-3f));
+    }
     { // SwingGuardaDoTick (tick não sobrescreve alvo no swing)
         Player p;
         p.body.rebuild({0.f, 0.f}, 1);
