@@ -19,6 +19,7 @@
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
 #include "support/Effects/ThrowSystem.h"
+#include "world/Generation.h"
 #include "world/World.h"
 #include "core/Vec.h"
 #include "core/Coords.h"
@@ -123,6 +124,8 @@ REGISTER_ENEMY_ARCHETYPE("slime", [] {
     a.postureRegenDelay = 1.0f;
     a.minStratum = 0;
     a.maxStratum = 99;
+    a.biomeMask = support::kBiomeGrassland | support::kBiomeForest | support::kBiomeSavanna | support::kBiomeBeach;
+    a.timeOfDay = 1;
     a.spawnWeight = 1.0f;
     a.maxAlive = 100;
     a.drops.entries.push_back({"slime_gel", 0.8f, 1, 2});
@@ -295,8 +298,10 @@ REGISTER_ENEMY_ARCHETYPE("hollow", [] {
     a.staminaMax = 30.f;
     a.staminaRegen = 20.f;
     a.staminaRegenDelay = 0.8f;
-    a.minStratum = 1;
+    a.minStratum = 0;
     a.maxStratum = 99;
+    a.biomeMask = support::kBiomeForest | support::kBiomeTaiga;
+    a.timeOfDay = 1;
     a.spawnWeight = 0.5f;
     a.maxAlive = 4;
     a.drops.entries.push_back({"iron_ore", 0.2f, 1, 1});
@@ -324,6 +329,8 @@ REGISTER_ENEMY_ARCHETYPE("rat", [] {
     a.postureRegenDelay = 1.0f;
     a.minStratum = 0;
     a.maxStratum = 99;
+    a.biomeMask = support::kBiomeGrassland | support::kBiomeSavanna | support::kBiomeForest;
+    a.timeOfDay = 1;
     a.spawnWeight = 0.6f;
     a.maxAlive = 6;
     a.packMin = 2; // matilha: ratos caçam em grupo
@@ -385,8 +392,10 @@ REGISTER_ENEMY_ARCHETYPE("imp", [] {
     a.staminaMax = 30.f;
     a.staminaRegen = 20.f;
     a.staminaRegenDelay = 0.8f;
-    a.minStratum = 3;
+    a.minStratum = 0;
     a.maxStratum = 99;
+    a.biomeMask = support::kBiomeGrassland | support::kBiomeForest | support::kBiomeSavanna | support::kBiomeDesert;
+    a.timeOfDay = 2;
     a.spawnWeight = 0.3f;
     a.maxAlive = 3;
     a.drops.entries.push_back({"iron_ore", 0.2f, 1, 1});
@@ -450,8 +459,9 @@ REGISTER_ENEMY_ARCHETYPE("undead", [] {
     a.staminaRegen = 20.f;
     a.staminaRegenDelay = 0.8f;
     a.resistances.set(core::DamageType::Physical, 0.8f);
-    a.minStratum = 2;
+    a.minStratum = 0;
     a.maxStratum = 99;
+    a.biomeMask = support::kBiomeTaiga | support::kBiomeTundra;
     a.spawnWeight = 0.4f;
     a.maxAlive = 4;
     a.drops.entries.push_back({"iron_ore", 0.25f, 1, 1});
@@ -480,8 +490,9 @@ REGISTER_ENEMY_ARCHETYPE("harpy", [] {
     a.staminaMax = 30.f;
     a.staminaRegen = 20.f;
     a.staminaRegenDelay = 0.8f;
-    a.minStratum = 1;
+    a.minStratum = 0;
     a.maxStratum = 99;
+    a.biomeMask = support::kBiomeBeach | support::kBiomeOcean;
     a.spawnWeight = 0.4f;
     a.maxAlive = 4;
     a.drops.entries.push_back({"soul_lost", 0.3f, 1, 1});
@@ -509,6 +520,8 @@ REGISTER_ENEMY_ARCHETYPE("eye", [] {
     a.postureRegenDelay = 1.0f;
     a.minStratum = 0;
     a.maxStratum = 99;
+    a.biomeMask = support::kBiomeBeach | support::kBiomeOcean;
+    a.timeOfDay = 1;
     a.spawnWeight = 0.5f;
     a.maxAlive = 5;
     a.packMin = 1;
@@ -542,8 +555,10 @@ REGISTER_ENEMY_ARCHETYPE("fire_slime", [] {
     a.postureRegen = 10.f;
     a.postureRegenDelay = 1.0f;
     a.resistances.set(core::DamageType::Fire, 0.5f);
-    a.minStratum = 2;
+    a.minStratum = 0;
     a.maxStratum = 99;
+    a.biomeMask = support::kBiomeDesert;
+    a.timeOfDay = 1;
     a.spawnWeight = 0.2f;
     a.maxAlive = 100; // compartilha o cap do slime (mesmo kind)
     a.tint = core::rgba(255, 150, 60, 255);
@@ -572,8 +587,10 @@ REGISTER_ENEMY_ARCHETYPE("ice_slime", [] {
     a.postureRegenDelay = 1.0f;
     a.resistances.set(core::DamageType::Frost, 0.5f);
     a.resistances.set(core::DamageType::Fire, 1.3f);
-    a.minStratum = 3;
+    a.minStratum = 0;
     a.maxStratum = 99;
+    a.biomeMask = support::kBiomeTaiga | support::kBiomeTundra;
+    a.timeOfDay = 1;
     a.spawnWeight = 0.2f;
     a.maxAlive = 100;
     a.tint = core::rgba(150, 210, 255, 255);
@@ -690,8 +707,10 @@ REGISTER_ENEMY_ARCHETYPE("spider", [] {
     a.staminaMax = 30.f;
     a.staminaRegen = 20.f;
     a.staminaRegenDelay = 0.8f;
-    a.minStratum = 1;
+    a.minStratum = 0;
     a.maxStratum = 99;
+    a.biomeMask = support::kBiomeForest;
+    a.timeOfDay = 1;
     a.spawnWeight = 0.4f;
     a.maxAlive = 4;
     a.packMin = 1;
@@ -722,8 +741,10 @@ REGISTER_ENEMY_ARCHETYPE("serpent", [] {
     a.staminaMax = 30.f;
     a.staminaRegen = 20.f;
     a.staminaRegenDelay = 0.8f;
-    a.minStratum = 2;
+    a.minStratum = 0;
     a.maxStratum = 99;
+    a.biomeMask = support::kBiomeDesert;
+    a.timeOfDay = 1;
     a.spawnWeight = 0.3f;
     a.maxAlive = 3;
     a.drops.entries.push_back({"slime_gel", 0.3f, 1, 1});
@@ -754,8 +775,10 @@ REGISTER_ENEMY_ARCHETYPE("wraith", [] {
     a.staminaRegenDelay = 0.8f;
     a.resistances.set(core::DamageType::Physical, 0.6f);
     a.resistances.set(core::DamageType::Fire, 1.2f);
-    a.minStratum = 3;
+    a.minStratum = 0;
     a.maxStratum = 99;
+    a.biomeMask = support::kBiomeForest | support::kBiomeTaiga | support::kBiomeTundra | support::kBiomeBeach | support::kBiomeOcean;
+    a.timeOfDay = 2;
     a.spawnWeight = 0.3f;
     a.maxAlive = 3;
     a.drops.entries.push_back({"soul_lost", 0.3f, 1, 1});

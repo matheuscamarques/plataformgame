@@ -146,6 +146,17 @@ inline constexpr float H_WET = 0.57f;
 
 enum class Biome { Ocean, Beach, Desert, Savanna, Grassland, Forest, Taiga, Tundra, COUNT };
 
+// Bit do bioma p/ EnemyArchetype::biomeMask (ordem = enum acima).
+inline constexpr uint8_t kBiomeOcean = 1u << 0;
+inline constexpr uint8_t kBiomeBeach = 1u << 1;
+inline constexpr uint8_t kBiomeDesert = 1u << 2;
+inline constexpr uint8_t kBiomeSavanna = 1u << 3;
+inline constexpr uint8_t kBiomeGrassland = 1u << 4;
+inline constexpr uint8_t kBiomeForest = 1u << 5;
+inline constexpr uint8_t kBiomeTaiga = 1u << 6;
+inline constexpr uint8_t kBiomeTundra = 1u << 7;
+static_assert(static_cast<int>(Biome::COUNT) <= 8, "mask de bioma estoura uint8");
+
 // Clima do tile (tx,ty); ocean/coastal têm precedência (mar virou bioma).
 Biome pickBiome(float temp, float humid, bool ocean, bool coastal);
 // Tile de topo para o bioma (subsolo não muda).

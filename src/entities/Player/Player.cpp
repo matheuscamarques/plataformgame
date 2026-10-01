@@ -361,6 +361,9 @@ void Player::applyClass(core::PlayerClass klass) {
     inventory = core::Inventory{};
     attuned.clear();
     souls = 0;
+    xpDecayToast_.clear();
+    xpDecayToastT_ = -99.f;
+    xpDecayToasted_.clear();
     for (const auto& id : def.equipment) {
         if (core::ItemRegistry::instance().find(id))
             equipment.equip(core::Item{id, 1});

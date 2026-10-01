@@ -11,8 +11,10 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <cmath>
 
+#include "core/Coords.h"
 #include "core/ItemDef.h"
 #include "core/Time.h"
+#include "world/Stratum.h"
 #include "core/VecSfml.h"
 #include "core/Random.h"
 #include "entities/Player/Player.h"
@@ -73,9 +75,24 @@ void DropSystem::tick(float dt, GameContext &ctx) {
             const float d2 = dx * dx + dy * dy;
 
             if (d2 < kCollectRadius * kCollectRadius) {
+                // Decaimento por estrato (Fatia 1): acima do nível
+                // natural o XP definha (piso 1, nunca zero). Toast
+                // sutil uma vez por estrato (campos no Player).
+                const int ty =
+                    core::worldToTile(core::WorldPos{o.pos.x, o.pos.y}).y;
+                const int stratum = stratumAt(ty);
+                const float decay = stratumXpMult(
+                    stratum, ctx.player->attrs.level());
+                int gain = static_cast<int>(
+                    o.value * ctx.player->tarotFx.soulsGainMult * decay);
+                if (gain < 1 && o.value > 0) gain = 1;
+                if (decay < 1.f &&
+                    ctx.player->xpDecayToasted_.insert(stratum).second) {
+                    ctx.player->xpDecayToast_ =
+                        "Este lugar já não te ensina nada.";
+                    ctx.player->xpDecayToastT_ = core::Time::elapsed();
+                }
                 // Roda da Fortuna: souls da coleta × agregado.
-                const int gain = static_cast<int>(
-                    o.value * ctx.player->tarotFx.soulsGainMult);
                 collected_ += gain;
                 // Souls (F1): XP coletado credita a carteira do player.
                 ctx.player->souls += gain;

@@ -6,6 +6,7 @@
  */
 
 #pragma once
+#include <cstdint>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <string>
@@ -47,6 +48,22 @@ struct EnemyArchetype {
     int maxStratum = 99;
     float spawnWeight = 1.0f;
     int maxAlive = 100;
+
+    // Roster de superfície: bitmask de biomas (bits em
+    // world/Generation.h, ordem = enum Biome); 0 = qualquer bioma.
+    uint8_t biomeMask = 0;
+    // Horário: 0 = qualquer, 1 = só dia, 2 = só noite.
+    uint8_t timeOfDay = 0;
+
+    // Filtro de spawn (puro, testável): faixa de estrato SEM bypass
+    // de S0, bioma e horário. biomeBit 0xFF = sem mundo (tudo passa).
+    bool allowsSpawn(uint8_t biomeBit, bool isNight, int stratum) const {
+        if (stratum < minStratum || stratum > maxStratum) return false;
+        if (biomeMask != 0 && (biomeMask & biomeBit) == 0) return false;
+        if (timeOfDay == 1 && isNight) return false;
+        if (timeOfDay == 2 && !isNight) return false;
+        return true;
+    }
 
     // Matilha (Minecraft-style): quantos nascem juntos no mesmo ponto.
     // 1/1 = solo. Rato 2-3 (caça em grupo), olho 1-2.

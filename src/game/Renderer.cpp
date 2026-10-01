@@ -1043,6 +1043,28 @@ void Game::render()
             window->draw(tt);
         }
     }
+    // Decaimento de XP (Fatia 1): toast sutil 3s na primeira coleta
+    // decaída de cada estrato (one-shot por personagem; texto e
+    // timestamp vêm do Player, preenchidos no DropSystem).
+    {
+        const float age =
+            core::Time::elapsed() - player.get()->xpDecayToastT_;
+        if (!player.get()->xpDecayToast_.empty() && age >= 0.f &&
+            age < 3.f) {
+            sf::Text tt;
+            tt.setFont(font);
+            tt.setString(support::utf8(player.get()->xpDecayToast_));
+            tt.setCharacterSize(18);
+            const sf::Color gold(255, 220, 100,
+                                 static_cast<sf::Uint8>(255.f * (1.f - age / 3.f)));
+            tt.setFillColor(gold);
+            tt.setOutlineColor(sf::Color::Black);
+            tt.setOutlineThickness(1);
+            const float tw = tt.getLocalBounds().width;
+            tt.setPosition((viewW_ - tw) * 0.5f, viewH_ * 0.5f - 90.f);
+            window->draw(tt);
+        }
+    }
 
     // Menu Dark Souls: por cima da hotbar (view default ativa).
     // Dependências já injetadas no tick (App); aqui só desenha.

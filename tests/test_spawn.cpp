@@ -9,6 +9,7 @@
 #include <cstdio>
 #include "core/Config.h"
 #include "entities/Player/Player.h"
+#include "support/Enemies/EnemyArchetype.h"
 #include "support/Enemies/EnemySystem.h"
 #include "support/GameContext.h"
 #include "support/Enemies/SpawnSystem.h"
@@ -104,6 +105,56 @@ int main() {
         ctx.enemies = &enemies;
         ss.tick(1.f / 30.f, ctx);
         assert(enemies.count() == 0u);
+    }
+    { // S0RespeitaFaixa (bug do bypass: blaze/golem não nascem em S0)
+        const EnemyArchetype* blaze =
+            ArchetypeRegistry::instance().find("blaze");
+        const EnemyArchetype* golem =
+            ArchetypeRegistry::instance().find("golem");
+        const EnemyArchetype* slime =
+            ArchetypeRegistry::instance().find("slime");
+        assert(blaze && golem && slime);
+        assert(!blaze->allowsSpawn(0xFF, false, 0));
+        assert(!blaze->allowsSpawn(0xFF, true, 0));
+        assert(!golem->allowsSpawn(0xFF, false, 0));
+        assert(slime->allowsSpawn(support::kBiomeGrassland, false, 0));
+        // Teto da faixa via cópia (slime vai até S99 de verdade).
+        assert(slime->allowsSpawn(0xFF, false, 99));
+        EnemyArchetype capped = *slime;
+        capped.maxStratum = 5;
+        assert(capped.allowsSpawn(0xFF, false, 5));
+        assert(!capped.allowsSpawn(0xFF, false, 6));
+    }
+    { // RosterBiomaHorario (dia/grama ≠ noite/grama; olho é diurno)
+        // Esqueleto segue S2+ elite (min 2, fora do roster S0).
+        const EnemyArchetype* slime =
+            ArchetypeRegistry::instance().find("slime");
+        const EnemyArchetype* eye =
+            ArchetypeRegistry::instance().find("eye");
+        const EnemyArchetype* imp =
+            ArchetypeRegistry::instance().find("imp");
+        assert(slime && eye && imp);
+        assert(slime->allowsSpawn(support::kBiomeGrassland, false, 0));
+        assert(!slime->allowsSpawn(support::kBiomeGrassland, true, 0));
+        assert(!slime->allowsSpawn(support::kBiomeDesert, false, 0));
+        assert(imp->allowsSpawn(support::kBiomeGrassland, true, 0));
+        assert(!imp->allowsSpawn(support::kBiomeGrassland, false, 0));
+        assert(eye->allowsSpawn(support::kBiomeBeach, false, 0));
+        assert(!eye->allowsSpawn(support::kBiomeBeach, true, 0));
+        assert(!eye->allowsSpawn(support::kBiomeGrassland, false, 0));
+    }
+    { // S0NaoEsvazia (dia e noite em Grassland têm candidato)
+        bool day = false, night = false;
+        for (const auto& key : ArchetypeRegistry::instance().keys()) {
+            const EnemyArchetype* a =
+                ArchetypeRegistry::instance().find(key);
+            if (!a) continue;
+            if (a->allowsSpawn(support::kBiomeGrassland, false, 0))
+                day = true;
+            if (a->allowsSpawn(support::kBiomeGrassland, true, 0))
+                night = true;
+        }
+        assert(day && night);
     }
     { // IntervalGatesSpawns (1 tick isolado não spawna)
         Player p;

@@ -29,6 +29,22 @@ struct XPOrb {
     bool         magnetized = false;
 };
 
+// Nível natural por estrato (S0..S10): economia honesta, sem porta.
+// Matar bem abaixo do nível rende ~nada (piso 1 soul, nunca zero);
+// backtrack por material continua livre. Sem código de gate.
+inline constexpr int kNaturalLevel[11] = {17, 25, 33, 41, 49,
+                                          57, 65, 73, 81, 89, 97};
+
+// Multiplicador de XP por estrato × nível (puro, testável).
+inline float stratumXpMult(int stratum, int playerLevel) {
+    const int s = stratum < 0 ? 0 : (stratum > 10 ? 10 : stratum);
+    const int over = playerLevel - kNaturalLevel[s];
+    if (over <= 0) return 1.f;
+    float m = 1.f;
+    for (int i = 0; i < over; ++i) m *= 0.6f;
+    return m < 0.01f ? 0.01f : m;
+}
+
 // Orbe de item (fase 2): mesma física/magnet do XP, com payload de
 // inventário. pickupDelay impede sugar no frame do spawn; lifetime 60s
 // (chão guarda o que não coube). Render: rect na cor da raridade.

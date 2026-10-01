@@ -21,6 +21,7 @@
 #include "EnemyArchetype.h"
 #include "support/Debug/DebugFeed.h"
 #include "support/GameContext.h"
+#include "world/Generation.h"
 #include "world/Stratum.h"
 #include "world/World.h"
 #include "core/Coords.h"
@@ -102,8 +103,29 @@ void SpawnSystem::tick(float dt, GameContext &ctx) {
         static_cast<std::size_t>(effectiveBudget))
         return;
 
-    // Candidatos data-driven: faixa + maxAlive por archetype, peso
-    // ponderado. Sorteio único por janela.
+    // Roster por bioma × horário no tile do player (biomas são
+    // regionais; o anel de spawn cruza a borda, vale o centro).
+    // Sem mundo: bit tudo-1 (bioma passa; estrato/horário valem).
+    uint8_t biomeBit = 0xFF;
+    if (ctx.world) {
+        const uint32_t seed = ctx.world->getSeed();
+        const core::TilePos tp = core::worldToTile({px, py});
+        const int surfY = support::surfaceHeight(tp.x, seed);
+        const support::Biome b = support::pickBiome(
+            support::temperature(tp.x, tp.y, seed),
+            support::humidity(tp.x, tp.y, seed),
+            support::isOceanColumn(tp.x, seed),
+            support::isCoastal(surfY));
+        biomeBit = static_cast<uint8_t>(1u << static_cast<int>(b));
+    }
+    const bool isNight =
+        ctx.dayNight
+            ? ctx.dayNight->sample().sunIntensity < 0.20f
+            : false;
+
+    // Candidatos data-driven: faixa (sem bypass de S0) + bioma +
+    // horário + maxAlive por archetype, peso ponderado. Sorteio único
+    // por janela.
     struct Cand {
         std::string key;
         float weight;
@@ -113,8 +135,7 @@ void SpawnSystem::tick(float dt, GameContext &ctx) {
     for (const auto &key : ArchetypeRegistry::instance().keys()) {
         const EnemyArchetype *a = ArchetypeRegistry::instance().find(key);
         if (!a) continue;
-        // No estrato 0 todos os inimigos podem nascer; fora dele respeita faixa
-        if (stratum != 0 && (stratum < a->minStratum || stratum > a->maxStratum)) continue;
+        if (!a->allowsSpawn(biomeBit, isNight, stratum)) continue;
         if (countAlive(*ctx.enemies, a->kind) >= a->maxAlive) continue;
         cands.push_back({key, a->spawnWeight});
         totalW += a->spawnWeight;

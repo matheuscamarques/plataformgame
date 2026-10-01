@@ -117,6 +117,49 @@ int main() {
         for (int i = 0; i < 60; ++i) drops.tick(1.f / 30.f, ctx);
         assert(p.souls >= 100); // 100 do XP (+soul item se rolou)
     }
+    { // DecayTable (S0 natural até 17; 0.6^over; piso nunca zero)
+        using support::stratumXpMult;
+        assert(stratumXpMult(0, 15) == 1.f);
+        assert(stratumXpMult(0, 17) == 1.f);
+        const float m18 = stratumXpMult(0, 18);
+        assert(m18 > 0.59f && m18 < 0.61f); // 0.6^1
+        const float m25 = stratumXpMult(0, 25);
+        assert(m25 > 0.016f && m25 < 0.018f); // 0.6^8
+        assert(stratumXpMult(0, 60) == 0.01f); // piso
+        assert(stratumXpMult(99, 1) == 1.f);  // estrato clamp em S10
+        assert(stratumXpMult(-5, 1) == 1.f);  // negativo clamp em S0
+        assert(stratumXpMult(1, 25) == 1.f);  // S1 natural até 25
+    }
+    { // DecayCollectsLess (Lv25 em S0: orbe 100 vira ~1, nunca 0)
+        Player p;
+        p.souls = 0;
+        p.attrs.set(core::Attr::Strength, 34); // spent 24 → Lv25
+        assert(p.attrs.level() == 25);
+        DropSystem drops;
+        GameContext ctx{};
+        ctx.player = &p;
+        ctx.drops = &drops;
+        drops.spawnXP({p.getCenterX(), p.getCenterY()}, 100);
+        for (int i = 0; i < 5; ++i) drops.tick(1.f / 30.f, ctx);
+        assert(p.souls == 1); // 100*0.0168=1.68 → 1 (piso, nunca 0)
+        assert(!p.xpDecayToast_.empty()); // toast one-shot disparou
+        assert(p.xpDecayToasted_.count(0) == 1u);
+    }
+    { // DecayCollectsFullBelowCap (Lv15 em S0: 100% + sem toast)
+        Player p;
+        p.souls = 0;
+        p.attrs.set(core::Attr::Strength, 24); // spent 14 → Lv15
+        assert(p.attrs.level() == 15);
+        DropSystem drops;
+        GameContext ctx{};
+        ctx.player = &p;
+        ctx.drops = &drops;
+        drops.spawnXP({p.getCenterX(), p.getCenterY()}, 100);
+        for (int i = 0; i < 5; ++i) drops.tick(1.f / 30.f, ctx);
+        assert(p.souls == 100);
+        assert(p.xpDecayToast_.empty());
+        assert(p.xpDecayToasted_.empty());
+    }
     { // SoulUse (almas consumíveis viram souls na hora)
         Player p;
         p.souls = 0; // seed dá 100k: zera p/ medir o consumível

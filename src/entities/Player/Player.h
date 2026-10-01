@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <set>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -98,6 +99,14 @@ class Player : public Entity
         // (RunManager); R voluntário mantém; respawn não mexe.
         int souls = 0;
         void addSouls(int v) { souls += v; }
+
+        // Toast de decaimento de XP (Fatia 1): texto + timestamp
+        // (Time::elapsed, fade no Renderer como swapToast_) + estratos
+        // já avisados (one-shot por personagem; applyClass limpa).
+        // DropSystem preenche na primeira coleta decaída do estrato.
+        std::string xpDecayToast_;
+        float xpDecayToastT_ = -99.f;
+        std::set<int> xpDecayToasted_;
 
         // Nome do personagem (criação; save futuro). Vazio = sem nome.
         std::string name;
