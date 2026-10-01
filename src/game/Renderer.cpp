@@ -1311,10 +1311,13 @@ void Game::drawPlayerEquipment(Player *p) {
         window->draw(spr);
     };
 
-    // Elmo 12x5: topo 2 rows acima do topo da cabeça.
+    // Elmo 12x8 como coroa: topo 6 rows acima do topo da hitbox da
+    // cabeça (= base do rosto, que começa onde o cabelo None termina),
+    // faixa visível sobre o cabelo e olhos livres. Antes cobria os
+    // olhos (banda sólida sem slits, que não acompanharia as poses).
     if (mHelm >= 0)
         drawFullWidth(sprites_.helm[mHelm], sprites::kHelmW,
-                      support::BodyPartId::Head, 0.f, -2.f);
+                      support::BodyPartId::Head, 0.f, -6.f);
     // Peitoral 12x8: topo no topo do torso.
     if (mChest >= 0)
         drawFullWidth(sprites_.chest[mChest], sprites::kChestW,
