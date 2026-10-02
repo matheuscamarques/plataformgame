@@ -36,12 +36,15 @@ bool hasChar(const assets::Part& p, const char* chars) {
     return false;
 }
 
-// Simetria módulo-espelho: pares esq/dir (G/H braços, L/B pernas)
-// valem como iguais — vista simétrica de verdade.
+// Simetria módulo-espelho: pares esq/dir (G/H braços, L/B pernas,
+// incluindo sombras Tier-1 g/h e l/b) valem como iguais — vista
+// simétrica de verdade.
 bool symEq(char a, char b) {
     if (a == b) return true;
     if ((a == 'G' && b == 'H') || (a == 'H' && b == 'G')) return true;
     if ((a == 'L' && b == 'B') || (a == 'B' && b == 'L')) return true;
+    if ((a == 'g' && b == 'h') || (a == 'h' && b == 'g')) return true;
+    if ((a == 'l' && b == 'b') || (a == 'b' && b == 'l')) return true;
     return false;
 }
 
